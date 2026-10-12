@@ -254,69 +254,218 @@ HTML_TEMPLATE = r"""<!doctype html>
     const minSpeed = Math.min(...speeds), speedSpan = Math.max(...speeds) - minSpeed || 1;
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
 
-        /* ---------- 3D galaxy morphology: Hernquist bulge + exponential / sech^2 disk ---------- */
-        const GALAXY={bulgeCount:120,diskCount:680,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
-            diskScaleLength:4.0,diskScaleHeight:0.28,diskMax:maxRadius,diskMin:0.70,
-            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.42};
-        function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
-            t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-        // Hernquist (1990) inverse CDF: r = a*sqrt(u)/(1-sqrt(u)); isotropic spherical distribution gives a true 3D spherical concentration.
-        function sampleBulge(rng){
-            let r;
-            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.hernquistA*s/(1-s);}
-            while(r>GALAXY.bulgeMax||r<GALAXY.bulgeKeepOut);
-            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
-        }
-        function sampleDisk(rng){
-            let R;
-            do{R=-GALAXY.diskScaleLength*(Math.log(1-rng())+Math.log(1-rng()));}
-            while(R>GALAXY.diskMax||R<GALAXY.diskMin);
-            const phi=2*Math.PI*rng();
-            // sech^2 vertical profile: z = z0 * atanh(2u-1) / 2 samples rho ~ sech^2(z/z0).
-            const u=Math.min(Math.max(rng(),1e-4),1-1e-4);
-            const z=GALAXY.diskScaleHeight*0.5*Math.log(u/(1-u));
-            return[R*Math.cos(phi),R*Math.sin(phi),z];
-        }
-        function sampleHalo(rng){
-            let r;
-            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.haloA*s/(1-s);}
-            while(r>GALAXY.haloMax||r<GALAXY.haloMin);
-            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
-        }
-        // Particles are ordered bulge then disk; kind selects the orbit initial conditions and colour.
-        const particles=(()=>{
-            const rng=mulberry32(3198),out=[];
-            const randomAxis=()=>{
-                const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-                return[sinT*Math.cos(phi),sinT*Math.sin(phi),cosT];
+        /* ---------- 1. Parameter Object (Astrophysical baseline for NGC 3198) ---------- */
+        const GALAXY_PARAMS = {
+            // Particle Count & Population Ratios (Rule 1: exactly 800 stars)
+            totalStars: 800,
+            bulgeRatio: 0.15, // ~15% bulge (~120 stars)
+            diskRatio: 0.85,  // ~85% disk (~680 stars)
+            get bulgeCount() { return Math.round(this.totalStars * this.bulgeRatio); }, // 120
+            get diskCount() { return this.totalStars - this.bulgeCount; },              // 680
+
+            // Accurate NGC 3198 Morphology (Rule 2)
+            // Negligible Bulge: subtle, dense central concentration merging smoothly into inner disk
+            bulgeScaleRadius: 0.75, // kpc - scale radius of core concentration
+            bulgeMaxRadius: 2.2,    // kpc - outer limit of subtle bulge merging into disk
+            // Exponential Disk & Thickness: clean exponential radial profile with physical scale height
+            diskScaleLength: 3.8,   // kpc - exponential radial scale length (photometric Rd)
+            diskScaleHeight: 0.5,   // kpc - physical vertical scale height (~0.5 kpc)
+            diskMinRadius: 0.2,     // kpc - inner boundary to prevent singularity
+            diskMaxRadius: maxRadius, // kpc - outer boundary matching SPARC extent
+
+            // Physics Implementation - Separated Dynamics (Rule 3)
+            // Disk (Ordered Differential Rotation): flat rotation curve where tangential velocity flattens out
+            vFlat: 150.0,           // km/s - asymptotic flat rotation velocity for NGC 3198
+            coreRadius: 1.8,        // kpc - core softening transition radius
+            // Bulge (Dispersion-Supported): 3D velocity dispersion tensor (chaotic drift)
+            bulgeVelocityDispersion: 0.002, // kpc/Myr - calibrated dispersion keeping core bound over timeline
+
+            // Simulation & rendering parameters
+            kmSToKpcMyr: KM_S_TO_KPC_MYR, // conversion factor (1 km/s = ~0.001023 kpc/Myr)
+            timeScale: 1.0,         // Myr per unit t
+            starBaseRadius: 0.18,   // base visual sphere radius
+            blackHoleRadius: 0.42   // central feature visual radius
+        };
+
+        // Deterministic PRNG (Mulberry32)
+        function mulberry32(seed) {
+            return () => {
+                seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+                let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+                t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
             };
-            for(let i=0;i<GALAXY.bulgeCount;i++){
-                const p=sampleBulge(rng);
-                out.push({kind:'bulge',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1});
-            }
-            for(let i=0;i<GALAXY.diskCount;i++){
-                const p=sampleDisk(rng);
-                out.push({kind:'disk',position:p,radius:Math.hypot(p[0],p[1]),axis:randomAxis(),speedScale:1});
-            }
-            for(let i=0;i<GALAXY.haloCount;i++){
-                const p=sampleHalo(rng);
-                out.push({kind:'halo',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1,warm:rng()<0.12});
-            }
-            return out;
-        })();
-        const indicesOf=kind=>particles.map((p,i)=>p.kind===kind?i:-1).filter(i=>i>=0);
-        const bulgeIndices=indicesOf('bulge'),diskIndices=indicesOf('disk'),haloIndices=indicesOf('halo');
-        const vObs=DATA.rotation.map(p=>p.observed_kms);
-        function observedVelocity(radius){
-            const last=radii.length-1;
-            if(radius<=radii[0])return vObs[0]*radius/radii[0];
-            if(radius>=radii[last])return vObs[last];
-            let low=0,high=last;
-            while(high-low>1){const m=(low+high)>>1;if(radii[m]<=radius)low=m;else high=m;}
-            return vObs[low]+(radius-radii[low])/(radii[high]-radii[low])*(vObs[high]-vObs[low]);
         }
+
+        // Box-Muller transform: converts pairs of uniform random numbers to standard normal distribution
+        function boxMuller(mean = 0, stdDev = 1, rng = Math.random) {
+            let u1 = rng();
+            let u2 = rng();
+            while (u1 <= 1e-15) u1 = rng(); // Guard against log(0)
+            const mag = Math.sqrt(-2.0 * Math.log(u1));
+            return mean + stdDev * mag * Math.cos(2.0 * Math.PI * u2);
+        }
+
+        // Sample subtle, dense bulge concentration merging smoothly into inner disk (Rule 2)
+        function sampleBulgeStar(rng, params) {
+            const r_xy = params.bulgeScaleRadius * Math.sqrt(-2.0 * Math.log(Math.max(1e-6, rng())));
+            const phi = 2.0 * Math.PI * rng();
+            const x = r_xy * Math.cos(phi);
+            const y = r_xy * Math.sin(phi);
+            const z = boxMuller(0, params.diskScaleHeight * 0.7, rng);
+            return [x, y, z];
+        }
+
+        // Sample clean exponential disk with isothermal sech^2 vertical profile (Rule 2)
+        function sampleDiskStar(rng, params) {
+            let R;
+            do {
+                const u1 = Math.max(1e-7, rng()), u2 = Math.max(1e-7, rng());
+                R = -params.diskScaleLength * (Math.log(u1) + Math.log(u2));
+            } while (R < params.diskMinRadius || R > params.diskMaxRadius);
+
+            const phi = 2.0 * Math.PI * rng();
+            const u = Math.min(Math.max(rng(), 1e-4), 1.0 - 1e-4);
+            const z = params.diskScaleHeight * 0.5 * Math.log(u / (1.0 - u));
+
+            return [R * Math.cos(phi), R * Math.sin(phi), z, R, phi];
+        }
+
+        // Flat rotation curve: v(R) flattens out, angular velocity omega(R) = v(R)/R decreases with R (Rule 3)
+        function getDiskOmega(R, params) {
+            const vTangential = params.vFlat * (R / Math.hypot(R, params.coreRadius)); // km/s
+            const omegaKmSPerKpc = vTangential / R; // km/s / kpc
+            return omegaKmSPerKpc * params.kmSToKpcMyr; // rad / Myr
+        }
+
+        /* ---------- 2. Creation Function with Initial State Storage in userData (Rule 4) ---------- */
+        function createGalaxy(scene, params = GALAXY_PARAMS, seed = 3198) {
+            const rng = mulberry32(seed);
+            const totalCount = params.totalStars;
+            const bulgeCount = params.bulgeCount;
+            const diskCount = params.diskCount;
+
+            const geometry = new THREE.SphereGeometry(params.starBaseRadius, 10, 8);
+            const material = new THREE.MeshBasicMaterial({ toneMapped: false });
+            const starMesh = new THREE.InstancedMesh(geometry, material, totalCount);
+            starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+            starMesh.frustumCulled = false;
+            starMesh.renderOrder = 1;
+
+            // Persistent state arrays stored in userData for deterministic timeline evaluation
+            starMesh.userData = {
+                count: totalCount,
+                bulgeCount: bulgeCount,
+                diskCount: diskCount,
+                initialPositions: new Float32Array(totalCount * 3), // [x0, y0, z0]
+                initialRadii: new Float32Array(totalCount),         // cylindrical R0
+                initialAngles: new Float32Array(totalCount),        // azimuthal angle theta0
+                velocities: new Float32Array(totalCount * 3),       // [vx, vy, vz] for 3D dispersion
+                omegas: new Float32Array(totalCount),               // orbital angular velocity omega
+                kinds: new Array(totalCount)                        // 'bulge' | 'disk'
+            };
+
+            const { initialPositions, initialRadii, initialAngles, velocities, omegas, kinds } = starMesh.userData;
+            const matrix = new THREE.Matrix4();
+            const color = new THREE.Color();
+            const warmCore = new THREE.Color('#FFE8D6');
+            const pureWhite = new THREE.Color('#FFFFFF');
+            const diskBlue = new THREE.Color('#9FC5E8');
+
+            // Bulge population (~15% = 120 stars): Dispersion-supported 3D drift
+            for (let i = 0; i < bulgeCount; i++) {
+                const [x0, y0, z0] = sampleBulgeStar(rng, params);
+                const r0 = Math.hypot(x0, y0);
+                const theta0 = Math.atan2(y0, x0);
+
+                // 3D isotropic velocity dispersion tensor: vx, vy, vz ~ N(0, sigma^2)
+                const vx = boxMuller(0, params.bulgeVelocityDispersion, rng);
+                const vy = boxMuller(0, params.bulgeVelocityDispersion, rng);
+                const vz = boxMuller(0, params.bulgeVelocityDispersion, rng);
+
+                const i3 = i * 3;
+                initialPositions[i3] = x0;
+                initialPositions[i3 + 1] = y0;
+                initialPositions[i3 + 2] = z0;
+                initialRadii[i] = r0;
+                initialAngles[i] = theta0;
+                velocities[i3] = vx;
+                velocities[i3 + 1] = vy;
+                velocities[i3 + 2] = vz;
+                omegas[i] = 0.0;
+                kinds[i] = 'bulge';
+
+                const scale = 0.30;
+                color.copy(warmCore).lerp(pureWhite, Math.min(1.0, r0 / params.bulgeMaxRadius));
+                matrix.makeScale(scale, scale, scale).setPosition(x0, y0, z0);
+                starMesh.setMatrixAt(i, matrix);
+                starMesh.setColorAt(i, color);
+            }
+
+            // Disk population (~85% = 680 stars): Ordered differential rotation
+            for (let i = bulgeCount; i < totalCount; i++) {
+                const [x0, y0, z0, r0, theta0] = sampleDiskStar(rng, params);
+                const omega = getDiskOmega(r0, params);
+
+                const i3 = i * 3;
+                initialPositions[i3] = x0;
+                initialPositions[i3 + 1] = y0;
+                initialPositions[i3 + 2] = z0;
+                initialRadii[i] = r0;
+                initialAngles[i] = theta0;
+                velocities[i3] = 0.0;
+                velocities[i3 + 1] = 0.0;
+                velocities[i3 + 2] = 0.0;
+                omegas[i] = omega;
+                kinds[i] = 'disk';
+
+                const scale = 0.32 + 0.12 * (r0 / params.diskMaxRadius);
+                color.copy(pureWhite).lerp(diskBlue, Math.min(1.0, r0 / (params.diskMaxRadius * 0.7)));
+                matrix.makeScale(scale, scale, scale).setPosition(x0, y0, z0);
+                starMesh.setMatrixAt(i, matrix);
+                starMesh.setColorAt(i, color);
+            }
+
+            starMesh.instanceColor.needsUpdate = true;
+            starMesh.instanceMatrix.needsUpdate = true;
+            scene.add(starMesh);
+
+            return starMesh;
+        }
+
+        /* ---------- 3. Absolute-Time Update Loop (Rule 4) ---------- */
+        // Deterministic evaluation from time zero:
+        // - Bulge position = initialPosition + (velocity * scaledT)
+        // - Disk angle = initialAngle + (omega * scaledT)
+        // Prevents cumulative drift and particle explosion when scrubbing the timeline
+        function updateGalaxy(starMesh, t, params = GALAXY_PARAMS) {
+            const scaledT = t * params.timeScale;
+            const { initialPositions, initialRadii, initialAngles, velocities, omegas, kinds, count } = starMesh.userData;
+            const matArray = starMesh.instanceMatrix.array;
+
+            for (let i = 0; i < count; i++) {
+                const off = i * 16;
+                const i3 = i * 3;
+
+                if (kinds[i] === 'bulge') {
+                    // Bulge: 3D chaotic dispersion drift
+                    matArray[off + 12] = initialPositions[i3]     + velocities[i3]     * scaledT;
+                    matArray[off + 13] = initialPositions[i3 + 1] + velocities[i3 + 1] * scaledT;
+                    matArray[off + 14] = initialPositions[i3 + 2] + velocities[i3 + 2] * scaledT;
+                } else {
+                    // Disk: Ordered differential circular rotation
+                    const r = initialRadii[i];
+                    const theta = initialAngles[i] + omegas[i] * scaledT;
+                    matArray[off + 12] = r * Math.cos(theta);
+                    matArray[off + 13] = r * Math.sin(theta);
+                    matArray[off + 14] = initialPositions[i3 + 2]; // preserve vertical scale height offset
+                }
+            }
+
+            starMesh.instanceMatrix.needsUpdate = true;
+        }
+
+        const vObs=DATA.rotation.map(p=>p.observed_kms);
         const radii=DATA.rotation.map(p=>p.radius_kpc);
         const vBary=DATA.rotation.map(p=>p.baryonic_kms);
         function nfwVelocityModel(massSolar,scaleRadius) {
@@ -332,53 +481,6 @@ HTML_TEMPLATE = r"""<!doctype html>
             };
         }
         function haloCurve(massT,scaleRadius) {return radii.map(nfwVelocityModel(massT*1e12,scaleRadius));}
-        function baryonicVelocity(radius) {
-            if(radius<=radii[0])return vBary[0]*radius/radii[0];
-            const last=radii.length-1;
-            if(radius>=radii[last])return vBary[last]*Math.sqrt(radii[last]/radius);
-            let low=0,high=last;
-            while(high-low>1){const middle=Math.floor((low+high)/2);if(radii[middle]<=radius)low=middle;else high=middle;}
-            const fraction=(radius-radii[low])/(radii[high]-radii[low]);
-            return vBary[low]+fraction*(vBary[high]-vBary[low]);
-        }
-        function orbitDerivative(state,haloVelocity) {
-            const [x,y,z,vx,vy,vz]=state;
-            const radius=Math.max(Math.hypot(x,y,z),1e-5);
-            const baryonic=baryonicVelocity(radius);
-            const halo=haloVelocity(radius);
-            const k=(baryonic*baryonic+halo*halo)*KM_S_TO_KPC_MYR**2/(radius*radius);
-            return [vx,vy,vz,-k*x,-k*y,-k*z];
-        }
-        function integrateTrajectories(massT,scaleRadius) {
-            const haloVelocity=nfwVelocityModel(massT*1e12,scaleRadius),step=DATA.frame_step_myr;
-            return particles.map(particle=>{
-                const [x,y,z]=particle.position;
-                let dx,dy,dz;
-                if(particle.kind!=='disk'){
-                    const a=particle.axis;
-                    dx=a[1]*z-a[2]*y;dy=a[2]*x-a[0]*z;dz=a[0]*y-a[1]*x;
-                    if(Math.hypot(dx,dy,dz)<1e-4){
-                        const alt=[a[1],a[2],a[0]];
-                        dx=alt[1]*z-alt[2]*y;dy=alt[2]*x-alt[0]*z;dz=alt[0]*y-alt[1]*x;
-                    }
-                }else{dx=-y;dy=x;dz=0;}
-                const norm=Math.max(Math.hypot(dx,dy,dz),1e-8);
-                const speed=particle.speedScale*observedVelocity(particle.radius)*KM_S_TO_KPC_MYR/norm;
-                let state=[x,y,z,dx*speed,dy*speed,dz*speed];
-                const positions=[[x,y,z]];
-                for(let frame=1;frame<frameCount;frame++){
-                      const k1=orbitDerivative(state,haloVelocity);
-                      const k2=orbitDerivative(state.map((value,index)=>value+step*k1[index]/2),haloVelocity);
-                      const k3=orbitDerivative(state.map((value,index)=>value+step*k2[index]/2),haloVelocity);
-                      const k4=orbitDerivative(state.map((value,index)=>value+step*k3[index]),haloVelocity);
-                    state=state.map((value,index)=>value+step*(k1[index]+2*k2[index]+2*k3[index]+k4[index])/6);
-                    positions.push([state[0],state[1],state[2]]);
-                }
-                return positions;
-            });
-        }
-        let activeTrajectories=integrateTrajectories(DEFAULTS.massT,DEFAULTS.scaleRadius);
-        let currentFrame=0,orbitModelTimer=null;
     const palette = [[0,[35,145,255]],[0.5,[255,211,69]],[1,[255,69,58]]];
     function velocityColor(v, radius) {
       const t = Math.max(0,Math.min(1,(v-minSpeed)/speedSpan));
@@ -556,37 +658,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         const camera=new THREE.PerspectiveCamera(40,1,1,2000);
         // Three-quarter view: ~39 degrees above the disk plane, framed to fit the galaxy.
         const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
-        const diskCount=diskIndices.length;
 
-        // All 800 stars (bulge + disk) are InstancedMesh spheres; no glowing orbs or halo clutter.
-        const STAR_BASE_RADIUS=0.18;
-        const starCount=particles.length;
-        const starIndices=Array.from({length:starCount},(_,i)=>i);
-        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),new THREE.MeshBasicMaterial({toneMapped:false}),starCount);
-        starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        starMesh.frustumCulled=false;starMesh.renderOrder=1;
-        (()=>{
-            const m=new THREE.Matrix4(),c=new THREE.Color();
-            const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8'),warm=new THREE.Color('#FFE8D6');
-            const smooth01=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
-            for(let k=0;k<starCount;k++){
-                const pt=particles[starIndices[k]],p=activeTrajectories[starIndices[k]][0];
-                if(pt.kind==='bulge'){
-                    c.copy(warm).lerp(white,Math.min(1,pt.radius/GALAXY.bulgeMax));
-                }else{
-                    c.copy(white).lerp(blue,smooth01((pt.radius-GALAXY.diskMin)/(maxRadius*0.6)));
-                }
-                const sc=pt.kind==='bulge'?0.30+0.08*Math.min(1,pt.radius/GALAXY.bulgeMax):0.32+0.12*(pt.radius/maxRadius);
-                m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
-                starMesh.setMatrixAt(k,m);
-                starMesh.setColorAt(k,c);
-            }
-            starMesh.instanceColor.needsUpdate=true;
-        })();
-        scene.add(starMesh);
+        // Exactly 800 stars (120 bulge, 680 disk) created via InstancedMesh with userData storage (Rules 1, 4)
+        const starMesh=createGalaxy(scene,GALAXY_PARAMS,3198);
+        const diskCount=GALAXY_PARAMS.diskCount;
 
         // Black hole: compact core feature with crisp event horizon shadow and clean, sharp photon ring.
-        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=2.4;
+        const BH_R=GALAXY_PARAMS.blackHoleRadius,BH_EXTENT=2.4;
         const blackHole=new THREE.Mesh(
             new THREE.PlaneGeometry(2*BH_R*BH_EXTENT,2*BH_R*BH_EXTENT),
             new THREE.ShaderMaterial({
@@ -613,42 +691,34 @@ HTML_TEMPLATE = r"""<!doctype html>
         blackHole.position.set(0,0,0);
         blackHole.renderOrder=3;scene.add(blackHole);
 
-        // Optional orbit trajectory lines: full paths of an evenly spaced subset of disk stars.
-        const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=3;
-        const orbitLineIdx=Array.from({length:Math.min(ORBIT_LINE_STARS,diskCount)},(_,k)=>diskIndices[Math.floor(k*diskCount/Math.min(ORBIT_LINE_STARS,diskCount))]);
-        const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
+        // Optional orbit trajectory lines: circular paths of an evenly spaced subset of disk stars.
+        const ORBIT_LINE_STARS=60,CIRCLE_SEGS=64;
         const orbitLineGeom=new THREE.BufferGeometry();
-        orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(orbitLineIdx.length*orbitSegs*6),3));
+        orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(ORBIT_LINE_STARS*CIRCLE_SEGS*6),3));
         const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x7be4f1,transparent:true,opacity:0.22,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
         function fillOrbitLines(){
             const a=orbitLineGeom.attributes.position.array;let o=0;
-            for(const idx of orbitLineIdx){
-                const t=activeTrajectories[idx];
-                for(let s=0;s<orbitSegs;s++){
-                    const p=t[s*ORBIT_LINE_STEP],q=t[Math.min((s+1)*ORBIT_LINE_STEP,frameCount-1)];
-                    a[o++]=p[0];a[o++]=p[1];a[o++]=p[2];a[o++]=q[0];a[o++]=q[1];a[o++]=q[2];
+            const {initialRadii,initialPositions,diskCount,bulgeCount}=starMesh.userData;
+            const step=Math.max(1,Math.floor(diskCount/ORBIT_LINE_STARS));
+            for(let s=0;s<ORBIT_LINE_STARS;s++){
+                const idx=bulgeCount+Math.min(s*step,diskCount-1);
+                const r=initialRadii[idx];
+                const z=initialPositions[idx*3+2];
+                for(let seg=0;seg<CIRCLE_SEGS;seg++){
+                    const phi1=(seg/CIRCLE_SEGS)*2*Math.PI;
+                    const phi2=((seg+1)/CIRCLE_SEGS)*2*Math.PI;
+                    a[o++]=r*Math.cos(phi1);a[o++]=r*Math.sin(phi1);a[o++]=z;
+                    a[o++]=r*Math.cos(phi2);a[o++]=r*Math.sin(phi2);a[o++]=z;
                 }
             }
             orbitLineGeom.attributes.position.needsUpdate=true;
         }
         fillOrbitLines();
 
-        // Sub-frame continuous orbit updates for locked 60 FPS animation
+        // Sub-frame continuous orbit updates for locked 60 FPS animation (Rule 4)
         function updateStarTransforms(timeFloat){
-            const fFloat=Math.max(0,Math.min(frameCount-1,timeFloat));
-            const f0=Math.floor(fFloat);
-            const f1=Math.min(f0+1,frameCount-1);
-            const alpha=fFloat-f0;
-            const matArray=starMesh.instanceMatrix.array;
-            for(let k=0;k<starCount;k++){
-                const trajectory=activeTrajectories[starIndices[k]];
-                const p0=trajectory[f0],p1=trajectory[f1],off=k*16;
-                matArray[off+12]=p0[0]+(p1[0]-p0[0])*alpha;
-                matArray[off+13]=p0[1]+(p1[1]-p0[1])*alpha;
-                matArray[off+14]=p0[2]+(p1[2]-p0[2])*alpha;
-            }
-            starMesh.instanceMatrix.needsUpdate=true;
+            updateGalaxy(starMesh, timeFloat, GALAXY_PARAMS);
         }
 
         // Render loop: continuous delta-time playback with throttled UI sync
@@ -737,12 +807,6 @@ HTML_TEMPLATE = r"""<!doctype html>
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       Plotly.restyle('curvePlot',{y:[halo,total]},[2,3]);
-            clearTimeout(orbitModelTimer);
-            orbitModelTimer=setTimeout(()=>{
-                activeTrajectories=integrateTrajectories(massT,rs);
-                fillOrbitLines();
-                updateStarTransforms(simTime);requestRender();
-            },120);
     }
     massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
         document.getElementById('applyObservedFit').addEventListener('click',()=>{
