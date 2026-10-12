@@ -261,7 +261,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         /* ---------- 3D galaxy morphology: razor-thin exponential disk (NGC 3198 Sc spiral) ---------- */
         const GALAXY={bulgeCount:0,diskCount:800,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
             diskScaleLength:4.0,scaleHeight:0.15,diskScaleHeight:0.15,diskMax:maxRadius,diskMin:0.45,
-            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.42};
+            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.16};
         function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
             t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
         // Box-Muller transform: converts pairs of uniform random numbers to standard normal distribution
@@ -618,8 +618,8 @@ HTML_TEMPLATE = r"""<!doctype html>
         })();
         scene.add(starMesh);
 
-        // Black hole: compact core feature with crisp event horizon shadow and clean, sharp photon ring.
-        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=2.4;
+        // Black hole: compact core shadow with gravitationally lensed photon ring and warm amber/orange glowing arcs.
+        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=3.2;
         const blackHole=new THREE.Mesh(
             new THREE.PlaneGeometry(2*BH_R*BH_EXTENT,2*BH_R*BH_EXTENT),
             new THREE.ShaderMaterial({
@@ -629,16 +629,49 @@ HTML_TEMPLATE = r"""<!doctype html>
                 fragmentShader:`
                     varying vec2 vP;
                     void main(){
-                        vec2 p=vP/${BH_R.toFixed(3)};float d=length(p);
-                        float shadow=1.0-smoothstep(0.96,1.0,d);
-                        float beam=1.0+0.40*cos(atan(p.y,p.x)-0.5);
-                        float ring=exp(-pow((d-1.06)/0.055,2.0))*2.8*beam;
-                        float glow=exp(-pow((d-1.10)/0.18,2.0))*0.10;
-                        float fade=1.0-smoothstep(1.35,1.8,d);
-                        vec3 ringCol=vec3(1.0,0.98,0.92)*ring;
-                        vec3 glowCol=vec3(1.0,0.88,0.72)*glow;
-                        vec3 col=(ringCol+glowCol)*fade*(1.0-shadow);
-                        gl_FragColor=vec4(col,shadow);
+                        vec2 p=vP/${BH_R.toFixed(3)};
+                        float d=length(p);
+                        float shadow=1.0-smoothstep(0.93,0.99,d);
+
+                        // Relativistic Doppler beaming across the disk (counter-clockwise spin)
+                        float beam=1.0+0.38*(-p.x/max(d,0.25));
+
+                        // 1. Primary circular photon ring hugging the event horizon
+                        float ringDist=abs(d-1.035);
+                        float photonRing=exp(-pow(ringDist/0.040,2.0))*3.6;
+                        float photonShoulder=exp(-pow((d-1.06)/0.10,2.0))*1.2;
+
+                        // 2. Gravitational lensing arcs: upper arc bent over top, lower arc bent under bottom
+                        float rUp=length(vec2(p.x/1.80,(p.y+0.25)/1.50));
+                        float arcUp=exp(-pow(abs(rUp-1.0)/0.075,2.0))*2.4*smoothstep(-0.20,0.15,p.y);
+
+                        float rDown=length(vec2(p.x/1.65,(p.y-0.20)/1.30));
+                        float arcDown=exp(-pow(abs(rDown-1.0)/0.070,2.0))*1.9*smoothstep(0.20,-0.15,p.y);
+
+                        // 3. Equatorial accretion disk extending horizontally
+                        float rDisk=length(vec2(p.x/2.15,p.y/0.28));
+                        float disk=exp(-pow(abs(rDisk-1.0)/0.095,2.0))*2.0;
+
+                        // Combined emission with Doppler boosting and diffuse amber halo
+                        float totalRings=(photonRing+photonShoulder+arcUp+arcDown+disk*0.85)*beam;
+                        float glow=exp(-pow((d-1.15)/0.60,2.0))*0.30;
+                        float fade=1.0-smoothstep(2.3,3.1,d);
+
+                        // Warm amber/orange palette
+                        vec3 cDeepOrange=vec3(0.92,0.24,0.02);
+                        vec3 cWarmAmber=vec3(1.0,0.58,0.10);
+                        vec3 cGold=vec3(1.0,0.85,0.38);
+                        vec3 cHotWhite=vec3(1.0,0.96,0.85);
+
+                        vec3 col=cDeepOrange*glow;
+                        col+=cWarmAmber*totalRings;
+                        col+=cGold*(pow(photonRing,1.2)*0.45+(arcUp+arcDown)*0.35);
+                        col+=cHotWhite*pow(photonRing,2.0)*0.16;
+
+                        // Translucent rendering: allow background stars to subtly show through
+                        const float OPACITY = 0.55;
+                        col = col * fade * (1.0 - shadow * 0.70) * OPACITY;
+                        gl_FragColor = vec4(col, shadow * 0.50);
                     }
                 `
             })
