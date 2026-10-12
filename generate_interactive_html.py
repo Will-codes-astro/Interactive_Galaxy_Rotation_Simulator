@@ -198,6 +198,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
     .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
+    .view-panel button[aria-pressed=true] { background:rgba(123,228,241,.22); border-color:var(--cyan); color:var(--ink); }
     .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
     .view-panel .view-row button { text-align:center; }
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
@@ -233,7 +234,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><button type="button" id="viewHighlight" aria-pressed="false" title="Brighten the orbit trajectory lines so they are easier to see">Highlight trajectories</button><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -508,7 +509,8 @@ HTML_TEMPLATE = r"""<!doctype html>
             pathAttribute.needsUpdate=true;
         }
         fillOrbitPaths();
-        const pathLines=new THREE.LineSegments(pathGeometry,new THREE.LineBasicMaterial({color:0x6e91b2,transparent:true,opacity:0.2,depthWrite:false}));
+        const pathMaterial=new THREE.LineBasicMaterial({color:0x6e91b2,transparent:true,opacity:0.2,depthWrite:false});
+        const pathLines=new THREE.LineSegments(pathGeometry,pathMaterial);
         pathLines.frustumCulled=false;scene.add(pathLines);
 
         // Stars: one Points draw call, round sprites via a tiny shader
@@ -554,6 +556,16 @@ HTML_TEMPLATE = r"""<!doctype html>
         viewToggle.addEventListener('click',()=>{
             const collapsed=viewPanel.classList.toggle('collapsed');
             viewToggle.setAttribute('aria-expanded',String(!collapsed));
+        });
+        const highlightButton=document.getElementById('viewHighlight');
+        highlightButton.addEventListener('click',()=>{
+            const on=highlightButton.getAttribute('aria-pressed')!=='true';
+            highlightButton.setAttribute('aria-pressed',String(on));
+            pathMaterial.color.set(on?0x7be4f1:0x6e91b2);
+            pathMaterial.opacity=on?0.85:0.2;
+            pathMaterial.blending=on?THREE.AdditiveBlending:THREE.NormalBlending;
+            pathMaterial.needsUpdate=true;
+            requestRender();
         });
         document.getElementById('viewReset').addEventListener('click',()=>controls.reset());
         document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0,target:[0,0,0],radius:GALAXY_VIEW.radius}));
