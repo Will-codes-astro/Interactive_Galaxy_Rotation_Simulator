@@ -213,7 +213,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel.collapsed > :not(.view-head) { display:none; }
     .view-panel.collapsed .view-head { padding:0; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
-    @media (hover:none) and (pointer:coarse) { .view-panel { display:none; } }
+    @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } }
     .timeline { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:0 16px 14px; color:var(--muted); font-size:12px; }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
     button:hover { border-color:var(--cyan); }
@@ -553,6 +553,10 @@ HTML_TEMPLATE = r"""<!doctype html>
         const viewPanel=document.getElementById('viewPanel');
         ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>viewPanel.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
         const viewToggle=document.getElementById('viewToggle');
+        if(window.matchMedia('(hover:none) and (pointer:coarse)').matches){
+            viewPanel.classList.add('collapsed');
+            viewToggle.setAttribute('aria-expanded','false');
+        }
         viewToggle.addEventListener('click',()=>{
             const collapsed=viewPanel.classList.toggle('collapsed');
             viewToggle.setAttribute('aria-expanded',String(!collapsed));
