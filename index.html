@@ -31,7 +31,7 @@
     #orbitPlot { position:relative; touch-action:none; overscroll-behavior:contain; user-select:none; -webkit-user-select:none; cursor:grab; }
     #orbitPlot.dragging { cursor:grabbing; }
     #orbitPlot canvas { display:block; width:100%; height:100%; touch-action:none; }
-    .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:132px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
+    .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
     .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
@@ -41,6 +41,10 @@
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
     .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    .view-panel .speed-toggle { display:grid; grid-template-columns:1fr 1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
+    .view-panel .speed-toggle button { padding:4px 2px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); transition:background .15s,color .15s; }
+    .view-panel .speed-toggle button:hover, .view-panel .speed-toggle button:focus-visible { color:var(--ink); outline:none; }
+    .view-panel .speed-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
     #orbitPlot.pan-mode { cursor:move; }
     #orbitPlot.pan-mode.dragging { cursor:grabbing; }
     .view-panel .view-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
@@ -50,7 +54,7 @@
     .view-panel.collapsed > :not(.view-head) { display:none; }
     .view-panel.collapsed .view-head { padding:0; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
-    @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } }
+    @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } .view-panel .speed-toggle button { padding:7px 4px; font-size:12px; } }
     .timeline { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:0 16px 14px; color:var(--muted); font-size:12px; }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
     button:hover { border-color:var(--cyan); }
@@ -71,7 +75,7 @@
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="300" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -393,10 +397,26 @@
 
         /* ---------- Three.js scene ---------- */
         const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-        renderer.setClearColor(BG,1);
+        renderer.setClearColor(0x030308, 1.0); // Deep space dark navy/black.
         orbitPlot.appendChild(renderer.domElement);
         const scene=new THREE.Scene();
         const camera=new THREE.PerspectiveCamera(40,1,1,2000);
+        const distantStarCount=900,distantStarPositions=new Float32Array(distantStarCount*3);
+        let starSeed=3198;
+        const randomStar=()=>{starSeed=(starSeed*1664525+1013904223)>>>0;return starSeed/4294967296;};
+        for(let i=0;i<distantStarCount;i++){
+            const y=randomStar()*2-1,r=Math.sqrt(1-y*y),angle=randomStar()*Math.PI*2;
+            const distance=820+randomStar()*120;
+            distantStarPositions[i*3]=Math.cos(angle)*r*distance;
+            distantStarPositions[i*3+1]=y*distance;
+            distantStarPositions[i*3+2]=Math.sin(angle)*r*distance;
+        }
+        const distantStarGeometry=new THREE.BufferGeometry();
+        distantStarGeometry.setAttribute('position',new THREE.BufferAttribute(distantStarPositions,3));
+        const distantStars=new THREE.Points(distantStarGeometry,new THREE.PointsMaterial({
+            color:0x68708a,size:1.1,sizeAttenuation:false,transparent:true,opacity:0.16,depthWrite:false,toneMapped:false
+        }));
+        distantStars.frustumCulled=false;scene.add(distantStars);
         // Three-quarter view: ~39 degrees above the disk plane, framed to fit the galaxy.
         const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
         const diskCount=diskIndices.length;
@@ -495,7 +515,7 @@
         }
 
         // Render loop: continuous delta-time playback with throttled UI sync
-        let needsRender=true,lastTime=performance.now(),simTime=0,playing=false,lastReportedFrame=-1;
+        let needsRender=true,lastTime=performance.now(),simTime=0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
         const PLAYBACK_SPEED_MYR_PER_SEC=24.0;
         const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
@@ -529,6 +549,25 @@
             modeButtons.forEach(b=>b.setAttribute('aria-checked',String(b.dataset.mode===mode)));
         }
         modeButtons.forEach(b=>b.addEventListener('click',()=>setDragMode(b.dataset.mode)));
+        // Playback speed multiplier (0.5x, 1x, 2x)
+        const speedButtons=[...viewPanel.querySelectorAll('[data-speed]')];
+        function setPlaybackMultiplier(speed){
+            playbackMultiplier=parseFloat(speed)||1.0;
+            speedButtons.forEach(b=>b.setAttribute('aria-checked',String(parseFloat(b.dataset.speed)===playbackMultiplier)));
+        }
+        speedButtons.forEach((b,idx)=>{
+            b.addEventListener('click',()=>setPlaybackMultiplier(b.dataset.speed));
+            b.addEventListener('keydown',e=>{
+                let nextIdx=-1;
+                if(e.key==='ArrowRight'||e.key==='ArrowDown')nextIdx=(idx+1)%speedButtons.length;
+                else if(e.key==='ArrowLeft'||e.key==='ArrowUp')nextIdx=(idx-1+speedButtons.length)%speedButtons.length;
+                if(nextIdx>=0){
+                    e.preventDefault();
+                    speedButtons[nextIdx].focus();
+                    setPlaybackMultiplier(speedButtons[nextIdx].dataset.speed);
+                }
+            });
+        });
         function resizeOrbit(){
             const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
             renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
@@ -542,7 +581,7 @@
             lastTime=now;
             if(controls.update(dt))needsRender=true;
             if(playing){
-                simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC;
+                simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC*playbackMultiplier;
                 if(simTime>=frameCount-1){
                     simTime=frameCount-1;
                     playing=false;
