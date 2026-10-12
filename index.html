@@ -62,7 +62,7 @@
 <body>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
-    <div class="header-note">200 massless test stars · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
+    <div class="header-note">1720 massless test particles (bulge, disk, stellar halo) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
   </header>
   <main>
     <section class="controls" aria-label="Dark matter controls">
@@ -71,7 +71,7 @@
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="300" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><button type="button" id="viewHighlight" aria-pressed="false" title="Brighten the orbit trajectory lines so they are easier to see">Highlight trajectories</button><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -89,8 +89,71 @@
     const maxRadius = Math.max(...stars.map(s => s.initial_r_kpc));
     const speeds = stars.map(s => s.v_rot_kms);
     const minSpeed = Math.min(...speeds), speedSpan = Math.max(...speeds) - minSpeed || 1;
-        const ORBIT_PATH_STEP = 6;
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
+
+        /* ---------- 3D galaxy morphology: Hernquist bulge + exponential / sech^2 disk ---------- */
+        const GALAXY={bulgeCount:240,diskCount:1360,haloCount:120,hernquistA:1.0,bulgeMax:7,bulgeKeepOut:1.1,
+            diskScaleLength:4.0,diskScaleHeight:0.28,diskMax:maxRadius,diskMin:0.8,
+            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.7};
+        function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
+            t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+        // Hernquist (1990) inverse CDF: r = a*sqrt(u)/(1-sqrt(u)); isotropic spherical distribution gives a true 3D spherical concentration.
+        function sampleBulge(rng){
+            let r;
+            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.hernquistA*s/(1-s);}
+            while(r>GALAXY.bulgeMax||r<GALAXY.bulgeKeepOut);
+            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
+            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
+        }
+        function sampleDisk(rng){
+            let R;
+            do{R=-GALAXY.diskScaleLength*(Math.log(1-rng())+Math.log(1-rng()));}
+            while(R>GALAXY.diskMax||R<GALAXY.diskMin);
+            const phi=2*Math.PI*rng();
+            // sech^2 vertical profile: z = z0 * atanh(2u-1) / 2 samples rho ~ sech^2(z/z0).
+            const u=Math.min(Math.max(rng(),1e-4),1-1e-4);
+            const z=GALAXY.diskScaleHeight*0.5*Math.log(u/(1-u));
+            return[R*Math.cos(phi),R*Math.sin(phi),z];
+        }
+        function sampleHalo(rng){
+            let r;
+            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.haloA*s/(1-s);}
+            while(r>GALAXY.haloMax||r<GALAXY.haloMin);
+            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
+            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
+        }
+        // Particles are ordered bulge then disk; kind selects the orbit initial conditions and colour.
+        const particles=(()=>{
+            const rng=mulberry32(3198),out=[];
+            const randomAxis=()=>{
+                const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
+                return[sinT*Math.cos(phi),sinT*Math.sin(phi),cosT];
+            };
+            for(let i=0;i<GALAXY.bulgeCount;i++){
+                const p=sampleBulge(rng);
+                out.push({kind:'bulge',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1});
+            }
+            for(let i=0;i<GALAXY.diskCount;i++){
+                const p=sampleDisk(rng);
+                out.push({kind:'disk',position:p,radius:Math.hypot(p[0],p[1]),axis:randomAxis(),speedScale:1});
+            }
+            for(let i=0;i<GALAXY.haloCount;i++){
+                const p=sampleHalo(rng);
+                out.push({kind:'halo',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1,warm:rng()<0.12});
+            }
+            return out;
+        })();
+        const indicesOf=kind=>particles.map((p,i)=>p.kind===kind?i:-1).filter(i=>i>=0);
+        const bulgeIndices=indicesOf('bulge'),diskIndices=indicesOf('disk'),haloIndices=indicesOf('halo');
+        const vObs=DATA.rotation.map(p=>p.observed_kms);
+        function observedVelocity(radius){
+            const last=radii.length-1;
+            if(radius<=radii[0])return vObs[0]*radius/radii[0];
+            if(radius>=radii[last])return vObs[last];
+            let low=0,high=last;
+            while(high-low>1){const m=(low+high)>>1;if(radii[m]<=radius)low=m;else high=m;}
+            return vObs[low]+(radius-radii[low])/(radii[high]-radii[low])*(vObs[high]-vObs[low]);
+        }
         const radii=DATA.rotation.map(p=>p.radius_kpc);
         const vBary=DATA.rotation.map(p=>p.baryonic_kms);
         function nfwVelocityModel(massSolar,scaleRadius) {
@@ -116,27 +179,37 @@
             return vBary[low]+fraction*(vBary[high]-vBary[low]);
         }
         function orbitDerivative(state,haloVelocity) {
-            const [x,y,vx,vy]=state;
-            const radius=Math.max(Math.hypot(x,y),1e-5);
+            const [x,y,z,vx,vy,vz]=state;
+            const radius=Math.max(Math.hypot(x,y,z),1e-5);
             const baryonic=baryonicVelocity(radius);
             const halo=haloVelocity(radius);
-            const acceleration=(baryonic*baryonic+halo*halo)*KM_S_TO_KPC_MYR**2/radius;
-            return [vx,vy,-acceleration*x/radius,-acceleration*y/radius];
+            const k=(baryonic*baryonic+halo*halo)*KM_S_TO_KPC_MYR**2/(radius*radius);
+            return [vx,vy,vz,-k*x,-k*y,-k*z];
         }
         function integrateTrajectories(massT,scaleRadius) {
             const haloVelocity=nfwVelocityModel(massT*1e12,scaleRadius),step=DATA.frame_step_myr;
-            return stars.map(star=>{
-                const [x,y]=star.positions[0],radius=Math.max(Math.hypot(x,y),1e-8);
-                const speed=star.v_rot_kms*KM_S_TO_KPC_MYR;
-                let state=[x,y,-speed*y/radius,speed*x/radius];
-                const positions=[[x,y,0]];
+            return particles.map(particle=>{
+                const [x,y,z]=particle.position;
+                let dx,dy,dz;
+                if(particle.kind!=='disk'){
+                    const a=particle.axis;
+                    dx=a[1]*z-a[2]*y;dy=a[2]*x-a[0]*z;dz=a[0]*y-a[1]*x;
+                    if(Math.hypot(dx,dy,dz)<1e-4){
+                        const alt=[a[1],a[2],a[0]];
+                        dx=alt[1]*z-alt[2]*y;dy=alt[2]*x-alt[0]*z;dz=alt[0]*y-alt[1]*x;
+                    }
+                }else{dx=-y;dy=x;dz=0;}
+                const norm=Math.max(Math.hypot(dx,dy,dz),1e-8);
+                const speed=particle.speedScale*observedVelocity(particle.radius)*KM_S_TO_KPC_MYR/norm;
+                let state=[x,y,z,dx*speed,dy*speed,dz*speed];
+                const positions=[[x,y,z]];
                 for(let frame=1;frame<frameCount;frame++){
                       const k1=orbitDerivative(state,haloVelocity);
                       const k2=orbitDerivative(state.map((value,index)=>value+step*k1[index]/2),haloVelocity);
                       const k3=orbitDerivative(state.map((value,index)=>value+step*k2[index]/2),haloVelocity);
                       const k4=orbitDerivative(state.map((value,index)=>value+step*k3[index]),haloVelocity);
                     state=state.map((value,index)=>value+step*(k1[index]+2*k2[index]+2*k3[index]+k4[index])/6);
-                    positions.push([state[0],state[1],0]);
+                    positions.push([state[0],state[1],state[2]]);
                 }
                 return positions;
             });
@@ -162,8 +235,8 @@
             constructor(camera,element,options={}) {
                 this.camera=camera;this.element=element;this.dragMode='rotate';
                 this.o=Object.assign({damping:11,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
-                    minDistance:12,maxDistance:420,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
-                    initial:{theta:-0.82,phi:1.0,radius:120,target:[0,0,0]},onChange:()=>{}},options);
+                    minDistance:5,maxDistance:450,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
+                    initial:{theta:-0.82,phi:1.01,radius:72,target:[0,0,0]},onChange:()=>{}},options);
                 const i=this.o.initial;
                 this.goal={theta:i.theta,phi:i.phi,radius:i.radius,target:new THREE.Vector3(...i.target)};
                 this.view={theta:i.theta,phi:i.phi,radius:i.radius,target:this.goal.target.clone()};
@@ -318,72 +391,153 @@
         orbitPlot.appendChild(renderer.domElement);
         const scene=new THREE.Scene();
         const camera=new THREE.PerspectiveCamera(40,1,1,2000);
-        const GALAXY_VIEW=(()=>{const e=[1.35,-1.45,1.05],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*58,target:[0,0,0]};})();
+        // Three-quarter view: ~39 degrees above the disk plane, framed to fit the galaxy.
+        const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
+        const diskCount=diskIndices.length;
 
-        // Reference grid (galaxy plane) and axes
-        const grid=new THREE.GridHelper(130,13,0x2a3b4c,0x1c2936);grid.rotation.x=Math.PI/2;scene.add(grid);
-        const axisPoints=[0,0,0,65,0,0, 0,0,0,0,65,0, 0,0,0,0,0,65];
-        const axisColors=[0.48,0.89,0.95,0.48,0.89,0.95, 0.95,0.78,0.47,0.95,0.78,0.47, 0.6,0.6,0.9,0.6,0.6,0.9];
-        const axisGeometry=new THREE.BufferGeometry();
-        axisGeometry.setAttribute('position',new THREE.Float32BufferAttribute(axisPoints,3));
-        axisGeometry.setAttribute('color',new THREE.Float32BufferAttribute(axisColors,3));
-        scene.add(new THREE.LineSegments(axisGeometry,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.55})));
+        // Disk stars are InstancedMesh spheres; bulge and halo are soft additive glow sprites.
+        const STAR_BASE_RADIUS=0.32*0.75;
+        const starCount=diskIndices.length;
+        const starIndices=diskIndices;
+        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),new THREE.MeshBasicMaterial({toneMapped:false}),starCount);
+        starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        starMesh.frustumCulled=false;starMesh.renderOrder=1;
+        (()=>{
+            const m=new THREE.Matrix4(),c=new THREE.Color();
+            const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8');
+            const smooth01=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
+            for(let k=0;k<starCount;k++){
+                const pt=particles[starIndices[k]],p=activeTrajectories[starIndices[k]][0];
+                c.copy(white).lerp(blue,smooth01((pt.radius-GALAXY.diskMin)/(maxRadius*0.6)));
+                const sc=0.40+0.15*(pt.radius/maxRadius);
+                m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
+                starMesh.setMatrixAt(k,m);
+                starMesh.setColorAt(k,c);
+            }
+            starMesh.instanceColor.needsUpdate=true;
+        })();
+        scene.add(starMesh);
 
-        // Orbit paths (one segment list, rewritten in place when the halo changes)
-        function orbitPathSegmentCount(){return stars.length*Math.floor((frameCount-1)/ORBIT_PATH_STEP);}
-        const pathPositions=new Float32Array(orbitPathSegmentCount()*6);
-        const pathAttribute=new THREE.BufferAttribute(pathPositions,3);pathAttribute.setUsage(THREE.DynamicDrawUsage);
-        const pathGeometry=new THREE.BufferGeometry();pathGeometry.setAttribute('position',pathAttribute);
-        function fillOrbitPaths(){
-            let o=0;
-            for(const positions of activeTrajectories){
-                for(let i=0;i+ORBIT_PATH_STEP<frameCount;i+=ORBIT_PATH_STEP){
-                    const a=positions[i],b=positions[i+ORBIT_PATH_STEP];
-                    pathPositions[o++]=a[0];pathPositions[o++]=a[1];pathPositions[o++]=a[2];
-                    pathPositions[o++]=b[0];pathPositions[o++]=b[1];pathPositions[o++]=b[2];
+        // Soft glow sprites (THREE.Points + radial-gradient texture + additive blending) for bulge and halo.
+        const spriteTexture=(()=>{
+            const cv=document.createElement('canvas');cv.width=cv.height=64;
+            const g=cv.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);
+            gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(0.25,'rgba(255,255,255,0.55)');
+            gr.addColorStop(0.6,'rgba(255,255,255,0.12)');gr.addColorStop(1,'rgba(255,255,255,0)');
+            g.fillStyle=gr;g.fillRect(0,0,64,64);
+            return new THREE.CanvasTexture(cv);
+        })();
+        const spriteUniforms={uScale:{value:400}};
+        const spriteMaterial=new THREE.ShaderMaterial({
+            uniforms:{...spriteUniforms,uMap:{value:spriteTexture}},
+            transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,
+            vertexShader:`attribute float size;varying vec3 vC;uniform float uScale;
+                void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*uScale/-mv.z;gl_Position=projectionMatrix*mv;}`,
+            fragmentShader:`uniform sampler2D uMap;varying vec3 vC;
+                void main(){vec4 t=texture2D(uMap,gl_PointCoord);gl_FragColor=vec4(vC*t.a,t.a);}`
+        });
+        spriteUniforms.uScale=spriteMaterial.uniforms.uScale;
+        const spriteSets=[];
+        function makeSpritePoints(indices,colorFn,sizeFn,order){
+            const n=indices.length,pos=new Float32Array(n*3),col=new Float32Array(n*3),size=new Float32Array(n);
+            const c=new THREE.Color();
+            for(let k=0;k<n;k++){
+                const pt=particles[indices[k]];colorFn(pt,c);
+                col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b;size[k]=sizeFn(pt);
+            }
+            const geom=new THREE.BufferGeometry();
+            const posAttr=new THREE.BufferAttribute(pos,3);posAttr.setUsage(THREE.DynamicDrawUsage);
+            geom.setAttribute('position',posAttr);
+            geom.setAttribute('color',new THREE.BufferAttribute(col,3));
+            geom.setAttribute('size',new THREE.BufferAttribute(size,1));
+            const pts=new THREE.Points(geom,spriteMaterial);
+            pts.frustumCulled=false;pts.renderOrder=order;scene.add(pts);
+            spriteSets.push({indices,pos,posAttr});
+        }
+        const bulgeIn=new THREE.Color('#FFFFFF'),bulgeOut=new THREE.Color('#FF8FA3');
+        makeSpritePoints(bulgeIndices,(pt,c)=>{
+            const t=Math.min(1,pt.radius/(GALAXY.bulgeMax*0.6));c.copy(bulgeIn).lerp(bulgeOut,Math.sqrt(t)).            multiplyScalar(0.42-0.22*t);
+                    },pt=>3.2+1.6*Math.min(1,pt.radius/(GALAXY.bulgeMax*0.6)),0);
+        makeSpritePoints(haloIndices,(pt,c)=>{
+            c.set(pt.warm?'#ffc68a':'#9db8e0').multiplyScalar(pt.warm?0.7:0.35);
+        },pt=>pt.warm?2.4:1.3,0);
+        // Black hole: camera-facing shader quad. Opaque shadow disc, thin Doppler-beamed photon ring and a soft accretion glow.
+        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=4.0;
+        const blackHole=new THREE.Mesh(
+            new THREE.PlaneGeometry(2*BH_R*BH_EXTENT,2*BH_R*BH_EXTENT),
+            new THREE.ShaderMaterial({
+                transparent:true,depthWrite:false,blending:THREE.CustomBlending,
+                blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,
+                vertexShader:`varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+                fragmentShader:`
+                    varying vec2 vP;
+                    void main(){
+                        vec2 p=vP/${BH_R.toFixed(3)};float d=length(p);
+                        float shadow=1.0-smoothstep(0.96,1.0,d);
+                        float beam=1.0+0.55*cos(atan(p.y,p.x)-0.6);
+                        float ring=exp(-pow((d-1.07)/0.045,2.0))*1.9*beam;
+                        float glow=exp(-pow((d-1.12)/0.42,2.0))*0.32;
+                        float fade=1.0-smoothstep(${(BH_EXTENT-1.0).toFixed(1)},${BH_EXTENT.toFixed(1)},d);
+                        vec3 col=(vec3(1.0,0.97,0.88)*ring+vec3(1.0,0.62,0.32)*glow)*fade*(1.0-shadow);
+                        gl_FragColor=vec4(col,shadow);
+                    }
+                `
+            })
+        );
+        blackHole.position.set(0,0,0);
+        blackHole.renderOrder=3;scene.add(blackHole);
+
+        // Optional orbit trajectory lines: full paths of an evenly spaced subset of disk stars.
+        const ORBIT_LINE_STARS=90,ORBIT_LINE_STEP=3;
+        const orbitLineIdx=Array.from({length:Math.min(ORBIT_LINE_STARS,diskCount)},(_,k)=>diskIndices[Math.floor(k*diskCount/Math.min(ORBIT_LINE_STARS,diskCount))]);
+        const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
+        const orbitLineGeom=new THREE.BufferGeometry();
+        orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(orbitLineIdx.length*orbitSegs*6),3));
+        const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x7be4f1,transparent:true,opacity:0.22,depthWrite:false,blending:THREE.AdditiveBlending}));
+        orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
+        function fillOrbitLines(){
+            const a=orbitLineGeom.attributes.position.array;let o=0;
+            for(const idx of orbitLineIdx){
+                const t=activeTrajectories[idx];
+                for(let s=0;s<orbitSegs;s++){
+                    const p=t[s*ORBIT_LINE_STEP],q=t[Math.min((s+1)*ORBIT_LINE_STEP,frameCount-1)];
+                    a[o++]=p[0];a[o++]=p[1];a[o++]=p[2];a[o++]=q[0];a[o++]=q[1];a[o++]=q[2];
                 }
             }
-            pathAttribute.needsUpdate=true;
+            orbitLineGeom.attributes.position.needsUpdate=true;
         }
-        fillOrbitPaths();
-        const pathMaterial=new THREE.LineBasicMaterial({color:0x6e91b2,transparent:true,opacity:0.2,depthWrite:false});
-        const pathLines=new THREE.LineSegments(pathGeometry,pathMaterial);
-        pathLines.frustumCulled=false;scene.add(pathLines);
+        fillOrbitLines();
 
-        // Stars: one Points draw call, round sprites via a tiny shader
-        const starPositions=new Float32Array(stars.length*3),starColors=new Float32Array(stars.length*3),starSizes=new Float32Array(stars.length);
-        stars.forEach((s,i)=>{
-            const c=new THREE.Color(velocityColor(s.v_rot_kms,s.initial_r_kpc));
-            starColors.set([c.r,c.g,c.b],i*3);
-            starSizes[i]=6.5+1.5*s.initial_r_kpc/maxRadius;
-        });
-        const starAttribute=new THREE.BufferAttribute(starPositions,3);starAttribute.setUsage(THREE.DynamicDrawUsage);
-        const starGeometry=new THREE.BufferGeometry();
-        starGeometry.setAttribute('position',starAttribute);
-        starGeometry.setAttribute('color',new THREE.BufferAttribute(starColors,3));
-        starGeometry.setAttribute('size',new THREE.BufferAttribute(starSizes,1));
-        const pointVertex='attribute float size;attribute vec3 color;varying vec3 vColor;uniform float scale;void main(){vColor=color;gl_PointSize=size*scale;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}';
-        const pointFragment='varying vec3 vColor;uniform float rim;void main(){vec2 p=gl_PointCoord-0.5;float d=length(p);if(d>0.5)discard;vec3 col=mix(vColor,vec3(0.92,0.97,1.0),smoothstep(0.38,0.5,d)*rim);gl_FragColor=vec4(col,1.0);}';
-        const starMaterial=new THREE.ShaderMaterial({vertexShader:pointVertex,fragmentShader:pointFragment,uniforms:{scale:{value:1},rim:{value:0.7}}});
-        const starPoints=new THREE.Points(starGeometry,starMaterial);starPoints.frustumCulled=false;scene.add(starPoints);
-
-        const coreGeometry=new THREE.BufferGeometry();
-        coreGeometry.setAttribute('position',new THREE.Float32BufferAttribute([0,0,0],3));
-        coreGeometry.setAttribute('color',new THREE.Float32BufferAttribute([0.94,0.84,0.61],3));
-        coreGeometry.setAttribute('size',new THREE.Float32BufferAttribute([12],1));
-        const coreMaterial=new THREE.ShaderMaterial({vertexShader:pointVertex,fragmentShader:pointFragment,uniforms:{scale:{value:1},rim:{value:0}}});
-        scene.add(new THREE.Points(coreGeometry,coreMaterial));
-
-        function starCoordinates(frameIndex){
-            for(let i=0;i<activeTrajectories.length;i++){
-                const p=activeTrajectories[i][frameIndex];
-                starPositions[i*3]=p[0];starPositions[i*3+1]=p[1];starPositions[i*3+2]=p[2];
+        // Sub-frame continuous orbit updates for locked 60 FPS animation
+        function updateStarTransforms(timeFloat){
+            const fFloat=Math.max(0,Math.min(frameCount-1,timeFloat));
+            const f0=Math.floor(fFloat);
+            const f1=Math.min(f0+1,frameCount-1);
+            const alpha=fFloat-f0;
+            const matArray=starMesh.instanceMatrix.array;
+            for(let k=0;k<starCount;k++){
+                const trajectory=activeTrajectories[starIndices[k]];
+                const p0=trajectory[f0],p1=trajectory[f1],off=k*16;
+                matArray[off+12]=p0[0]+(p1[0]-p0[0])*alpha;
+                matArray[off+13]=p0[1]+(p1[1]-p0[1])*alpha;
+                matArray[off+14]=p0[2]+(p1[2]-p0[2])*alpha;
             }
-            starAttribute.needsUpdate=true;
+            starMesh.instanceMatrix.needsUpdate=true;
+            for(const set of spriteSets){
+                for(let k=0;k<set.indices.length;k++){
+                    const trajectory=activeTrajectories[set.indices[k]];
+                    const p0=trajectory[f0],p1=trajectory[f1];
+                    set.pos[k*3]=p0[0]+(p1[0]-p0[0])*alpha;
+                    set.pos[k*3+1]=p0[1]+(p1[1]-p0[1])*alpha;
+                    set.pos[k*3+2]=p0[2]+(p1[2]-p0[2])*alpha;
+                }
+                set.posAttr.needsUpdate=true;
+            }
         }
 
-        // Render loop: always cheap, draws only when the camera is easing or the scene changed.
-        let needsRender=true,lastTime=performance.now();
+        // Render loop: continuous delta-time playback with throttled UI sync
+        let needsRender=true,lastTime=performance.now(),simTime=0,playing=false,lastReportedFrame=-1;
+        const PLAYBACK_SPEED_MYR_PER_SEC=24.0;
         const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
         // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
@@ -398,18 +552,15 @@
             const collapsed=viewPanel.classList.toggle('collapsed');
             viewToggle.setAttribute('aria-expanded',String(!collapsed));
         });
-        const highlightButton=document.getElementById('viewHighlight');
-        highlightButton.addEventListener('click',()=>{
-            const on=highlightButton.getAttribute('aria-pressed')!=='true';
-            highlightButton.setAttribute('aria-pressed',String(on));
-            pathMaterial.color.set(on?0x7be4f1:0x6e91b2);
-            pathMaterial.opacity=on?0.85:0.2;
-            pathMaterial.blending=on?THREE.AdditiveBlending:THREE.NormalBlending;
-            pathMaterial.needsUpdate=true;
+        function resetView(){controls.reset();requestRender();}
+        document.getElementById('viewReset').addEventListener('click',resetView);
+        const orbitToggle=document.getElementById('toggleOrbits');
+        orbitToggle.addEventListener('click',()=>{
+            orbitLines.visible=!orbitLines.visible;
+            orbitToggle.setAttribute('aria-pressed',String(orbitLines.visible));
             requestRender();
         });
-        document.getElementById('viewReset').addEventListener('click',()=>controls.reset());
-        document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0,target:[0,0,0],radius:GALAXY_VIEW.radius}));
+        document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0.04,target:[0,0,0],radius:GALAXY_VIEW.radius}));
         document.getElementById('viewEdgeOn').addEventListener('click',()=>controls.flyTo({phi:Math.PI/2,target:[0,0,0],radius:GALAXY_VIEW.radius}));
         // Rotate/Pan only changes what a primary mouse drag does; touch gestures are unaffected.
         const modeButtons=[...viewPanel.querySelectorAll('[data-mode]')];
@@ -423,15 +574,31 @@
             const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
             renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
             camera.aspect=w/h;camera.updateProjectionMatrix();
-            starMaterial.uniforms.scale.value=dpr;coreMaterial.uniforms.scale.value=dpr;
+            spriteUniforms.uScale.value=h*dpr/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)));
             needsRender=true;
         }
         if(window.ResizeObserver)new ResizeObserver(resizeOrbit).observe(orbitPlot);
         window.addEventListener('resize',resizeOrbit);
         function renderLoop(now){
-            const dt=(now-lastTime)/1000;lastTime=now;
+            const dt=Math.min((now-lastTime)/1000,0.1);
+            lastTime=now;
             if(controls.update(dt))needsRender=true;
-            if(needsRender){needsRender=false;renderer.render(scene,camera);}
+            if(playing){
+                simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC;
+                if(simTime>=frameCount-1){
+                    simTime=frameCount-1;
+                    playing=false;
+                    playButton.textContent='Play';
+                }
+                updateStarTransforms(simTime);
+                const intFrame=Math.floor(simTime);
+                if(intFrame!==lastReportedFrame){
+                    lastReportedFrame=intFrame;
+                    syncTimelineUI(intFrame);
+                }
+                needsRender=true;
+            }
+            if(needsRender){needsRender=false;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);}
             requestAnimationFrame(renderLoop);
         }
         resizeOrbit();requestAnimationFrame(renderLoop);
@@ -458,7 +625,8 @@
             clearTimeout(orbitModelTimer);
             orbitModelTimer=setTimeout(()=>{
                 activeTrajectories=integrateTrajectories(massT,rs);
-                fillOrbitPaths();starCoordinates(currentFrame);requestRender();
+                fillOrbitLines();
+                updateStarTransforms(simTime);requestRender();
             },120);
     }
     massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
@@ -469,32 +637,32 @@
         });
 
     const timeSlider=document.getElementById('timeSlider'),timeSliderBottom=document.getElementById('timeSliderBottom');
-        const playButton=document.getElementById('playButton');let timer=null,playing=false;
-        function setFrame(index){
-      index=Math.max(0,Math.min(frameCount-1,Number(index)));
-            currentFrame=index;
-      timeSlider.value=index;timeSliderBottom.value=index;
-      starCoordinates(index);requestRender();
-      document.getElementById('frameLabel').textContent=`Frame ${index+1}`;
-      document.getElementById('timeValue').textContent=`${(index*DATA.frame_step_myr).toFixed(0)} Myr`;
-      document.getElementById('timeLabel').textContent=`${(index*DATA.frame_step_myr).toFixed(0)} Myr`;
-            return Promise.resolve();
+    const playButton=document.getElementById('playButton');
+    function syncTimelineUI(intFrame){
+        timeSlider.value=intFrame;timeSliderBottom.value=intFrame;
+        document.getElementById('frameLabel').textContent=`Frame ${intFrame+1}`;
+        document.getElementById('timeValue').textContent=`${(intFrame*DATA.frame_step_myr).toFixed(0)} Myr`;
+        document.getElementById('timeLabel').textContent=`${(intFrame*DATA.frame_step_myr).toFixed(0)} Myr`;
     }
-    timeSlider.addEventListener('input',()=>setFrame(timeSlider.value));
-    timeSliderBottom.addEventListener('input',()=>setFrame(timeSliderBottom.value));
-        async function advanceFrame(){
-            if(!playing)return;
-            const next=Number(timeSlider.value)+1;
-            if(next>=frameCount){playing=false;timer=null;playButton.textContent='Play';return;}
-            await setFrame(next);
-            if(playing)timer=setTimeout(advanceFrame,150);
+    function onSliderInput(val){
+        simTime=Math.max(0,Math.min(frameCount-1,Number(val)));
+        updateStarTransforms(simTime);
+        const intFrame=Math.floor(simTime);
+        lastReportedFrame=intFrame;
+        syncTimelineUI(intFrame);
+        requestRender();
+    }
+    timeSlider.addEventListener('input',()=>onSliderInput(timeSlider.value));
+    timeSliderBottom.addEventListener('input',()=>onSliderInput(timeSliderBottom.value));
+    playButton.addEventListener('click',()=>{
+        if(playing){
+            playing=false;playButton.textContent='Play';
+        }else{
+            if(simTime>=frameCount-1)simTime=0;
+            playing=true;playButton.textContent='Pause';
         }
-        playButton.addEventListener('click',async()=>{
-            if(playing){playing=false;clearTimeout(timer);timer=null;playButton.textContent='Play';return;}
-            if(Number(timeSlider.value)>=frameCount-1)await setFrame(0);
-            playing=true;playButton.textContent='Pause';advanceFrame();
     });
-    setFrame(0);
+    updateStarTransforms(0);syncTimelineUI(0);
   </script>
 </body>
 </html>
