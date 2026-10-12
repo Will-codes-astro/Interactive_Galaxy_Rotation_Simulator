@@ -585,10 +585,17 @@ HTML_TEMPLATE = r"""<!doctype html>
         const diskCount=diskIndices.length;
 
         // All 800 stars (bulge + disk) are InstancedMesh spheres; no glowing orbs or halo clutter.
-        const STAR_BASE_RADIUS=0.18;
+        const STAR_BASE_RADIUS=0.13;
         const starCount=particles.length;
         const starIndices=Array.from({length:starCount},(_,i)=>i);
-        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),new THREE.MeshBasicMaterial({toneMapped:false}),starCount);
+        const starMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffbb66, // Warm star color (or 0x88ccff for blue giants)
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false // Crucial for additive blending so overlapping stars glow properly
+        });
+        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),starMaterial,starCount);
         starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         starMesh.frustumCulled=false;starMesh.renderOrder=1;
         (()=>{
