@@ -225,7 +225,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <body>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
-    <div class="header-note">800 massless test particles (bulge, disk) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
+    <div class="header-note">800 massless test particles (disk) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
   </header>
   <main>
     <section class="controls" aria-label="Dark matter controls">
@@ -254,28 +254,34 @@ HTML_TEMPLATE = r"""<!doctype html>
     const minSpeed = Math.min(...speeds), speedSpan = Math.max(...speeds) - minSpeed || 1;
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
 
-        /* ---------- 3D galaxy morphology: Hernquist bulge + exponential / sech^2 disk ---------- */
-        const GALAXY={bulgeCount:120,diskCount:680,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
-            diskScaleLength:4.0,diskScaleHeight:0.28,diskMax:maxRadius,diskMin:0.70,
+        /* ---------- 3D galaxy morphology: razor-thin exponential disk (NGC 3198 Sc spiral) ---------- */
+        const GALAXY={bulgeCount:0,diskCount:800,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
+            diskScaleLength:4.0,scaleHeight:0.15,diskScaleHeight:0.15,diskMax:maxRadius,diskMin:0.45,
             haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.42};
         function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
             t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-        // Hernquist (1990) inverse CDF: r = a*sqrt(u)/(1-sqrt(u)); isotropic spherical distribution gives a true 3D spherical concentration.
+        // Box-Muller transform: converts pairs of uniform random numbers to standard normal distribution
+        function boxMuller(mean,stdDev,rng){
+            let u1=rng();
+            while(u1<=1e-15)u1=rng();
+            const u2=rng();
+            return mean+stdDev*Math.sqrt(-2.0*Math.log(u1))*Math.cos(2.0*Math.PI*u2);
+        }
         function sampleBulge(rng){
             let r;
             do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.hernquistA*s/(1-s);}
             while(r>GALAXY.bulgeMax||r<GALAXY.bulgeKeepOut);
-            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
+            const phi=2*Math.PI*rng();
+            const z=boxMuller(0,GALAXY.scaleHeight,rng);
+            return[r*Math.cos(phi),r*Math.sin(phi),z];
         }
         function sampleDisk(rng){
             let R;
-            do{R=-GALAXY.diskScaleLength*(Math.log(1-rng())+Math.log(1-rng()));}
+            do{R=-GALAXY.diskScaleLength*(Math.log(Math.max(1e-7,rng()))+Math.log(Math.max(1e-7,rng())));}
             while(R>GALAXY.diskMax||R<GALAXY.diskMin);
             const phi=2*Math.PI*rng();
-            // sech^2 vertical profile: z = z0 * atanh(2u-1) / 2 samples rho ~ sech^2(z/z0).
-            const u=Math.min(Math.max(rng(),1e-4),1-1e-4);
-            const z=GALAXY.diskScaleHeight*0.5*Math.log(u/(1-u));
+            // Tight Gaussian (normal distribution) scale height for razor-thin disk (late-type Sc spiral)
+            const z=boxMuller(0,GALAXY.scaleHeight,rng);
             return[R*Math.cos(phi),R*Math.sin(phi),z];
         }
         function sampleHalo(rng){
