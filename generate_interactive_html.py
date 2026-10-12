@@ -169,6 +169,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   <meta name="description" content="Interactive Galaxy Rotation Simulator for NGC 3198 orbit and SPARC rotation-curve exploration">
   <title>Interactive Galaxy Rotation Simulator</title>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#050910; --panel:#0a111b; --line:#1b2a3a; --ink:#dbe7f4; --muted:#91a4b8; --cyan:#7be4f1; --gold:#f2c879; }
     * { box-sizing:border-box; }
@@ -190,7 +191,28 @@ HTML_TEMPLATE = r"""<!doctype html>
     h2 { margin:0; font-size:14px; font-weight:600; }
     .panel-heading span { color:var(--muted); font-size:11px; }
     .plot { width:100%; height:min(68vh,700px); min-height:420px; }
-    #orbitPlot { touch-action:none; }
+    #orbitPlot { position:relative; touch-action:none; overscroll-behavior:contain; user-select:none; -webkit-user-select:none; cursor:grab; }
+    #orbitPlot.dragging { cursor:grabbing; }
+    #orbitPlot canvas { display:block; width:100%; height:100%; touch-action:none; }
+    .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:132px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
+    .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
+    .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
+    .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
+    .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .view-panel .view-row button { text-align:center; }
+    .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
+    .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
+    .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    #orbitPlot.pan-mode { cursor:move; }
+    #orbitPlot.pan-mode.dragging { cursor:grabbing; }
+    .view-panel .view-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
+    .view-panel .view-head:hover, .view-panel .view-head:focus-visible { background:transparent; color:var(--ink); }
+    .view-panel .chev { display:inline-block; font-size:12px; transition:transform .2s; }
+    .view-panel.collapsed { min-width:0; padding:7px 10px; border-radius:999px; }
+    .view-panel.collapsed > :not(.view-head) { display:none; }
+    .view-panel.collapsed .view-head { padding:0; }
+    .view-panel.collapsed .chev { transform:rotate(90deg); }
+    @media (hover:none) and (pointer:coarse) { .view-panel { display:none; } }
     .timeline { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:0 16px 14px; color:var(--muted); font-size:12px; }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
     button:hover { border-color:var(--cyan); }
@@ -211,7 +233,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2><span>3D · kpc · drag to orbit · toolbar for Pan/Zoom · wheel to zoom</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -293,36 +315,273 @@ HTML_TEMPLATE = r"""<!doctype html>
       const rgb=a[1].map((c,i)=>Math.round((c+f*(b[1][i]-c))*(1-distanceLift)+255*distanceLift));
       return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
     }
-        function starCoordinates(frameIndex) {
-            return {
-                x:activeTrajectories.map(positions=>positions[frameIndex][0]),
-                y:activeTrajectories.map(positions=>positions[frameIndex][1]),
-                z:activeTrajectories.map(positions=>positions[frameIndex][2])
-            };
-        }
-        function starTrace(frameIndex) {
-            return {
-                type:'scatter3d', mode:'markers', name:'Stars',
-                ...starCoordinates(frameIndex),
-        customdata:stars.map(s=>[s.id,s.v_rot_kms,s.initial_r_kpc]),
-        marker:{size:stars.map(s=>4.8+1.2*s.initial_r_kpc/maxRadius),color:stars.map(s=>velocityColor(s.v_rot_kms,s.initial_r_kpc)),opacity:0.98,line:{width:0.5,color:'rgba(235,248,255,0.72)'}},
-        hovertemplate:'Star %{customdata[0]}<br>R = %{customdata[2]:.1f} kpc<br>v = %{customdata[1]:.1f} km/s<extra></extra>'
-      };
-    }
-        function orbitPathCoordinates(){
-            const x=[],y=[],z=[];
-            for(const positions of activeTrajectories){for(let i=0;i<positions.length;i+=ORBIT_PATH_STEP){const p=positions[i];x.push(p[0]);y.push(p[1]);z.push(p[2]);}x.push(null);y.push(null);z.push(null);}
-            return{x,y,z};
-        }
-        const orbitPaths=orbitPathCoordinates();
         const orbitPlot=document.getElementById('orbitPlot');
-    const orbitData=[
-    {type:'scatter3d',mode:'lines',name:'Orbit paths',x:orbitPaths.x,y:orbitPaths.y,z:orbitPaths.z,hoverinfo:'skip',line:{color:'rgba(110,145,178,0.16)',width:1}},
-      starTrace(0),
-      {type:'scatter3d',mode:'markers',name:'Galactic core',x:[0],y:[0],z:[0],hoverinfo:'skip',marker:{size:5,color:'#f0d69b',opacity:0.82}}
-    ];
-    const orbitLayout={paper_bgcolor:BG,plot_bgcolor:BG,margin:{l:0,r:0,t:8,b:0},showlegend:false,scene:{uirevision:'ngc3198-camera',dragmode:'orbit',bgcolor:BG,aspectmode:'cube',xaxis:{title:'x (kpc)',range:[-65,65],gridcolor:GRID,zerolinecolor:GRID,color:textColor},yaxis:{title:'y (kpc)',range:[-65,65],gridcolor:GRID,zerolinecolor:GRID,color:textColor},zaxis:{title:'z (kpc)',range:[-65,65],gridcolor:GRID,zerolinecolor:GRID,color:textColor},camera:{eye:{x:1.35,y:-1.45,z:1.05}}}};
-    const orbitPlotReady=Plotly.newPlot(orbitPlot,orbitData,orbitLayout,{responsive:true,displaylogo:false,displayModeBar:true,scrollZoom:true});
+
+        /* ---------- Camera / input module: damped orbit controls (mouse, pen, touch) ---------- */
+        class SmoothOrbitControls {
+            // Z-up spherical orbit. Input only edits `goal`; update(dt) eases `view` toward it
+            // with a frame-rate independent exponential filter, so nothing ever snaps.
+            constructor(camera,element,options={}) {
+                this.camera=camera;this.element=element;this.dragMode='rotate';
+                this.o=Object.assign({damping:11,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
+                    minDistance:12,maxDistance:420,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
+                    initial:{theta:-0.82,phi:1.0,radius:120,target:[0,0,0]},onChange:()=>{}},options);
+                const i=this.o.initial;
+                this.goal={theta:i.theta,phi:i.phi,radius:i.radius,target:new THREE.Vector3(...i.target)};
+                this.view={theta:i.theta,phi:i.phi,radius:i.radius,target:this.goal.target.clone()};
+                this.pointers=new Map();this.pinch=null;this.lastMove=0;this.velocity={theta:0,phi:0};
+                this._right=new THREE.Vector3();this._up=new THREE.Vector3();
+                this._bind();this._apply();
+            }
+            _bind() {
+                const el=this.element;
+                this._h={
+                    down:e=>this._down(e),move:e=>this._move(e),up:e=>this._up_(e),
+                    wheel:e=>this._wheel(e),menu:e=>e.preventDefault(),dbl:()=>this.reset()
+                };
+                el.addEventListener('pointerdown',this._h.down);
+                el.addEventListener('pointermove',this._h.move);
+                el.addEventListener('pointerup',this._h.up);
+                el.addEventListener('pointercancel',this._h.up);
+                el.addEventListener('lostpointercapture',this._h.up);
+                el.addEventListener('wheel',this._h.wheel,{passive:false});
+                el.addEventListener('contextmenu',this._h.menu);
+                el.addEventListener('dblclick',this._h.dbl);
+            }
+            dispose() {
+                const el=this.element,h=this._h;
+                el.removeEventListener('pointerdown',h.down);el.removeEventListener('pointermove',h.move);
+                el.removeEventListener('pointerup',h.up);el.removeEventListener('pointercancel',h.up);
+                el.removeEventListener('lostpointercapture',h.up);el.removeEventListener('wheel',h.wheel);
+                el.removeEventListener('contextmenu',h.menu);el.removeEventListener('dblclick',h.dbl);
+            }
+            // Eases to a preset; theta takes the shortest way round so the camera never spins the long way.
+            flyTo({theta,phi,radius,target}={}) {
+                const g=this.goal;
+                if(theta!==undefined){
+                    const turn=Math.PI*2;
+                    g.theta=theta+Math.round((this.view.theta-theta)/turn)*turn;
+                }
+                if(phi!==undefined)g.phi=this._clampPhi(phi);
+                if(radius!==undefined)g.radius=this._clampRadius(radius);
+                if(target)g.target.set(...target);
+                this.velocity.theta=this.velocity.phi=0;
+                this.o.onChange();
+            }
+            reset() {this.flyTo(this.o.initial);}
+            _down(e) {
+                if(e.pointerType==='mouse'&&e.button>2)return;
+                try{this.element.setPointerCapture(e.pointerId);}catch(_){}
+                this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:e.button,shift:e.shiftKey||e.ctrlKey||e.metaKey,type:e.pointerType});
+                this.velocity.theta=this.velocity.phi=0;
+                if(this.pointers.size===2)this.pinch=this._pinchState();
+                this.element.classList.add('dragging');
+                this.o.onChange();
+            }
+            _pinchState() {
+                const [a,b]=[...this.pointers.values()];
+                return{dist:Math.hypot(a.x-b.x,a.y-b.y)||1,x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+            }
+            _move(e) {
+                const p=this.pointers.get(e.pointerId);
+                if(!p)return;
+                // Coalesced events keep fast swipes smooth on high-polling-rate devices.
+                const events=e.getCoalescedEvents?e.getCoalescedEvents():[];
+                for(const ev of (events.length?events:[e])) {
+                    const dx=ev.clientX-p.x,dy=ev.clientY-p.y;
+                    p.x=ev.clientX;p.y=ev.clientY;
+                    if(this.pointers.size===1) {
+                        const mousePan=p.type!=='touch'&&p.button===0&&this.dragMode==='pan';
+                        if(p.button===2||p.button===1||p.shift||mousePan)this._pan(dx,dy);
+                        else this._rotate(dx,dy,ev.timeStamp);
+                    } else if(this.pointers.size===2&&this.pinch) {
+                        const s=this._pinchState();
+                        this.goal.radius=this._clampRadius(this.goal.radius*this.pinch.dist/s.dist);
+                        this._pan(s.x-this.pinch.x,s.y-this.pinch.y);
+                        this.pinch=s;
+                    }
+                }
+            }
+            _up_(e) {
+                if(!this.pointers.delete(e.pointerId))return;
+                try{this.element.releasePointerCapture(e.pointerId);}catch(_){}
+                this.pinch=null;
+                if(this.pointers.size===1)this.pinch=null;
+                if(this.pointers.size===0) {
+                    this.element.classList.remove('dragging');
+                    // Release momentum: only if the pointer was still moving when lifted.
+                    if(performance.now()-this.lastMove<80) {
+                        const k=this.o.inertia*1000;
+                        this.goal.theta+=this.velocity.theta*k;
+                        this.goal.phi=this._clampPhi(this.goal.phi+this.velocity.phi*k);
+                    }
+                    this.velocity.theta=this.velocity.phi=0;
+                } else if(this.pointers.size===1&&this.pinch===null) {
+                    // Remaining finger continues as a rotate without a jump.
+                    const rest=[...this.pointers.values()][0];rest.button=0;rest.shift=false;
+                }
+                this.o.onChange();
+            }
+            _height() {return this.element.clientHeight||1;}
+            _rotate(dx,dy,t) {
+                const f=2*Math.PI*this.o.rotateSpeed/this._height();
+                const dTheta=-dx*f,dPhi=-dy*f;
+                this.goal.theta+=dTheta;
+                this.goal.phi=this._clampPhi(this.goal.phi+dPhi);
+                const now=performance.now(),dt=Math.max(now-this.lastMove,1);
+                this.velocity.theta=0.6*this.velocity.theta+0.4*dTheta/dt;
+                this.velocity.phi=0.6*this.velocity.phi+0.4*dPhi/dt;
+                this.lastMove=now;
+                this.o.onChange();
+            }
+            _pan(dx,dy) {
+                const cam=this.camera,k=2*this.goal.radius*Math.tan(THREE.MathUtils.degToRad(cam.fov)/2)/this._height()*this.o.panSpeed;
+                cam.updateMatrixWorld();
+                this._right.setFromMatrixColumn(cam.matrixWorld,0);
+                this._up.setFromMatrixColumn(cam.matrixWorld,1);
+                this.goal.target.addScaledVector(this._right,-dx*k).addScaledVector(this._up,dy*k);
+                const L=this.o.panLimit;
+                this.goal.target.set(...this.goal.target.toArray().map(v=>Math.max(-L,Math.min(L,v))));
+                this.o.onChange();
+            }
+            _wheel(e) {
+                e.preventDefault();
+                const unit=e.deltaMode===1?16:e.deltaMode===2?100:1;
+                const delta=Math.max(-400,Math.min(400,e.deltaY*unit))*(e.ctrlKey?2.5:1);
+                this.goal.radius=this._clampRadius(this.goal.radius*Math.exp(delta*this.o.zoomSpeed));
+                this.o.onChange();
+            }
+            _clampPhi(v) {return Math.max(this.o.minPhi,Math.min(this.o.maxPhi,v));}
+            _clampRadius(v) {return Math.max(this.o.minDistance,Math.min(this.o.maxDistance,v));}
+            // Returns true while the view is still easing toward the goal (caller keeps rendering).
+            update(dt) {
+                const g=this.goal,v=this.view,a=1-Math.exp(-this.o.damping*Math.min(dt,0.1));
+                const dTheta=g.theta-v.theta,dPhi=g.phi-v.phi,dR=g.radius-v.radius;
+                const dT=g.target.distanceTo(v.target);
+                if(Math.abs(dTheta)<1e-5&&Math.abs(dPhi)<1e-5&&Math.abs(dR)<1e-3&&dT<1e-3) {
+                    if(dTheta||dPhi||dR||dT){v.theta=g.theta;v.phi=g.phi;v.radius=g.radius;v.target.copy(g.target);this._apply();return true;}
+                    return false;
+                }
+                v.theta+=dTheta*a;v.phi+=dPhi*a;v.radius+=dR*a;v.target.lerp(g.target,a);
+                this._apply();
+                return true;
+            }
+            _apply() {
+                const v=this.view,s=Math.sin(v.phi);
+                this.camera.up.set(0,0,1);
+                this.camera.position.set(v.target.x+v.radius*s*Math.cos(v.theta),v.target.y+v.radius*s*Math.sin(v.theta),v.target.z+v.radius*Math.cos(v.phi));
+                this.camera.lookAt(v.target);
+            }
+        }
+
+        /* ---------- Three.js scene ---------- */
+        const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+        renderer.setClearColor(BG,1);
+        orbitPlot.appendChild(renderer.domElement);
+        const scene=new THREE.Scene();
+        const camera=new THREE.PerspectiveCamera(40,1,1,2000);
+        const GALAXY_VIEW=(()=>{const e=[1.35,-1.45,1.05],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*58,target:[0,0,0]};})();
+
+        // Reference grid (galaxy plane) and axes
+        const grid=new THREE.GridHelper(130,13,0x2a3b4c,0x1c2936);grid.rotation.x=Math.PI/2;scene.add(grid);
+        const axisPoints=[0,0,0,65,0,0, 0,0,0,0,65,0, 0,0,0,0,0,65];
+        const axisColors=[0.48,0.89,0.95,0.48,0.89,0.95, 0.95,0.78,0.47,0.95,0.78,0.47, 0.6,0.6,0.9,0.6,0.6,0.9];
+        const axisGeometry=new THREE.BufferGeometry();
+        axisGeometry.setAttribute('position',new THREE.Float32BufferAttribute(axisPoints,3));
+        axisGeometry.setAttribute('color',new THREE.Float32BufferAttribute(axisColors,3));
+        scene.add(new THREE.LineSegments(axisGeometry,new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:0.55})));
+
+        // Orbit paths (one segment list, rewritten in place when the halo changes)
+        function orbitPathSegmentCount(){return stars.length*Math.floor((frameCount-1)/ORBIT_PATH_STEP);}
+        const pathPositions=new Float32Array(orbitPathSegmentCount()*6);
+        const pathAttribute=new THREE.BufferAttribute(pathPositions,3);pathAttribute.setUsage(THREE.DynamicDrawUsage);
+        const pathGeometry=new THREE.BufferGeometry();pathGeometry.setAttribute('position',pathAttribute);
+        function fillOrbitPaths(){
+            let o=0;
+            for(const positions of activeTrajectories){
+                for(let i=0;i+ORBIT_PATH_STEP<frameCount;i+=ORBIT_PATH_STEP){
+                    const a=positions[i],b=positions[i+ORBIT_PATH_STEP];
+                    pathPositions[o++]=a[0];pathPositions[o++]=a[1];pathPositions[o++]=a[2];
+                    pathPositions[o++]=b[0];pathPositions[o++]=b[1];pathPositions[o++]=b[2];
+                }
+            }
+            pathAttribute.needsUpdate=true;
+        }
+        fillOrbitPaths();
+        const pathLines=new THREE.LineSegments(pathGeometry,new THREE.LineBasicMaterial({color:0x6e91b2,transparent:true,opacity:0.2,depthWrite:false}));
+        pathLines.frustumCulled=false;scene.add(pathLines);
+
+        // Stars: one Points draw call, round sprites via a tiny shader
+        const starPositions=new Float32Array(stars.length*3),starColors=new Float32Array(stars.length*3),starSizes=new Float32Array(stars.length);
+        stars.forEach((s,i)=>{
+            const c=new THREE.Color(velocityColor(s.v_rot_kms,s.initial_r_kpc));
+            starColors.set([c.r,c.g,c.b],i*3);
+            starSizes[i]=6.5+1.5*s.initial_r_kpc/maxRadius;
+        });
+        const starAttribute=new THREE.BufferAttribute(starPositions,3);starAttribute.setUsage(THREE.DynamicDrawUsage);
+        const starGeometry=new THREE.BufferGeometry();
+        starGeometry.setAttribute('position',starAttribute);
+        starGeometry.setAttribute('color',new THREE.BufferAttribute(starColors,3));
+        starGeometry.setAttribute('size',new THREE.BufferAttribute(starSizes,1));
+        const pointVertex='attribute float size;attribute vec3 color;varying vec3 vColor;uniform float scale;void main(){vColor=color;gl_PointSize=size*scale;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}';
+        const pointFragment='varying vec3 vColor;uniform float rim;void main(){vec2 p=gl_PointCoord-0.5;float d=length(p);if(d>0.5)discard;vec3 col=mix(vColor,vec3(0.92,0.97,1.0),smoothstep(0.38,0.5,d)*rim);gl_FragColor=vec4(col,1.0);}';
+        const starMaterial=new THREE.ShaderMaterial({vertexShader:pointVertex,fragmentShader:pointFragment,uniforms:{scale:{value:1},rim:{value:0.7}}});
+        const starPoints=new THREE.Points(starGeometry,starMaterial);starPoints.frustumCulled=false;scene.add(starPoints);
+
+        const coreGeometry=new THREE.BufferGeometry();
+        coreGeometry.setAttribute('position',new THREE.Float32BufferAttribute([0,0,0],3));
+        coreGeometry.setAttribute('color',new THREE.Float32BufferAttribute([0.94,0.84,0.61],3));
+        coreGeometry.setAttribute('size',new THREE.Float32BufferAttribute([12],1));
+        const coreMaterial=new THREE.ShaderMaterial({vertexShader:pointVertex,fragmentShader:pointFragment,uniforms:{scale:{value:1},rim:{value:0}}});
+        scene.add(new THREE.Points(coreGeometry,coreMaterial));
+
+        function starCoordinates(frameIndex){
+            for(let i=0;i<activeTrajectories.length;i++){
+                const p=activeTrajectories[i][frameIndex];
+                starPositions[i*3]=p[0];starPositions[i*3+1]=p[1];starPositions[i*3+2]=p[2];
+            }
+            starAttribute.needsUpdate=true;
+        }
+
+        // Render loop: always cheap, draws only when the camera is easing or the scene changed.
+        let needsRender=true,lastTime=performance.now();
+        const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
+        function requestRender(){needsRender=true;}
+        // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
+        const viewPanel=document.getElementById('viewPanel');
+        ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>viewPanel.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
+        const viewToggle=document.getElementById('viewToggle');
+        viewToggle.addEventListener('click',()=>{
+            const collapsed=viewPanel.classList.toggle('collapsed');
+            viewToggle.setAttribute('aria-expanded',String(!collapsed));
+        });
+        document.getElementById('viewReset').addEventListener('click',()=>controls.reset());
+        document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0,target:[0,0,0],radius:GALAXY_VIEW.radius}));
+        document.getElementById('viewEdgeOn').addEventListener('click',()=>controls.flyTo({phi:Math.PI/2,target:[0,0,0],radius:GALAXY_VIEW.radius}));
+        // Rotate/Pan only changes what a primary mouse drag does; touch gestures are unaffected.
+        const modeButtons=[...viewPanel.querySelectorAll('[data-mode]')];
+        function setDragMode(mode){
+            controls.dragMode=mode;
+            orbitPlot.classList.toggle('pan-mode',mode==='pan');
+            modeButtons.forEach(b=>b.setAttribute('aria-checked',String(b.dataset.mode===mode)));
+        }
+        modeButtons.forEach(b=>b.addEventListener('click',()=>setDragMode(b.dataset.mode)));
+        function resizeOrbit(){
+            const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
+            renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
+            camera.aspect=w/h;camera.updateProjectionMatrix();
+            starMaterial.uniforms.scale.value=dpr;coreMaterial.uniforms.scale.value=dpr;
+            needsRender=true;
+        }
+        if(window.ResizeObserver)new ResizeObserver(resizeOrbit).observe(orbitPlot);
+        window.addEventListener('resize',resizeOrbit);
+        function renderLoop(now){
+            const dt=(now-lastTime)/1000;lastTime=now;
+            if(controls.update(dt))needsRender=true;
+            if(needsRender){needsRender=false;renderer.render(scene,camera);}
+            requestAnimationFrame(renderLoop);
+        }
+        resizeOrbit();requestAnimationFrame(renderLoop);
 
     const initialHalo=haloCurve(DEFAULTS.massT,DEFAULTS.scaleRadius);
     const totalCurve=vBary.map((v,i)=>Math.hypot(v,initialHalo[i]));
@@ -346,11 +605,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             clearTimeout(orbitModelTimer);
             orbitModelTimer=setTimeout(()=>{
                 activeTrajectories=integrateTrajectories(massT,rs);
-                const paths=orbitPathCoordinates(),points=starCoordinates(currentFrame);
-                orbitPlotReady.then(()=>Promise.all([
-                    Plotly.restyle(orbitPlot,{x:[paths.x],y:[paths.y],z:[paths.z]},[0]),
-                    Plotly.restyle(orbitPlot,{x:[points.x],y:[points.y],z:[points.z]},[1])
-                ]));
+                fillOrbitPaths();starCoordinates(currentFrame);requestRender();
             },120);
     }
     massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
@@ -362,59 +617,20 @@ HTML_TEMPLATE = r"""<!doctype html>
 
     const timeSlider=document.getElementById('timeSlider'),timeSliderBottom=document.getElementById('timeSliderBottom');
         const playButton=document.getElementById('playButton');let timer=null,playing=false;
-        let userCamera=null,cameraRevision=0,interactionUntil=0,pointerInteracting=false,touchInteracting=false;
-        orbitPlot.addEventListener('wheel',()=>{
-            interactionUntil=performance.now()+350;
-        },{capture:true,passive:true});
-        orbitPlot.addEventListener('pointerdown',()=>{pointerInteracting=true;},true);
-        orbitPlot.addEventListener('touchstart',()=>{touchInteracting=true;},{capture:true,passive:true});
-        orbitPlot.addEventListener('touchmove',()=>{interactionUntil=performance.now()+350;},{capture:true,passive:true});
-        window.addEventListener('pointerup',()=>{
-            pointerInteracting=false;
-            interactionUntil=performance.now()+250;
-        },true);
-        window.addEventListener('pointercancel',()=>{
-            pointerInteracting=false;
-            interactionUntil=performance.now()+250;
-        },true);
-        window.addEventListener('touchend',event=>{
-            touchInteracting=event.touches.length>0;
-            if(!touchInteracting)interactionUntil=performance.now()+350;
-        },{capture:true,passive:true});
-        window.addEventListener('touchcancel',event=>{
-            touchInteracting=event.touches.length>0;
-            if(!touchInteracting)interactionUntil=performance.now()+350;
-        },{capture:true,passive:true});
-        orbitPlot.on('plotly_relayout',event=>{
-            if(Object.keys(event).some(key=>key.startsWith('scene.camera'))){
-                userCamera=JSON.parse(JSON.stringify(orbitPlot.layout.scene.camera));
-                cameraRevision++;
-            }
-        });
         function setFrame(index){
       index=Math.max(0,Math.min(frameCount-1,Number(index)));
             currentFrame=index;
       timeSlider.value=index;timeSliderBottom.value=index;
-    const points=starCoordinates(index);
+      starCoordinates(index);requestRender();
       document.getElementById('frameLabel').textContent=`Frame ${index+1}`;
       document.getElementById('timeValue').textContent=`${(index*DATA.frame_step_myr).toFixed(0)} Myr`;
       document.getElementById('timeLabel').textContent=`${(index*DATA.frame_step_myr).toFixed(0)} Myr`;
-            const camera=JSON.parse(JSON.stringify(userCamera||orbitPlot.layout.scene.camera));
-            const revision=cameraRevision;
-            return Plotly.restyle(orbitPlot,{x:[points.x],y:[points.y],z:[points.z]},[1]).then(()=>{
-                if(revision===cameraRevision&&camera&&JSON.stringify(orbitPlot.layout.scene.camera)!==JSON.stringify(camera)){
-                    return Plotly.relayout(orbitPlot,{'scene.camera':camera});
-                }
-            });
+            return Promise.resolve();
     }
     timeSlider.addEventListener('input',()=>setFrame(timeSlider.value));
     timeSliderBottom.addEventListener('input',()=>setFrame(timeSliderBottom.value));
         async function advanceFrame(){
             if(!playing)return;
-            if(pointerInteracting||touchInteracting||performance.now()<interactionUntil){
-                timer=setTimeout(advanceFrame,50);
-                return;
-            }
             const next=Number(timeSlider.value)+1;
             if(next>=frameCount){playing=false;timer=null;playButton.textContent='Play';return;}
             await setFrame(next);
