@@ -225,7 +225,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <body>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
-    <div class="header-note">1720 massless test particles (bulge, disk, stellar halo) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
+    <div class="header-note">800 massless test particles (bulge, disk) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
   </header>
   <main>
     <section class="controls" aria-label="Dark matter controls">
@@ -255,9 +255,9 @@ HTML_TEMPLATE = r"""<!doctype html>
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
 
         /* ---------- 3D galaxy morphology: Hernquist bulge + exponential / sech^2 disk ---------- */
-        const GALAXY={bulgeCount:240,diskCount:1360,haloCount:120,hernquistA:1.0,bulgeMax:7,bulgeKeepOut:1.1,
-            diskScaleLength:4.0,diskScaleHeight:0.28,diskMax:maxRadius,diskMin:0.8,
-            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.7};
+        const GALAXY={bulgeCount:120,diskCount:680,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
+            diskScaleLength:4.0,diskScaleHeight:0.28,diskMax:maxRadius,diskMin:0.70,
+            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.42};
         function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
             t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
         // Hernquist (1990) inverse CDF: r = a*sqrt(u)/(1-sqrt(u)); isotropic spherical distribution gives a true 3D spherical concentration.
@@ -558,21 +558,25 @@ HTML_TEMPLATE = r"""<!doctype html>
         const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
         const diskCount=diskIndices.length;
 
-        // Disk stars are InstancedMesh spheres; bulge and halo are soft additive glow sprites.
-        const STAR_BASE_RADIUS=0.32*0.75;
-        const starCount=diskIndices.length;
-        const starIndices=diskIndices;
+        // All 800 stars (bulge + disk) are InstancedMesh spheres; no glowing orbs or halo clutter.
+        const STAR_BASE_RADIUS=0.18;
+        const starCount=particles.length;
+        const starIndices=Array.from({length:starCount},(_,i)=>i);
         const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),new THREE.MeshBasicMaterial({toneMapped:false}),starCount);
         starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         starMesh.frustumCulled=false;starMesh.renderOrder=1;
         (()=>{
             const m=new THREE.Matrix4(),c=new THREE.Color();
-            const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8');
+            const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8'),warm=new THREE.Color('#FFE8D6');
             const smooth01=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
             for(let k=0;k<starCount;k++){
                 const pt=particles[starIndices[k]],p=activeTrajectories[starIndices[k]][0];
-                c.copy(white).lerp(blue,smooth01((pt.radius-GALAXY.diskMin)/(maxRadius*0.6)));
-                const sc=0.40+0.15*(pt.radius/maxRadius);
+                if(pt.kind==='bulge'){
+                    c.copy(warm).lerp(white,Math.min(1,pt.radius/GALAXY.bulgeMax));
+                }else{
+                    c.copy(white).lerp(blue,smooth01((pt.radius-GALAXY.diskMin)/(maxRadius*0.6)));
+                }
+                const sc=pt.kind==='bulge'?0.30+0.08*Math.min(1,pt.radius/GALAXY.bulgeMax):0.32+0.12*(pt.radius/maxRadius);
                 m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
                 starMesh.setMatrixAt(k,m);
                 starMesh.setColorAt(k,c);
@@ -581,51 +585,8 @@ HTML_TEMPLATE = r"""<!doctype html>
         })();
         scene.add(starMesh);
 
-        // Soft glow sprites (THREE.Points + radial-gradient texture + additive blending) for bulge and halo.
-        const spriteTexture=(()=>{
-            const cv=document.createElement('canvas');cv.width=cv.height=64;
-            const g=cv.getContext('2d'),gr=g.createRadialGradient(32,32,0,32,32,32);
-            gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(0.25,'rgba(255,255,255,0.55)');
-            gr.addColorStop(0.6,'rgba(255,255,255,0.12)');gr.addColorStop(1,'rgba(255,255,255,0)');
-            g.fillStyle=gr;g.fillRect(0,0,64,64);
-            return new THREE.CanvasTexture(cv);
-        })();
-        const spriteUniforms={uScale:{value:400}};
-        const spriteMaterial=new THREE.ShaderMaterial({
-            uniforms:{...spriteUniforms,uMap:{value:spriteTexture}},
-            transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,vertexColors:true,
-            vertexShader:`attribute float size;varying vec3 vC;uniform float uScale;
-                void main(){vC=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*uScale/-mv.z;gl_Position=projectionMatrix*mv;}`,
-            fragmentShader:`uniform sampler2D uMap;varying vec3 vC;
-                void main(){vec4 t=texture2D(uMap,gl_PointCoord);gl_FragColor=vec4(vC*t.a,t.a);}`
-        });
-        spriteUniforms.uScale=spriteMaterial.uniforms.uScale;
-        const spriteSets=[];
-        function makeSpritePoints(indices,colorFn,sizeFn,order){
-            const n=indices.length,pos=new Float32Array(n*3),col=new Float32Array(n*3),size=new Float32Array(n);
-            const c=new THREE.Color();
-            for(let k=0;k<n;k++){
-                const pt=particles[indices[k]];colorFn(pt,c);
-                col[k*3]=c.r;col[k*3+1]=c.g;col[k*3+2]=c.b;size[k]=sizeFn(pt);
-            }
-            const geom=new THREE.BufferGeometry();
-            const posAttr=new THREE.BufferAttribute(pos,3);posAttr.setUsage(THREE.DynamicDrawUsage);
-            geom.setAttribute('position',posAttr);
-            geom.setAttribute('color',new THREE.BufferAttribute(col,3));
-            geom.setAttribute('size',new THREE.BufferAttribute(size,1));
-            const pts=new THREE.Points(geom,spriteMaterial);
-            pts.frustumCulled=false;pts.renderOrder=order;scene.add(pts);
-            spriteSets.push({indices,pos,posAttr});
-        }
-        const bulgeIn=new THREE.Color('#FFFFFF'),bulgeOut=new THREE.Color('#FF8FA3');
-        makeSpritePoints(bulgeIndices,(pt,c)=>{
-            const t=Math.min(1,pt.radius/(GALAXY.bulgeMax*0.6));c.copy(bulgeIn).lerp(bulgeOut,Math.sqrt(t)).            multiplyScalar(0.42-0.22*t);
-                    },pt=>3.2+1.6*Math.min(1,pt.radius/(GALAXY.bulgeMax*0.6)),0);
-        makeSpritePoints(haloIndices,(pt,c)=>{
-            c.set(pt.warm?'#ffc68a':'#9db8e0').multiplyScalar(pt.warm?0.7:0.35);
-        },pt=>pt.warm?2.4:1.3,0);
-        // Black hole: camera-facing shader quad. Opaque shadow disc, thin Doppler-beamed photon ring and a soft accretion glow.
-        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=4.0;
+        // Black hole: compact core feature with crisp event horizon shadow and clean, sharp photon ring.
+        const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=2.4;
         const blackHole=new THREE.Mesh(
             new THREE.PlaneGeometry(2*BH_R*BH_EXTENT,2*BH_R*BH_EXTENT),
             new THREE.ShaderMaterial({
@@ -637,11 +598,13 @@ HTML_TEMPLATE = r"""<!doctype html>
                     void main(){
                         vec2 p=vP/${BH_R.toFixed(3)};float d=length(p);
                         float shadow=1.0-smoothstep(0.96,1.0,d);
-                        float beam=1.0+0.55*cos(atan(p.y,p.x)-0.6);
-                        float ring=exp(-pow((d-1.07)/0.045,2.0))*1.9*beam;
-                        float glow=exp(-pow((d-1.12)/0.42,2.0))*0.32;
-                        float fade=1.0-smoothstep(${(BH_EXTENT-1.0).toFixed(1)},${BH_EXTENT.toFixed(1)},d);
-                        vec3 col=(vec3(1.0,0.97,0.88)*ring+vec3(1.0,0.62,0.32)*glow)*fade*(1.0-shadow);
+                        float beam=1.0+0.40*cos(atan(p.y,p.x)-0.5);
+                        float ring=exp(-pow((d-1.06)/0.055,2.0))*2.8*beam;
+                        float glow=exp(-pow((d-1.10)/0.18,2.0))*0.10;
+                        float fade=1.0-smoothstep(1.35,1.8,d);
+                        vec3 ringCol=vec3(1.0,0.98,0.92)*ring;
+                        vec3 glowCol=vec3(1.0,0.88,0.72)*glow;
+                        vec3 col=(ringCol+glowCol)*fade*(1.0-shadow);
                         gl_FragColor=vec4(col,shadow);
                     }
                 `
@@ -651,7 +614,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         blackHole.renderOrder=3;scene.add(blackHole);
 
         // Optional orbit trajectory lines: full paths of an evenly spaced subset of disk stars.
-        const ORBIT_LINE_STARS=90,ORBIT_LINE_STEP=3;
+        const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=3;
         const orbitLineIdx=Array.from({length:Math.min(ORBIT_LINE_STARS,diskCount)},(_,k)=>diskIndices[Math.floor(k*diskCount/Math.min(ORBIT_LINE_STARS,diskCount))]);
         const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
         const orbitLineGeom=new THREE.BufferGeometry();
@@ -686,16 +649,6 @@ HTML_TEMPLATE = r"""<!doctype html>
                 matArray[off+14]=p0[2]+(p1[2]-p0[2])*alpha;
             }
             starMesh.instanceMatrix.needsUpdate=true;
-            for(const set of spriteSets){
-                for(let k=0;k<set.indices.length;k++){
-                    const trajectory=activeTrajectories[set.indices[k]];
-                    const p0=trajectory[f0],p1=trajectory[f1];
-                    set.pos[k*3]=p0[0]+(p1[0]-p0[0])*alpha;
-                    set.pos[k*3+1]=p0[1]+(p1[1]-p0[1])*alpha;
-                    set.pos[k*3+2]=p0[2]+(p1[2]-p0[2])*alpha;
-                }
-                set.posAttr.needsUpdate=true;
-            }
         }
 
         // Render loop: continuous delta-time playback with throttled UI sync
@@ -737,7 +690,6 @@ HTML_TEMPLATE = r"""<!doctype html>
             const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
             renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
             camera.aspect=w/h;camera.updateProjectionMatrix();
-            spriteUniforms.uScale.value=h*dpr/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)));
             needsRender=true;
         }
         if(window.ResizeObserver)new ResizeObserver(resizeOrbit).observe(orbitPlot);

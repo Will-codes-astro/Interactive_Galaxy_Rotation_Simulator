@@ -30,15 +30,15 @@
 
 ## V2.0 Particle Engine (implemented)
 
-Implemented in [generate_interactive_html.py](generate_interactive_html.py) and regenerated into `index.html`. Tunables live in the `GALAXY` object. There are 1720 massless test particles (seeded PRNG), integrated in 3D with RK4 in the spherical baryonic + NFW potential from the observed SPARC speed. The mix is a visual choice, not SPARC data.
+Implemented in [generate_interactive_html.py](generate_interactive_html.py) and regenerated into `index.html`. Tunables live in the `GALAXY` object. There are 800 massless test particles (seeded PRNG), integrated in 3D with RK4 in the spherical baryonic + NFW potential from the observed SPARC speed. The mix is a visual choice, not SPARC data.
 
 | Component | Count | Radial profile | Vertical profile | Rendering |
 |---|---|---|---|---|
-| Bulge | 240 | Hernquist, `a = 1 kpc` | Isotropic (spherical) | `THREE.Points`, soft radial-gradient sprite, `AdditiveBlending`, white centre to pink edge |
-| Disk | 1360 | Exponential, `R_d = 4 kpc` | `sech^2`, `z_0 = 0.28 kpc` | `InstancedMesh` spheres, white to blue-white |
-| Stellar halo | 120 (about 12% warm knots) | Hernquist-like, `a = 12 kpc`, 5-48 kpc | Isotropic | `THREE.Points`, faint sprites, additive |
+| Bulge | 120 | Hernquist, `a = 1 kpc` | Isotropic (spherical) | `InstancedMesh` spheres, warm cream to white |
+| Disk | 680 | Exponential, `R_d = 4 kpc` | `sech^2`, `z_0 = 0.28 kpc` | `InstancedMesh` spheres, white to blue-white |
+| Stellar halo | 0 | Removed to eliminate external glowing orbs | N/A | Space outside galaxy is clean black |
 
-- **Star size:** the instanced star radius is `0.32 * 0.75` (`STAR_BASE_RADIUS`).
-- **Black hole:** a camera-facing shader quad at (0,0,0), radius 0.7. It draws an opaque shadow disc, a thin Doppler-beamed photon ring and a soft orange glow. A keep-out radius (`bulgeKeepOut`) keeps bulge stars off the shadow. It does not change the orbit model.
-- **Purged:** grid and axes helpers, torus/ring meshes and the hard black sphere. Orbit lines are an optional "Orbit lines" toggle in the View panel, and the Reset view button gives a 3/4 view.
-- **Sprites:** point size scales with the canvas height and FOV (`uScale`), and `depthWrite` is off so overlaps add into a glow.
+- **Star size:** the instanced star radius is `0.18` (`STAR_BASE_RADIUS`), scaled delicately for a crisp, uncluttered field.
+- **Black hole:** a compact camera-facing shader quad at (0,0,0), radius 0.42. It renders an opaque shadow disc, a sharp, clean photon sphere with subtle relativistic Doppler beaming, and a minimal, tight warm falloff (no wide red haze). A keep-out radius (`bulgeKeepOut = 0.65`) keeps stars orbiting cleanly outside the photon sphere.
+- **Purged:** grid and axes helpers, torus/ring meshes, external halo glowing orbs, and diffuse bulge glow sprites. Orbit lines are an optional "Orbit lines" toggle in the View panel, and the Reset view button gives a 3/4 view.
+- **Instancing:** all 800 stars are rendered in a single `THREE.InstancedMesh` draw call with in-place matrix updates.
