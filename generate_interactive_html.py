@@ -79,7 +79,7 @@ def load_rotation_curve(path: Path) -> list[dict[str, float]]:
             baryonic = math.sqrt(
                 max(
                     0.0,
-                    gas**2 + UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2,
+                    gas * abs(gas) + UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2,
                 )
             )
             rows.append(
@@ -89,6 +89,9 @@ def load_rotation_curve(path: Path) -> list[dict[str, float]]:
                     "error_kms": abs(error),
                     "baryonic_kms": baryonic,
                     "gas_kms": abs(gas),
+                    "gas_sq": gas * abs(gas),
+                    "disk_kms": abs(disk),
+                    "bulge_kms": abs(bulge),
                     "stellar_kms": math.sqrt(
                         max(0.0, UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2)
                     ),
@@ -181,7 +184,25 @@ HTML_TEMPLATE = r"""<!doctype html>
     header { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding:22px 26px 16px; border-bottom:1px solid var(--line); background:#070d15; }
     .eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.12em; font-size:11px; }
     h1 { font-size:22px; line-height:1.15; margin:5px 0 0; font-weight:600; }
-    .header-note { color:var(--muted); font-size:12px; text-align:right; }
+    .header-stats { display:flex; flex-wrap:nowrap; justify-content:flex-end; gap:8px; flex:0 0 auto; align-items:flex-start; }
+    .stat { min-width:0; padding:7px 12px 8px; border:1px solid var(--line); border-radius:8px; background:linear-gradient(160deg,rgba(123,228,241,0.09),rgba(123,228,241,0.015)); white-space:nowrap; }
+    .stat.ml { background:linear-gradient(160deg,rgba(242,200,121,0.12),rgba(242,200,121,0.02)); border-color:rgba(242,200,121,0.28); }
+    .stat-label { color:var(--muted); font-size:9px; letter-spacing:.1em; text-transform:uppercase; }
+    .stat-value { margin-top:1px; font-size:18px; font-weight:600; line-height:1.15; color:var(--cyan); font-variant-numeric:tabular-nums; }
+    .stat-value small { font-size:12px; font-weight:400; color:var(--muted); margin-left:3px; }
+    .stat.ml .stat-value { color:var(--gold); }
+    .ml-col { display:flex; flex-direction:column; align-items:stretch; gap:6px; }
+    .fit-toggle { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 10px; border:1px solid rgba(255,174,92,0.28); border-radius:8px; background:rgba(255,174,92,0.05); font-size:11px; color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap; }
+    .fit-toggle[hidden] { display:none; }
+    .fit-toggle input { position:absolute; opacity:0; width:0; height:0; }
+    .fit-toggle .track { position:relative; width:30px; height:16px; border-radius:999px; background:#16222f; border:1px solid rgba(120,150,180,0.4); transition:background .2s,border-color .2s; flex:none; }
+    .fit-toggle .track::after { content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:#dbe7f4; transition:transform .2s; }
+    .fit-toggle input:checked ~ .track { background:rgba(255,174,92,0.25); border-color:rgba(255,174,92,0.7); }
+    .fit-toggle input:checked ~ .track::after { transform:translateX(14px); background:#ffae5c; }
+    .fit-toggle input:focus-visible ~ .track { outline:2px solid var(--cyan); outline-offset:2px; }
+    .fit-toggle input:checked ~ .fit-label { color:var(--ink); }
+    .ml-pair { display:flex; gap:16px; }
+    .ml-pair span { display:block; font-size:10px; font-weight:400; color:var(--muted); letter-spacing:.06em; }
     main { padding:16px; max-width:1800px; margin:auto; }
     .controls { display:grid; grid-template-columns:minmax(230px,1fr) minmax(230px,1fr) minmax(280px,1.4fr); gap:14px; padding:13px 16px; border:1px solid var(--line); background:var(--panel); border-radius:5px; margin-bottom:14px; }
     .control label { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; margin-bottom:7px; }
@@ -277,19 +298,26 @@ HTML_TEMPLATE = r"""<!doctype html>
     button:hover { border-color:var(--cyan); }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     @media(max-width:960px) { .panel-grid { grid-template-columns:1fr; } .plot { height:62vh; } .controls { grid-template-columns:1fr 1fr; } .control:last-child { grid-column:1/-1; } }
-    @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-note { text-align:left; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } footer { flex-direction:column; } }
+    @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } footer { flex-direction:column; } }
   </style>
 </head>
 <body>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
-    <div class="header-note">800 massless test particles (disk) · 1000 Myr (1 Gyr) evolutionary timeline<br>Local data embedded in this page · dark halo uses an NFW profile</div>
+    <div class="header-stats" aria-label="Simulation summary">
+      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value">800<small>massless</small></div></div>
+      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
+      <div class="ml-col">
+        <div class="stat ml" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label">Mass-to-light (M/L)</div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div></div>
+        <label class="fit-toggle" id="mondFitWrap" hidden title="Re-fit a₀ and the disk M/L to the SPARC data to minimise χ² (MOND mode only)"><span class="fit-label">MOND best fit</span><input type="checkbox" id="mondFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
+      </div>
+    </div>
   </header>
   <main>
     <section class="model-bar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
-      <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
-      <span class="mond-note" id="mondNote" hidden>MOND active: no dark matter (M<sub>200</sub> = 0). Gravity is boosted below a<sub>0</sub> = 1.2×10⁻¹⁰ m/s².</span>
+      <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
+      <span class="mond-note" id="mondNote" hidden>MOND active: no dark matter (M<sub>200</sub> = 0). Gravity is boosted below a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</span>
     </section>
     <section class="controls" aria-label="Dark matter controls">
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button></div>
@@ -313,7 +341,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <p>Both ideas can match this galaxy's curve; they disagree about <i>why</i>. Flip the switch above to compare them.</p>
       </details>
     </section>
-    <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
+    <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
   </main>
   <script>
     const DATA = __DATA_JSON__;
@@ -406,6 +434,8 @@ HTML_TEMPLATE = r"""<!doctype html>
         }
         const radii=DATA.rotation.map(p=>p.radius_kpc);
         const vBary=DATA.rotation.map(p=>p.baryonic_kms);
+        const mlState={disk:DATA.upsilon_disk,bulge:DATA.upsilon_bulge};
+        const baryonsFor=(ud,ub)=>DATA.rotation.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
         function nfwVelocityModel(massSolar,scaleRadius) {
             if(massSolar<=0)return ()=>0;
             const rhoCrit=3*H0*H0/(8*Math.PI*G);
@@ -420,7 +450,8 @@ HTML_TEMPLATE = r"""<!doctype html>
         }
         function haloCurve(massT,scaleRadius) {return radii.map(nfwVelocityModel(massT*1e12,scaleRadius));}
         const M_PER_KPC = 3.08567758e19;
-        const MOND_A0 = 1.2e-10; // m/s^2
+        const MOND_A0_DEFAULT = 1.2e-10; // m/s^2
+        let MOND_A0 = MOND_A0_DEFAULT;
         let mondMode = false;
         // SI calculation with the standard interpolating function mu(x) = x / sqrt(1 + x^2)
         function mondVelocity(vBarKms, rKpc, a0 = MOND_A0) {
@@ -1014,13 +1045,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         }
         // Radial profile on a 1 kpc grid (1-44 kpc, limited to the range covered by the SPARC data).
         function buildRotationCurveCsv(){
-            const gas=DATA.rotation.map(p=>p.gas_kms),disk=DATA.rotation.map(p=>p.stellar_kms),err=DATA.rotation.map(p=>p.error_kms);
-            const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(DATA.rotation.map(p=>p.baryonic_kms),r));
+            const gas=DATA.rotation.map(p=>p.gas_kms),gasSq=DATA.rotation.map(p=>p.gas_sq),disk=DATA.rotation.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=DATA.rotation.map(p=>p.error_kms);
+            const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3);
             let csv="Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
             for(let r=1;r<=44&&r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r),vd=interpolateAt(disk,r);
-                const vb=Math.hypot(vg,vd),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);
+                const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);
                 csv+=[r,f(vo),f(eo),f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh)),f(vo-vb)].join(',')+"\n";
             }
             return csv;
@@ -1157,7 +1188,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
-      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[halo,total],name:[mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[!mondMode,true]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[vBary.slice()]},[1]);Plotly.restyle('curvePlot',{y:[halo,total],name:[mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[!mondMode,true]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
       document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       Plotly.relayout('curvePlot',{'yaxis.range':[0,yMax]});
@@ -1170,12 +1201,43 @@ HTML_TEMPLATE = r"""<!doctype html>
           requestRender();
       },120);
     }
-    const mondToggle=document.getElementById('mondToggle');
+    const mondToggle=document.getElementById('mondToggle'),mondFitToggle=document.getElementById('mondFitToggle');
+    // Grid search over a0 and the disk M/L (bulge M/L stays fixed) for the lowest chi-squared.
+    let mondBest=null;
+    function findMondBestFit(){
+      if(mondBest)return mondBest;
+      let best={chi:Infinity,disk:mlState.disk,a0:MOND_A0_DEFAULT};
+      for(let ud=0.05;ud<=1.5001;ud+=0.01){
+        const vb=baryonsFor(ud,DATA.upsilon_bulge);
+        for(let a0=0.3e-10;a0<=4e-10;a0+=0.01e-10){
+          let chi=0;
+          for(let i=0;i<vb.length;i++){const d=(obsV[i]-mondVelocity(vb[i],radii[i],a0))/obsErr[i];chi+=d*d;}
+          if(chi<best.chi)best={chi,disk:ud,a0};
+        }
+      }
+      return mondBest=best;
+    }
+    function applyBaryonState(){
+      const fit=mondMode&&mondFitToggle.checked,best=fit?findMondBestFit():null;
+      mlState.disk=fit?best.disk:DATA.upsilon_disk;
+      MOND_A0=fit?best.a0:MOND_A0_DEFAULT;
+      baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
+      document.getElementById('mondFitWrap').hidden=!mondMode;
+      document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
+      document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
+      document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
+      document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
+      const e=Math.floor(Math.log10(MOND_A0));
+      document.getElementById('mondA0Text').textContent=`${(MOND_A0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;
+    }
+    mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
+      if(!mondMode)mondFitToggle.checked=false;
       document.getElementById('optNfw').classList.toggle('active',!mondMode);
       document.getElementById('optMond').classList.toggle('active',mondMode);
       document.getElementById('mondNote').hidden=!mondMode;
+      applyBaryonState();
       ['massControl','scaleControl'].forEach(id=>{
         const c=document.getElementById(id);
         c.classList.toggle('disabled',mondMode);
@@ -1262,6 +1324,8 @@ def main() -> None:
     payload = {
         "stars": stars,
         "rotation": rotation,
+        "upsilon_disk": UPSILON_DISK,
+        "upsilon_bulge": UPSILON_BULGE,
         "frame_step_myr": 1.0,
         "total_time_myr": 1000.0,
         "default_halo_mass_msun": mass_msun,
