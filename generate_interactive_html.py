@@ -229,7 +229,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <body>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
-    <div class="header-note">800 massless test particles (disk) · 301 frames · 1 Myr per frame<br>Local data embedded in this page · dark halo uses an NFW profile</div>
+    <div class="header-note">800 massless test particles (disk) · 1000 Myr (1 Gyr) evolutionary timeline<br>Local data embedded in this page · dark halo uses an NFW profile</div>
   </header>
   <main>
     <section class="controls" aria-label="Dark matter controls">
@@ -238,7 +238,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><div style="display:flex;align-items:center;gap:8px"><button id="playButtonBottom" type="button" title="Play or pause galaxy simulation" style="min-width:62px">Play</button><span id="frameLabel" style="font-family:monospace;min-width:64px">Frame 1</span></div><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0" aria-label="Simulation timeline scrubber"><span id="timeLabel" style="font-family:monospace;white-space:nowrap">Current Time: 0 Myr / 1000 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -252,8 +252,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     const GRID = '#1c2936';
     const textColor = '#bac9d8';
     const stars = DATA.stars;
-    const frameCount = stars[0].positions.length;
+    const SIM_TOTAL_TIME_MYR = 1000.0;
+    const SIM_DT_MYR = 1.0;
+    const frameCount = 1001; // 0 to 1000 Myr (1 Gyr)
+    const SUBSTEPS = 2; // 2 Velocity-Verlet substeps per 1 Myr frame
+    const DT_SUB = SIM_DT_MYR / SUBSTEPS;
     const maxRadius = Math.max(...stars.map(s => s.initial_r_kpc));
+    const ESCAPE_RADIUS2 = maxRadius ** 2;
     const speeds = stars.map(s => s.v_rot_kms);
     const minSpeed = Math.min(...speeds), speedSpan = Math.max(...speeds) - minSpeed || 1;
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
@@ -351,43 +356,116 @@ HTML_TEMPLATE = r"""<!doctype html>
             const fraction=(radius-radii[low])/(radii[high]-radii[low]);
             return vBary[low]+fraction*(vBary[high]-vBary[low]);
         }
-        function orbitDerivative(state,haloVelocity) {
-            const [x,y,z,vx,vy,vz]=state;
-            const radius=Math.max(Math.hypot(x,y,z),1e-5);
-            const baryonic=baryonicVelocity(radius);
-            const halo=haloVelocity(radius);
-            const k=(baryonic*baryonic+halo*halo)*KM_S_TO_KPC_MYR**2/(radius*radius);
-            return [vx,vy,vz,-k*x,-k*y,-k*z];
-        }
-        function integrateTrajectories(massT,scaleRadius) {
-            const haloVelocity=nfwVelocityModel(massT*1e12,scaleRadius),step=DATA.frame_step_myr;
-            return particles.map(particle=>{
-                const [x,y,z]=particle.position;
-                let dx,dy,dz;
-                if(particle.kind!=='disk'){
-                    const a=particle.axis;
-                    dx=a[1]*z-a[2]*y;dy=a[2]*x-a[0]*z;dz=a[0]*y-a[1]*x;
-                    if(Math.hypot(dx,dy,dz)<1e-4){
-                        const alt=[a[1],a[2],a[0]];
-                        dx=alt[1]*z-alt[2]*y;dy=alt[2]*x-alt[0]*z;dz=alt[0]*y-alt[1]*x;
-                    }
-                }else{dx=-y;dy=x;dz=0;}
-                const norm=Math.max(Math.hypot(dx,dy,dz),1e-8);
-                const speed=particle.speedScale*observedVelocity(particle.radius)*KM_S_TO_KPC_MYR/norm;
-                let state=[x,y,z,dx*speed,dy*speed,dz*speed];
-                const positions=[[x,y,z]];
-                for(let frame=1;frame<frameCount;frame++){
-                      const k1=orbitDerivative(state,haloVelocity);
-                      const k2=orbitDerivative(state.map((value,index)=>value+step*k1[index]/2),haloVelocity);
-                      const k3=orbitDerivative(state.map((value,index)=>value+step*k2[index]/2),haloVelocity);
-                      const k4=orbitDerivative(state.map((value,index)=>value+step*k3[index]),haloVelocity);
-                    state=state.map((value,index)=>value+step*(k1[index]+2*k2[index]+2*k3[index]+k4[index])/6);
-                    positions.push([state[0],state[1],state[2]]);
+
+        // Fast radial acceleration lookup table for NFW halo + SPARC baryonic potential
+        const ACCEL_TABLE_SIZE = 2048;
+        const R_MAX_TABLE = 160.0;
+        const INV_DR_TABLE = (ACCEL_TABLE_SIZE - 1) / R_MAX_TABLE;
+        const DR_TABLE = R_MAX_TABLE / (ACCEL_TABLE_SIZE - 1);
+
+        function buildAccelerationFunction(haloVelocity) {
+            const kTable = new Float32Array(ACCEL_TABLE_SIZE);
+            for (let i = 0; i < ACCEL_TABLE_SIZE; i++) {
+                const r = Math.max(i * DR_TABLE, 1e-4);
+                const vb = baryonicVelocity(r);
+                const vh = haloVelocity(r);
+                kTable[i] = ((vb * vb + vh * vh) * (KM_S_TO_KPC_MYR ** 2)) / (r * r);
+            }
+            return function getAccel(x, y, z) {
+                const r = Math.max(Math.hypot(x, y, z), 1e-4);
+                const idxFloat = r * INV_DR_TABLE;
+                let k;
+                if (idxFloat >= ACCEL_TABLE_SIZE - 1) {
+                    const ratio = R_MAX_TABLE / r;
+                    k = kTable[ACCEL_TABLE_SIZE - 1] * ratio * ratio * ratio;
+                } else {
+                    const idx = idxFloat | 0;
+                    const f = idxFloat - idx;
+                    k = kTable[idx] + f * (kTable[idx + 1] - kTable[idx]);
                 }
+                return [-k * x, -k * y, -k * z];
+            };
+        }
+
+        let sortedEscapeTimes = [];
+
+        // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline
+        function integrateTrajectories(massT, scaleRadius) {
+            const haloVelocity = nfwVelocityModel(massT * 1e12, scaleRadius);
+            const getAccel = buildAccelerationFunction(haloVelocity);
+            const dtSub = DT_SUB;
+            const dtSub2Half = 0.5 * dtSub * dtSub;
+            const dtSubHalf = 0.5 * dtSub;
+            const escapeTimes = [];
+
+            const trajectories = particles.map(particle => {
+                const [x0, y0, z0] = particle.position;
+                let dx, dy, dz;
+                if (particle.kind !== 'disk') {
+                    const a = particle.axis;
+                    dx = a[1]*z0 - a[2]*y0; dy = a[2]*x0 - a[0]*z0; dz = a[0]*y0 - a[1]*x0;
+                    if (Math.hypot(dx, dy, dz) < 1e-4) {
+                        const alt = [a[1], a[2], a[0]];
+                        dx = alt[1]*z0 - alt[2]*y0; dy = alt[2]*x0 - alt[0]*z0; dz = alt[0]*y0 - alt[1]*x0;
+                    }
+                } else {
+                    dx = -y0; dy = x0; dz = 0;
+                }
+                const norm = Math.max(Math.hypot(dx, dy, dz), 1e-8);
+                const speed = particle.speedScale * observedVelocity(particle.radius) * KM_S_TO_KPC_MYR / norm;
+                let vx = dx * speed, vy = dy * speed, vz = dz * speed;
+                let x = x0, y = y0, z = z0;
+                let [ax, ay, az] = getAccel(x, y, z);
+
+                const positions = new Float32Array(frameCount * 3);
+                positions[0] = x; positions[1] = y; positions[2] = z;
+
+                let escTime = Infinity;
+                if (x * x + y * y + z * z > ESCAPE_RADIUS2) {
+                    escTime = 0.0;
+                }
+
+                for (let frame = 1; frame < frameCount; frame++) {
+                    const prevR2 = x * x + y * y + z * z;
+                    for (let s = 0; s < SUBSTEPS; s++) {
+                        // Velocity-Verlet step 1: advance position
+                        x += vx * dtSub + ax * dtSub2Half;
+                        y += vy * dtSub + ay * dtSub2Half;
+                        z += vz * dtSub + az * dtSub2Half;
+
+                        // Velocity-Verlet step 2: evaluate acceleration at new position
+                        const [nax, nay, naz] = getAccel(x, y, z);
+
+                        // Velocity-Verlet step 3: advance velocity
+                        vx += (ax + nax) * dtSubHalf;
+                        vy += (ay + nay) * dtSubHalf;
+                        vz += (az + naz) * dtSubHalf;
+
+                        ax = nax; ay = nay; az = naz;
+                    }
+
+                    const currR2 = x * x + y * y + z * z;
+                    if (escTime === Infinity && currR2 > ESCAPE_RADIUS2) {
+                        const rPrev = Math.sqrt(prevR2), rCurr = Math.sqrt(currR2);
+                        const frac = Math.max(0, Math.min(1, (maxRadius - rPrev) / Math.max(rCurr - rPrev, 1e-6)));
+                        escTime = (frame - 1 + frac) * SIM_DT_MYR;
+                    }
+
+                    const idx = frame * 3;
+                    positions[idx] = x; positions[idx + 1] = y; positions[idx + 2] = z;
+                }
+
+                if (escTime < Infinity) {
+                    escapeTimes.push(escTime);
+                }
+
                 return positions;
             });
+
+            sortedEscapeTimes = escapeTimes.sort((a, b) => a - b);
+            return trajectories;
         }
-        let activeTrajectories=integrateTrajectories(DEFAULTS.massT,DEFAULTS.scaleRadius);
+        let activeTrajectories = integrateTrajectories(DEFAULTS.massT, DEFAULTS.scaleRadius);
         let currentFrame=0,orbitModelTimer=null;
     const palette = [[0,[35,145,255]],[0.5,[255,211,69]],[1,[255,69,58]]];
     function velocityColor(v, radius) {
@@ -603,7 +681,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8'),warm=new THREE.Color('#FFE8D6');
             const smooth01=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
             for(let k=0;k<starCount;k++){
-                const pt=particles[starIndices[k]],p=activeTrajectories[starIndices[k]][0];
+                const pt=particles[starIndices[k]],p=pt.position;
                 // ~85% warm gold/amber, ~15% crisp ice-blue (seeded for reproducibility)
                 if(randomStar()<0.15){
                     c.set(0x88ccff);
@@ -705,7 +783,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         blackHole.renderOrder=3;scene.add(blackHole);
 
         // Optional orbit trajectory lines: full paths of an evenly spaced subset of disk stars.
-        const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=3;
+        const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=5;
         const orbitLineIdx=Array.from({length:Math.min(ORBIT_LINE_STARS,diskCount)},(_,k)=>diskIndices[Math.floor(k*diskCount/Math.min(ORBIT_LINE_STARS,diskCount))]);
         const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
         const orbitLineGeom=new THREE.BufferGeometry();
@@ -717,44 +795,50 @@ HTML_TEMPLATE = r"""<!doctype html>
             for(const idx of orbitLineIdx){
                 const t=activeTrajectories[idx];
                 for(let s=0;s<orbitSegs;s++){
-                    const p=t[s*ORBIT_LINE_STEP],q=t[Math.min((s+1)*ORBIT_LINE_STEP,frameCount-1)];
-                    a[o++]=p[0];a[o++]=p[1];a[o++]=p[2];a[o++]=q[0];a[o++]=q[1];a[o++]=q[2];
+                    const f0=s*ORBIT_LINE_STEP;
+                    const f1=Math.min((s+1)*ORBIT_LINE_STEP,frameCount-1);
+                    const i0=f0*3,i1=f1*3;
+                    a[o++]=t[i0];a[o++]=t[i0+1];a[o++]=t[i0+2];
+                    a[o++]=t[i1];a[o++]=t[i1+1];a[o++]=t[i1+2];
                 }
             }
             orbitLineGeom.attributes.position.needsUpdate=true;
         }
         fillOrbitLines();
 
-        // A star counts as escaped once it is beyond the outermost initial orbital radius (the disk edge).
-        const ESCAPE_RADIUS2=maxRadius**2;
+        // A star counts as escaped once it crosses beyond the outermost initial orbital radius (the disk edge).
         const escapeCountVal=document.getElementById('escape-count-val');
         let lastEscaped=-1;
         document.getElementById('escape-counter').lastChild.textContent=' / '+particles.length;
-        // Counts every one of the simulated particles at the current (interpolated) time.
-        function updateEscapeCounter(timeFloat){
-            const fFloat=Math.max(0,Math.min(frameCount-1,timeFloat));
-            const f0=Math.floor(fFloat),f1=Math.min(f0+1,frameCount-1),alpha=fFloat-f0;
-            let escaped=0;
-            for(let i=0;i<activeTrajectories.length;i++){
-                const p0=activeTrajectories[i][f0],p1=activeTrajectories[i][f1];
-                const x=p0[0]+(p1[0]-p0[0])*alpha,y=p0[1]+(p1[1]-p0[1])*alpha,z=p0[2]+(p1[2]-p0[2])*alpha;
-                if(x*x+y*y+z*z>ESCAPE_RADIUS2)escaped++;
+
+        // Synchronized escape counter using bisection on exact particle ejection times
+        function updateEscapeCounter(timeMyr){
+            const t=Math.max(0,Math.min(SIM_TOTAL_TIME_MYR,timeMyr));
+            let low=0,high=sortedEscapeTimes.length;
+            while(low<high){
+                const mid=(low+high)>>1;
+                if(sortedEscapeTimes[mid]<=t)low=mid+1;
+                else high=mid;
             }
+            const escaped=low;
             if(escaped!==lastEscaped){lastEscaped=escaped;escapeCountVal.textContent=escaped;}
         }
 
         // Sub-frame continuous orbit updates for locked 60 FPS animation
-        function updateStarTransforms(timeFloat){
-            const fFloat=Math.max(0,Math.min(frameCount-1,timeFloat));
+        function updateStarTransforms(timeMyr){
+            const fFloat=Math.max(0,Math.min(frameCount-1,timeMyr/SIM_DT_MYR));
             const f0=Math.floor(fFloat);
             const f1=Math.min(f0+1,frameCount-1);
             const alpha=fFloat-f0;
             const matArray=starMesh.instanceMatrix.array;
             const glowArray=glowGeometry.attributes.position.array;
+            const i0=f0*3,i1=f1*3;
             for(let k=0;k<starCount;k++){
-                const trajectory=activeTrajectories[starIndices[k]];
-                const p0=trajectory[f0],p1=trajectory[f1],off=k*16;
-                const x=p0[0]+(p1[0]-p0[0])*alpha,y=p0[1]+(p1[1]-p0[1])*alpha,z=p0[2]+(p1[2]-p0[2])*alpha;
+                const t=activeTrajectories[k];
+                const x=t[i0]+(t[i1]-t[i0])*alpha;
+                const y=t[i0+1]+(t[i1+1]-t[i0+1])*alpha;
+                const z=t[i0+2]+(t[i1+2]-t[i0+2])*alpha;
+                const off=k*16;
                 matArray[off+12]=x;matArray[off+13]=y;matArray[off+14]=z;
                 glowArray[k*3]=x;glowArray[k*3+1]=y;glowArray[k*3+2]=z;
             }
@@ -762,9 +846,10 @@ HTML_TEMPLATE = r"""<!doctype html>
             glowGeometry.attributes.position.needsUpdate=true;
         }
 
-        // Render loop: continuous delta-time playback with throttled UI sync
-        let needsRender=true,lastTime=performance.now(),simTime=0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
-        const PLAYBACK_SPEED_MYR_PER_SEC=24.0;
+        // Render loop: continuous delta-time playback spanning 0 to 1000 Myr (1 Gyr)
+        let needsRender=true,lastTime=performance.now(),simTime=0.0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
+        window.simTime=simTime;
+        const PLAYBACK_SPEED_MYR_PER_SEC=50.0;
         const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
         // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
@@ -828,19 +913,20 @@ HTML_TEMPLATE = r"""<!doctype html>
             const dt=Math.min((now-lastTime)/1000,0.1);
             lastTime=now;
             if(controls.update(dt))needsRender=true;
-            updateEscapeCounter(simTime);
             if(playing){
                 simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC*playbackMultiplier;
-                if(simTime>=frameCount-1){
-                    simTime=frameCount-1;
-                    playing=false;
-                    playButton.textContent='Play';
+                window.simTime=simTime;
+                if(simTime>=SIM_TOTAL_TIME_MYR){
+                    simTime=SIM_TOTAL_TIME_MYR;
+                    window.simTime=simTime;
+                    setPlaying(false);
                 }
                 updateStarTransforms(simTime);
-                const intFrame=Math.floor(simTime);
-                if(intFrame!==lastReportedFrame){
-                    lastReportedFrame=intFrame;
-                    syncTimelineUI(intFrame);
+                updateEscapeCounter(simTime);
+                const intMyr=Math.floor(simTime);
+                if(intMyr!==lastReportedFrame){
+                    lastReportedFrame=intMyr;
+                    syncTimelineUI(simTime);
                 }
                 needsRender=true;
             }
@@ -862,53 +948,76 @@ HTML_TEMPLATE = r"""<!doctype html>
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
     massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
-        function updateHalo(){
+    function updateHalo(){
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value),halo=haloCurve(massT,rs);
       const total=vBary.map((v,i)=>Math.hypot(v,halo[i]));
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       Plotly.restyle('curvePlot',{y:[halo,total]},[2,3]);
-            clearTimeout(orbitModelTimer);
-            orbitModelTimer=setTimeout(()=>{
-                activeTrajectories=integrateTrajectories(massT,rs);
-                fillOrbitLines();
-                updateStarTransforms(simTime);requestRender();
-            },120);
+      clearTimeout(orbitModelTimer);
+      orbitModelTimer=setTimeout(()=>{
+          activeTrajectories=integrateTrajectories(massT,rs);
+          fillOrbitLines();
+          updateStarTransforms(simTime);
+          updateEscapeCounter(simTime);
+          requestRender();
+      },120);
     }
     massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
-        document.getElementById('applyObservedFit').addEventListener('click',()=>{
-            massSlider.value=DEFAULTS.massT;
-            scaleSlider.value=DEFAULTS.scaleRadius;
-            updateHalo();
-        });
+    document.getElementById('applyObservedFit').addEventListener('click',()=>{
+        massSlider.value=DEFAULTS.massT;
+        scaleSlider.value=DEFAULTS.scaleRadius;
+        updateHalo();
+    });
 
     const timeSlider=document.getElementById('timeSlider'),timeSliderBottom=document.getElementById('timeSliderBottom');
-    const playButton=document.getElementById('playButton');
-    function syncTimelineUI(intFrame){
-        timeSlider.value=intFrame;timeSliderBottom.value=intFrame;
-        document.getElementById('frameLabel').textContent=`Frame ${intFrame+1}`;
-        document.getElementById('timeValue').textContent=`${(intFrame*DATA.frame_step_myr).toFixed(0)} Myr`;
-        document.getElementById('timeLabel').textContent=`${(intFrame*DATA.frame_step_myr).toFixed(0)} Myr`;
+    const playButton=document.getElementById('playButton'),playButtonBottom=document.getElementById('playButtonBottom');
+
+    function setPlaying(isPlaying){
+        playing=isPlaying;
+        const txt=playing?'Pause':'Play';
+        playButton.textContent=txt;
+        if(playButtonBottom)playButtonBottom.textContent=txt;
     }
+
+    function togglePlayback(){
+        if(playing){
+            setPlaying(false);
+        }else{
+            if(simTime>=SIM_TOTAL_TIME_MYR){
+                simTime=0.0;
+                window.simTime=simTime;
+                updateStarTransforms(simTime);
+                updateEscapeCounter(simTime);
+                syncTimelineUI(simTime);
+            }
+            setPlaying(true);
+        }
+        requestRender();
+    }
+    playButton.addEventListener('click',togglePlayback);
+    if(playButtonBottom)playButtonBottom.addEventListener('click',togglePlayback);
+
+    function syncTimelineUI(timeMyr){
+        const val=Math.round(Math.max(0,Math.min(SIM_TOTAL_TIME_MYR,timeMyr)));
+        timeSlider.value=val;timeSliderBottom.value=val;
+        const frameEl=document.getElementById('frameLabel');
+        if(frameEl)frameEl.textContent=`Frame ${val+1}`;
+        document.getElementById('timeValue').textContent=`${val} Myr / 1000 Myr`;
+        document.getElementById('timeLabel').textContent=`Current Time: ${val} Myr / 1000 Myr`;
+    }
+
     function onSliderInput(val){
-        simTime=Math.max(0,Math.min(frameCount-1,Number(val)));
+        simTime=Math.max(0,Math.min(SIM_TOTAL_TIME_MYR,Number(val)));
+        window.simTime=simTime;
         updateStarTransforms(simTime);
-        const intFrame=Math.floor(simTime);
-        lastReportedFrame=intFrame;
-        syncTimelineUI(intFrame);
+        updateEscapeCounter(simTime);
+        syncTimelineUI(simTime);
         requestRender();
     }
     timeSlider.addEventListener('input',()=>onSliderInput(timeSlider.value));
     timeSliderBottom.addEventListener('input',()=>onSliderInput(timeSliderBottom.value));
-    playButton.addEventListener('click',()=>{
-        if(playing){
-            playing=false;playButton.textContent='Play';
-        }else{
-            if(simTime>=frameCount-1)simTime=0;
-            playing=true;playButton.textContent='Pause';
-        }
-    });
-    updateStarTransforms(0);syncTimelineUI(0);
+    updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
   </script>
 </body>
 </html>
@@ -928,6 +1037,7 @@ def main() -> None:
         "stars": stars,
         "rotation": rotation,
         "frame_step_myr": 1.0,
+        "total_time_myr": 1000.0,
         "default_halo_mass_msun": mass_msun,
         "default_scale_radius_kpc": scale_radius,
     }
@@ -937,7 +1047,7 @@ def main() -> None:
         json.dumps(payload, separators=(",", ":"), allow_nan=False).replace("</", "<\\/"),
     )
     html = html.replace("__DEFAULT_JSON__", json.dumps(defaults))
-    html = html.replace("__FRAME_MAX__", str(len(stars[0]["positions"]) - 1))
+    html = html.replace("__FRAME_MAX__", "1000")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB)")
