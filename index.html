@@ -75,7 +75,7 @@
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="300" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><span id="frameLabel">Frame 1</span><input id="timeSliderBottom" type="range" min="0" max="300" step="1" value="0"><span id="timeLabel">0 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -547,7 +547,7 @@
         const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
         const orbitLineGeom=new THREE.BufferGeometry();
         orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(orbitLineIdx.length*orbitSegs*6),3));
-        const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x7be4f1,transparent:true,opacity:0.22,depthWrite:false,blending:THREE.AdditiveBlending}));
+        const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x9ff0ff,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
         function fillOrbitLines(){
             const a=orbitLineGeom.attributes.position.array;let o=0;
@@ -561,6 +561,24 @@
             orbitLineGeom.attributes.position.needsUpdate=true;
         }
         fillOrbitLines();
+
+        // A star counts as escaped once it is beyond the outermost initial orbital radius (the disk edge).
+        const ESCAPE_RADIUS2=maxRadius**2;
+        const escapeCountVal=document.getElementById('escape-count-val');
+        let lastEscaped=-1;
+        document.getElementById('escape-counter').lastChild.textContent=' / '+particles.length;
+        // Counts every one of the simulated particles at the current (interpolated) time.
+        function updateEscapeCounter(timeFloat){
+            const fFloat=Math.max(0,Math.min(frameCount-1,timeFloat));
+            const f0=Math.floor(fFloat),f1=Math.min(f0+1,frameCount-1),alpha=fFloat-f0;
+            let escaped=0;
+            for(let i=0;i<activeTrajectories.length;i++){
+                const p0=activeTrajectories[i][f0],p1=activeTrajectories[i][f1];
+                const x=p0[0]+(p1[0]-p0[0])*alpha,y=p0[1]+(p1[1]-p0[1])*alpha,z=p0[2]+(p1[2]-p0[2])*alpha;
+                if(x*x+y*y+z*z>ESCAPE_RADIUS2)escaped++;
+            }
+            if(escaped!==lastEscaped){lastEscaped=escaped;escapeCountVal.textContent=escaped;}
+        }
 
         // Sub-frame continuous orbit updates for locked 60 FPS animation
         function updateStarTransforms(timeFloat){
@@ -647,6 +665,7 @@
             const dt=Math.min((now-lastTime)/1000,0.1);
             lastTime=now;
             if(controls.update(dt))needsRender=true;
+            updateEscapeCounter(simTime);
             if(playing){
                 simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC*playbackMultiplier;
                 if(simTime>=frameCount-1){
