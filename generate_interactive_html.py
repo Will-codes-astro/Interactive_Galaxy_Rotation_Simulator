@@ -193,11 +193,14 @@ HTML_TEMPLATE = r"""<!doctype html>
     .plot { width:100%; height:min(68vh,700px); min-height:420px; }
     #orbitPlot { position:relative; touch-action:none; overscroll-behavior:contain; user-select:none; -webkit-user-select:none; cursor:grab; }
     #orbitPlot.dragging { cursor:grabbing; }
-    #orbitPlot canvas { display:block; width:100%; height:100%; touch-action:none; }
+    #orbitPlot canvas { display:block; width:100% !important; height:100% !important; touch-action:none; }
+    #orbitPlot:fullscreen, #orbit-plot-container:fullscreen { width:100vw; height:100vh; max-height:none; border:0; border-radius:0; background:#020206; }
+    #orbitPlot:-webkit-full-screen, #orbit-plot-container:-webkit-full-screen { width:100vw; height:100vh; max-height:none; border:0; border-radius:0; background:#020206; }
     .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
     .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
+    .view-panel button:active { background:rgba(123,228,241,.28); border-color:var(--cyan); }
     .view-panel button[aria-pressed=true] { background:rgba(123,228,241,.22); border-color:var(--cyan); color:var(--ink); }
     .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
     .view-panel .view-row button { text-align:center; }
@@ -238,7 +241,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><div style="display:flex;align-items:center;gap:8px"><button id="playButtonBottom" type="button" title="Play or pause galaxy simulation" style="min-width:62px">Play</button><span id="frameLabel" style="font-family:monospace;min-width:64px">Frame 1</span></div><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0" aria-label="Simulation timeline scrubber"><span id="timeLabel" style="font-family:monospace;white-space:nowrap">Current Time: 0 Myr / 1000 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><div style="display:flex;align-items:center;gap:8px"><button id="playButtonBottom" type="button" title="Play or pause galaxy simulation" style="min-width:62px">Play</button><span id="frameLabel" style="font-family:monospace;min-width:64px">Frame 1</span></div><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0" aria-label="Simulation timeline scrubber"><span id="timeLabel" style="font-family:monospace;white-space:nowrap">Current Time: 0 Myr / 1000 Myr</span></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -866,6 +869,25 @@ HTML_TEMPLATE = r"""<!doctype html>
         });
         function resetView(){controls.reset();requestRender();}
         document.getElementById('viewReset').addEventListener('click',resetView);
+        function toggleFullscreen() {
+            const container = document.getElementById('orbit-plot-container') || renderer.domElement.parentElement;
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => {
+                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+        window.toggleFullscreen = toggleFullscreen;
+        const fsBtn = document.getElementById('toggleFullscreen') || document.getElementById('viewFullscreen');
+        if (fsBtn) {
+            fsBtn.addEventListener('click', toggleFullscreen);
+        }
+        const viewFsBtn = document.getElementById('viewFullscreen');
+        if (viewFsBtn && viewFsBtn !== fsBtn) {
+            viewFsBtn.addEventListener('click', toggleFullscreen);
+        }
         const orbitToggle=document.getElementById('toggleOrbits');
         orbitToggle.addEventListener('click',()=>{
             orbitLines.visible=!orbitLines.visible;
@@ -901,7 +923,13 @@ HTML_TEMPLATE = r"""<!doctype html>
                 }
             });
         });
+        let containerOriginalWidth = orbitPlot.clientWidth || 800;
+        let containerOriginalHeight = orbitPlot.clientHeight || 600;
         function resizeOrbit(){
+            if (!document.fullscreenElement) {
+                containerOriginalWidth = orbitPlot.clientWidth;
+                containerOriginalHeight = orbitPlot.clientHeight;
+            }
             const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
             renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
             camera.aspect=w/h;camera.updateProjectionMatrix();
@@ -909,6 +937,34 @@ HTML_TEMPLATE = r"""<!doctype html>
         }
         if(window.ResizeObserver)new ResizeObserver(resizeOrbit).observe(orbitPlot);
         window.addEventListener('resize',resizeOrbit);
+        document.addEventListener('fullscreenchange', () => {
+            const isFullscreen = document.fullscreenElement !== null;
+            
+            // Target window dimensions vs original container dimensions
+            const width = isFullscreen ? window.innerWidth : containerOriginalWidth;
+            const height = isFullscreen ? window.innerHeight : containerOriginalHeight;
+            
+            // Update camera projection and renderer
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            if (fsBtn) {
+                fsBtn.setAttribute('aria-pressed', String(isFullscreen));
+            }
+            needsRender = true;
+        });
+        document.addEventListener('webkitfullscreenchange', () => {
+            const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+            const width = isFullscreen ? window.innerWidth : containerOriginalWidth;
+            const height = isFullscreen ? window.innerHeight : containerOriginalHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+            if (fsBtn) {
+                fsBtn.setAttribute('aria-pressed', String(isFullscreen));
+            }
+            needsRender = true;
+        });
         function renderLoop(now){
             const dt=Math.min((now-lastTime)/1000,0.1);
             lastTime=now;
