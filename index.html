@@ -44,6 +44,13 @@
     #orbitPlot canvas { display:block; width:100% !important; height:100% !important; touch-action:none; }
     #orbitPlot:fullscreen, #orbit-plot-container:fullscreen { width:100vw; height:100vh; max-height:none; border:0; border-radius:0; background:#020206; }
     #orbitPlot:-webkit-full-screen, #orbit-plot-container:-webkit-full-screen { width:100vw; height:100vh; max-height:none; border:0; border-radius:0; background:#020206; }
+    .timeline-row { display:flex; align-items:center; gap:12px; }
+    .timeline-row input[type=range] { flex:1; min-width:0; }
+    .play-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:44px; min-height:44px; padding:0 14px; flex:none; font-size:13px; border-radius:22px; background:rgba(123,228,241,.12); border-color:var(--cyan); touch-action:manipulation; }
+    .play-btn[aria-pressed=true] { background:rgba(123,228,241,.28); }
+    @media(max-width:560px) { .play-btn .play-text { display:none; } .play-btn { width:44px; padding:0; } }
+    .fullscreen-active { position:fixed !important; inset:0; z-index:9999; width:100vw !important; height:100dvh !important; max-height:none !important; min-height:0 !important; border:0 !important; border-radius:0 !important; background:#020206; }
+    body.fullscreen-lock { overflow:hidden; }
     .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
@@ -87,7 +94,7 @@
     <section class="controls" aria-label="Dark matter controls">
     <div class="control"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button></div>
     <div class="control"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
-      <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div>
+      <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
     <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
@@ -339,7 +346,7 @@
             // with a frame-rate independent exponential filter, so nothing ever snaps.
             constructor(camera,element,options={}) {
                 this.camera=camera;this.element=element;this.dragMode='rotate';
-                this.o=Object.assign({damping:11,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
+                this.o=Object.assign({damping:11,touchDamping:5,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
                     minDistance:5,maxDistance:450,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
                     initial:{theta:-0.82,phi:1.01,radius:72,target:[0,0,0]},onChange:()=>{}},options);
                 const i=this.o.initial;
@@ -389,6 +396,7 @@
                 if(e.pointerType==='mouse'&&e.button>2)return;
                 try{this.element.setPointerCapture(e.pointerId);}catch(_){}
                 this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:e.button,shift:e.shiftKey||e.ctrlKey||e.metaKey,type:e.pointerType});
+                this.touchActive=e.pointerType==='touch';
                 this.velocity.theta=this.velocity.phi=0;
                 if(this.pointers.size===2)this.pinch=this._pinchState();
                 this.element.classList.add('dragging');
@@ -471,7 +479,7 @@
             _clampRadius(v) {return Math.max(this.o.minDistance,Math.min(this.o.maxDistance,v));}
             // Returns true while the view is still easing toward the goal (caller keeps rendering).
             update(dt) {
-                const g=this.goal,v=this.view,a=1-Math.exp(-this.o.damping*Math.min(dt,0.1));
+                const g=this.goal,v=this.view,rate=this.touchActive?this.o.touchDamping:this.o.damping,a=1-Math.exp(-rate*Math.min(dt,0.1));
                 const dTheta=g.theta-v.theta,dPhi=g.phi-v.phi,dR=g.radius-v.radius;
                 const dT=g.target.distanceTo(v.target);
                 if(Math.abs(dTheta)<1e-5&&Math.abs(dPhi)<1e-5&&Math.abs(dR)<1e-3&&dT<1e-3) {
@@ -703,7 +711,7 @@
         // Render loop: continuous delta-time playback spanning 0 to 1000 Myr (1 Gyr)
         let needsRender=true,lastTime=performance.now(),simTime=0.0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
         window.simTime=simTime;
-        const PLAYBACK_SPEED_MYR_PER_SEC=50.0;
+        const PLAYBACK_SPEED_MYR_PER_SEC=25.0; // half of the nominal 50 Myr/s; UI labels stay 0.25x-2x
         const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
         // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
@@ -720,15 +728,28 @@
         });
         function resetView(){controls.reset();requestRender();}
         document.getElementById('viewReset').addEventListener('click',resetView);
+        const nativeFsElement=()=>document.fullscreenElement||document.webkitFullscreenElement||null;
+        function setCssFullscreen(on){
+            orbitPlot.classList.toggle('fullscreen-active',on);
+            document.body.classList.toggle('fullscreen-lock',on);
+            if(fsBtn)fsBtn.setAttribute('aria-pressed',String(on));
+            resizeOrbit();requestAnimationFrame(resizeOrbit);
+        }
         function toggleFullscreen() {
-            const container = document.getElementById('orbit-plot-container') || renderer.domElement.parentElement;
-            if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => {
-                    console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                });
-            } else {
-                document.exitFullscreen();
+            const container = orbitPlot;
+            if (nativeFsElement()) {
+                (document.exitFullscreen||document.webkitExitFullscreen).call(document);
+                return;
             }
+            if (container.classList.contains('fullscreen-active')) { setCssFullscreen(false); return; }
+            const request=container.requestFullscreen||container.webkitRequestFullscreen;
+            if (!request) { setCssFullscreen(true); return; }
+            try {
+                const result=request.call(container);
+                if (result&&result.catch) result.catch(()=>setCssFullscreen(true));
+            } catch (err) { setCssFullscreen(true); }
+            // iOS Safari silently ignores the request on non-video elements.
+            setTimeout(()=>{ if(!nativeFsElement()&&!container.classList.contains('fullscreen-active'))setCssFullscreen(true); },250);
         }
         window.toggleFullscreen = toggleFullscreen;
         const fsBtn = document.getElementById('toggleFullscreen') || document.getElementById('viewFullscreen');
@@ -827,7 +848,7 @@
         let containerOriginalWidth = orbitPlot.clientWidth || 800;
         let containerOriginalHeight = orbitPlot.clientHeight || 600;
         function resizeOrbit(){
-            if (!document.fullscreenElement) {
+            if (!nativeFsElement()) {
                 containerOriginalWidth = orbitPlot.clientWidth;
                 containerOriginalHeight = orbitPlot.clientHeight;
             }
@@ -839,7 +860,7 @@
         if(window.ResizeObserver)new ResizeObserver(resizeOrbit).observe(orbitPlot);
         window.addEventListener('resize',resizeOrbit);
         function onFullscreenChange() {
-            const isFullscreen = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+            const isFullscreen = Boolean(nativeFsElement() || orbitPlot.classList.contains('fullscreen-active'));
             if (fsBtn) fsBtn.setAttribute('aria-pressed', String(isFullscreen));
             // Layout settles after the change event, so resize now and on the next frame.
             resizeOrbit();
@@ -887,12 +908,12 @@
       {type:'bar',name:'Residual',x:radii,y:residualsOf(totalCurve),yaxis:'y2',showlegend:false,width:0.55,marker:{color:residualsOf(totalCurve).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'}
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
-      xaxis:{...AXIS,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor'},
-      yaxis:{...AXIS,title:{text:'Orbital velocity (km/s)',standoff:10},range:[0,190],domain:[0.32,1],zeroline:false},
-      yaxis2:{...AXIS,title:{text:'Residual',standoff:6},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4},
+      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor'},
+      yaxis:{...AXIS,title:{text:'Orbital velocity (km/s)',standoff:10},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
+      yaxis2:{...AXIS,title:{text:'Residual',standoff:6},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.03,xanchor:'left',x:0,font:{size:11,color:'#c3cfdb'},itemsizing:'constant'},
       hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.96)',bordercolor:'rgba(120,150,180,0.35)',font:{color:'#f1f5f9',size:12}},dragmode:'pan'};
-    Plotly.newPlot('curvePlot',curveData,curveLayout,{responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:true,doubleClick:'reset'});
+    Plotly.newPlot('curvePlot',curveData,curveLayout,{responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:true,doubleClick:false});
     updateChi(totalCurve);
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
@@ -902,7 +923,9 @@
       const total=vBary.map((v,i)=>Math.hypot(v,halo[i]));
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
-      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[halo,total]},[2,3]);Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[halo,total]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
+      Plotly.relayout('curvePlot',{'yaxis.range':[0,yMax]});
       clearTimeout(orbitModelTimer);
       orbitModelTimer=setTimeout(()=>{
           activeTrajectories=integrateTrajectories(massT,rs);
@@ -922,7 +945,15 @@
     const timeSlider=document.getElementById('timeSlider');
     function setPlaying(isPlaying){
         playing=isPlaying;
+        const b=document.getElementById('playPauseBtn');
+        if(b){
+            b.setAttribute('aria-pressed',String(playing));
+            b.setAttribute('aria-label',playing?'Pause simulation':'Play simulation');
+            b.querySelector('.play-icon').textContent=playing?'❚❚':'▶';
+            b.querySelector('.play-text').textContent=playing?'Pause':'Play';
+        }
     }
+    document.getElementById('playPauseBtn').addEventListener('click',()=>togglePlayback());
 
     function togglePlayback(){
         if(playing){
@@ -940,7 +971,9 @@
         requestRender();
     }
     window.addEventListener('keydown',e=>{
+        if(e.code==='Escape'&&orbitPlot.classList.contains('fullscreen-active')){setCssFullscreen(false);return;}
         if(e.code==='Space'){
+            if(e.target&&e.target.closest&&e.target.closest('button'))return;
             e.preventDefault();
             if(!e.repeat)togglePlayback();
         }
