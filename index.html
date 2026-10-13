@@ -1114,10 +1114,15 @@
     window.addEventListener('keydown',e=>{
         if(e.code==='Escape'&&orbitPlot.classList.contains('fullscreen-active')){setCssFullscreen(false);return;}
         if(e.code==='Space'){
-            if(e.target&&e.target.closest&&e.target.closest('button'))return;
+            const btn=e.target&&e.target.closest?e.target.closest('button'):null;
+            if(btn)btn.blur();
             e.preventDefault();
             if(!e.repeat)togglePlayback();
         }
+    });
+    // Stop the browser's keyup-triggered button click from also firing (e.g. exiting fullscreen)
+    window.addEventListener('keyup',e=>{
+        if(e.code==='Space'&&e.target&&e.target.closest&&e.target.closest('button'))e.preventDefault();
     });
 
     function syncTimelineUI(timeMyr){
