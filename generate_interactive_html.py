@@ -207,7 +207,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
     .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
-    .view-panel .speed-toggle { display:grid; grid-template-columns:1fr 1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
+    .view-panel .speed-toggle { display:grid; grid-template-columns:repeat(4,1fr); padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .speed-toggle button { padding:4px 2px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); transition:background .15s,color .15s; }
     .view-panel .speed-toggle button:hover, .view-panel .speed-toggle button:focus-visible { color:var(--ink); outline:none; }
     .view-panel .speed-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
@@ -221,7 +221,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel.collapsed .view-head { padding:0; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
     @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } .view-panel .speed-toggle button { padding:7px 4px; font-size:12px; } }
-    .timeline { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:0 16px 14px; color:var(--muted); font-size:12px; }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
     button:hover { border-color:var(--cyan); }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
@@ -241,7 +240,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div style="display:flex;align-items:center;gap:12px"><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"><button id="playButton" type="button">Play</button></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div><div class="timeline"><div style="display:flex;align-items:center;gap:8px"><button id="playButtonBottom" type="button" title="Play or pause galaxy simulation" style="min-width:62px">Play</button><span id="frameLabel" style="font-family:monospace;min-width:64px">Frame 1</span></div><input id="timeSliderBottom" type="range" min="0" max="__FRAME_MAX__" step="1" value="0" aria-label="Simulation timeline scrubber"><span id="timeLabel" style="font-family:monospace;white-space:nowrap">Current Time: 0 Myr / 1000 Myr</span></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span>SPARC data and NFW halo response</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></article>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
@@ -904,7 +903,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             modeButtons.forEach(b=>b.setAttribute('aria-checked',String(b.dataset.mode===mode)));
         }
         modeButtons.forEach(b=>b.addEventListener('click',()=>setDragMode(b.dataset.mode)));
-        // Playback speed multiplier (0.5x, 1x, 2x)
+        // Playback speed multiplier (0.25x, 0.5x, 1x, 2x)
         const speedButtons=[...viewPanel.querySelectorAll('[data-speed]')];
         function setPlaybackMultiplier(speed){
             playbackMultiplier=parseFloat(speed)||1.0;
@@ -1026,14 +1025,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         updateHalo();
     });
 
-    const timeSlider=document.getElementById('timeSlider'),timeSliderBottom=document.getElementById('timeSliderBottom');
-    const playButton=document.getElementById('playButton'),playButtonBottom=document.getElementById('playButtonBottom');
+    const timeSlider=document.getElementById('timeSlider');
+    const playButton=document.getElementById('playButton');
 
     function setPlaying(isPlaying){
         playing=isPlaying;
         const txt=playing?'Pause':'Play';
         playButton.textContent=txt;
-        if(playButtonBottom)playButtonBottom.textContent=txt;
     }
 
     function togglePlayback(){
@@ -1052,15 +1050,17 @@ HTML_TEMPLATE = r"""<!doctype html>
         requestRender();
     }
     playButton.addEventListener('click',togglePlayback);
-    if(playButtonBottom)playButtonBottom.addEventListener('click',togglePlayback);
+    window.addEventListener('keydown',e=>{
+        if(e.code==='Space'){
+            e.preventDefault();
+            if(!e.repeat)togglePlayback();
+        }
+    });
 
     function syncTimelineUI(timeMyr){
         const val=Math.round(Math.max(0,Math.min(SIM_TOTAL_TIME_MYR,timeMyr)));
-        timeSlider.value=val;timeSliderBottom.value=val;
-        const frameEl=document.getElementById('frameLabel');
-        if(frameEl)frameEl.textContent=`Frame ${val+1}`;
+        timeSlider.value=val;
         document.getElementById('timeValue').textContent=`${val} Myr / 1000 Myr`;
-        document.getElementById('timeLabel').textContent=`Current Time: ${val} Myr / 1000 Myr`;
     }
 
     function onSliderInput(val){
@@ -1072,7 +1072,6 @@ HTML_TEMPLATE = r"""<!doctype html>
         requestRender();
     }
     timeSlider.addEventListener('input',()=>onSliderInput(timeSlider.value));
-    timeSliderBottom.addEventListener('input',()=>onSliderInput(timeSliderBottom.value));
     updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
   </script>
 </body>
