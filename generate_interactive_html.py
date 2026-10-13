@@ -188,6 +188,34 @@ HTML_TEMPLATE = r"""<!doctype html>
     .control output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .control-help { color:var(--muted); font-size:11px; margin:6px 0 0; min-height:32px; }
     .fit-button { margin-top:7px; font-size:11px; }
+    .model-bar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:10px 16px; border:1px solid var(--line); background:var(--panel); border-radius:5px; margin-bottom:14px; }
+    .model-bar .model-label { color:var(--muted); font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+    .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
+    .switch input { position:absolute; opacity:0; width:0; height:0; }
+    .switch .track { position:relative; width:44px; height:24px; border-radius:999px; background:#16222f; border:1px solid rgba(120,150,180,0.4); transition:background .2s,border-color .2s; flex:none; }
+    .switch .track::after { content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#dbe7f4; transition:transform .2s; }
+    .switch input:checked ~ .track { background:rgba(255,174,92,0.25); border-color:rgba(255,174,92,0.7); }
+    .switch input:checked ~ .track::after { transform:translateX(20px); background:#ffae5c; }
+    .switch input:focus-visible ~ .track { outline:2px solid var(--cyan); outline-offset:2px; }
+    .chi-note { margin:0 16px 14px; font-size:12px; color:#9fb0c2; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); padding:0 14px; }
+    .chi-note summary { cursor:pointer; padding:9px 0; color:#c3cfdb; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    .chi-note p { margin:0 0 10px; }
+    .switch .opt { color:var(--muted); font-size:13px; transition:color .2s; }
+    .switch .opt.active { color:var(--ink); font-weight:600; }
+    .control.disabled { opacity:.35; pointer-events:none; }
+    .control.disabled input, .control.disabled button { cursor:not-allowed; }
+    .mond-note { color:#ffc48a; font-size:12px; }
+    .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .learn details { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px; }
+    .learn summary { cursor:pointer; padding:12px 0; font-size:14px; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center; }
+    .learn summary::-webkit-details-marker { display:none; }
+    .learn summary::after { content:"▾"; color:var(--muted); transition:transform .2s; }
+    .learn details[open] summary::after { transform:rotate(180deg); }
+    .learn details.nfw summary { color:#b39ae8; } .learn details.mond summary { color:#ffae5c; }
+    .learn p { color:#9fb0c2; font-size:13px; margin:0 0 10px; }
+    .learn p.tldr { color:#dbe7f4; }
+    .learn .eq { font-family:Consolas,monospace; font-size:12px; color:#c3cfdb; background:rgba(120,150,180,0.07); border-radius:6px; padding:7px 10px; margin-bottom:12px; overflow-x:auto; }
+    @media (max-width:900px) { .learn { grid-template-columns:1fr; } }
     input[type=range] { width:100%; accent-color:var(--cyan); }
     .panel-grid { display:grid; grid-template-columns:1.12fr 1fr; gap:14px; }
     .panel { min-width:0; background:var(--panel); border:1px solid var(--line); border-radius:5px; overflow:hidden; }
@@ -258,14 +286,32 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="header-note">800 massless test particles (disk) · 1000 Myr (1 Gyr) evolutionary timeline<br>Local data embedded in this page · dark halo uses an NFW profile</div>
   </header>
   <main>
+    <section class="model-bar" aria-label="Gravity model">
+      <span class="model-label">Gravity model</span>
+      <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
+      <span class="mond-note" id="mondNote" hidden>MOND active: no dark matter (M<sub>200</sub> = 0). Gravity is boosted below a<sub>0</sub> = 1.2×10⁻¹⁰ m/s².</span>
+    </section>
     <section class="controls" aria-label="Dark matter controls">
-    <div class="control"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button></div>
-    <div class="control"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
+    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button></div>
+    <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
-      <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo.</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model. The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
+      <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND assumes one fixed a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
+    </section>
+    <section class="learn" aria-label="Theory guide">
+      <details class="nfw"><summary>What is a dark matter halo?</summary>
+        <p class="tldr">An invisible cloud of extra mass around the galaxy whose gravity keeps the outer stars from flying off.</p>
+        <p>The stars and gas we can see are not heavy enough to hold on to fast-moving stars far from the centre. Measured speeds stay high out to the edge instead of dropping, so astronomers propose a huge, roughly spherical halo of unseen matter that extends well beyond the visible disk.</p>
+        <p>This simulator uses the standard NFW halo shape. Its total mass (M<sub>200</sub>) and how tightly it is packed towards the centre (r<sub>s</sub>) are set by the sliders. More halo mass means faster outer stars.</p>
+      </details>
+      <details class="mond"><summary>What is MOND?</summary>
+        <p class="tldr">Instead of adding invisible mass, MOND slightly changes how gravity behaves where it is extremely weak.</p>
+        <p>In the outskirts of a galaxy, gravity from the visible matter is very feeble. MOND says that below a tiny threshold acceleration (a<sub>0</sub> ≈ 1.2×10⁻¹⁰ m/s²) gravity falls off more gently than Newton predicted, so outer stars keep orbiting quickly and the rotation curve flattens, using only the matter we can see.</p>
+        <div class="eq">v² = ( v<sub>bar</sub>² + √( v<sub>bar</sub>⁴ + 4·r·a₀·v<sub>bar</sub>² ) ) / 2</div>
+        <p>Both ideas can match this galaxy's curve; they disagree about <i>why</i>. Flip the switch above to compare them.</p>
+      </details>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + 0.50V<sub>disk</sub>² + 0.70V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
   </main>
@@ -373,6 +419,26 @@ HTML_TEMPLATE = r"""<!doctype html>
             };
         }
         function haloCurve(massT,scaleRadius) {return radii.map(nfwVelocityModel(massT*1e12,scaleRadius));}
+        const M_PER_KPC = 3.08567758e19;
+        const MOND_A0 = 1.2e-10; // m/s^2
+        let mondMode = false;
+        // SI calculation with the standard interpolating function mu(x) = x / sqrt(1 + x^2)
+        function mondVelocity(vBarKms, rKpc, a0 = MOND_A0) {
+            const rM = rKpc * M_PER_KPC, vMs = vBarKms * 1000;
+            if (rM <= 0 || vMs <= 0) return 0;
+            const gN = vMs * vMs / rM;
+            const g = Math.sqrt((gN * gN + Math.sqrt(gN ** 4 + 4 * gN * gN * a0 * a0)) / 2);
+            return Math.sqrt(g * rM) / 1000;
+        }
+        // Velocity added on top of the baryons (in quadrature): NFW halo, or the MOND boost.
+        function extraVelocityModel(massSolar, scaleRadius, vbOf) {
+            if (!mondMode) return nfwVelocityModel(massSolar, scaleRadius);
+            return radius => {
+                if (radius <= 0) return 0;
+                const vb = vbOf(radius), vm = mondVelocity(vb, radius);
+                return Math.sqrt(Math.max(vm * vm - vb * vb, 0));
+            };
+        }
         function baryonicVelocity(radius) {
             if(radius<=radii[0])return vBary[0]*radius/radii[0];
             const last=radii.length-1;
@@ -418,7 +484,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 
         // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline
         function integrateTrajectories(massT, scaleRadius) {
-            const haloVelocity = nfwVelocityModel(massT * 1e12, scaleRadius);
+            const haloVelocity = extraVelocityModel(massT * 1e12, scaleRadius, baryonicVelocity);
             const getAccel = buildAccelerationFunction(haloVelocity);
             const dtSub = DT_SUB;
             const dtSub2Half = 0.5 * dtSub * dtSub;
@@ -490,7 +556,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             });
 
             sortedEscapeTimes = escapeTimes.sort((a, b) => a - b);
-            activeHaloMassT = massT;
+            activeHaloMassT = mondMode ? 0 : massT;
             return trajectories;
         }
         let activeTrajectories = integrateTrajectories(DEFAULTS.massT, DEFAULTS.scaleRadius);
@@ -949,12 +1015,12 @@ HTML_TEMPLATE = r"""<!doctype html>
         // Radial profile on a 1 kpc grid (1-44 kpc, limited to the range covered by the SPARC data).
         function buildRotationCurveCsv(){
             const gas=DATA.rotation.map(p=>p.gas_kms),disk=DATA.rotation.map(p=>p.stellar_kms),err=DATA.rotation.map(p=>p.error_kms);
-            const rs=Number(scaleSlider.value),halo=nfwVelocityModel(activeHaloMassT*1e12,rs);
+            const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(DATA.rotation.map(p=>p.baryonic_kms),r));
             const f=v=>v.toFixed(3);
             let csv="Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
             for(let r=1;r<=44&&r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r),vd=interpolateAt(disk,r);
-                const vb=Math.hypot(vg,vd),vh=halo(r);
+                const vb=Math.hypot(vg,vd),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);
                 csv+=[r,f(vo),f(eo),f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh)),f(vo-vb)].join(',')+"\n";
             }
             return csv;
@@ -1086,11 +1152,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
     massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
     function updateHalo(){
-      const massT=Number(massSlider.value),rs=Number(scaleSlider.value),halo=haloCurve(massT,rs);
-      const total=vBary.map((v,i)=>Math.hypot(v,halo[i]));
+      const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
+      const halo=mondMode?vBary.map(()=>0):haloCurve(massT,rs);
+      const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
-      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[halo,total]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[halo,total],name:[mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[!mondMode,true]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       Plotly.relayout('curvePlot',{'yaxis.range':[0,yMax]});
       clearTimeout(orbitModelTimer);
@@ -1102,6 +1170,20 @@ HTML_TEMPLATE = r"""<!doctype html>
           requestRender();
       },120);
     }
+    const mondToggle=document.getElementById('mondToggle');
+    mondToggle.addEventListener('change',()=>{
+      mondMode=mondToggle.checked;
+      document.getElementById('optNfw').classList.toggle('active',!mondMode);
+      document.getElementById('optMond').classList.toggle('active',mondMode);
+      document.getElementById('mondNote').hidden=!mondMode;
+      ['massControl','scaleControl'].forEach(id=>{
+        const c=document.getElementById(id);
+        c.classList.toggle('disabled',mondMode);
+        c.setAttribute('aria-disabled',String(mondMode));
+        c.querySelectorAll('input,button').forEach(el=>{el.disabled=mondMode;});
+      });
+      updateHalo();
+    });
     massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
         massSlider.value=DEFAULTS.massT;
