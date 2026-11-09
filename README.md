@@ -142,7 +142,8 @@ Test stars:
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
   dense centres never meet a force singularity.
 
-The 3D view also draws the cold gas as a faint blue cloud: an exponential disk
+The 3D view also draws the cold gas as a faint blue cloud (the View panel's
+Hide gas button switches it off): an exponential disk
 three times as extended as the stars, cut at R_max, whose brightness follows
 the gas mass. The Reset view, Face-on and Edge-on distances scale with the
 galaxy (NGC 3198 keeps its original framing), and switching galaxy or mode
