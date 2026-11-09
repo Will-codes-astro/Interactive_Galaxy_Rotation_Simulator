@@ -51,6 +51,17 @@ HALO_MASS_STEP_MSUN = 1e10  # resolution of the halo mass slider (0.01 x 10^12 M
 HALO_SCALE_STEP_KPC = 0.5  # resolution of the scale radius slider
 # Concentrations c = r200 / rs of stable NFW halos; outside this range the sandbox shows its warning.
 STABLE_CONCENTRATION = (3.0, 25.0)
+# Test-star model. The default preset (NGC 3198) and the default sandbox galaxy are the BASE_STAR_COUNT
+# template; other galaxies scale it by (visible mass / template mass) ** STAR_COUNT_EXPONENT, within the limits.
+BASE_STAR_COUNT = 800
+MIN_STAR_COUNT = 200
+MAX_STAR_COUNT = 2400
+STAR_COUNT_EXPONENT = 0.5
+# A star is "ejected" once it is farther than EJECTION_RADIUS_FACTOR x R_max from the galactic centre.
+EJECTION_RADIUS_FACTOR = 1.5
+# Gravitational softening of the orbit integrator (kpc): the low end for pure disks; with a bulge it follows the
+# bulge's scale radius within this range.
+SOFTENING_RANGE_KPC = (0.5, 1.0)
 
 
 def load_trajectories(path: Path) -> list[dict[str, Any]]:
@@ -366,7 +377,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .c-ticks { position:relative; height:16px; margin:5px 6px 0; color:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; }
     .c-ticks span { position:absolute; transform:translateX(-50%); }
     .stability-message { margin:8px 0 0; color:#9fb0c2; font-size:12px; }
-    .stability-chip { position:absolute; top:44px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
+    .stability-chip { position:absolute; top:64px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
     @media (prefers-reduced-motion:reduce) { .c-marker { transition:none; } }
     @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
     @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
@@ -526,7 +537,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   <header>
     <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
     <div class="header-stats" aria-label="Simulation summary">
-      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value">800<small>massless</small></div></div>
+      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
         <div class="stat ml" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label">Mass-to-light (M/L)</div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div></div>
@@ -541,7 +552,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span>Custom Sandbox</span></label>
       </div>
       <div class="preset-picker" id="presetPicker">
-        <label class="model-label" for="galaxySelect">Galaxy</label>
+        <label class="model-label" id="galaxyLabel" for="galaxySelect">Galaxy</label>
         <select id="galaxySelect" autocomplete="off" aria-describedby="galaxySummary" title="Choose which SPARC galaxy to model"></select>
         <span class="galaxy-summary" id="galaxySummary" role="status" aria-live="polite"></span>
       </div>
@@ -551,22 +562,25 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="sandbox-groups">
         <div class="sandbox-group">
           <h3>Stellar disk</h3>
-          <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Total mass of the stars in the flat disk.</p></div>
+          <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Total mass of the stars in the flat disk (exponential profile).</p></div>
           <div class="control"><label for="sbDiskScale"><span>Scale length, R<sub>d</sub></span><output id="sbDiskScaleValue" for="sbDiskScale"></output></label><input id="sbDiskScale" type="range" min="1.5" max="6" step="0.1" value="3.1" autocomplete="off"><p class="control-help">How quickly the disk fades outwards: the brightness falls by a factor of e every R<sub>d</sub>.</p></div>
-          <div class="control"><label for="sbTruncation"><span>Truncation radius, R<sub>max</sub></span><output id="sbTruncationValue" for="sbTruncation"></output></label><input id="sbTruncation" type="range" min="15" max="40" step="0.5" value="30" autocomplete="off"><p class="control-help">Outer edge of the galaxy's visible matter.</p></div>
+          <div class="control"><label for="sbTruncation"><span>Truncation radius, R<sub>max</sub></span><output id="sbTruncationValue" for="sbTruncation"></output></label><input id="sbTruncation" type="range" min="15" max="40" step="0.5" value="30" autocomplete="off"><p class="control-help">Outer edge of the galaxy's visible matter. Stars that stray beyond 1.5 × R<sub>max</sub> count as ejected.</p></div>
         </div>
         <div class="sandbox-group">
           <h3>Bulge</h3>
           <div class="control"><label for="sbBulgeMass"><span>Bulge mass, M<sub>bulge</sub></span><output id="sbBulgeMassValue" for="sbBulgeMass"></output></label><input id="sbBulgeMass" type="range" min="0" max="5e10" step="1e8" value="0" autocomplete="off"><p class="control-help">Mass of the round central cluster of stars. Zero gives a pure disk galaxy.</p></div>
-          <div class="control" id="sbBulgeRadiusControl"><label for="sbBulgeRadius"><span>Effective radius, r<sub>b</sub></span><output id="sbBulgeRadiusValue" for="sbBulgeRadius"></output></label><input id="sbBulgeRadius" type="range" min="0.2" max="2" step="0.1" value="1" autocomplete="off"><p class="control-help" id="sbBulgeRadiusHelp">The radius containing half of the bulge's light.</p></div>
+          <div class="control" id="sbBulgeRadiusControl"><label for="sbBulgeRadius"><span>Effective radius, r<sub>b</sub></span><output id="sbBulgeRadiusValue" for="sbBulgeRadius"></output></label><input id="sbBulgeRadius" type="range" min="0.2" max="2" step="0.1" value="1" autocomplete="off"><p class="control-help" id="sbBulgeRadiusHelp">Scale radius of the bulge's Hernquist profile. Half of the bulge's mass lies within about 2.4 times this radius.</p></div>
         </div>
         <div class="sandbox-group">
           <h3>Gas</h3>
-          <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of the cold gas, mostly hydrogen, that extends beyond the stars.</p></div>
+          <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of the cold gas, mostly hydrogen, in a disk three times more extended than the stars.</p></div>
           <dl class="sandbox-summary" aria-label="Sandbox galaxy summary">
             <dt>Total visible mass</dt><dd id="sbTotalMass"></dd>
             <dt>Bulge-to-total (stars)</dt><dd id="sbBulgeFraction"></dd>
             <dt>Gas fraction</dt><dd id="sbGasFraction"></dd>
+            <dt>Baseline halo M<sub>200</sub> (SHMR)</dt><dd id="sbHaloBaseline"></dd>
+            <dt>Test stars</dt><dd id="sbStarCount"></dd>
+            <dt>Ejection radius</dt><dd id="sbEjectRadius"></dd>
           </dl>
         </div>
       </div>
@@ -577,7 +591,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="c-ticks" id="cTicks" aria-hidden="true"></div>
         <p class="stability-message" id="stabilityMessage"></p>
       </div>
-      <div class="sandbox-footer"><p>Preview: the anatomy sliders define your galaxy and update the summary, and the stability monitor reads the halo sliders below. The rotation curve and 3D orbits still show <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> until the next update couples them to this physics.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
+      <div class="sandbox-footer"><p id="sandboxNote">The anatomy sliders drive the rotation curve, χ², halo and 3D stars live. The halo follows the stellar-to-halo mass relation: fine-tune its mass and scale radius with the halo sliders below. The white points and χ² come from the SPARC galaxy chosen under Compare with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
     </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
@@ -586,12 +600,12 @@ HTML_TEMPLATE = r"""<!doctype html>
       <button type="button" class="tutorial-launch" id="tutorialLaunch">Tutorial</button>
     </section>
     <section class="controls" aria-label="Dark matter controls">
-    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
-    <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
+    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
+    <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;"><div>Ejected: <span id="escape-count-val">0</span> / <span id="star-total-val">800</span></div><div id="star-detail" style="font-size: 10px; opacity: 0.7;"></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -609,7 +623,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <details class="key">
           <summary>Understanding the colours and χ²</summary>
           <div class="key-content">
-            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul>
+            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
             <h3>Why isn't χ² exactly 0?</h3>
             <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
             <p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p>
@@ -633,7 +647,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         </div>
       </details>
     </section>
-    <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
+    <footer><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span></div>
@@ -700,27 +714,174 @@ __GALAXIES_JS__
     const haloDefaultsOf = galaxy => ({massT: galaxy.default_halo.m200_msun / 1e12, scaleRadius: galaxy.default_halo.scale_radius_kpc});
     let activeGalaxy = GALAXIES[DATA.default_galaxy_id];
     let DEFAULTS = haloDefaultsOf(activeGalaxy);
+    let customActive = false; // true while the Custom Sandbox, not a SPARC preset, drives the physics
+    let customModel = null; // PhysicsEngine circular-speed functions of the sandbox galaxy
     const G = 4.30091e-6;
     const H0 = 0.07;
     const BG = '#050910';
     const GRID = '#1c2936';
     const textColor = '#bac9d8';
-    const stars = DATA.stars;
     const SIM_TOTAL_TIME_MYR = 1000.0;
     const SIM_DT_MYR = 1.0;
     const frameCount = 1001; // 0 to 1000 Myr (1 Gyr)
     const SUBSTEPS = 2; // 2 Velocity-Verlet substeps per 1 Myr frame
     const DT_SUB = SIM_DT_MYR / SUBSTEPS;
-    const maxRadius = Math.max(...stars.map(s => s.initial_r_kpc));
-    const ESCAPE_RADIUS2 = maxRadius ** 2;
-    const speeds = stars.map(s => s.v_rot_kms);
-    const minSpeed = Math.min(...speeds), speedSpan = Math.max(...speeds) - minSpeed || 1;
         const KM_S_TO_KPC_MYR = 0.0010227121650537077;
 
-        /* ---------- 3D galaxy morphology: razor-thin exponential disk (NGC 3198 Sc spiral) ---------- */
-        const GALAXY={bulgeCount:0,diskCount:800,haloCount:0,hernquistA:1.0,bulgeMax:6.5,bulgeKeepOut:0.65,
-            diskScaleLength:4.0,scaleHeight:0.15,diskScaleHeight:0.15,diskMax:maxRadius,diskMin:0.45,
-            haloA:12.0,haloMin:5,haloMax:48,blackHoleRadius:0.16};
+        /* ---------- Physics engine: gravitational potentials of a custom galaxy ----------
+           Pure functions of the anatomy sliders (no DOM). Each component contributes its circular speed
+           V_c^2 = R dPhi/dR in (km/s)^2, and the components add in quadrature:
+             stellar disk, gas  exponential disks, Sigma(R) = Sigma_0 exp(-R/R_s) cut at R_max. Inside R_max: Freeman's (1970)
+                                Bessel-function solution for the infinite disk, minus the annulus beyond R_max (a sum of
+                                softened elliptic-integral rings). Outside R_max: the rings out to R_max.
+             bulge              Hernquist sphere, Phi = -G M / (r + r_b), so V_c^2 = G M r / (r + r_b)^2.
+           The halo baseline couples to the stellar mass through the Moster et al. (2013) stellar-to-halo mass relation
+           (inverted for M200) and the Dutton & Maccio (2014) mass-concentration relation (giving the NFW scale radius). */
+        const PhysicsEngine=(()=>{
+            const TWO_PI=2*Math.PI;
+            const RHO_CRIT=3*H0*H0/(8*Math.PI*G);
+            const GAS_SCALE_RATIO=3; // the gas disk is this many times more extended than the stellar disk
+            let ellipK=0,ellipE=0;
+            // Complete elliptic integrals K(m) and E(m), m = k^2, by the arithmetic-geometric mean.
+            function ellipticKE(m){
+                let a=1,b=Math.sqrt(1-m),sum=m/2,weight=1;
+                for(let i=0;i<40;i++){
+                    const c=(a-b)/2,next=(a+b)/2;
+                    b=Math.sqrt(a*b);a=next;
+                    sum+=weight*c*c;weight*=2;
+                    if(c<1e-16*a)break;
+                }
+                ellipK=Math.PI/(2*a);ellipE=ellipK*(1-sum);
+            }
+            // Modified Bessel functions (Abramowitz & Stegun 9.8.1-9.8.8, relative error ~1e-7).
+            const poly=(t,c)=>{let s=0;for(let i=c.length-1;i>=0;i--)s=s*t+c[i];return s;};
+            const I0_SMALL=[1,3.5156229,3.0899424,1.2067492,0.2659732,0.0360768,0.0045813];
+            const I0_LARGE=[0.39894228,0.01328592,0.00225319,-0.00157565,0.00916281,-0.02057706,0.02635537,-0.01647633,0.00392377];
+            const I1_SMALL=[0.5,0.87890594,0.51498869,0.15084934,0.02658733,0.00301532,0.00032411];
+            const I1_LARGE=[0.39894228,-0.03988024,-0.00362018,0.00163801,-0.01031555,0.02282967,-0.02895312,0.01787654,-0.00420059];
+            const K0_SMALL=[-0.57721566,0.42278420,0.23069756,0.03488590,0.00262698,0.00010750,0.00000740];
+            const K0_LARGE=[1.25331414,-0.07832358,0.02189568,-0.01062446,0.00587872,-0.00251540,0.00053208];
+            const K1_SMALL=[1,0.15443144,-0.67278579,-0.18156897,-0.01919402,-0.00110404,-0.00004686];
+            const K1_LARGE=[1.25331414,0.23498619,-0.03655620,0.01504268,-0.00780353,0.00325614,-0.00068245];
+            const besselI0=x=>x<3.75?poly((x/3.75)**2,I0_SMALL):Math.exp(x)/Math.sqrt(x)*poly(3.75/x,I0_LARGE);
+            const besselI1=x=>x<3.75?x*poly((x/3.75)**2,I1_SMALL):Math.exp(x)/Math.sqrt(x)*poly(3.75/x,I1_LARGE);
+            const besselK0=x=>x<=2?-Math.log(x/2)*besselI0(x)+poly((x/2)**2,K0_SMALL):Math.exp(-x)/Math.sqrt(x)*poly(2/x,K0_LARGE);
+            const besselK1=x=>x<=2?Math.log(x/2)*besselI1(x)+poly((x/2)**2,K1_SMALL)/x:Math.exp(-x)/Math.sqrt(x)*poly(2/x,K1_LARGE);
+            // Gauss-Legendre nodes and weights on [-1, 1].
+            function gaussLegendre(n){
+                const x=new Float64Array(n),w=new Float64Array(n);
+                for(let i=0;i<n;i++){
+                    let z=Math.cos(Math.PI*(i+0.75)/(n+0.5)),dp=1;
+                    for(let it=0;it<100;it++){
+                        let p1=1,p2=0;
+                        for(let j=0;j<n;j++){const p3=p2;p2=p1;p1=((2*j+1)*z*p2-j*p3)/(j+1);}
+                        dp=n*(z*p1-p2)/(z*z-1);
+                        const dz=p1/dp;z-=dz;
+                        if(Math.abs(dz)<1e-15)break;
+                    }
+                    x[i]=z;w[i]=2/((1-z*z)*dp*dp);
+                }
+                return{x,w};
+            }
+            const GL=gaussLegendre(10),PANELS=7;
+            // (dPhi/dR)/G for a thin ring of unit mass and radius a, seen at in-plane radius R with Plummer softening eps.
+            // Positive pulls inwards. Phi_ring = -(2/pi) K(m) / sqrt(s), s = (a+R)^2 + eps^2, m = 4aR/s.
+            function ringGradient(a,R,eps2){
+                const s=(a+R)*(a+R)+eps2,m=4*a*R/s;
+                ellipticKE(m);
+                const mc=1-m,dm=4*a*(a*a-R*R+eps2)/(s*s);
+                const dK=m<1e-6?Math.PI/8*(1+9*m/16):(ellipE-mc*ellipK)/(2*m*mc);
+                const root=Math.sqrt(s);
+                return -(2/Math.PI)*(dK*dm/root-ellipK*(a+R)/(s*root));
+            }
+            // Exponential disk of the given mass inside r_max (so the slider is the mass actually present).
+            function exponentialDisk(mass,scale,rMax,eps){
+                const xm=rMax/scale,sigma0=mass/(TWO_PI*scale*scale*(1-(1+xm)*Math.exp(-xm)));
+                const eps2=eps*eps;
+                // integral of 2 pi a Sigma(a) (dPhi_ring/dR)/G over [lo, hi]: composite Gauss-Legendre whose panels
+                // shrink geometrically towards the end nearest R, where the ring kernel is sharpest.
+                function ringSum(R,lo,hi,sharpEnd){
+                    let sum=0,far=hi-lo;
+                    for(let p=0;p<PANELS;p++){
+                        const near=p===PANELS-1?0:far/2;
+                        const from=sharpEnd==='high'?hi-far:lo+near,to=sharpEnd==='high'?hi-near:lo+far;
+                        const mid=(from+to)/2,half=(to-from)/2;
+                        for(let i=0;i<GL.x.length;i++){
+                            const a=mid+half*GL.x[i];
+                            sum+=GL.w[i]*half*a*Math.exp(-a/scale)*ringGradient(a,R,eps2);
+                        }
+                        far=near;
+                    }
+                    return TWO_PI*sigma0*sum;
+                }
+                function vSq(R){
+                    if(!(R>0))return 0;
+                    if(R<rMax){
+                        const y=R/(2*scale);
+                        const freeman=4*Math.PI*G*sigma0*scale*y*y*(besselI0(y)*besselK0(y)-besselI1(y)*besselK1(y));
+                        return Math.max(0,freeman-G*R*ringSum(R,rMax,rMax+16*scale,'low'));
+                    }
+                    return Math.max(0,G*R*ringSum(R,0,rMax,'high'));
+                }
+                return{sigma0,vSq};
+            }
+            // Circular-speed functions (km/s squared) of a galaxy with the given anatomy.
+            function buildGalaxy(anatomy,eps){
+                const stars=exponentialDisk(anatomy.diskMass,anatomy.diskScale,anatomy.rMax,eps);
+                const gas=exponentialDisk(anatomy.gasMass,GAS_SCALE_RATIO*anatomy.diskScale,anatomy.rMax,eps);
+                const bulgeMass=anatomy.bulgeMass>0?anatomy.bulgeMass:0,rb=anatomy.bulgeRadius;
+                const bulgeSq=r=>bulgeMass>0?G*bulgeMass*r/((r+rb)*(r+rb)):0;
+                return{diskSq:stars.vSq,gasSq:gas.vSq,bulgeSq,vSq:r=>stars.vSq(r)+gas.vSq(r)+bulgeSq(r)};
+            }
+            // Moster et al. (2013), z = 0: M*/M_h = 2 N [(M_h/M_1)^-beta + (M_h/M_1)^gamma]^-1.
+            const SHMR={logM1:11.59,norm:0.0351,beta:1.376,gamma:0.608};
+            function stellarMassOfHalo(m200){
+                const x=m200/10**SHMR.logM1;
+                return m200*2*SHMR.norm/(x**-SHMR.beta+x**SHMR.gamma);
+            }
+            function haloMassFromStellar(mStar){
+                let lo=7,hi=16;
+                for(let i=0;i<60;i++){const mid=(lo+hi)/2;if(stellarMassOfHalo(10**mid)<mStar)lo=mid;else hi=mid;}
+                return 10**((lo+hi)/2);
+            }
+            // Dutton & Maccio (2014): log10 c200 = 0.905 - 0.101 log10(M200 / (10^12 h^-1 Msun)), with h = 0.7.
+            const concentrationOf=m200=>10**(0.905-0.101*Math.log10(m200/(1e12/0.7)));
+            const virialRadius=m200=>Math.cbrt(3*m200/(4*Math.PI*200*RHO_CRIT));
+            function baselineHalo(stellarMass){
+                const m200=haloMassFromStellar(stellarMass);
+                return{m200,scaleRadius:virialRadius(m200)/concentrationOf(m200)};
+            }
+            // Rough anatomy of a SPARC galaxy from its mass-model speeds; it only shapes the 3D star population.
+            function anatomyFromRotation(rotation,upsilonDisk,upsilonBulge){
+                const r=rotation.radius_kpc,n=r.length,rLast=r[n-1];
+                const vDisk=rotation.v_disk_kms.map(Math.abs),vBulge=rotation.v_bulge_kms.map(Math.abs);
+                let peak=0;
+                for(let i=1;i<n;i++)if(vDisk[i]>vDisk[peak])peak=i;
+                // An exponential disk's speed peaks at 2.16 R_d, where V^2 = 0.3872 G M / R_d (Freeman 1970).
+                const diskScale=r[peak]/2.16,diskMass=upsilonDisk*vDisk[peak]**2*diskScale/(0.3872*G);
+                // A spherical bulge's enclosed mass is V^2 r / G; its Hernquist half-mass radius is (1 + sqrt 2) r_b.
+                const enclosed=r.map((x,i)=>upsilonBulge*vBulge[i]**2*x/G),bulgeMass=enclosed[n-1];
+                let halfRadius=r[0];
+                for(let i=0;i<n;i++){
+                    if(enclosed[i]>=bulgeMass/2){
+                        const previous=i>0?i-1:0,span=enclosed[i]-enclosed[previous]||1;
+                        halfRadius=i>0?r[previous]+(r[i]-r[previous])*(bulgeMass/2-enclosed[previous])/span:r[0];
+                        break;
+                    }
+                }
+                const gasMass=rotation.v_gas_kms[n-1]**2*rLast/G;
+                return{diskMass,diskScale,rMax:rLast,bulgeMass:bulgeMass>1e6?bulgeMass:0,bulgeRadius:Math.max(0.05,halfRadius/(1+Math.SQRT2)),gasMass};
+            }
+            return{buildGalaxy,baselineHalo,anatomyFromRotation};
+        })();
+
+        /* ---------- Test-star population ----------
+           The 800-star NGC 3198 disk is the template: other galaxies scale it with their visible mass (starCountFor).
+           Each star owns fixed random numbers (STAR_SEEDS), so moving a slider slides the stars smoothly instead of
+           reshuffling them. Stars are ordered bulge first, then disk. */
+        const PM=DATA.particle_model;
+        const MAX_STARS=PM.max_count,MIN_BULGE_STARS=12,MIN_DISK_STARS=24,BULGE_ROTATION=0.3;
+        const GALAXY={scaleHeight:0.15,diskMin:0.45,bulgeMin:0.1,blackHoleRadius:0.16};
         function mulberry32(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);
             t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
         // Box-Muller transform: converts pairs of uniform random numbers to standard normal distribution
@@ -730,59 +891,62 @@ __GALAXIES_JS__
             const u2=rng();
             return mean+stdDev*Math.sqrt(-2.0*Math.log(u1))*Math.cos(2.0*Math.PI*u2);
         }
-        function sampleBulge(rng){
-            let r;
-            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.hernquistA*s/(1-s);}
-            while(r>GALAXY.bulgeMax||r<GALAXY.bulgeKeepOut);
-            const phi=2*Math.PI*rng();
-            const z=boxMuller(0,GALAXY.scaleHeight,rng);
-            return[r*Math.cos(phi),r*Math.sin(phi),z];
-        }
-        function sampleDisk(rng){
-            let R;
-            do{R=-GALAXY.diskScaleLength*(Math.log(Math.max(1e-7,rng()))+Math.log(Math.max(1e-7,rng())));}
-            while(R>GALAXY.diskMax||R<GALAXY.diskMin);
-            const phi=2*Math.PI*rng();
-            // Tight Gaussian (normal distribution) scale height for razor-thin disk (late-type Sc spiral)
-            const z=boxMuller(0,GALAXY.scaleHeight,rng);
-            return[R*Math.cos(phi),R*Math.sin(phi),z];
-        }
-        function sampleHalo(rng){
-            let r;
-            do{const s=Math.sqrt(Math.min(Math.max(rng(),1e-6),0.999));r=GALAXY.haloA*s/(1-s);}
-            while(r>GALAXY.haloMax||r<GALAXY.haloMin);
-            const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-            return[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT];
-        }
-        // Particles are ordered bulge then disk; kind selects the orbit initial conditions and colour.
-        const particles=(()=>{
-            const rng=mulberry32(3198),out=[];
-            const randomAxis=()=>{
-                const cosT=2*rng()-1,sinT=Math.sqrt(Math.max(0,1-cosT*cosT)),phi=2*Math.PI*rng();
-                return[sinT*Math.cos(phi),sinT*Math.sin(phi),cosT];
-            };
-            for(let i=0;i<GALAXY.bulgeCount;i++){
-                const p=sampleBulge(rng);
-                out.push({kind:'bulge',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1});
-            }
-            for(let i=0;i<GALAXY.diskCount;i++){
-                const p=sampleDisk(rng);
-                out.push({kind:'disk',position:p,radius:Math.hypot(p[0],p[1]),axis:randomAxis(),speedScale:1});
-            }
-            for(let i=0;i<GALAXY.haloCount;i++){
-                const p=sampleHalo(rng);
-                out.push({kind:'halo',position:p,radius:Math.hypot(p[0],p[1],p[2]),axis:randomAxis(),speedScale:1,warm:rng()<0.12});
-            }
-            return out;
+        // Fixed uniform and Gaussian random numbers for every star the page can ever show.
+        const STAR_SEEDS=(()=>{
+            const rng=mulberry32(3198),uniform=new Float32Array(MAX_STARS*4),gauss=new Float32Array(MAX_STARS*4);
+            for(let i=0;i<MAX_STARS*4;i++){uniform[i]=rng();gauss[i]=boxMuller(0,1,rng);}
+            return{uniform,gauss};
         })();
-        const indicesOf=kind=>particles.map((p,i)=>p.kind===kind?i:-1).filter(i=>i>=0);
-        const bulgeIndices=indicesOf('bulge'),diskIndices=indicesOf('disk'),haloIndices=indicesOf('halo');
+        const starCountFor=(visibleMass,templateMass)=>Math.max(PM.min_count,Math.min(PM.max_count,
+            Math.round(PM.base_count*Math.pow(visibleMass/templateMass,PM.count_exponent))));
+        const visibleMassOf=anatomy=>anatomy.diskMass+anatomy.bulgeMass+anatomy.gasMass;
+        const presetAnatomy=galaxy=>PhysicsEngine.anatomyFromRotation(galaxy.rotation,DATA.upsilon_disk,DATA.upsilon_bulge);
+        const PRESET_TEMPLATE_MASS=visibleMassOf(presetAnatomy(GALAXIES[DATA.default_galaxy_id]));
+        // The sandbox template is its own slider defaults, an NGC 3198-like galaxy.
+        const sandboxTemplateMass=()=>['sbDiskMass','sbBulgeMass','sbGasMass'].reduce((sum,id)=>sum+Number(document.getElementById(id).defaultValue),0);
+        // Radius enclosing the fraction u of an exponential disk's stars (cumulative 1-(1+x)e^-x, x = R/R_d) between rMin and rMax.
+        function diskRadius(u,scale,rMin,rMax){
+            const cdf=x=>1-(1+x)*Math.exp(-x),c0=cdf(rMin/scale),target=c0+u*(cdf(rMax/scale)-c0);
+            let lo=rMin/scale,hi=rMax/scale;
+            for(let i=0;i<40;i++){const mid=(lo+hi)/2;if(cdf(mid)<target)lo=mid;else hi=mid;}
+            return scale*(lo+hi)/2;
+        }
+        // Radius enclosing the fraction u of a Hernquist bulge's stars (cumulative (r/(r+a))^2) between rMin and rMax.
+        function hernquistRadius(u,a,rMin,rMax){
+            const fraction=r=>(r/(r+a))**2,f0=fraction(rMin),s=Math.sqrt(f0+u*(fraction(rMax)-f0));
+            return a*s/(1-s);
+        }
+        // Positions of `count` stars for an anatomy: an exponential disk to R_max and, when there is a bulge, a
+        // spheroidal Hernquist cluster (its share of the stars follows its share of the stellar mass).
+        function generatePopulation(anatomy,count){
+            let bulgeCount=0;
+            if(anatomy.bulgeMass>0){
+                const share=anatomy.bulgeMass/(anatomy.diskMass+anatomy.bulgeMass);
+                bulgeCount=Math.min(count-MIN_DISK_STARS,Math.max(MIN_BULGE_STARS,Math.round(count*share)));
+            }
+            const bulgeCut=Math.min(anatomy.rMax,25*anatomy.bulgeRadius);
+            const u=STAR_SEEDS.uniform,g=STAR_SEEDS.gauss,list=new Array(count);
+            for(let k=0;k<count;k++){
+                const phi=2*Math.PI*u[4*k+1],kick=[g[4*k+1],g[4*k+2],g[4*k+3]];
+                if(k<bulgeCount){
+                    const r=hernquistRadius(u[4*k],anatomy.bulgeRadius,GALAXY.bulgeMin,bulgeCut);
+                    const cosT=2*u[4*k+2]-1,sinT=Math.sqrt(1-cosT*cosT);
+                    list[k]={kind:'bulge',position:[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT],radius:r,kick,colorSeed:u[4*k+3]};
+                }else{
+                    const R=diskRadius(u[4*k],anatomy.diskScale,GALAXY.diskMin,anatomy.rMax);
+                    list[k]={kind:'disk',position:[R*Math.cos(phi),R*Math.sin(phi),g[4*k]*GALAXY.scaleHeight],radius:R,kick,colorSeed:u[4*k+3]};
+                }
+            }
+            return{particles:list,bulgeCount,bulgeCut};
+        }
         /* ---------- Active galaxy: SPARC rotation curve ----------
            galaxies.js stores the raw SPARC columns. loadGalaxyData() rebuilds every array below for the chosen
            galaxy, so the rest of the page reads radii / vObs / vBary without knowing which galaxy is active. */
         const mlState={disk:DATA.upsilon_disk,bulge:DATA.upsilon_bulge};
         let rotationRows=[],radii=[],vObs=[],obsV=[],obsErr=[],vBary=[];
-        const baryonsFor=(ud,ub)=>rotationRows.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
+        const baryonsFor=(ud,ub)=>customActive&&customModel
+            ?rotationRows.map(p=>Math.sqrt(customModel.vSq(p.radius_kpc)))
+            :rotationRows.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
         function loadGalaxyData(galaxy){
             const t=galaxy.rotation;
             rotationRows=t.radius_kpc.map((radius,i)=>{
@@ -839,7 +1003,15 @@ __GALAXIES_JS__
                 return Math.sqrt(Math.max(vm * vm - vb * vb, 0));
             };
         }
+        // Baryonic circular speed: the custom galaxy's engine table, or the SPARC mass model interpolated at the data radii.
+        let customBaryonTable=null;
         function baryonicVelocity(radius) {
+            if(customActive&&customBaryonTable){
+                const t=radius*INV_DR_TABLE;
+                if(t>=ACCEL_TABLE_SIZE-1)return Math.sqrt(customBaryonTable[ACCEL_TABLE_SIZE-1]*R_MAX_TABLE/radius);
+                const i=t|0,f=t-i;
+                return Math.sqrt(customBaryonTable[i]+f*(customBaryonTable[i+1]-customBaryonTable[i]));
+            }
             if(radius<=radii[0])return vBary[0]*radius/radii[0];
             const last=radii.length-1;
             if(radius>=radii[last])return vBary[last]*Math.sqrt(radii[last]/radius);
@@ -849,74 +1021,138 @@ __GALAXIES_JS__
             return vBary[low]+fraction*(vBary[high]-vBary[low]);
         }
 
-        // Fast radial acceleration lookup table for NFW halo + SPARC baryonic potential
+        // Radial acceleration tables: a = -k(r) r_vec (k in 1/Myr^2) for the total potential of baryons + halo.
         const ACCEL_TABLE_SIZE = 2048;
         const R_MAX_TABLE = 160.0;
         const INV_DR_TABLE = (ACCEL_TABLE_SIZE - 1) / R_MAX_TABLE;
         const DR_TABLE = R_MAX_TABLE / (ACCEL_TABLE_SIZE - 1);
-
-        function buildAccelerationFunction(haloVelocity) {
-            const kTable = new Float32Array(ACCEL_TABLE_SIZE);
+        const SOFTENING_SPLINE = 2.8; // the cubic-spline force is exactly Newtonian beyond 2.8 epsilon (Plummer-equivalent epsilon)
+        // Gravitational softening: the fraction of the Newtonian force left at u = r / (2.8 epsilon), which smooths the
+        // dense centre so no star meets a force singularity or a time step too coarse for its orbit.
+        function softeningFactor(u) {
+            if (u >= 1) return 1;
+            const u3 = u * u * u;
+            return (u < 0.5
+                ? 10.666666666667 + u * u * (32 * u - 38.4)
+                : 21.333333333333 - 48 * u + 38.4 * u * u - 10.666666666667 * u3 - 0.066666666667 / u3) * u3;
+        }
+        // A pure disk gets the smallest softening; with a bulge it follows the bulge's scale radius within the allowed range.
+        const softeningFor = anatomy => anatomy.bulgeMass > 0
+            ? Math.min(PM.softening_kpc[1], Math.max(PM.softening_kpc[0], anatomy.bulgeRadius))
+            : PM.softening_kpc[0];
+        let softening = PM.softening_kpc[0];
+        const forceTable = new Float64Array(ACCEL_TABLE_SIZE), referenceTable = new Float64Array(ACCEL_TABLE_SIZE);
+        function fillForceTable(table, speedSquaredAt) {
+            const scale = SOFTENING_SPLINE * softening;
             for (let i = 0; i < ACCEL_TABLE_SIZE; i++) {
                 const r = Math.max(i * DR_TABLE, 1e-4);
-                const vb = baryonicVelocity(r);
-                const vh = haloVelocity(r);
-                kTable[i] = ((vb * vb + vh * vh) * (KM_S_TO_KPC_MYR ** 2)) / (r * r);
+                table[i] = speedSquaredAt(r) * (KM_S_TO_KPC_MYR ** 2) * softeningFactor(r / scale) / (r * r);
             }
-            return function getAccel(x, y, z) {
-                const r = Math.max(Math.hypot(x, y, z), 1e-4);
-                const idxFloat = r * INV_DR_TABLE;
-                let k;
-                if (idxFloat >= ACCEL_TABLE_SIZE - 1) {
-                    const ratio = R_MAX_TABLE / r;
-                    k = kTable[ACCEL_TABLE_SIZE - 1] * ratio * ratio * ratio;
-                } else {
-                    const idx = idxFloat | 0;
-                    const f = idxFloat - idx;
-                    k = kTable[idx] + f * (kTable[idx + 1] - kTable[idx]);
-                }
-                return [-k * x, -k * y, -k * z];
+        }
+        function accelFactor(table, r) {
+            const idxFloat = r * INV_DR_TABLE;
+            if (idxFloat >= ACCEL_TABLE_SIZE - 1) {
+                const ratio = R_MAX_TABLE / r;
+                return table[ACCEL_TABLE_SIZE - 1] * ratio * ratio * ratio;
+            }
+            const idx = idxFloat | 0;
+            return table[idx] + (idxFloat - idx) * (table[idx + 1] - table[idx]);
+        }
+
+        /* ---------- Active population and its initial orbits ----------
+           Stars start on the orbits that balance a reference galaxy: the observed SPARC curve of a preset, or the
+           baryons plus the baseline halo of a custom galaxy. Moving the halo sliders or switching to MOND then changes
+           the gravity under them. Disk stars begin on circular orbits; bulge stars get an isotropic velocity dispersion
+           from the Jeans equation, so the spheroid is held up by pressure instead of rotation. */
+        const presetReferenceSpeedSquared = r => observedVelocity(r) ** 2;
+        let referenceSpeedSquared = presetReferenceSpeedSquared;
+        let particles = [], starCount = 0, bulgeStarCount = 0, bulgeCutRadius = 1, currentAnatomy = null, ejectionRadius = 1;
+        const JEANS_POINTS = 240, JEANS_R_MIN = 0.01, JEANS_R_MAX = 1500;
+        // sigma^2(r) = (1/rho) integral_r^inf rho g dr' for a Hernquist tracer (rho ~ 1/(r (r+a)^3)) in the reference gravity g.
+        function bulgeDispersionSquared(scale) {
+            const lnStep = Math.log(JEANS_R_MAX / JEANS_R_MIN) / (JEANS_POINTS - 1), sigma2 = new Float64Array(JEANS_POINTS);
+            let tail = 0, previous = 0;
+            for (let i = JEANS_POINTS - 1; i >= 0; i--) {
+                const r = JEANS_R_MIN * Math.exp(i * lnStep), rho = 1 / (r * (r + scale) ** 3);
+                const flux = rho * accelFactor(referenceTable, r) * r * r;
+                if (i < JEANS_POINTS - 1) tail += 0.5 * (flux + previous) * lnStep;
+                previous = flux;
+                sigma2[i] = tail / rho;
+            }
+            return r => {
+                const t = Math.log(Math.max(r, JEANS_R_MIN) / JEANS_R_MIN) / lnStep, i = Math.min(Math.floor(t), JEANS_POINTS - 2);
+                return Math.max(0, sigma2[i] + Math.min(1, t - i) * (sigma2[i + 1] - sigma2[i]));
             };
+        }
+        function assignInitialVelocities() {
+            fillForceTable(referenceTable, referenceSpeedSquared);
+            const dispersion = bulgeStarCount > 0 ? bulgeDispersionSquared(currentAnatomy.bulgeRadius) : null;
+            const streaming = Math.sqrt(1 - BULGE_ROTATION ** 2);
+            for (const p of particles) {
+                const [x, y, z] = p.position;
+                if (p.kind === 'disk') {
+                    const rho = Math.max(Math.hypot(x, y), 1e-6);
+                    const speed = Math.sqrt(accelFactor(referenceTable, Math.hypot(x, y, z))) * rho;
+                    p.velocity = [-y / rho * speed, x / rho * speed, 0];
+                } else {
+                    const sigma = Math.sqrt(dispersion(p.radius)), rho = Math.hypot(x, y);
+                    const c = rho > 1e-9 ? x / rho : 1, s = rho > 1e-9 ? y / rho : 0;
+                    const vR = sigma * p.kick[0], vPhi = sigma * (streaming * p.kick[1] + BULGE_ROTATION), vZ = sigma * p.kick[2];
+                    p.velocity = [vR * c - vPhi * s, vR * s + vPhi * c, vZ];
+                }
+            }
+        }
+        // Builds the test stars for an anatomy. referenceSpeedSquared must already describe the galaxy.
+        function setPopulation(anatomy, count) {
+            currentAnatomy = anatomy;
+            softening = softeningFor(anatomy);
+            ejectionRadius = PM.ejection_factor * anatomy.rMax;
+            const population = generatePopulation(anatomy, count);
+            particles = population.particles;
+            bulgeStarCount = population.bulgeCount;
+            bulgeCutRadius = population.bulgeCut;
+            starCount = particles.length;
+            assignInitialVelocities();
         }
 
         let sortedEscapeTimes = [];
         let activeHaloMassT = DEFAULTS.massT;
 
+        // One shared buffer holds every star's 1 Gyr path (frameCount x 3 floats each); it only grows.
+        let trajectoryBuffer = null, trajectoryViews = [];
+        function trajectoryViewsFor(count) {
+            if (trajectoryViews.length < count) {
+                const stride = frameCount * 3;
+                trajectoryBuffer = new Float32Array(count * stride);
+                trajectoryViews = Array.from({length: count}, (_, k) => trajectoryBuffer.subarray(k * stride, (k + 1) * stride));
+            }
+            return trajectoryViews;
+        }
+
         // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline
         function integrateTrajectories(massT, scaleRadius) {
             const haloVelocity = extraVelocityModel(massT * 1e12, scaleRadius, baryonicVelocity);
-            const getAccel = buildAccelerationFunction(haloVelocity);
+            fillForceTable(forceTable, r => {
+                const vb = baryonicVelocity(r), vh = haloVelocity(r);
+                return vb * vb + vh * vh;
+            });
+            const count = particles.length, trajectories = trajectoryViewsFor(count);
             const dtSub = DT_SUB;
             const dtSub2Half = 0.5 * dtSub * dtSub;
             const dtSubHalf = 0.5 * dtSub;
+            const limit = ejectionRadius, limit2 = limit * limit;
             const escapeTimes = [];
 
-            const trajectories = particles.map(particle => {
-                const [x0, y0, z0] = particle.position;
-                let dx, dy, dz;
-                if (particle.kind !== 'disk') {
-                    const a = particle.axis;
-                    dx = a[1]*z0 - a[2]*y0; dy = a[2]*x0 - a[0]*z0; dz = a[0]*y0 - a[1]*x0;
-                    if (Math.hypot(dx, dy, dz) < 1e-4) {
-                        const alt = [a[1], a[2], a[0]];
-                        dx = alt[1]*z0 - alt[2]*y0; dy = alt[2]*x0 - alt[0]*z0; dz = alt[0]*y0 - alt[1]*x0;
-                    }
-                } else {
-                    dx = -y0; dy = x0; dz = 0;
-                }
-                const norm = Math.max(Math.hypot(dx, dy, dz), 1e-8);
-                const speed = particle.speedScale * observedVelocity(particle.radius) * KM_S_TO_KPC_MYR / norm;
-                let vx = dx * speed, vy = dy * speed, vz = dz * speed;
-                let x = x0, y = y0, z = z0;
-                let [ax, ay, az] = getAccel(x, y, z);
-
-                const positions = new Float32Array(frameCount * 3);
+            for (let p = 0; p < count; p++) {
+                const particle = particles[p], positions = trajectories[p];
+                let x = particle.position[0], y = particle.position[1], z = particle.position[2];
+                let vx = particle.velocity[0], vy = particle.velocity[1], vz = particle.velocity[2];
+                let k = accelFactor(forceTable, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
+                let ax = -k * x, ay = -k * y, az = -k * z;
                 positions[0] = x; positions[1] = y; positions[2] = z;
 
-                let escTime = Infinity;
-                if (x * x + y * y + z * z > ESCAPE_RADIUS2) {
-                    escTime = 0.0;
-                }
+                // A star is ejected once it is beyond the ejection radius (1.5 x R_max); the crossing time is kept.
+                let escTime = x * x + y * y + z * z > limit2 ? 0.0 : Infinity;
 
                 for (let frame = 1; frame < frameCount; frame++) {
                     const prevR2 = x * x + y * y + z * z;
@@ -927,7 +1163,8 @@ __GALAXIES_JS__
                         z += vz * dtSub + az * dtSub2Half;
 
                         // Velocity-Verlet step 2: evaluate acceleration at new position
-                        const [nax, nay, naz] = getAccel(x, y, z);
+                        k = accelFactor(forceTable, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
+                        const nax = -k * x, nay = -k * y, naz = -k * z;
 
                         // Velocity-Verlet step 3: advance velocity
                         vx += (ax + nax) * dtSubHalf;
@@ -938,9 +1175,9 @@ __GALAXIES_JS__
                     }
 
                     const currR2 = x * x + y * y + z * z;
-                    if (escTime === Infinity && currR2 > ESCAPE_RADIUS2) {
+                    if (escTime === Infinity && currR2 > limit2) {
                         const rPrev = Math.sqrt(prevR2), rCurr = Math.sqrt(currR2);
-                        const frac = Math.max(0, Math.min(1, (maxRadius - rPrev) / Math.max(rCurr - rPrev, 1e-6)));
+                        const frac = Math.max(0, Math.min(1, (limit - rPrev) / Math.max(rCurr - rPrev, 1e-6)));
                         escTime = (frame - 1 + frac) * SIM_DT_MYR;
                     }
 
@@ -951,26 +1188,15 @@ __GALAXIES_JS__
                 if (escTime < Infinity) {
                     escapeTimes.push(escTime);
                 }
-
-                return positions;
-            });
+            }
 
             sortedEscapeTimes = escapeTimes.sort((a, b) => a - b);
             activeHaloMassT = mondMode ? 0 : massT;
             return trajectories;
         }
+        setPopulation(presetAnatomy(activeGalaxy), starCountFor(visibleMassOf(presetAnatomy(activeGalaxy)), PRESET_TEMPLATE_MASS));
         let activeTrajectories = integrateTrajectories(DEFAULTS.massT, DEFAULTS.scaleRadius);
         let currentFrame=0,orbitModelTimer=null;
-    const palette = [[0,[35,145,255]],[0.5,[255,211,69]],[1,[255,69,58]]];
-    function velocityColor(v, radius) {
-      const t = Math.max(0,Math.min(1,(v-minSpeed)/speedSpan));
-      let a=palette[0],b=palette[1];
-      if(t>0.5){a=palette[1];b=palette[2];}
-      const f=(t-a[0])/(b[0]-a[0]);
-      const distanceLift=0.10*Math.max(0,Math.min(1,radius/maxRadius));
-      const rgb=a[1].map((c,i)=>Math.round((c+f*(b[1][i]-c))*(1-distanceLift)+255*distanceLift));
-      return `rgb(${rgb[0]},${rgb[1]},${rgb[2]})`;
-    }
         const orbitPlot=document.getElementById('orbitPlot');
 
         /* ---------- Camera / input module: damped orbit controls (mouse, pen, touch) ---------- */
@@ -1159,12 +1385,9 @@ __GALAXIES_JS__
         distantStars.frustumCulled=false;scene.add(distantStars);
         // Three-quarter view: ~39 degrees above the disk plane, framed to fit the galaxy.
         const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
-        const diskCount=diskIndices.length;
-
-        // All 800 stars (bulge + disk) are InstancedMesh spheres; no glowing orbs or halo clutter.
+        // Every star (bulge + disk) is an InstancedMesh sphere; no glowing orbs or halo clutter. The mesh holds the largest
+        // possible population and draws only the first starCount instances; syncStarMeshes() refills it.
         const STAR_BASE_RADIUS=0.13;
-        const starCount=particles.length;
-        const starIndices=Array.from({length:starCount},(_,i)=>i);
         const starMaterial = new THREE.MeshBasicMaterial({
             color: 0xffffff, // Neutral base so per-instance colors show unchanged
             transparent: true,
@@ -1172,28 +1395,10 @@ __GALAXIES_JS__
             blending: THREE.AdditiveBlending,
             depthWrite: false // Crucial for additive blending so overlapping stars glow properly
         });
-        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),starMaterial,starCount);
+        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),starMaterial,MAX_STARS);
+        starMesh.setColorAt(0,new THREE.Color(0xffffff)); // allocates the per-instance colours while count is still the capacity
         starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
         starMesh.frustumCulled=false;starMesh.renderOrder=1;
-        (()=>{
-            const m=new THREE.Matrix4(),c=new THREE.Color();
-            const white=new THREE.Color('#FFFFFF'),blue=new THREE.Color('#9FC5E8'),warm=new THREE.Color('#FFE8D6');
-            const smooth01=x=>{const t=Math.min(1,Math.max(0,x));return t*t*(3-2*t);};
-            for(let k=0;k<starCount;k++){
-                const pt=particles[starIndices[k]],p=pt.position;
-                // ~85% warm gold/amber, ~15% crisp ice-blue (seeded for reproducibility)
-                if(randomStar()<0.15){
-                    c.set(0x88ccff);
-                }else{
-                    c.set(randomStar()>0.5?0xffeedd:0xffaa33);
-                }
-                const sc=pt.kind==='bulge'?0.30+0.08*Math.min(1,pt.radius/GALAXY.bulgeMax):0.32+0.12*(pt.radius/maxRadius);
-                m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
-                starMesh.setMatrixAt(k,m);
-                starMesh.setColorAt(k,c);
-            }
-            starMesh.instanceColor.needsUpdate=true;
-        })();
         scene.add(starMesh);
 
         function createGlowTexture(){
@@ -1211,8 +1416,8 @@ __GALAXIES_JS__
         }
         // Soft glow halo per star, tinted by the star's instance color and following the instanced spheres.
         const glowGeometry=new THREE.BufferGeometry();
-        glowGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(starCount*3),3).setUsage(THREE.DynamicDrawUsage));
-        glowGeometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(starMesh.instanceColor.array),3));
+        glowGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3).setUsage(THREE.DynamicDrawUsage));
+        glowGeometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3).setUsage(THREE.DynamicDrawUsage));
         const glowPoints=new THREE.Points(glowGeometry,new THREE.PointsMaterial({
             map:createGlowTexture(),size:1.6,sizeAttenuation:true,vertexColors:true,transparent:true,
             opacity:0.55,blending:THREE.AdditiveBlending,depthWrite:false
@@ -1281,14 +1486,41 @@ __GALAXIES_JS__
         blackHole.position.set(0,0,0);
         blackHole.renderOrder=3;scene.add(blackHole);
 
-        // Optional orbit trajectory lines: full paths of an evenly spaced subset of disk stars.
+        // Optional orbit trajectory lines: full paths of an evenly spaced subset of the stars (mostly disk, a few bulge).
         const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=5;
-        const orbitLineIdx=Array.from({length:Math.min(ORBIT_LINE_STARS,diskCount)},(_,k)=>diskIndices[Math.floor(k*diskCount/Math.min(ORBIT_LINE_STARS,diskCount))]);
+        let orbitLineIdx=[];
         const orbitSegs=Math.ceil((frameCount-1)/ORBIT_LINE_STEP);
         const orbitLineGeom=new THREE.BufferGeometry();
-        orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(orbitLineIdx.length*orbitSegs*6),3));
+        orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(ORBIT_LINE_STARS*orbitSegs*6),3).setUsage(THREE.DynamicDrawUsage));
         const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x9ff0ff,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
+
+        // Refills the star meshes (position, size, colour) and the orbit-line selection from the current population.
+        function syncStarMeshes(){
+            starMesh.count=starCount;
+            glowGeometry.setDrawRange(0,starCount);
+            const m=new THREE.Matrix4(),c=new THREE.Color(),glowColors=glowGeometry.attributes.color.array;
+            for(let k=0;k<starCount;k++){
+                const pt=particles[k],p=pt.position;
+                // ~85% warm gold/amber, ~15% crisp ice-blue (seeded for reproducibility)
+                if(pt.colorSeed<0.15)c.set(0x88ccff);
+                else c.set((pt.colorSeed-0.15)/0.85>0.5?0xffeedd:0xffaa33);
+                const sc=pt.kind==='bulge'?0.30+0.08*Math.min(1,pt.radius/bulgeCutRadius):0.32+0.12*(pt.radius/currentAnatomy.rMax);
+                m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
+                starMesh.setMatrixAt(k,m);
+                starMesh.setColorAt(k,c);
+                glowColors[k*3]=c.r;glowColors[k*3+1]=c.g;glowColors[k*3+2]=c.b;
+            }
+            starMesh.instanceMatrix.needsUpdate=true;starMesh.instanceColor.needsUpdate=true;
+            glowGeometry.attributes.color.needsUpdate=true;
+            const diskStars=starCount-bulgeStarCount;
+            const bulgeLines=bulgeStarCount>0?Math.min(bulgeStarCount,Math.max(6,Math.round(ORBIT_LINE_STARS*bulgeStarCount/starCount))):0;
+            const diskLines=Math.min(diskStars,ORBIT_LINE_STARS-bulgeLines);
+            orbitLineIdx=[];
+            for(let j=0;j<bulgeLines;j++)orbitLineIdx.push(Math.floor(j*bulgeStarCount/bulgeLines));
+            for(let j=0;j<diskLines;j++)orbitLineIdx.push(bulgeStarCount+Math.floor(j*diskStars/diskLines));
+            orbitLineGeom.setDrawRange(0,orbitLineIdx.length*orbitSegs*2);
+        }
 
         /* ---------- NFW dark matter halo visual ----------
            Points are drawn from the true NFW enclosed-mass profile M(<r) ~ ln(1+x)-x/(1+x), x=r/rs,
@@ -1391,12 +1623,22 @@ __GALAXIES_JS__
             }
             orbitLineGeom.attributes.position.needsUpdate=true;
         }
+        syncStarMeshes();
         fillOrbitLines();
 
-        // A star counts as escaped once it crosses beyond the outermost initial orbital radius (the disk edge).
+        // A star is ejected once it passes the ejection radius, PM.ejection_factor x R_max of the active galaxy.
         const escapeCountVal=document.getElementById('escape-count-val');
         let lastEscaped=-1;
-        document.getElementById('escape-counter').lastChild.textContent=' / '+particles.length;
+        // Live telemetry follows the active population: total stars, the disk / bulge split and the ejection radius.
+        function updateStarTelemetry(){
+            const diskStars=starCount-bulgeStarCount;
+            document.getElementById('star-total-val').textContent=starCount;
+            document.getElementById('starCountStat').textContent=starCount;
+            document.getElementById('star-detail').textContent=`${diskStars} disk${bulgeStarCount>0?` + ${bulgeStarCount} bulge`:''} · ejected beyond ${ejectionRadius.toFixed(0)} kpc`;
+            document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
+            lastEscaped=-1;
+        }
+        updateStarTelemetry();
 
         // Synchronized escape counter using bisection on exact particle ejection times
         function updateEscapeCounter(timeMyr){
@@ -1519,7 +1761,8 @@ __GALAXIES_JS__
         }
         // Radial profile on a 1 kpc grid, limited to the range covered by the active galaxy's SPARC data.
         function buildRotationCurveCsv(){
-            const gas=rotationRows.map(p=>p.gas_kms),gasSq=rotationRows.map(p=>p.gas_sq),disk=rotationRows.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=rotationRows.map(p=>p.error_kms);
+            const gas=customActive?componentCurves[2].slice():rotationRows.map(p=>p.gas_kms),gasSq=customActive?componentCurves[2].map(v=>v*v):rotationRows.map(p=>p.gas_sq);
+            const disk=customActive?componentCurves[0].map((v,i)=>Math.hypot(v,componentCurves[1][i])):rotationRows.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=rotationRows.map(p=>p.error_kms);
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3);
             let csv="Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
@@ -1543,7 +1786,7 @@ __GALAXIES_JS__
             buildSimulationLog().forEach(row=>{
                 csvContent+=`${row.time},${row.escaped},${row.total},${(row.haloMass*1e12).toExponential(4)}\n`;
             });
-            const filePrefix=activeGalaxy.id.toLowerCase();
+            const filePrefix=customActive?'custom_galaxy':activeGalaxy.id.toLowerCase();
             downloadCsv(`${filePrefix}_timeseries_log.csv`,csvContent);
             // Browsers may block back-to-back downloads, so stagger the second file.
             setTimeout(()=>downloadCsv(`${filePrefix}_rotation_curve_model.csv`,buildRotationCurveCsv()),300);
@@ -1643,12 +1886,17 @@ __GALAXIES_JS__
     const AXIS={gridcolor:'rgba(120,150,180,0.10)',zerolinecolor:'rgba(120,150,180,0.22)',linecolor:'rgba(120,150,180,0.25)',tickcolor:'rgba(120,150,180,0.25)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#9fb0c2'}};
     // Residual bars are about half the mean spacing of the SPARC radii, so dense and sparse curves both read clearly.
     const residualBarWidth=()=>Math.round(53*(radii[radii.length-1]-radii[0])/(radii.length-1))/100;
+    // The custom galaxy's stellar disk, bulge and gas speeds are drawn as thin dotted lines (hidden for presets).
+    const COMPONENT_STYLE=[['Stellar disk','#ffd166'],['Bulge','#ff8fab'],['Gas','#7bd88f']];
+    let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
+    const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
     const buildCurveData=(halo,total)=>[
       {type:'scatter',mode:'markers',name:'Observed (SPARC)',x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'V_obs  <b>%{y:.1f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'V_baryonic  <b>%{y:.1f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'V_halo  <b>%{y:.1f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'V_model  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'}
+      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'},
+      ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+'  <b>%{y:.1f}</b> km/s<extra></extra>'}))
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor'},
@@ -1663,27 +1911,43 @@ __GALAXIES_JS__
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
     let sliderUpdateTimer=null,sliderDragging=false;
     const fsSliders=document.getElementById('fsSliders'),fsMass=document.getElementById('fsMassSlider'),fsScale=document.getElementById('fsScaleSlider');
-    // The mass slider grows for massive halos so a fitted value is never pinned to the end of its track.
+    // The mass slider grows for massive halos so a fitted value is never pinned to the end of its track. In the Custom
+    // Sandbox it spans 0 to HALO_FINE_RANGE x the stellar-to-halo baseline, so it fine-tunes that baseline: haloFine is
+    // M200 as a multiple of it, kept when the anatomy moves the baseline. rsManual records that the user took over r_s.
+    const HALO_FINE_RANGE=5;
+    let haloFine=1,rsManual=false;
     function configureHaloSliders(){
+      if(customActive){
+        const maxT=DEFAULTS.massT*HALO_FINE_RANGE;
+        massSlider.max=fsMass.max=String(maxT);
+        massSlider.step=fsMass.step=String(maxT/500);
+        massSlider.value=haloFine*DEFAULTS.massT;
+        if(!rsManual)scaleSlider.value=DEFAULTS.scaleRadius;
+        return;
+      }
+      massSlider.step=fsMass.step='0.01';
       const maxT=String(Math.max(2,Math.ceil(2*DEFAULTS.massT/0.5)*0.5));
       massSlider.max=maxT;fsMass.max=maxT;
       massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
     }
     configureHaloSliders();
+    const haloMassText=massT=>customActive?formatMass(massT*1e12):`${massT.toFixed(2)} × 10¹² M☉`;
+    function refreshOrbits(){
+      clearTimeout(orbitModelTimer);
+      activeTrajectories=integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value));
+      fillOrbitLines();
+      updateStarTransforms(simTime);
+      updateEscapeCounter(simTime);
+      requestRender();
+    }
     function scheduleOrbitUpdate(){
       clearTimeout(orbitModelTimer);
       if(sliderDragging)return;
-      orbitModelTimer=setTimeout(()=>{
-          activeTrajectories=integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value));
-          fillOrbitLines();
-          updateStarTransforms(simTime);
-          updateEscapeCounter(simTime);
-          requestRender();
-      },120);
+      orbitModelTimer=setTimeout(refreshOrbits,120);
     }
     function syncFsSliders(){
       fsMass.value=massSlider.value;fsScale.value=scaleSlider.value;
-      document.getElementById('fsMassValue').textContent=`${Number(massSlider.value).toFixed(2)} × 10¹² M☉`;
+      document.getElementById('fsMassValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('fsScaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
       fsSliders.classList.toggle('disabled',mondMode);
       fsMass.disabled=fsScale.disabled=mondMode;
@@ -1722,7 +1986,7 @@ __GALAXIES_JS__
       {key:'gasMass',id:'sbGasMass',format:formatMass},
     ].map(slider=>({...slider,input:document.getElementById(slider.id),output:document.getElementById(slider.id+'Value')}));
     const sandbox={};
-    const sandboxPanel=document.getElementById('sandboxPanel'),presetPicker=document.getElementById('presetPicker');
+    const sandboxPanel=document.getElementById('sandboxPanel');
     const bulgeRadiusControl=document.getElementById('sbBulgeRadiusControl');
     const bulgeRadiusHelp=document.getElementById('sbBulgeRadiusHelp');
     const BULGE_RADIUS_HELP=bulgeRadiusHelp.textContent;
@@ -1792,11 +2056,12 @@ __GALAXIES_JS__
     let galaxyMode='preset';
     const galaxyModeRadios=[...document.querySelectorAll('input[name=galaxyMode]')];
     function setGalaxyMode(mode){
+      const changed=mode!==galaxyMode;
       galaxyMode=mode;
       const custom=mode==='custom';
       galaxyModeRadios.forEach(radio=>{radio.checked=radio.value===mode;});
-      presetPicker.hidden=custom;
       sandboxPanel.hidden=!custom;
+      if(changed){if(custom)activateCustom();else loadPreset(activeGalaxy);}
       updateStability();
       document.dispatchEvent(new CustomEvent('galaxymodechange',{detail:{mode}}));
     }
@@ -1809,13 +2074,14 @@ __GALAXIES_JS__
       clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
       const{halo,total}=modelCurves(massT,rs);
-      document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
+      document.getElementById('massValue').textContent=haloMassText(massT);
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       const res=residualsOf(total);updateChi(total);
       document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[true,!mondMode,true]},{'yaxis.range':[0,yMax]},[1,2,3]);
-      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
+      const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)');
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,true,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
@@ -1836,13 +2102,15 @@ __GALAXIES_JS__
       return mondBest=best;
     }
     function applyBaryonState(){
-      const fit=mondMode&&mondFitToggle.checked,best=fit?findMondBestFit():null;
+      // A custom galaxy is built from masses, so mass-to-light ratios and the MOND best fit (which tunes them) do not apply.
+      const fit=mondMode&&!customActive&&mondFitToggle.checked,best=fit?findMondBestFit():null;
       mlState.disk=fit?best.disk:DATA.upsilon_disk;
       MOND_A0=fit?best.a0:MOND_A0_DEFAULT;
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
-      document.getElementById('mondFitWrap').hidden=!mondMode;
-      document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
-      document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
+      document.getElementById('mondFitWrap').hidden=!mondMode||customActive;
+      const ratioText=ratio=>customActive?'—':ratio.toFixed(2);
+      document.getElementById('mlDisk').textContent=ratioText(mlState.disk);
+      document.getElementById('mlBulge').textContent=ratioText(mlState.bulge);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
       const e=Math.floor(Math.log10(MOND_A0));
@@ -1866,7 +2134,7 @@ __GALAXIES_JS__
     });
     function queueSliderUpdate(){
       updateStability();
-      document.getElementById('massValue').textContent=`${Number(massSlider.value).toFixed(2)} × 10¹² M☉`;
+      document.getElementById('massValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('scaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
       if(sliderUpdateTimer===null)sliderUpdateTimer=setTimeout(updateHalo,100);
     }
@@ -1874,6 +2142,11 @@ __GALAXIES_JS__
       slider.addEventListener('input',queueSliderUpdate);
       slider.addEventListener('change',updateHalo);
       slider.addEventListener('pointerdown',()=>{sliderDragging=true;clearTimeout(orbitModelTimer);});
+    });
+    // Only the user's own drags change haloFine / rsManual; the sandbox moves the sliders in code without input events.
+    ['input','change'].forEach(type=>{
+      massSlider.addEventListener(type,()=>{if(customActive)haloFine=Number(massSlider.value)/DEFAULTS.massT;});
+      scaleSlider.addEventListener(type,()=>{if(customActive)rsManual=true;});
     });
     function finishSliderDrag(){
       if(!sliderDragging)return;
@@ -1886,43 +2159,149 @@ __GALAXIES_JS__
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
         massSlider.value=DEFAULTS.massT;
         scaleSlider.value=DEFAULTS.scaleRadius;
+        haloFine=1;rsManual=false;
         updateHalo();
     });
     document.getElementById('visibleMatterOnly').addEventListener('click',()=>{
         massSlider.value=0;
+        haloFine=0;
         updateHalo();
     });
 
-    /* ---------- Galaxy presets ----------
+    /* ---------- Galaxy presets and the Custom Sandbox physics ----------
        The dropdown swaps the active SPARC galaxy: its baryonic baseline, observed halo fit, slider ranges,
-       rotation-curve plot, chi-squared and orbits are all rebuilt from that galaxy's galaxies.js entry. */
+       rotation-curve plot, chi-squared and orbits are all rebuilt from that galaxy's galaxies.js entry.
+       In the Custom Sandbox the same dropdown ("Compare with") only chooses which galaxy's measured speeds the
+       custom galaxy is compared with; the anatomy sliders then drive every output through PhysicsEngine. */
     const galaxySelect=document.getElementById('galaxySelect'),galaxySummary=document.getElementById('galaxySummary');
     Object.values(GALAXIES).forEach(galaxy=>galaxySelect.add(new Option(galaxy.name,galaxy.id)));
     function applyGalaxyLabels(galaxy){
       document.querySelectorAll('[data-galaxy-name]').forEach(el=>{el.textContent=galaxy.name;});
-      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.distance_mpc} Mpc · ${galaxy.rotation.radius_kpc.length} SPARC points`;
-      orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxy.name} star trajectories`);
-      document.getElementById('curvePlot').setAttribute('aria-label',`${galaxy.name} observed, baryonic, and fitted rotation curves`);
-      document.getElementById('viewReset').title=`Return to the default ${galaxy.name} view`;
+      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.distance_mpc} Mpc · ${galaxy.rotation.radius_kpc.length} SPARC points${galaxyMode==='custom'?' · data points and χ² for your galaxy':''}`;
+      orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxyMode==='custom'?'custom galaxy':galaxy.name} star trajectories`);
+      document.getElementById('curvePlot').setAttribute('aria-label',`${galaxyMode==='custom'?'Custom galaxy compared with '+galaxy.name:galaxy.name} observed, baryonic, and fitted rotation curves`);
+      document.getElementById('viewReset').title=`Return to the default ${galaxyMode==='custom'?'custom galaxy':galaxy.name} view`;
     }
     galaxySelect.value=activeGalaxy.id;
     applyGalaxyLabels(activeGalaxy);
-    function selectGalaxy(id){
-      const galaxy=GALAXIES[id];
-      if(!galaxy||galaxy===activeGalaxy)return;
+    // Wording that differs between a preset galaxy and the sandbox.
+    function applyModeLabels(){
+      const custom=customActive,fitButton=document.getElementById('applyObservedFit');
+      document.getElementById('galaxyLabel').textContent=custom?'Compare with':'Galaxy';
+      galaxySelect.title=custom?'Choose the SPARC galaxy whose measured speeds your custom galaxy is compared with':'Choose which SPARC galaxy to model';
+      document.getElementById('massHelp').textContent=custom
+        ?'Fine-tunes the halo around the stellar-to-halo mass relation baseline for your galaxy: the slider spans 0 to 5 times that baseline. Set it to 0 for visible matter only.'
+        :'Updates the rotation curve and star orbits. Set it to 0 for visible matter only.';
+      document.getElementById('scaleHelp').textContent=custom
+        ?'Controls halo concentration. It follows the mass–concentration relation for your galaxy until you move it.'
+        :'Controls halo concentration: a smaller radius packs more dark matter near the center.';
+      fitButton.textContent=custom?'Apply SHMR Baseline':'Apply Observed Fit';
+      if(custom)fitButton.title='Return the halo to the stellar-to-halo mass relation baseline';else fitButton.removeAttribute('title');
+      document.getElementById('footerModel').hidden=custom;
+      document.getElementById('footerCustom').hidden=!custom;
+      document.getElementById('componentKey').hidden=!custom;
+      applyGalaxyLabels(activeGalaxy);
+    }
+    // Makes a SPARC preset the active galaxy: the page then follows its data, with stars on its observed orbits.
+    function loadPreset(galaxy){
+      customActive=false;
       activeGalaxy=galaxy;
       DEFAULTS=haloDefaultsOf(galaxy);
       mondBest=null; // a cached MOND fit belongs to the previous galaxy
       loadGalaxyData(galaxy);
       applyBaryonState();
       configureHaloSliders();
-      applyGalaxyLabels(galaxy);
+      applyModeLabels();
+      componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
+      referenceSpeedSquared=presetReferenceSpeedSquared;
+      const anatomy=presetAnatomy(galaxy);
+      setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),PRESET_TEMPLATE_MASS));
+      syncStarMeshes();updateStarTelemetry();
+      // Restart the orbit clock and integrate the new population in the new galaxy's potential.
+      simTime=0;window.simTime=0;syncTimelineUI(0);
+      refreshOrbits();
       const{halo,total}=modelCurves(DEFAULTS.massT,DEFAULTS.scaleRadius);
       Plotly.react('curvePlot',buildCurveData(halo,total),curveLayout,curveConfig);
-      // Restart the orbit clock; updateHalo() re-integrates the orbits in the new galaxy's potential.
-      simTime=0;window.simTime=0;
-      updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
-      updateHalo();
+      updateHalo();clearTimeout(orbitModelTimer);
+      document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy}}));
+    }
+    // Custom Sandbox: everything below is recomputed from the anatomy sliders, as fast as the sliders move.
+    const COMPONENT_SQ=['diskSq','bulgeSq','gasSq']; // same order as COMPONENT_STYLE
+    const snapScaleRadius=rs=>Math.min(60,Math.max(5,Math.round(rs/0.5)*0.5)); // the scale-radius slider's range and step
+    function updateCustomSummary(baseline){
+      document.getElementById('sbHaloBaseline').textContent=formatMass(baseline.m200);
+      document.getElementById('sbStarCount').textContent=bulgeStarCount>0?`${starCount} (${starCount-bulgeStarCount} disk + ${bulgeStarCount} bulge)`:`${starCount} (all disk)`;
+      document.getElementById('sbEjectRadius').textContent=`${ejectionRadius.toFixed(1)} kpc (${PM.ejection_factor} × R_max)`;
+    }
+    // V^2 of an exponential disk is proportional to its mass, so the costly per-radius tables are kept per unit mass and
+    // only rebuilt when a disk's shape (R_d or R_max) changes. Nodes are exact near the centre, where V^2 changes fastest,
+    // and every fourth node further out, interpolated linearly in between.
+    const diskShape={key:'',stars:new Float64Array(ACCEL_TABLE_SIZE),gas:new Float64Array(ACCEL_TABLE_SIZE)};
+    function fillCoarseTable(table,valueAt){
+      const EXACT_NODES=64,STRIDE=4;
+      let previous=0,previousValue=0;
+      table[0]=0;
+      for(let i=1;i<ACCEL_TABLE_SIZE;i++){
+        if(i<EXACT_NODES||i%STRIDE===0||i===ACCEL_TABLE_SIZE-1){
+          const value=valueAt(i*DR_TABLE);
+          for(let j=previous+1;j<i;j++)table[j]=previousValue+(value-previousValue)*(j-previous)/(i-previous);
+          table[i]=value;previous=i;previousValue=value;
+        }
+      }
+    }
+    function rebuildCustomGalaxy({replot=false}={}){
+      const anatomy={diskMass:sandbox.diskMass,diskScale:sandbox.diskScale,rMax:sandbox.truncation,bulgeMass:sandbox.bulgeMass,bulgeRadius:sandbox.bulgeRadius,gasMass:sandbox.gasMass};
+      // Rotation curve: the baryonic speed of the new anatomy on the force-table grid and at the data radii.
+      customModel=PhysicsEngine.buildGalaxy(anatomy,PM.softening_kpc[0]);
+      const shapeKey=`${anatomy.diskScale}|${anatomy.rMax}`;
+      if(shapeKey!==diskShape.key){
+        fillCoarseTable(diskShape.stars,r=>customModel.diskSq(r)/anatomy.diskMass);
+        fillCoarseTable(diskShape.gas,r=>customModel.gasSq(r)/anatomy.gasMass);
+        diskShape.key=shapeKey;
+      }
+      if(!customBaryonTable)customBaryonTable=new Float64Array(ACCEL_TABLE_SIZE);
+      for(let i=0;i<ACCEL_TABLE_SIZE;i++)customBaryonTable[i]=diskShape.stars[i]*anatomy.diskMass+diskShape.gas[i]*anatomy.gasMass+customModel.bulgeSq(i*DR_TABLE);
+      applyBaryonState();
+      componentCurves=COMPONENT_SQ.map(key=>radii.map(r=>Math.sqrt(customModel[key](r))));
+      // Halo: the stellar-to-halo mass relation sets the baseline; haloFine and rsManual keep the user's own tuning.
+      const baseline=PhysicsEngine.baselineHalo(anatomy.diskMass+anatomy.bulgeMass);
+      DEFAULTS={massT:baseline.m200/1e12,scaleRadius:snapScaleRadius(baseline.scaleRadius)};
+      configureHaloSliders();
+      // Stars start on the orbits of the baryons plus baseline halo, then feel whatever halo the sliders leave.
+      const baselineHalo=nfwVelocityModel(baseline.m200,DEFAULTS.scaleRadius);
+      referenceSpeedSquared=r=>{const vb=baryonicVelocity(r),vh=baselineHalo(r);return vb*vb+vh*vh;};
+      setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));
+      syncStarMeshes();updateStarTelemetry();updateCustomSummary(baseline);
+      if(replot){
+        const{halo,total}=modelCurves(Number(massSlider.value),Number(scaleSlider.value));
+        Plotly.react('curvePlot',buildCurveData(halo,total),curveLayout,curveConfig);
+      }
+      refreshOrbits();
+      updateHalo();clearTimeout(orbitModelTimer);
+    }
+    function activateCustom(){
+      customActive=true;haloFine=1;rsManual=false;mondBest=null;
+      applyModeLabels();
+      simTime=0;window.simTime=0;syncTimelineUI(0);
+      rebuildCustomGalaxy({replot:true});
+      document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy:activeGalaxy}}));
+    }
+    let customUpdateTimer=null;
+    document.addEventListener('sandboxchange',()=>{
+      if(!customActive||customUpdateTimer!==null)return;
+      customUpdateTimer=setTimeout(()=>{customUpdateTimer=null;rebuildCustomGalaxy();},40);
+    });
+    document.getElementById('sandboxReset').addEventListener('click',()=>{haloFine=1;rsManual=false;});
+    function selectGalaxy(id){
+      const galaxy=GALAXIES[id];
+      if(!galaxy||galaxy===activeGalaxy)return;
+      if(!customActive){loadPreset(galaxy);return;}
+      // Custom Sandbox: only the measured data change; the anatomy and halo stay as built.
+      activeGalaxy=galaxy;
+      mondBest=null;
+      loadGalaxyData(galaxy);
+      applyGalaxyLabels(galaxy);
+      rebuildCustomGalaxy({replot:true});
       document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy}}));
     }
     galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
@@ -2009,7 +2388,7 @@ __GALAXIES_JS__
        text:'The 3D view shows simulated, massless test stars, not observations of individual stars. The models calculate their motion over one billion years.',
        action:'Press Play or move the time slider. Try changing the model and see how the orbits respond.'},
       {target:'orbitPlot',gesture:'drag',title:'Interpret the animation',
-       text:'“Escaped” counts stars that have crossed the simulation’s chosen outer radius; it does not necessarily mean they are gravitationally unbound. The halo is a visual representation of the model.',
+       text:'“Ejected” counts stars that have travelled beyond 1.5 times the galaxy’s outer radius; it does not necessarily mean they are gravitationally unbound. The halo is a visual representation of the model.',
        action:'Drag to rotate the view. Use the mouse wheel or a pinch gesture to zoom.'},
       {target:'viewToggle',gesture:'click',title:'Explore the View controls',
        text:'View opens the camera and display controls. Face-on and Edge-on change your angle; Reset view returns to the start. With a mouse, Rotate or Pan changes how dragging moves the view. Hide halo and Orbit lines change what is drawn; you can also adjust speed or enter fullscreen.',
@@ -2305,6 +2684,14 @@ def main() -> None:
         "total_time_myr": 1000.0,
         "default_galaxy_id": DEFAULT_PRESET.sparc_id,
         "stable_concentration": list(STABLE_CONCENTRATION),
+        "particle_model": {
+            "base_count": BASE_STAR_COUNT,
+            "min_count": MIN_STAR_COUNT,
+            "max_count": MAX_STAR_COUNT,
+            "count_exponent": STAR_COUNT_EXPONENT,
+            "ejection_factor": EJECTION_RADIUS_FACTOR,
+            "softening_kpc": list(SOFTENING_RANGE_KPC),
+        },
     }
     html = HTML_TEMPLATE.replace(
         "__DATA_JSON__",

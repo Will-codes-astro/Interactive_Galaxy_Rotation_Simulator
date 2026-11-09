@@ -68,8 +68,10 @@ The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
 the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
 restarts the orbit clock and re-integrates the star orbits. The selected
-gravity model (NFW or MOND) is kept. The 3D star disk still uses the NGC 3198
-layout for every galaxy; only the orbital dynamics follow the selected galaxy.
+gravity model (NFW or MOND) is kept. The 3D stars follow the selected galaxy
+too: a rough disk scale length, outer radius, bulge and visible mass are
+estimated from its SPARC mass-model speeds (`anatomyFromRotation`), and these
+set the star population described under "Test stars" below.
 
 The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
@@ -89,9 +91,56 @@ configuration. Its halo stability monitor computes the concentration
 c = r200 / rs of the current NFW halo from the halo mass and scale radius
 sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile" badge (also over
 the 3D view) whenever c falls outside 3–25 (`STABLE_CONCENTRATION` in the
-generator). The anatomy sliders currently drive only the sandbox summary and a
-`sandboxchange` event; the rotation curve and 3D orbits keep showing the last
-preset galaxy until the physics is coupled in a later stage.
+generator).
+
+In the sandbox the anatomy sliders drive the rotation curve, the χ² badge, the
+halo and the 3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the
+generator's page script). The dropdown stays visible as "Compare with": it
+picks the SPARC galaxy whose measured points and radii the custom curve and χ²
+are compared with, without touching the anatomy.
+
+- Stellar disk and gas are exponential disks cut at the truncation radius, each
+  holding the slider's mass inside it; the gas disk is three times more
+  extended than the stars. Their speeds come from Freeman's exact Bessel
+  solution for the infinite disk minus the annulus beyond the truncation
+  radius (softened elliptic-integral rings); beyond it the rings alone are
+  used. The bulge is a Hernquist sphere, Φ = −GM/(r + r_b), with r_b as its scale
+  radius. The components add in quadrature to the baryonic curve and are
+  drawn as thin dotted lines.
+- The halo starts at the stellar-to-halo mass relation baseline: M200 is
+  Moster et al. (2013) inverted for the stellar mass (disk + bulge) and r_s
+  comes from the Dutton & Macciò (2014) mass–concentration relation.
+  The existing halo mass slider becomes the fine-tuning control, spanning
+  0 to 5 times the baseline (it keeps its multiple when the anatomy moves the
+  baseline), and the scale radius follows the relation until it is moved.
+  Apply SHMR Baseline restores both. The MOND mass-to-light fit does not apply
+  to a sandbox galaxy and is hidden.
+
+Test stars:
+
+- The default preset (NGC 3198) and the default sandbox galaxy are the
+  800-star template. Other galaxies scale it by
+  (visible mass / template mass)^0.5, limited to 200–2400 stars
+  (`BASE_STAR_COUNT`, `MIN_STAR_COUNT`, `MAX_STAR_COUNT` and
+  `STAR_COUNT_EXPONENT` in the generator). The "Test stars" header stat, the
+  3D counter and the CSV export all read the active total.
+- A star is ejected once it is farther than 1.5 × R_max from the centre
+  (`EJECTION_RADIUS_FACTOR`), where R_max is the sandbox truncation radius or
+  the outermost SPARC radius of a preset. The 3D counter shows the live count
+  and the ejection radius.
+- With a bulge, a share of the stars proportional to its stellar mass sits in a
+  spheroidal Hernquist cluster. Each bulge star gets an isotropic velocity
+  dispersion from the Jeans equation in the reference gravity, plus a little
+  rotation, so the bulge is held up by pressure and stays put; disk stars start
+  on circular orbits.
+- Stars start on the orbits that balance a reference galaxy: the observed
+  SPARC speeds of a preset, or the baryons plus baseline halo of a sandbox
+  galaxy. Moving the halo sliders, or switching to MOND, changes the gravity
+  under them, so they can spiral in or be ejected (try Visible Matter Only).
+- The orbit integrator uses a cubic-spline gravitational softening of
+  0.5–1.0 kpc (`SOFTENING_RANGE_KPC`; 0.5 kpc for a pure disk, following the
+  bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
+  dense centres never meet a force singularity.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
