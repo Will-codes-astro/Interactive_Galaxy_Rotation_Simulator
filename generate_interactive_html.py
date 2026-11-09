@@ -468,10 +468,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     document.querySelectorAll('details').forEach(details=>{
       const summary=details.querySelector('summary');
       const content=summary.nextElementSibling;
-      let animation=null, pinned=details.open, hovered=false, targetOpen=details.open;
+      let animation=null, targetOpen=details.open;
       function updateDisclosure(){
-        const opening=pinned||hovered;
-        if(opening===targetOpen)return;
+        const opening=!targetOpen;
         targetOpen=opening;
         const height=details.open?content.getBoundingClientRect().height:0;
         const opacity=details.open?Number(getComputedStyle(content).opacity):0;
@@ -490,7 +489,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         content.style.overflow='hidden';
         animation=content.animate(
           [{height:height+'px',opacity},{height:(opening?content.scrollHeight:0)+'px',opacity:opening?1:0}],
-          {duration:200,easing:'ease',fill:'both'}
+          {duration:opening?350:200,easing:'ease',fill:'both'}
         );
         animation.onfinish=()=>{
           details.open=opening;
@@ -500,15 +499,8 @@ HTML_TEMPLATE = r"""<!doctype html>
           animation=null;
         };
       }
-      details.addEventListener('pointerenter',event=>{
-        if(event.pointerType!=='touch'){hovered=true;updateDisclosure();}
-      });
-      details.addEventListener('pointerleave',event=>{
-        if(event.pointerType!=='touch'){hovered=false;updateDisclosure();}
-      });
       summary.addEventListener('click',event=>{
         event.preventDefault();
-        pinned=!pinned;
         updateDisclosure();
       });
     });
