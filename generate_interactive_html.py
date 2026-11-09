@@ -1,24 +1,54 @@
-"""Create a standalone Plotly dashboard from the local NGC 3198 data."""
+"""Create a standalone Plotly dashboard from the local SPARC galaxy data."""
 
 from __future__ import annotations
 
 import csv
 import json
 import math
+from html import escape
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 
 BASE_DIR = Path(__file__).resolve().parent
 TRAJECTORY_PATH = BASE_DIR / "results" / "star_trajectories_baryonic.csv"
 SPARC_PATH = BASE_DIR / "table2.dat"
 OUTPUT_PATH = BASE_DIR / "index.html"
+GALAXIES_JS_PATH = BASE_DIR / "galaxies.js"
 
 G_KPC_KMS2_PER_MSUN = 4.30091e-6
 H0_KMS_PER_KPC = 0.07
 UPSILON_DISK = 0.50
 UPSILON_BULGE = 0.70
 STAR_COUNT = 200
+
+
+class GalaxyPreset(NamedTuple):
+    """One entry of the galaxy dropdown."""
+
+    sparc_id: str  # must match the Name column of table2.dat
+    name: str
+    summary: str
+
+
+# The first preset is selected when the page opens. To offer another SPARC galaxy,
+# add a preset here and run this script again.
+GALAXY_PRESETS = (
+    GalaxyPreset("NGC3198", "NGC 3198", "Classic late-type spiral benchmark"),
+    GalaxyPreset("NGC2403", "NGC 2403", "Gas-rich late-type spiral"),
+    GalaxyPreset("NGC7331", "NGC 7331", "Massive early-type spiral with a prominent bulge"),
+)
+DEFAULT_PRESET = GALAXY_PRESETS[0]
+ROTATION_COLUMNS = (
+    "radius_kpc",
+    "v_obs_kms",
+    "v_obs_err_kms",
+    "v_gas_kms",
+    "v_disk_kms",
+    "v_bulge_kms",
+)
+HALO_MASS_STEP_MSUN = 1e10  # resolution of the halo mass slider (0.01 x 10^12 Msun)
+HALO_SCALE_STEP_KPC = 0.5  # resolution of the scale radius slider
 
 
 def load_trajectories(path: Path) -> list[dict[str, Any]]:
@@ -62,46 +92,28 @@ def load_trajectories(path: Path) -> list[dict[str, Any]]:
     return stars[:STAR_COUNT]
 
 
-def load_rotation_curve(path: Path) -> list[dict[str, float]]:
+def load_sparc_galaxy(path: Path, sparc_id: str) -> dict[str, Any]:
+    """Read one galaxy's rotation curve from a SPARC table (the table2.dat column layout)."""
+    distance_mpc = None
     rows = []
     with path.open("r", encoding="utf-8", errors="replace") as source:
         for line in source:
             columns = line.split()
-            if len(columns) < 10 or columns[0].upper() != "NGC3198":
+            if len(columns) < 10 or columns[0].upper() != sparc_id.upper():
                 continue
             try:
-                radius, observed, error, gas, disk, bulge = map(
-                    float,
-                    (columns[2], columns[3], columns[4], columns[5], columns[6], columns[7]),
-                )
+                distance, radius, observed, error, gas, disk, bulge = map(float, columns[1:8])
             except ValueError:
                 continue
-            baryonic = math.sqrt(
-                max(
-                    0.0,
-                    gas * abs(gas) + UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2,
-                )
-            )
-            rows.append(
-                {
-                    "radius_kpc": radius,
-                    "observed_kms": abs(observed),
-                    "error_kms": abs(error),
-                    "baryonic_kms": baryonic,
-                    "gas_kms": abs(gas),
-                    "gas_sq": gas * abs(gas),
-                    "disk_kms": abs(disk),
-                    "bulge_kms": abs(bulge),
-                    "stellar_kms": math.sqrt(
-                        max(0.0, UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2)
-                    ),
-                }
-            )
+            distance_mpc = distance
+            # Vgas keeps its sign: the gas term is squared with its sign preserved.
+            rows.append((radius, abs(observed), abs(error), gas, abs(disk), abs(bulge)))
 
-    rows.sort(key=lambda row: row["radius_kpc"])
-    if len(rows) < 3:
-        raise ValueError(f"No usable NGC 3198 SPARC points found in {path}")
-    return rows
+    if distance_mpc is None or len(rows) < 3:
+        raise ValueError(f"No usable {sparc_id} SPARC points found in {path}")
+    rows.sort(key=lambda row: row[0])
+    rotation = {name: list(values) for name, values in zip(ROTATION_COLUMNS, zip(*rows))}
+    return {"distance_mpc": distance_mpc, "rotation": rotation}
 
 
 def _nfw_shape(x: float) -> float:
@@ -168,12 +180,94 @@ def fit_default_halo(curve: list[dict[str, float]]) -> tuple[float, float]:
     return fine[1] * 1e9, float(fine[2])
 
 
+def fit_galaxy_halo(rotation: dict[str, list[float]]) -> tuple[float, float]:
+    """Return one galaxy's starting NFW halo: M200 in Msun and scale radius in kpc.
+
+    The fit is snapped to the sliders' resolution so the page can display it exactly.
+    """
+    curve = []
+    for radius, observed, error, gas, disk, bulge in zip(
+        *(rotation[name] for name in ROTATION_COLUMNS)
+    ):
+        baryonic_squared = gas * abs(gas) + UPSILON_DISK * disk**2 + UPSILON_BULGE * bulge**2
+        curve.append(
+            {
+                "radius_kpc": radius,
+                "observed_kms": observed,
+                "error_kms": error,
+                "baryonic_kms": math.sqrt(max(0.0, baryonic_squared)),
+            }
+        )
+    mass_msun, scale_radius_kpc = fit_default_halo(curve)
+    return (
+        round(mass_msun / HALO_MASS_STEP_MSUN) * HALO_MASS_STEP_MSUN,
+        round(scale_radius_kpc / HALO_SCALE_STEP_KPC) * HALO_SCALE_STEP_KPC,
+    )
+
+
+def build_galaxy_record(preset: GalaxyPreset, sparc_path: Path) -> dict[str, Any]:
+    """Collect everything the page needs to model one preset galaxy."""
+    galaxy = load_sparc_galaxy(sparc_path, preset.sparc_id)
+    mass_msun, scale_radius_kpc = fit_galaxy_halo(galaxy["rotation"])
+    return {
+        "id": preset.sparc_id,
+        "name": preset.name,
+        "summary": preset.summary,
+        "distance_mpc": galaxy["distance_mpc"],
+        "default_halo": {"m200_msun": mass_msun, "scale_radius_kpc": scale_radius_kpc},
+        "rotation": galaxy["rotation"],
+    }
+
+
+GALAXIES_JS_HEADER = """/*
+ * galaxies.js - SPARC rotation-curve presets for the Interactive Galaxy Rotation Simulator.
+ *
+ * Generated by generate_interactive_html.py from table2.dat (SPARC mass models: Lelli,
+ * McGaugh & Schombert 2016, AJ 152, 157). Do not edit by hand: add or change presets in
+ * GALAXY_PRESETS in the generator and run it again. The generator also inlines this code
+ * into index.html, so the published page does not load this file separately.
+ *
+ * Radii are in kpc and velocities in km/s. v_gas_kms keeps SPARC's sign (the gas term can be
+ * negative). default_halo is the generator's NFW fit to the observed curve with the page's
+ * fixed mass-to-light ratios: the starting point of the Apply Observed Fit button.
+ */
+"""
+
+
+def render_galaxies_js(galaxies: list[dict[str, Any]]) -> str:
+    """Render the galaxies.js registry: a JavaScript lookup keyed by SPARC id."""
+
+    def dump(value: Any) -> str:
+        return json.dumps(value, allow_nan=False)
+
+    lines = [GALAXIES_JS_HEADER.rstrip("\n"), "window.GALAXIES = {"]
+    for galaxy in galaxies:
+        halo = galaxy["default_halo"]
+        lines += [
+            f"  {dump(galaxy['id'])}: {{",
+            f"    id: {dump(galaxy['id'])},",
+            f"    name: {dump(galaxy['name'])},",
+            f"    summary: {dump(galaxy['summary'])},",
+            f"    distance_mpc: {dump(galaxy['distance_mpc'])},",
+            "    default_halo: {",
+            f"      m200_msun: {dump(halo['m200_msun'])},",
+            f"      scale_radius_kpc: {dump(halo['scale_radius_kpc'])},",
+            "    },",
+            "    rotation: {",
+            *(f"      {name}: {dump(galaxy['rotation'][name])}," for name in ROTATION_COLUMNS),
+            "    },",
+            "  },",
+        ]
+    lines.append("};")
+    return "\n".join(lines) + "\n"
+
+
 HTML_TEMPLATE = r"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interactive Galaxy Rotation Simulator for NGC 3198 orbit and SPARC rotation-curve exploration">
+  <meta name="description" content="Interactive Galaxy Rotation Simulator: explore SPARC rotation curves and star orbits for __GALAXY_NAMES__">
   <title>Interactive Galaxy Rotation Simulator</title>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -226,6 +320,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .control.disabled { opacity:.35; pointer-events:none; }
     .control.disabled input, .control.disabled button { cursor:not-allowed; }
     .mond-note { color:#ffc48a; font-size:12px; }
+    .galaxy-bar select { min-width:150px; padding:6px 32px 6px 12px; font:inherit; font-size:13px; color:var(--ink); background-color:#102130; background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 17px) 55%,calc(100% - 12px) 55%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; border:1px solid #294255; border-radius:4px; -webkit-appearance:none; appearance:none; cursor:pointer; }
+    .galaxy-bar select:hover { border-color:var(--cyan); }
+    .galaxy-bar select:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .galaxy-bar option { background:#0a111b; color:var(--ink); }
+    .galaxy-summary { color:var(--muted); font-size:12px; }
     .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .learn details { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px; }
     .learn summary { cursor:pointer; padding:12px 0; font-size:14px; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center; }
@@ -391,6 +490,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
   </header>
   <main>
+    <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy preset">
+      <label class="model-label" for="galaxySelect">Galaxy</label>
+      <select id="galaxySelect" autocomplete="off" aria-describedby="galaxySummary" title="Choose which SPARC galaxy to model"></select>
+      <span class="galaxy-summary" id="galaxySummary" role="status" aria-live="polite"></span>
+    </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
       <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
@@ -403,7 +507,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -417,11 +521,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     </article>
       <article class="panel">
         <div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
-        <div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div>
+        <div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div>
         <details class="key">
           <summary>Understanding the colours and χ²</summary>
           <div class="key-content">
-            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul>
+            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul>
             <h3>Why isn't χ² exactly 0?</h3>
             <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
             <p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p>
@@ -433,7 +537,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <details class="nfw"><summary>What is a dark matter halo?</summary>
         <div class="learn-content">
         <p class="tldr">A dark matter halo is an extended region of invisible matter whose gravity adds to that of a galaxy's stars and gas.</p>
-        <p>Stars and gas far from the centre of NGC 3198 orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
+        <p>Stars and gas far from the centre of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
         <p>This simulator uses an NFW halo: a simple model that is denser near the centre and more diffuse farther out. Adjust the halo mass (M<sub>200</sub>, the mass within r<sub>200</sub>) and scale radius (r<sub>s</sub>) to see how its gravity changes the predicted rotation curve.</p>
         </div>
       </details>
@@ -448,7 +552,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
-    <div class="tutorial-eyebrow">Explore NGC 3198</div>
+    <div class="tutorial-eyebrow">Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span></div>
     <h2 id="welcomeTitle">Welcome to the simulator</h2>
     <p id="welcomeDescription">New here? Take a short, hands-on tour of the galaxy, its rotation curve and the ideas behind it. You can skip the tour at any time.</p>
     <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
@@ -464,6 +568,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     <p class="tutorial-fullscreen" id="tutorialFullscreen" hidden>Exit fullscreen to continue the tutorial.</p>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
+  <script>
+__GALAXIES_JS__
+  </script>
   <script>
     document.querySelectorAll('details').forEach(details=>{
       const summary=details.querySelector('summary');
@@ -505,7 +612,10 @@ HTML_TEMPLATE = r"""<!doctype html>
       });
     });
     const DATA = __DATA_JSON__;
-    const DEFAULTS = __DEFAULT_JSON__;
+    // GALAXIES (the inlined galaxies.js above) holds one SPARC rotation curve per preset galaxy.
+    const haloDefaultsOf = galaxy => ({massT: galaxy.default_halo.m200_msun / 1e12, scaleRadius: galaxy.default_halo.scale_radius_kpc});
+    let activeGalaxy = GALAXIES[DATA.default_galaxy_id];
+    let DEFAULTS = haloDefaultsOf(activeGalaxy);
     const G = 4.30091e-6;
     const H0 = 0.07;
     const BG = '#050910';
@@ -583,7 +693,26 @@ HTML_TEMPLATE = r"""<!doctype html>
         })();
         const indicesOf=kind=>particles.map((p,i)=>p.kind===kind?i:-1).filter(i=>i>=0);
         const bulgeIndices=indicesOf('bulge'),diskIndices=indicesOf('disk'),haloIndices=indicesOf('halo');
-        const vObs=DATA.rotation.map(p=>p.observed_kms);
+        /* ---------- Active galaxy: SPARC rotation curve ----------
+           galaxies.js stores the raw SPARC columns. loadGalaxyData() rebuilds every array below for the chosen
+           galaxy, so the rest of the page reads radii / vObs / vBary without knowing which galaxy is active. */
+        const mlState={disk:DATA.upsilon_disk,bulge:DATA.upsilon_bulge};
+        let rotationRows=[],radii=[],vObs=[],obsV=[],obsErr=[],vBary=[];
+        const baryonsFor=(ud,ub)=>rotationRows.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
+        function loadGalaxyData(galaxy){
+            const t=galaxy.rotation;
+            rotationRows=t.radius_kpc.map((radius,i)=>{
+                const gas=t.v_gas_kms[i];
+                return{radius_kpc:radius,observed_kms:Math.abs(t.v_obs_kms[i]),error_kms:Math.abs(t.v_obs_err_kms[i]),
+                    gas_kms:Math.abs(gas),gas_sq:gas*Math.abs(gas),disk_kms:Math.abs(t.v_disk_kms[i]),bulge_kms:Math.abs(t.v_bulge_kms[i])};
+            });
+            radii=rotationRows.map(p=>p.radius_kpc);
+            vObs=rotationRows.map(p=>p.observed_kms);
+            obsV=vObs.slice();
+            obsErr=rotationRows.map(p=>p.error_kms);
+            vBary=baryonsFor(mlState.disk,mlState.bulge);
+        }
+        loadGalaxyData(activeGalaxy);
         function observedVelocity(radius){
             const last=radii.length-1;
             if(radius<=radii[0])return vObs[0]*radius/radii[0];
@@ -592,10 +721,6 @@ HTML_TEMPLATE = r"""<!doctype html>
             while(high-low>1){const m=(low+high)>>1;if(radii[m]<=radius)low=m;else high=m;}
             return vObs[low]+(radius-radii[low])/(radii[high]-radii[low])*(vObs[high]-vObs[low]);
         }
-        const radii=DATA.rotation.map(p=>p.radius_kpc);
-        const vBary=DATA.rotation.map(p=>p.baryonic_kms);
-        const mlState={disk:DATA.upsilon_disk,bulge:DATA.upsilon_bulge};
-        const baryonsFor=(ud,ub)=>DATA.rotation.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
         function nfwVelocityModel(massSolar,scaleRadius) {
             if(massSolar<=0)return ()=>0;
             const rhoCrit=3*H0*H0/(8*Math.PI*G);
@@ -1308,13 +1433,13 @@ HTML_TEMPLATE = r"""<!doctype html>
             while(high-low>1){const m=(low+high)>>1;if(radii[m]<=radius)low=m;else high=m;}
             return values[low]+(radius-radii[low])/(radii[high]-radii[low])*(values[high]-values[low]);
         }
-        // Radial profile on a 1 kpc grid (1-44 kpc, limited to the range covered by the SPARC data).
+        // Radial profile on a 1 kpc grid, limited to the range covered by the active galaxy's SPARC data.
         function buildRotationCurveCsv(){
-            const gas=DATA.rotation.map(p=>p.gas_kms),gasSq=DATA.rotation.map(p=>p.gas_sq),disk=DATA.rotation.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=DATA.rotation.map(p=>p.error_kms);
+            const gas=rotationRows.map(p=>p.gas_kms),gasSq=rotationRows.map(p=>p.gas_sq),disk=rotationRows.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=rotationRows.map(p=>p.error_kms);
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3);
             let csv="Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
-            for(let r=1;r<=44&&r<=radii[radii.length-1]+1e-9;r++){
+            for(let r=Math.max(1,Math.ceil(radii[0]-1e-9));r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r),vd=interpolateAt(disk,r);
                 const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);
                 csv+=[r,f(vo),f(eo),f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh)),f(vo-vb)].join(',')+"\n";
@@ -1334,9 +1459,10 @@ HTML_TEMPLATE = r"""<!doctype html>
             buildSimulationLog().forEach(row=>{
                 csvContent+=`${row.time},${row.escaped},${row.total},${(row.haloMass*1e12).toExponential(4)}\n`;
             });
-            downloadCsv('ngc3198_timeseries_log.csv',csvContent);
+            const filePrefix=activeGalaxy.id.toLowerCase();
+            downloadCsv(`${filePrefix}_timeseries_log.csv`,csvContent);
             // Browsers may block back-to-back downloads, so stagger the second file.
-            setTimeout(()=>downloadCsv('ngc3198_rotation_curve_model.csv',buildRotationCurveCsv()),300);
+            setTimeout(()=>downloadCsv(`${filePrefix}_rotation_curve_model.csv`,buildRotationCurveCsv()),300);
         }
         document.getElementById('exportCsv').addEventListener('click',exportSimulationData);
         const orbitToggle=document.getElementById('toggleOrbits');
@@ -1428,16 +1554,17 @@ HTML_TEMPLATE = r"""<!doctype html>
 
     const initialHalo=haloCurve(DEFAULTS.massT,DEFAULTS.scaleRadius);
     const totalCurve=vBary.map((v,i)=>Math.hypot(v,initialHalo[i]));
-    const obsV=DATA.rotation.map(p=>p.observed_kms),obsErr=DATA.rotation.map(p=>p.error_kms);
     function updateChi(total){const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),dof=Math.max(1,obsV.length-2),red=chi/dof,b=document.getElementById('chiBadge');b.textContent='χ² '+chi.toFixed(0)+' · χ²ᵣ '+red.toFixed(2);b.className=red<2?'good':red<10?'ok':'poor';}
     const residualsOf=total=>obsV.map((v,i)=>v-total[i]);
     const AXIS={gridcolor:'rgba(120,150,180,0.10)',zerolinecolor:'rgba(120,150,180,0.22)',linecolor:'rgba(120,150,180,0.25)',tickcolor:'rgba(120,150,180,0.25)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#9fb0c2'}};
-    const curveData=[
+    // Residual bars are about half the mean spacing of the SPARC radii, so dense and sparse curves both read clearly.
+    const residualBarWidth=()=>Math.round(53*(radii[radii.length-1]-radii[0])/(radii.length-1))/100;
+    const buildCurveData=(halo,total)=>[
       {type:'scatter',mode:'markers',name:'Observed (SPARC)',x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'V_obs  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary,line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'V_baryonic  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:initialHalo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'V_halo  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:totalCurve,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'V_model  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'bar',name:'Residual',x:radii,y:residualsOf(totalCurve),yaxis:'y2',showlegend:false,width:0.55,marker:{color:residualsOf(totalCurve).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'}
+      {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'V_baryonic  <b>%{y:.1f}</b> km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'V_halo  <b>%{y:.1f}</b> km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'V_model  <b>%{y:.1f}</b> km/s<extra></extra>'},
+      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'}
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor'},
@@ -1445,13 +1572,20 @@ HTML_TEMPLATE = r"""<!doctype html>
       yaxis2:{...AXIS,title:{text:'Residual',standoff:6},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.03,xanchor:'left',x:0,font:{size:11,color:'#c3cfdb'},itemsizing:'constant'},
       hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.96)',bordercolor:'rgba(120,150,180,0.35)',font:{color:'#f1f5f9',size:12}},dragmode:false};
-    Plotly.newPlot('curvePlot',curveData,curveLayout,{responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false});
+    const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
+    Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayout,curveConfig);
     updateChi(totalCurve);
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
-    massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
     let sliderUpdateTimer=null,sliderDragging=false;
     const fsSliders=document.getElementById('fsSliders'),fsMass=document.getElementById('fsMassSlider'),fsScale=document.getElementById('fsScaleSlider');
+    // The mass slider grows for massive halos so a fitted value is never pinned to the end of its track.
+    function configureHaloSliders(){
+      const maxT=String(Math.max(2,Math.ceil(2*DEFAULTS.massT/0.5)*0.5));
+      massSlider.max=maxT;fsMass.max=maxT;
+      massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
+    }
+    configureHaloSliders();
     function scheduleOrbitUpdate(){
       clearTimeout(orbitModelTimer);
       if(sliderDragging)return;
@@ -1476,12 +1610,17 @@ HTML_TEMPLATE = r"""<!doctype html>
       mini.addEventListener('pointerdown',()=>{sliderDragging=true;clearTimeout(orbitModelTimer);});
     });
     ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu','touchstart'].forEach(type=>fsSliders.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
+    // Halo and total-model curves for the active galaxy under the current gravity model.
+    function modelCurves(massT,rs){
+      const halo=mondMode?vBary.map(()=>0):haloCurve(massT,rs);
+      const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
+      return{halo,total};
+    }
     function updateHalo(){
       syncFsSliders();
       clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
-      const halo=mondMode?vBary.map(()=>0):haloCurve(massT,rs);
-      const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
+      const{halo,total}=modelCurves(massT,rs);
       document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       const res=residualsOf(total);updateChi(total);
@@ -1564,6 +1703,40 @@ HTML_TEMPLATE = r"""<!doctype html>
         massSlider.value=0;
         updateHalo();
     });
+
+    /* ---------- Galaxy presets ----------
+       The dropdown swaps the active SPARC galaxy: its baryonic baseline, observed halo fit, slider ranges,
+       rotation-curve plot, chi-squared and orbits are all rebuilt from that galaxy's galaxies.js entry. */
+    const galaxySelect=document.getElementById('galaxySelect'),galaxySummary=document.getElementById('galaxySummary');
+    Object.values(GALAXIES).forEach(galaxy=>galaxySelect.add(new Option(galaxy.name,galaxy.id)));
+    function applyGalaxyLabels(galaxy){
+      document.querySelectorAll('[data-galaxy-name]').forEach(el=>{el.textContent=galaxy.name;});
+      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.distance_mpc} Mpc · ${galaxy.rotation.radius_kpc.length} SPARC points`;
+      orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxy.name} star trajectories`);
+      document.getElementById('curvePlot').setAttribute('aria-label',`${galaxy.name} observed, baryonic, and fitted rotation curves`);
+      document.getElementById('viewReset').title=`Return to the default ${galaxy.name} view`;
+    }
+    galaxySelect.value=activeGalaxy.id;
+    applyGalaxyLabels(activeGalaxy);
+    function selectGalaxy(id){
+      const galaxy=GALAXIES[id];
+      if(!galaxy||galaxy===activeGalaxy)return;
+      activeGalaxy=galaxy;
+      DEFAULTS=haloDefaultsOf(galaxy);
+      mondBest=null; // a cached MOND fit belongs to the previous galaxy
+      loadGalaxyData(galaxy);
+      applyBaryonState();
+      configureHaloSliders();
+      applyGalaxyLabels(galaxy);
+      const{halo,total}=modelCurves(DEFAULTS.massT,DEFAULTS.scaleRadius);
+      Plotly.react('curvePlot',buildCurveData(halo,total),curveLayout,curveConfig);
+      // Restart the orbit clock; updateHalo() re-integrates the orbits in the new galaxy's potential.
+      simTime=0;window.simTime=0;
+      updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
+      updateHalo();
+      document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy}}));
+    }
+    galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
 
     const timeSlider=document.getElementById('timeSlider');
     function setPlaying(isPlaying){
@@ -1669,6 +1842,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     const tutorialFeedback=document.getElementById('tutorialFeedback');
     const visibleMatterOnly=document.getElementById('visibleMatterOnly');
     let tutorialIndex=0,tutorialTarget=null,tutorialCompleted=[],tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false;
+    // A new galaxy resets the halo sliders and the timeline, so resync what the tutorial last saw.
+    document.addEventListener('galaxychange',()=>{
+      tutorialLastMass=Number(massSlider.value);
+      tutorialLastScale=Number(scaleSlider.value);
+      tutorialLastTime=Number(timeSlider.value);
+      refreshTutorialGuidance();
+    });
     function tutorialInstruction(){
       const step=tutorialSteps[tutorialIndex];
       if(tutorialIndex>=1&&tutorialIndex<=4&&mondMode)return 'Switch back to NFW first. '+step.action;
@@ -1909,6 +2089,13 @@ HTML_TEMPLATE = r"""<!doctype html>
 """
 
 
+def join_names(names: list[str]) -> str:
+    """Join names for prose: 'A', 'A and B', 'A, B and C'."""
+    if len(names) < 2:
+        return "".join(names)
+    return ", ".join(names[:-1]) + " and " + names[-1]
+
+
 def main() -> None:
     if not TRAJECTORY_PATH.is_file():
         raise FileNotFoundError(f"Missing trajectory CSV: {TRAJECTORY_PATH}")
@@ -1916,30 +2103,40 @@ def main() -> None:
         raise FileNotFoundError(f"Missing SPARC table: {SPARC_PATH}")
 
     stars = load_trajectories(TRAJECTORY_PATH)
-    rotation = load_rotation_curve(SPARC_PATH)
-    mass_msun, scale_radius = fit_default_halo(rotation)
+    galaxies = [build_galaxy_record(preset, SPARC_PATH) for preset in GALAXY_PRESETS]
+    galaxies_js = render_galaxies_js(galaxies)
+    GALAXIES_JS_PATH.write_text(galaxies_js, encoding="utf-8")
     payload = {
         "stars": stars,
-        "rotation": rotation,
         "upsilon_disk": UPSILON_DISK,
         "upsilon_bulge": UPSILON_BULGE,
         "frame_step_myr": 1.0,
         "total_time_myr": 1000.0,
-        "default_halo_mass_msun": mass_msun,
-        "default_scale_radius_kpc": scale_radius,
+        "default_galaxy_id": DEFAULT_PRESET.sparc_id,
     }
-    defaults = {"massT": mass_msun / 1e12, "scaleRadius": scale_radius}
     html = HTML_TEMPLATE.replace(
         "__DATA_JSON__",
         json.dumps(payload, separators=(",", ":"), allow_nan=False).replace("</", "<\\/"),
     )
-    html = html.replace("__DEFAULT_JSON__", json.dumps(defaults))
+    # The deployed site is index.html alone, so the galaxies.js code is inlined into it.
+    html = html.replace("__GALAXIES_JS__", galaxies_js.replace("</", "<\\/"))
+    html = html.replace("__DEFAULT_GALAXY_NAME__", escape(DEFAULT_PRESET.name))
+    html = html.replace(
+        "__GALAXY_NAMES__", escape(join_names([preset.name for preset in GALAXY_PRESETS]))
+    )
     html = html.replace("__FRAME_MAX__", "1000")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
-    print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB)")
-    print(f"Embedded {len(stars)} stars and {len(rotation)} NGC 3198 SPARC points")
-    print(f"NFW starting fit: M200={mass_msun:.3g} Msun, rs={scale_radius:.1f} kpc")
+    print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")
+    print(f"Embedded {len(stars)} stars and {len(galaxies)} SPARC galaxies")
+    for galaxy in galaxies:
+        halo = galaxy["default_halo"]
+        print(
+            f"  {galaxy['name']}: {len(galaxy['rotation']['radius_kpc'])} points, "
+            f"NFW starting fit M200={halo['m200_msun']:.3g} Msun, "
+            f"rs={halo['scale_radius_kpc']:.1f} kpc"
+        )
+
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # EPQ Rotation Curves
 
 Python models and a static GitHub Pages dashboard for exploring the rotation
-curve and stellar orbits of NGC 3198.
+curves and stellar orbits of SPARC galaxies (NGC 3198, NGC 2403 and NGC 7331).
 
 ## Set up on Windows
 
@@ -59,9 +59,27 @@ from a CDN; Python packages are not needed to preview the existing page:
 python -m http.server 8000
 ```
 
-Then open <http://localhost:8000/>. Commit the regenerated `index.html` when
-the dashboard is meant to change. Keep the checked-in data and generated QR
-images in sync with any change to the page's data or destination URL.
+Then open <http://localhost:8000/>. Commit the regenerated `index.html` and
+`galaxies.js` when the dashboard is meant to change. Keep the checked-in data
+and generated QR images in sync with any change to the page's data or
+destination URL.
+
+The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
+the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
+the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
+restarts the orbit clock and re-integrates the star orbits. The selected
+gravity model (NFW or MOND) is kept. The 3D star disk still uses the NGC 3198
+layout for every galaxy; only the orbital dynamics follow the selected galaxy.
+
+The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
+holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
+speed contributions. The generator creates it from `table2.dat`; do not edit it
+by hand. The generator also inlines the same code into `index.html`, so the
+published page stays a single file and the Pages workflow needs no change. To
+offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
+`generate_interactive_html.py` (its id must match the `Name` column of
+`table2.dat`) and run the generator again. It reads that galaxy's rows, fits
+its starting NFW halo and rewrites both files.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
@@ -85,6 +103,8 @@ or keyboard.
 - `NGC3198_Blender_Model.py`: Blender scene and add-on for the interactive
   3D model.
 - `generate_interactive_html.py`: static dashboard generator.
+- `galaxies.js`: generated registry of the preset SPARC galaxies (also inlined
+  into `index.html`).
 - `visualize_3d_model.py`, `plot_galaxy1.py`: trajectory plots and animation.
 - `results/`, `plots/`: input/output data and generated figures.
 - `table2.dat`: local SPARC rotation-curve data.
