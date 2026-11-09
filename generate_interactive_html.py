@@ -967,7 +967,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         const fullHaloBtn=document.getElementById('viewFullHalo');
         fullHaloBtn.addEventListener('click',()=>{
             if(haloHidden)haloToggle.click();
-            controls.flyTo({theta:GALAXY_VIEW.theta,phi:1.2,radius:haloR200*4.2,target:[0,0,0],rate:3});
+            controls.flyTo({theta:GALAXY_VIEW.theta,phi:1.2,radius:haloR200*4.2,target:[0,0,0],rate:2.4});
         });
         const nfwShape=x=>Math.log1p(x)-x/(1+x);
         function updateHaloVisual(massT,rs){
@@ -1167,8 +1167,8 @@ HTML_TEMPLATE = r"""<!doctype html>
             orbitToggle.setAttribute('aria-pressed',String(orbitLines.visible));
             requestRender();
         });
-        document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0.04,target:[0,0,0],radius:GALAXY_VIEW.radius}));
-        document.getElementById('viewEdgeOn').addEventListener('click',()=>controls.flyTo({phi:Math.PI/2,target:[0,0,0],radius:GALAXY_VIEW.radius}));
+        document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0.04,target:[0,0,0],radius:GALAXY_VIEW.radius,rate:3}));
+        document.getElementById('viewEdgeOn').addEventListener('click',()=>controls.flyTo({phi:Math.PI/2,target:[0,0,0],radius:GALAXY_VIEW.radius,rate:3}));
         // Rotate/Pan only changes what a primary mouse drag does; touch gestures are unaffected.
         const modeButtons=[...viewPanel.querySelectorAll('[data-mode]')];
         function setDragMode(mode){
