@@ -221,9 +221,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     .switch input:checked ~ .track { background:rgba(255,174,92,0.25); border-color:rgba(255,174,92,0.7); }
     .switch input:checked ~ .track::after { transform:translateX(20px); background:#ffae5c; }
     .switch input:focus-visible ~ .track { outline:2px solid var(--cyan); outline-offset:2px; }
-    .chi-note { margin:0 16px 14px; font-size:12px; color:#9fb0c2; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); padding:0 14px; }
-    .chi-note summary { cursor:pointer; padding:9px 0; color:#c3cfdb; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
-    .chi-note p { margin:0 0 10px; }
     .switch .opt { color:var(--muted); font-size:13px; transition:color .2s; }
     .switch .opt.active { color:var(--ink); font-weight:600; }
     .control.disabled { opacity:.35; pointer-events:none; }
@@ -245,8 +242,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .panel-heading { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:13px 16px 0; }
     h2 { margin:0; font-size:14px; font-weight:600; }
     .panel-heading span { color:var(--muted); font-size:11px; }
-    .key { margin:0 16px 14px; padding:10px 14px; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); font-size:12px; color:#9fb0c2; }
-    .key-title { font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#c3cfdb; margin-bottom:6px; }
+    .key { margin:0 16px 14px; padding:0 14px; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); font-size:12px; color:#9fb0c2; }
+    .key summary { cursor:pointer; padding:11px 0; color:#c3cfdb; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+    .key h3 { margin:14px 0 6px; color:#c3cfdb; font-size:12px; }
+    .key p { margin:0 0 10px; }
+    .key-content { padding-bottom:4px; }
     .key ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:5px 18px; }
     .key b { color:#e6edf5; font-weight:600; }
     .sw { display:inline-block; width:16px; height:3px; border-radius:2px; margin-right:7px; vertical-align:middle; }
@@ -275,7 +275,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .fs-sliders output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .fs-sliders input[type=range] { width:100%; height:16px; margin:0; }
     .fs-sliders.disabled { opacity:.35; pointer-events:none; }
-    .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:6px; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
+    .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:0; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
     .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
@@ -296,9 +296,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel .view-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
     .view-panel .view-head:hover, .view-panel .view-head:focus-visible { background:transparent; color:var(--ink); }
     .view-panel .chev { display:inline-block; font-size:12px; transition:transform .2s; }
-    .view-panel.collapsed { min-width:0; padding:7px 10px; border-radius:999px; }
-    .view-panel.collapsed > :not(.view-head) { display:none; }
-    .view-panel.collapsed .view-head { padding:0; }
+    .view-panel.collapsed { min-width:0; padding:0; border-radius:999px; }
+    .view-panel > :not(.view-head) { max-height:80px; margin-top:6px; opacity:1; visibility:visible; overflow:hidden; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s; }
+    .view-panel.collapsed > :not(.view-head) { width:0; min-width:0; max-height:0; margin-top:0; padding:0; border-width:0; opacity:0; visibility:hidden; pointer-events:none; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s linear .2s; }
+    .view-panel.collapsed .view-head { padding:7px 10px; border-radius:999px; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
     @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } .view-panel .speed-toggle button { padding:7px 4px; font-size:12px; } }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
@@ -309,9 +310,15 @@ HTML_TEMPLATE = r"""<!doctype html>
     .halo-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:12px 0 0; }
     .halo-metrics[hidden] { display:none; }
     .halo-metric { padding:10px; border:1px solid rgba(179,154,232,.14); border-radius:6px; background:rgba(5,9,16,.4); }
-    .halo-metric dt { color:#c3cfdb; font-size:11px; }
-    .halo-metric dd { margin:5px 0 0; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
-    .halo-metric p { margin:5px 0 0; color:var(--muted); font-size:11px; line-height:1.45; }
+    .halo-metric button { display:block; width:100%; padding:0; border:0; background:none; text-align:left; color:#c3cfdb; font-size:11px; }
+    .halo-metric button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px; }
+    .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
+    .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
+    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:grid-template-rows .2s ease, opacity .2s ease, visibility 0s linear .2s; }
+    .halo-metric dd > span { min-height:0; overflow:hidden; }
+    .halo-metric dd > span > span { display:block; padding-top:5px; }
+    .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition-delay:0s; }
+    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
@@ -399,27 +406,43 @@ HTML_TEMPLATE = r"""<!doctype html>
     <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
-        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years.</p>
+        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
         <dl class="halo-metrics" id="haloMetrics">
-          <div class="halo-metric"><dt>Halo radius, r<sub>200</sub></dt><dd id="haloRadius">—</dd><p>The model's outer halo radius; not a sharp physical edge.</p></div>
-          <div class="halo-metric"><dt>Scale radius, r<sub>s</sub></dt><dd id="haloScale">—</dd><p>Sets how the halo's density changes with distance from the centre.</p></div>
-          <div class="halo-metric"><dt>Concentration, c</dt><dd id="haloConcentration">—</dd><p>Halo radius divided by scale radius: a value of 10 means the halo radius is 10 times the scale radius. Higher values mean a more centrally concentrated halo.</p></div>
+          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>The model's outer halo radius; not a sharp physical edge.</span></span></dd></div>
+          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
+          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloConcentrationHelp">Concentration, c<span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloConcentration">—</span></button></dt><dd id="haloConcentrationHelp"><span><span>Halo radius divided by scale radius: a value of 10 means the halo radius is 10 times the scale radius. Higher values mean a more centrally concentrated halo.</span></span></dd></div>
         </dl>
         <p class="halo-empty" id="haloEmpty" hidden></p>
       </section>
     </article>
-      <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
+      <article class="panel">
+        <div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
+        <div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div>
+        <details class="key">
+          <summary>Understanding the colours and χ²</summary>
+          <div class="key-content">
+            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul>
+            <h3>Why isn't χ² exactly 0?</h3>
+            <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
+            <p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p>
+          </div>
+        </details>
+      </article>
     </section>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <details class="nfw"><summary>What is a dark matter halo?</summary>
+        <div class="learn-content">
         <p class="tldr">A dark matter halo is an extended region of invisible matter whose gravity adds to that of a galaxy's stars and gas.</p>
         <p>Stars and gas far from the centre of NGC 3198 orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
         <p>This simulator uses an NFW halo: a simple model that is denser near the centre and more diffuse farther out. Adjust the halo mass (M<sub>200</sub>, the mass within r<sub>200</sub>) and scale radius (r<sub>s</sub>) to see how its gravity changes the predicted rotation curve.</p>
+        </div>
       </details>
       <details class="mond"><summary>What is MOND?</summary>
+        <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) is an alternative idea: it changes the usual prediction for gravity at very low accelerations, rather than adding a dark matter halo.</p>
         <p>In a galaxy's outskirts, the gravitational acceleration from visible matter is very small. MOND predicts a stronger effect than Newtonian gravity there, helping explain why orbital speeds remain high. The change becomes important around an acceleration called a<sub>0</sub>; the default here is 1.2×10⁻¹⁰ m/s².</p>
         <p>Switch between the two models and compare their curves with the white observed points. A close match is informative, but one galaxy alone cannot settle which explanation is correct.</p>
+        </div>
       </details>
     </section>
     <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
@@ -442,6 +465,44 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
   <script>
+    document.querySelectorAll('details').forEach(details=>{
+      const summary=details.querySelector('summary');
+      const content=summary.nextElementSibling;
+      let animation=null, closing=false;
+      summary.addEventListener('click',event=>{
+        event.preventDefault();
+        const opening=!details.open||closing;
+        const height=details.open?content.getBoundingClientRect().height:0;
+        const opacity=details.open?Number(getComputedStyle(content).opacity):0;
+        if(animation){
+          animation.cancel();
+          animation=null;
+          content.style.overflow='';
+        }
+        closing=!opening;
+        details.open=true;
+        content.inert=!opening;
+        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+          details.open=opening;
+          closing=false;
+          content.inert=false;
+          return;
+        }
+        content.style.overflow='hidden';
+        animation=content.animate(
+          [{height:height+'px',opacity},{height:(opening?content.scrollHeight:0)+'px',opacity:opening?1:0}],
+          {duration:200,easing:'ease',fill:'both'}
+        );
+        animation.onfinish=()=>{
+          details.open=opening;
+          content.inert=false;
+          content.style.overflow='';
+          animation.cancel();
+          animation=null;
+          closing=false;
+        };
+      });
+    });
     const DATA = __DATA_JSON__;
     const DEFAULTS = __DEFAULT_JSON__;
     const G = 4.30091e-6;
@@ -1172,13 +1233,25 @@ HTML_TEMPLATE = r"""<!doctype html>
         const viewPanel=document.getElementById('viewPanel');
         ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>viewPanel.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
         const viewToggle=document.getElementById('viewToggle');
-        if(window.matchMedia('(hover:none) and (pointer:coarse)').matches){
-            viewPanel.classList.add('collapsed');
-            viewToggle.setAttribute('aria-expanded','false');
-        }
+        viewPanel.classList.add('collapsed');
+        viewToggle.setAttribute('aria-expanded','false');
         viewToggle.addEventListener('click',()=>{
             const collapsed=viewPanel.classList.toggle('collapsed');
             viewToggle.setAttribute('aria-expanded',String(!collapsed));
+        });
+        document.querySelectorAll('.halo-metric').forEach(metric=>{
+            const button=metric.querySelector('button');
+            metric.addEventListener('pointerenter',event=>{
+                if(event.pointerType!=='touch')metric.classList.add('hovered');
+            });
+            metric.addEventListener('pointerleave',event=>{
+                if(event.pointerType!=='touch')metric.classList.remove('hovered');
+            });
+            button.addEventListener('click',()=>{
+                const expanded=button.getAttribute('aria-expanded')!=='true';
+                button.setAttribute('aria-expanded',String(expanded));
+                metric.classList.toggle('expanded',expanded);
+            });
         });
         function resetView(){controls.reset();requestRender();}
         document.getElementById('viewReset').addEventListener('click',resetView);
