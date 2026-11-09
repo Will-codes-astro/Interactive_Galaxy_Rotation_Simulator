@@ -208,7 +208,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .control label { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; margin-bottom:7px; }
     .control output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .control-help { color:var(--muted); font-size:11px; margin:6px 0 0; min-height:32px; }
-    .fit-button { margin-top:7px; font-size:11px; }
+    .fit-actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:7px; }
+    .fit-button { font-size:11px; }
+    #visibleMatterOnly.tutorial-reveal { animation:tutorial-reveal .3s ease-out; }
+    @keyframes tutorial-reveal { from { opacity:0; } to { opacity:1; } }
     .model-bar { display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:10px 16px; border:1px solid var(--line); background:var(--panel); border-radius:5px; margin-bottom:14px; }
     .model-bar .model-label { color:var(--muted); font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
     .switch { display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; }
@@ -235,7 +238,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     .learn details.nfw summary { color:#b39ae8; } .learn details.mond summary { color:#ffae5c; }
     .learn p { color:#9fb0c2; font-size:13px; margin:0 0 10px; }
     .learn p.tldr { color:#dbe7f4; }
-    .learn .eq { font-family:Consolas,monospace; font-size:12px; color:#c3cfdb; background:rgba(120,150,180,0.07); border-radius:6px; padding:7px 10px; margin-bottom:12px; overflow-x:auto; }
     @media (max-width:900px) { .learn { grid-template-columns:1fr; } }
     input[type=range] { width:100%; accent-color:var(--cyan); }
     .panel-grid { display:grid; grid-template-columns:1.12fr 1fr; gap:14px; }
@@ -273,8 +275,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
     .view-panel button:active { background:rgba(123,228,241,.28); border-color:var(--cyan); }
     .view-panel button[aria-pressed=true] { background:rgba(123,228,241,.22); border-color:var(--cyan); color:var(--ink); }
-    .view-panel .export-btn { color:#9fe8b4; border-color:rgba(110,220,150,.45); background:rgba(110,220,150,.08); }
-    .view-panel .export-btn:hover, .view-panel .export-btn:focus-visible { background:rgba(110,220,150,.22); border-color:#6edc96; }
+    body.tutorial-view-intro .view-panel :is(#toggleHalo,#viewFullHalo):not(:focus-visible) { opacity:.4; }
     .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
     .view-panel .view-row button { text-align:center; }
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
@@ -296,7 +297,70 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } .view-panel .speed-toggle button { padding:7px 4px; font-size:12px; } }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
     button:hover { border-color:var(--cyan); }
+    .halo-info { margin:0 16px 16px; padding:14px; border:1px solid rgba(179,154,232,.22); border-radius:8px; background:rgba(179,154,232,.05); }
+    .halo-info h3 { margin:0; color:#d5c6f4; font-size:13px; }
+    .halo-info-intro, .halo-empty { margin:5px 0 0; color:var(--muted); font-size:12px; }
+    .halo-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:12px 0 0; }
+    .halo-metrics[hidden] { display:none; }
+    .halo-metric { padding:10px; border:1px solid rgba(179,154,232,.14); border-radius:6px; background:rgba(5,9,16,.4); }
+    .halo-metric dt { color:#c3cfdb; font-size:11px; }
+    .halo-metric dd { margin:5px 0 0; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
+    .halo-metric p { margin:5px 0 0; color:var(--muted); font-size:11px; line-height:1.45; }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
+    footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
+    footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
+    .tutorial-launch { margin-left:auto; background:transparent; color:var(--muted); font-size:12px; }
+    .tutorial-launch:hover, .tutorial-launch:focus-visible { color:var(--ink); }
+    .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(123,228,241,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
+    .tutorial-welcome::backdrop { background:rgba(2,6,12,.8); }
+    .tutorial-eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:600; }
+    .tutorial-welcome h2 { margin:8px 0; font-size:22px; }
+    .tutorial-welcome p { color:#b5c5d5; margin:0 0 18px; }
+    .tutorial-welcome-actions { display:flex; flex-wrap:wrap; gap:9px; }
+    .tutorial-primary { background:rgba(123,228,241,.16); border-color:var(--cyan); color:#e4fbff; font-weight:600; }
+    .tutorial-card { position:fixed; z-index:10000; right:16px; bottom:16px; display:flex; flex-direction:column; width:min(380px,calc(100% - 32px)); max-height:min(65vh,480px); overflow:hidden; padding:18px; border:1px solid rgba(123,228,241,.24); border-radius:16px; background:linear-gradient(155deg,#142838,#0b1623 70%); box-shadow:0 16px 48px rgba(0,0,0,.58); cursor:default; user-select:text; }
+    .tutorial-card.on-left { left:16px; right:auto; }
+    .tutorial-card[hidden] { display:none; }
+    .tutorial-top { display:flex; flex:none; align-items:center; justify-content:space-between; gap:12px; }
+    .tutorial-content { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+    .tutorial-skip { border:0; padding:4px; background:transparent; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; }
+    .tutorial-skip:hover, .tutorial-skip:focus-visible { color:var(--ink); }
+    .tutorial-progress-track { flex:none; height:3px; margin:10px 0 4px; background:rgba(123,228,241,.13); border-radius:4px; }
+    .tutorial-progress-fill { height:100%; width:0; border-radius:inherit; background:var(--cyan); transition:width .25s ease; }
+    .tutorial-card h2 { margin:10px 0 7px; font-size:18px; line-height:1.25; }
+    .tutorial-card p { margin:0 0 10px; color:#c3d0de; font-size:13px; line-height:1.5; }
+    .tutorial-card .tutorial-try { margin:2px 0 0; padding:10px 12px; border-left:2px solid var(--cyan); border-radius:0 7px 7px 0; background:rgba(123,228,241,.07); color:#c7f5fa; }
+    .tutorial-feedback { flex:none; margin:9px 0 0; color:#a5e3c2; font-size:12px; }
+    .tutorial-feedback[hidden] { display:none; }
+    .tutorial-card .tutorial-fullscreen { color:#ffc48a; }
+    .tutorial-actions { display:flex; flex:none; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .tutorial-keys { align-self:center; margin-right:auto; color:var(--muted); font-size:11px; }
+    @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
+    .tutorial-actions button { min-height:36px; }
+    .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
+    .tutorial-spotlight { position:fixed; z-index:9998; pointer-events:none; border:2px solid #8ceaf5; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 4px rgba(123,228,241,.16); transition:opacity .45s ease; }
+    .tutorial-spotlight[hidden] { display:none; }
+    .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; }
+    .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
+    .tutorial-spotlight.is-complete { opacity:0; }
+    .is-complete .tutorial-pointer { animation-play-state:paused; }
+    .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
+    @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
+    @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight { transition:none; } }
+    #orbitPlot:fullscreen { touch-action:auto; }
+    #orbitPlot:-webkit-full-screen { touch-action:auto; }
+    #orbitPlot.fullscreen-active { touch-action:auto; }
+    body.tutorial-active main { padding-bottom:calc(65vh + 32px); }
+    @media(max-width:600px) {
+      .tutorial-launch { margin-left:0; }
+      .tutorial-card { right:10px; bottom:10px; width:calc(100% - 20px); max-height:45vh; padding:12px; }
+      .tutorial-card.on-left { left:auto; right:10px; }
+      .tutorial-card h2 { margin:5px 0; }
+      .tutorial-card p { font-size:12px; margin-bottom:5px; }
+      .tutorial-actions { margin-top:7px; }
+      body.tutorial-active main { padding-bottom:calc(45vh + 20px); }
+    }
     @media(max-width:960px) { .panel-grid { grid-template-columns:1fr; } .plot { height:62vh; } .controls { grid-template-columns:1fr 1fr; } .control:last-child { grid-column:1/-1; } }
     @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } footer { flex-direction:column; } }
   </style>
@@ -314,35 +378,63 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
   </header>
   <main>
-    <section class="model-bar" aria-label="Gravity model">
+    <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
       <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
       <span class="mond-note" id="mondNote" hidden>MOND active: no dark matter (M<sub>200</sub> = 0). Gravity is boosted below a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</span>
+      <button type="button" class="tutorial-launch" id="tutorialLaunch">Tutorial</button>
     </section>
     <section class="controls" aria-label="Dark matter controls">
-    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button></div>
+    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div id="haloCaption" style="position:absolute;left:12px;bottom:12px;color:rgba(255,255,255,0.75);font-family:monospace;font-size:11px;background:rgba(0,0,0,0.45);padding:4px 8px;border-radius:4px;pointer-events:none;z-index:100;max-width:60%"></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
-      <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND assumes one fixed a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div>
+      <section class="halo-info" aria-labelledby="haloInfoTitle">
+        <h3 id="haloInfoTitle">Your NFW halo</h3>
+        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years.</p>
+        <dl class="halo-metrics" id="haloMetrics">
+          <div class="halo-metric"><dt>Halo radius, r<sub>200</sub></dt><dd id="haloRadius">—</dd><p>The model's outer halo radius; not a sharp physical edge.</p></div>
+          <div class="halo-metric"><dt>Scale radius, r<sub>s</sub></dt><dd id="haloScale">—</dd><p>Sets how the halo's density changes with distance from the centre.</p></div>
+          <div class="halo-metric"><dt>Concentration, c</dt><dd id="haloConcentration">—</dd><p>Halo radius divided by scale radius: a value of 10 means the halo radius is 10 times the scale radius. Higher values mean a more centrally concentrated halo.</p></div>
+        </dl>
+        <p class="halo-empty" id="haloEmpty" hidden></p>
+      </section>
+    </article>
+      <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
     </section>
-    <section class="learn" aria-label="Theory guide">
+    <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <details class="nfw"><summary>What is a dark matter halo?</summary>
-        <p class="tldr">An invisible cloud of extra mass around the galaxy whose gravity keeps the outer stars from flying off.</p>
-        <p>The stars and gas we can see are not heavy enough to hold on to fast-moving stars far from the centre. Measured speeds stay high out to the edge instead of dropping, so astronomers propose a huge, roughly spherical halo of unseen matter that extends well beyond the visible disk.</p>
-        <p>This simulator uses the standard NFW halo shape. Its total mass (M<sub>200</sub>) and how tightly it is packed towards the centre (r<sub>s</sub>) are set by the sliders. More halo mass means faster outer stars.</p>
+        <p class="tldr">A dark matter halo is an extended region of invisible matter whose gravity adds to that of a galaxy's stars and gas.</p>
+        <p>Stars and gas far from the centre of NGC 3198 orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
+        <p>This simulator uses an NFW halo: a simple model that is denser near the centre and more diffuse farther out. Adjust the halo mass (M<sub>200</sub>, the mass within r<sub>200</sub>) and scale radius (r<sub>s</sub>) to see how its gravity changes the predicted rotation curve.</p>
       </details>
       <details class="mond"><summary>What is MOND?</summary>
-        <p class="tldr">Instead of adding invisible mass, MOND slightly changes how gravity behaves where it is extremely weak.</p>
-        <p>In the outskirts of a galaxy, gravity from the visible matter is very feeble. MOND says that below a tiny threshold acceleration (a<sub>0</sub> ≈ 1.2×10⁻¹⁰ m/s²) gravity falls off more gently than Newton predicted, so outer stars keep orbiting quickly and the rotation curve flattens, using only the matter we can see.</p>
-        <div class="eq">v² = ( v<sub>bar</sub>² + √( v<sub>bar</sub>⁴ + 4·r·a₀·v<sub>bar</sub>² ) ) / 2</div>
-        <p>Both ideas can match this galaxy's curve; they disagree about <i>why</i>. Flip the switch above to compare them.</p>
+        <p class="tldr">MOND (Modified Newtonian Dynamics) is an alternative idea: it changes the usual prediction for gravity at very low accelerations, rather than adding a dark matter halo.</p>
+        <p>In a galaxy's outskirts, the gravitational acceleration from visible matter is very small. MOND predicts a stronger effect than Newtonian gravity there, helping explain why orbital speeds remain high. The change becomes important around an acceleration called a<sub>0</sub>; the default here is 1.2×10⁻¹⁰ m/s².</p>
+        <p>Switch between the two models and compare their curves with the white observed points. A close match is informative, but one galaxy alone cannot settle which explanation is correct.</p>
       </details>
     </section>
-    <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span></footer>
+    <footer><span>Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
   </main>
+  <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
+    <div class="tutorial-eyebrow">Explore NGC 3198</div>
+    <h2 id="welcomeTitle">Welcome to the simulator</h2>
+    <p id="welcomeDescription">New here? Take a short, hands-on tour of the galaxy, its rotation curve and the ideas behind it. You can skip the tour at any time.</p>
+    <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
+  </dialog>
+  <div class="tutorial-spotlight" id="tutorialSpotlight" aria-hidden="true" hidden>
+    <svg class="tutorial-pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2v23l6-5 4 10 5-2-4-10h8z" fill="#eaffff" stroke="#09212c" stroke-width="2" stroke-linejoin="round"/></svg>
+  </div>
+  <aside class="tutorial-card" id="tutorialCard" aria-labelledby="tutorialTitle" hidden>
+    <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
+    <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
+    <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
+    <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
+    <p class="tutorial-fullscreen" id="tutorialFullscreen" hidden>Exit fullscreen to continue the tutorial.</p>
+    <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
+  </aside>
   <script>
     const DATA = __DATA_JSON__;
     const DEFAULTS = __DEFAULT_JSON__;
@@ -962,7 +1054,8 @@ HTML_TEMPLATE = r"""<!doctype html>
             new THREE.LineBasicMaterial({color:0x5a7dff,transparent:true,opacity:0.13,depthWrite:false,blending:THREE.AdditiveBlending}));
         haloGrid.frustumCulled=false;haloGrid.renderOrder=1;haloGroup.add(haloGrid);
         let haloR200=158;
-        const haloToggle=document.getElementById('toggleHalo'),haloCaption=document.getElementById('haloCaption');
+        const haloToggle=document.getElementById('toggleHalo');
+        const haloMetrics=document.getElementById('haloMetrics'),haloEmpty=document.getElementById('haloEmpty');
         let haloHidden=false;
         const fullHaloBtn=document.getElementById('viewFullHalo');
         fullHaloBtn.addEventListener('click',()=>{
@@ -975,7 +1068,9 @@ HTML_TEMPLATE = r"""<!doctype html>
             haloGroup.visible=show;
             haloToggle.disabled=mondMode;fullHaloBtn.disabled=mondMode||massT<=0;
             haloToggle.setAttribute('aria-disabled',String(mondMode));
-            haloCaption.hidden=mondMode||massT<=0;
+            haloMetrics.hidden=mondMode||massT<=0;
+            haloEmpty.hidden=!haloMetrics.hidden;
+            haloEmpty.textContent=mondMode?'MOND does not use a dark matter halo.':'Set the halo mass above zero to see its size and shape.';
             if(mondMode||massT<=0){requestRender();return;}
             const rhoCrit=3*H0*H0/(8*Math.PI*G);
             const r200=Math.cbrt(3*massT*1e12/(4*Math.PI*200*rhoCrit)),c=r200/rs,mc=nfwShape(c);
@@ -994,7 +1089,9 @@ HTML_TEMPLATE = r"""<!doctype html>
             haloGeom.attributes.position.needsUpdate=true;haloGeom.attributes.aFrac.needsUpdate=true;
             haloShell.scale.setScalar(r200);haloGrid.scale.setScalar(r200);haloR200=r200;
             haloUniforms.uAlpha.value=0.05+0.28*Math.min(1,massT/2);
-            haloCaption.textContent=`NFW halo · r200 ${r200.toFixed(0)} kpc · rs ${rs.toFixed(1)} kpc · c ${c.toFixed(1)}`;
+            document.getElementById('haloRadius').textContent=`${r200.toFixed(0)} kpc`;
+            document.getElementById('haloScale').textContent=`${rs.toFixed(1)} kpc`;
+            document.getElementById('haloConcentration').textContent=c.toFixed(1);
             requestRender();
         }
         haloToggle.addEventListener('click',()=>{
@@ -1084,6 +1181,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             orbitPlot.classList.toggle('fullscreen-active',on);
             document.body.classList.toggle('fullscreen-lock',on);
             if(fsBtn)fsBtn.setAttribute('aria-pressed',String(on));
+            syncTutorialFullscreen();
             resizeOrbit();requestAnimationFrame(resizeOrbit);
         }
         function toggleFullscreen() {
@@ -1272,25 +1370,32 @@ HTML_TEMPLATE = r"""<!doctype html>
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
     massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
-    function updateHalo(){
-      const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
-      const halo=mondMode?vBary.map(()=>0):haloCurve(massT,rs);
-      const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
-      document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
-      document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
-      const res=residualsOf(total);updateChi(total);Plotly.restyle('curvePlot',{y:[vBary.slice()]},[1]);Plotly.restyle('curvePlot',{y:[halo,total],name:[mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[!mondMode,true]},[2,3]);      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
-      document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
-      const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
-      Plotly.relayout('curvePlot',{'yaxis.range':[0,yMax]});
-      updateHaloVisual(massT,rs);
+    let sliderUpdateTimer=null,sliderDragging=false;
+    function scheduleOrbitUpdate(){
       clearTimeout(orbitModelTimer);
+      if(sliderDragging)return;
       orbitModelTimer=setTimeout(()=>{
-          activeTrajectories=integrateTrajectories(massT,rs);
+          activeTrajectories=integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value));
           fillOrbitLines();
           updateStarTransforms(simTime);
           updateEscapeCounter(simTime);
           requestRender();
       },120);
+    }
+    function updateHalo(){
+      clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
+      const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
+      const halo=mondMode?vBary.map(()=>0):haloCurve(massT,rs);
+      const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
+      document.getElementById('massValue').textContent=`${massT.toFixed(2)} × 10¹² M☉`;
+      document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
+      const res=residualsOf(total);updateChi(total);
+      document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
+      const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model'],visible:[true,!mondMode,true]},{'yaxis.range':[0,yMax]},[1,2,3]);
+      Plotly.restyle('curvePlot',{y:[res],'marker.color':[res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')]},[4]);
+      updateHaloVisual(massT,rs);
+      scheduleOrbitUpdate();
     }
     const mondToggle=document.getElementById('mondToggle'),mondFitToggle=document.getElementById('mondFitToggle');
     // Grid search over a0 and the disk M/L (bulge M/L stays fixed) for the lowest chi-squared.
@@ -1337,10 +1442,31 @@ HTML_TEMPLATE = r"""<!doctype html>
       });
       updateHalo();
     });
-    massSlider.addEventListener('input',updateHalo);scaleSlider.addEventListener('input',updateHalo);updateHalo();
+    function queueSliderUpdate(){
+      document.getElementById('massValue').textContent=`${Number(massSlider.value).toFixed(2)} × 10¹² M☉`;
+      document.getElementById('scaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
+      if(sliderUpdateTimer===null)sliderUpdateTimer=setTimeout(updateHalo,100);
+    }
+    [massSlider,scaleSlider].forEach(slider=>{
+      slider.addEventListener('input',queueSliderUpdate);
+      slider.addEventListener('change',updateHalo);
+      slider.addEventListener('pointerdown',()=>{sliderDragging=true;clearTimeout(orbitModelTimer);});
+    });
+    function finishSliderDrag(){
+      if(!sliderDragging)return;
+      sliderDragging=false;
+      scheduleOrbitUpdate();
+    }
+    window.addEventListener('pointerup',finishSliderDrag);
+    window.addEventListener('pointercancel',finishSliderDrag);
+    updateHalo();
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
         massSlider.value=DEFAULTS.massT;
         scaleSlider.value=DEFAULTS.scaleRadius;
+        updateHalo();
+    });
+    document.getElementById('visibleMatterOnly').addEventListener('click',()=>{
+        massSlider.value=0;
         updateHalo();
     });
 
@@ -1374,16 +1500,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     }
     window.addEventListener('keydown',e=>{
         if(e.code==='Escape'&&orbitPlot.classList.contains('fullscreen-active')){setCssFullscreen(false);return;}
-        if(e.code==='Space'){
-            const btn=e.target&&e.target.closest?e.target.closest('button'):null;
-            if(btn)btn.blur();
+        if(e.code==='Space'&&!(e.target&&e.target.closest&&e.target.closest('button,input,select,textarea,a,summary,dialog,#tutorialCard,[contenteditable="true"]'))){
             e.preventDefault();
             if(!e.repeat)togglePlayback();
         }
-    });
-    // Stop the browser's keyup-triggered button click from also firing (e.g. exiting fullscreen)
-    window.addEventListener('keyup',e=>{
-        if(e.code==='Space'&&e.target&&e.target.closest&&e.target.closest('button'))e.preventDefault();
     });
 
     function syncTimelineUI(timeMyr){
@@ -1402,6 +1522,286 @@ HTML_TEMPLATE = r"""<!doctype html>
     }
     timeSlider.addEventListener('input',()=>onSliderInput(timeSlider.value));
     updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
+
+    const tutorialSteps=[
+      {target:'curvePlot',gesture:'scan',title:'Read the rotation curve',
+       text:'The horizontal axis is distance from the galaxy’s centre; the vertical axis is orbital speed. White points are measured speeds, with bars showing uncertainty. Cyan predicts the speed from visible matter alone.',
+       action:'Look towards the right of the graph: how does the cyan curve compare with the white points?'},
+      {target:'massSlider',gesture:'zero',title:'Try visible matter alone',
+       text:'The orange line is the current model prediction. In NFW mode it combines visible matter with a dark matter halo; the purple line shows the halo contribution.',
+       action:'Drag halo mass all the way left to 0. Compare the orange line with the observed points.'},
+      {target:'massSlider',gesture:'increase',title:'Add a dark matter halo',
+       text:'A halo adds gravity without adding visible light. The mass slider changes the halo mass within its model radius, r₂₀₀.',
+       action:'Increase halo mass and watch the orange curve. Can you bring it closer to the white points?'},
+      {target:'scaleSlider',gesture:'adjust',title:'Change the halo’s shape',
+       text:'The scale radius affects how the halo’s density changes with distance. At the same mass, a smaller scale radius makes the halo more concentrated.',
+       action:'Move the scale radius slider and compare the curve. The halo cards below the 3D view show the resulting size and concentration.'},
+      {target:'applyObservedFit',gesture:'click',title:'How close is the fit?',
+       text:'Residual bars show observed speed minus model speed. χ² combines the differences while accounting for measurement uncertainties; a lower value means a closer fit to these points.',
+       action:'Try different settings, or press Apply Observed Fit to return to the starting fit. A close fit alone does not prove a theory.'},
+      {target:'modelBar',gesture:'switch',title:'Compare another explanation',
+       text:'MOND predicts a stronger gravitational effect at very low accelerations, without a dark matter halo. The orange curve becomes its prediction; halo sliders are unavailable in this mode.',
+       action:'Switch to MOND and compare the orange curve with the observations. Switch back to NFW whenever you like.'},
+      {target:'playPauseBtn',gesture:'click',title:'Watch a galaxy evolve',
+       text:'The 3D view shows simulated, massless test stars, not observations of individual stars. The models calculate their motion over one billion years.',
+       action:'Press Play or move the time slider. Try changing the model and see how the orbits respond.'},
+      {target:'orbitPlot',gesture:'drag',title:'Interpret the animation',
+       text:'“Escaped” counts stars that have crossed the simulation’s chosen outer radius; it does not necessarily mean they are gravitationally unbound. The halo is a visual representation of the model.',
+       action:'Drag to rotate the view. Use the mouse wheel or a pinch gesture to zoom.'},
+      {target:'viewToggle',gesture:'click',title:'Explore the View controls',
+       text:'View opens the camera and display controls. Face-on and Edge-on change your angle; Reset view returns to the start. With a mouse, Rotate or Pan changes how dragging moves the view. Hide halo and Orbit lines change what is drawn; you can also adjust speed or enter fullscreen.',
+       action:'Press View to open or close the controls. Try a camera angle or turn on orbit lines. We’ll explore the dimmed halo controls next.'},
+      {target:'viewFullHalo',gesture:'click',title:'See the whole halo',
+       text:'In the NFW model, a vast dark matter halo surrounds the much smaller visible galaxy. The blue sphere is a model illustration, not a photograph; its outer radius r₂₀₀ is a conventional boundary, not a sharp edge.',
+       action:'Press View Full Halo to zoom out. The galaxy becomes tiny at this scale. Use Reset view to return.'},
+      {target:'theoryGuide',gesture:'guide',title:'Keep exploring',
+       text:'Both models simplify a real galaxy. The result also depends on measurement uncertainties and the estimated stellar mass. One galaxy alone cannot settle which explanation is correct.',
+       action:'Open the theory guide below for more. You can restart this tutorial from the button beside the gravity model switch.'}
+    ];
+    const tutorialWelcome=document.getElementById('tutorialWelcome'),tutorialCard=document.getElementById('tutorialCard');
+    const tutorialTitle=document.getElementById('tutorialTitle'),tutorialProgress=document.getElementById('tutorialProgress');
+    const tutorialText=document.getElementById('tutorialText'),tutorialTry=document.getElementById('tutorialTry');
+    const tutorialBack=document.getElementById('tutorialBack'),tutorialNext=document.getElementById('tutorialNext');
+    const tutorialLaunch=document.getElementById('tutorialLaunch'),tutorialFullscreen=document.getElementById('tutorialFullscreen');
+    const tutorialSpotlight=document.getElementById('tutorialSpotlight');
+    const tutorialProgressFill=document.getElementById('tutorialProgressFill');
+    const tutorialFeedback=document.getElementById('tutorialFeedback');
+    const visibleMatterOnly=document.getElementById('visibleMatterOnly');
+    let tutorialIndex=0,tutorialTarget=null,tutorialCompleted=[],tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false;
+    function tutorialInstruction(){
+      const step=tutorialSteps[tutorialIndex];
+      if(tutorialIndex>=1&&tutorialIndex<=4&&mondMode)return 'Switch back to NFW first. '+step.action;
+      if(tutorialIndex===1){
+        if(tutorialShortcutUnlocked)return 'The Visible Matter Only button is a shortcut to set halo mass to 0 again. Compare the orange line with the observed points.';
+        if(Number(massSlider.value)===0)return 'The mass is already 0. Move it up, then drag it all the way left to 0.';
+      }
+      if(tutorialIndex===9){
+        if(mondMode)return 'Switch back to NFW first; MOND does not use a dark matter halo. '+step.action;
+        if(Number(massSlider.value)===0)return 'Increase halo mass above 0 first so there is a halo to see. '+step.action;
+        if(viewPanel.classList.contains('collapsed'))return 'Open View first. '+step.action;
+      }
+      return step.action;
+    }
+    function tutorialAttentionTarget(){
+      if(mondMode&&((tutorialIndex>=1&&tutorialIndex<=4)||tutorialIndex===9))return document.querySelector('#modelBar .track');
+      if(tutorialIndex===9){
+        if(Number(massSlider.value)===0)return massSlider;
+        if(viewPanel.classList.contains('collapsed'))return viewToggle;
+      }
+      return tutorialTarget;
+    }
+    function refreshTutorialGuidance(){
+      if(tutorialCard.hidden)return;
+      tutorialTry.textContent='Try it: '+tutorialInstruction();
+      updateTutorialSpotlight();
+    }
+    function scrollTutorialTarget(){
+      const step=tutorialSteps[tutorialIndex],target=tutorialAttentionTarget();
+      const top=target.getBoundingClientRect().top+window.scrollY-(step.gesture==='scan'||step.gesture==='drag'?16:75);
+      window.scrollTo({top:Math.max(0,top),behavior:'auto'});
+    }
+    function completeTutorialAction(step,message){
+      if(tutorialCard.hidden||tutorialIndex!==step||tutorialCompleted[step])return;
+      tutorialCompleted[step]=message;
+      tutorialFeedback.hidden=false;
+      tutorialFeedback.textContent='✓ '+message;
+      tutorialSpotlight.classList.add('is-complete');
+    }
+    function tutorialIsFullscreen(){return !!nativeFsElement()||orbitPlot.classList.contains('fullscreen-active');}
+    function updateTutorialSpotlight(){
+      if(tutorialCard.hidden||tutorialIsFullscreen()){tutorialSpotlight.hidden=true;return;}
+      const step=tutorialSteps[tutorialIndex];
+      let target=tutorialAttentionTarget(),gesture=step.gesture;
+      if(target!==tutorialTarget){
+        gesture=target===massSlider?'increase':'click';
+      }else if(gesture==='switch'){
+        target=document.querySelector('#modelBar .track');gesture='click';
+      }else if(gesture==='guide'){
+        target=document.querySelector('#theoryGuide summary');gesture='click';
+      }
+      const rect=target.getBoundingClientRect();
+      if(rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
+      tutorialSpotlight.hidden=false;
+      const pad=gesture==='scan'||gesture==='drag'?4:6;
+      tutorialSpotlight.style.left=(rect.left-pad)+'px';
+      tutorialSpotlight.style.top=(rect.top-pad)+'px';
+      tutorialSpotlight.style.width=(rect.width+2*pad)+'px';
+      tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
+      tutorialSpotlight.classList.toggle('is-click',gesture==='click');
+      let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
+      if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
+      if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
+      if(gesture==='zero'||gesture==='increase'||gesture==='adjust'){
+        const fraction=(Number(target.value)-Number(target.min))/(Number(target.max)-Number(target.min));
+        fromX=8+(rect.width-16)*fraction;
+        const destination=gesture==='zero'?0:gesture==='increase'?Math.min(1,Math.max(.55,fraction+.2)):(fraction>.5?.2:.8);
+        toX=8+(rect.width-16)*destination;
+      }
+      tutorialSpotlight.style.setProperty('--from-x',(fromX+pad)+'px');
+      tutorialSpotlight.style.setProperty('--to-x',(toX+pad)+'px');
+      tutorialSpotlight.style.setProperty('--from-y',(fromY+pad)+'px');
+      tutorialSpotlight.style.setProperty('--to-y',(toY+pad)+'px');
+    }
+    function syncTutorialFullscreen(){
+      const fullscreen=tutorialIsFullscreen();
+      const parent=fullscreen?orbitPlot:document.body;
+      if(tutorialCard.parentElement!==parent)parent.appendChild(tutorialCard);
+      if(tutorialSpotlight.parentElement!==parent)parent.appendChild(tutorialSpotlight);
+      tutorialFullscreen.hidden=!fullscreen;
+      tutorialBack.disabled=fullscreen||tutorialIndex===0;
+      tutorialNext.disabled=fullscreen;
+      updateTutorialSpotlight();
+    }
+    function showTutorialStep(){
+      const step=tutorialSteps[tutorialIndex];
+      const backHadFocus=document.activeElement===tutorialBack;
+      tutorialLastMass=Number(massSlider.value);
+      tutorialLastScale=Number(scaleSlider.value);
+      tutorialLastTime=Number(timeSlider.value);
+      tutorialDrag=null;
+      tutorialTarget=document.getElementById(step.target);
+      tutorialProgress.textContent=`Tutorial · ${tutorialIndex+1} / ${tutorialSteps.length}`;
+      tutorialProgressFill.style.width=`${100*(tutorialIndex+1)/tutorialSteps.length}%`;
+      tutorialTitle.textContent=step.title;
+      tutorialText.textContent=step.text;
+      tutorialTry.textContent='Try it: '+tutorialInstruction();
+      tutorialFeedback.hidden=!tutorialCompleted[tutorialIndex];
+      tutorialFeedback.textContent=tutorialCompleted[tutorialIndex]?'✓ '+tutorialCompleted[tutorialIndex]:'';
+      tutorialSpotlight.classList.toggle('is-complete',!!tutorialCompleted[tutorialIndex]);
+      document.getElementById('tutorialContent').scrollTop=0;
+      tutorialBack.disabled=tutorialIndex===0;
+      tutorialNext.textContent=tutorialIndex===tutorialSteps.length-1?'Finish':'Next';
+      tutorialCard.classList.toggle('on-left',innerWidth>960&&tutorialIndex!==7);
+      document.body.classList.toggle('tutorial-view-intro',tutorialIndex===8);
+      syncTutorialFullscreen();
+      if(tutorialBack.disabled&&backHadFocus)tutorialNext.focus({preventScroll:true});
+      if(!tutorialIsFullscreen()){
+        scrollTutorialTarget();
+      }
+      updateTutorialSpotlight();
+    }
+    function startTutorial(){
+      if(tutorialWelcome.open)tutorialWelcome.close();
+      tutorialIndex=0;
+      tutorialCompleted=[];
+      visibleMatterOnly.hidden=!tutorialShortcutUnlocked;
+      document.body.classList.add('tutorial-active');
+      tutorialCard.hidden=false;
+      showTutorialStep();
+      tutorialTitle.focus({preventScroll:true});
+    }
+    function endTutorial(){
+      tutorialTarget=null;
+      tutorialCard.hidden=true;
+      tutorialSpotlight.hidden=true;
+      visibleMatterOnly.hidden=false;
+      tutorialSpotlight.classList.remove('is-interacting');
+      document.body.classList.remove('tutorial-active');
+      document.body.classList.remove('tutorial-view-intro');
+      (tutorialIsFullscreen()?fsBtn:tutorialLaunch).focus({preventScroll:true});
+    }
+    ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>tutorialCard.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
+    document.addEventListener('fullscreenchange',syncTutorialFullscreen);
+    document.addEventListener('webkitfullscreenchange',syncTutorialFullscreen);
+    window.addEventListener('scroll',updateTutorialSpotlight,{passive:true});
+    window.addEventListener('resize',updateTutorialSpotlight);
+    [massSlider,scaleSlider].forEach(slider=>{
+      slider.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
+      slider.addEventListener('change',updateTutorialSpotlight);
+    });
+    massSlider.addEventListener('input',()=>{
+      const value=Number(massSlider.value);
+      const crossedZero=(value===0)!==(tutorialLastMass===0);
+      if(!mondMode){
+        if(!tutorialCard.hidden&&value===0&&!tutorialShortcutUnlocked){
+          tutorialShortcutUnlocked=true;
+          visibleMatterOnly.hidden=false;
+          visibleMatterOnly.classList.add('tutorial-reveal');
+        }
+        if(value===0)completeTutorialAction(1,'Visible matter only selected.');
+        if(value>tutorialLastMass)completeTutorialAction(2,'Halo mass increased.');
+        if(value!==tutorialLastMass)completeTutorialAction(4,'Model settings adjusted.');
+      }
+      tutorialLastMass=value;
+      if(crossedZero&&(tutorialIndex===1||tutorialIndex===9))refreshTutorialGuidance();
+    });
+    massSlider.addEventListener('change',()=>{
+      if(!tutorialCard.hidden&&tutorialIndex===9&&!mondMode&&Number(massSlider.value)>0)scrollTutorialTarget();
+    });
+    scaleSlider.addEventListener('input',()=>{
+      const value=Number(scaleSlider.value);
+      if(!mondMode&&value!==tutorialLastScale){
+        completeTutorialAction(3,'Halo shape adjusted.');
+        completeTutorialAction(4,'Model settings adjusted.');
+      }
+      tutorialLastScale=value;
+    });
+    document.getElementById('visibleMatterOnly').addEventListener('click',()=>{
+      if(!mondMode)completeTutorialAction(1,'Visible matter only selected.');
+      tutorialLastMass=Number(massSlider.value);
+    });
+    document.getElementById('applyObservedFit').addEventListener('click',()=>{
+      if(!mondMode)completeTutorialAction(4,'Starting fit restored.');
+      tutorialLastMass=Number(massSlider.value);
+      tutorialLastScale=Number(scaleSlider.value);
+    });
+    document.getElementById('playPauseBtn').addEventListener('click',()=>{
+      if(playing)completeTutorialAction(6,'Simulation playing.');
+    });
+    timeSlider.addEventListener('input',()=>{
+      const value=Number(timeSlider.value);
+      if(value!==tutorialLastTime)completeTutorialAction(6,'Timeline adjusted.');
+      tutorialLastTime=value;
+    });
+    orbitPlot.addEventListener('pointerdown',e=>{
+      if(!tutorialCard.hidden&&tutorialIndex===7&&!e.target.closest('#viewPanel'))tutorialDrag={id:e.pointerId,x:e.clientX,y:e.clientY};
+    });
+    orbitPlot.addEventListener('pointermove',e=>{
+      if(tutorialDrag&&e.pointerId===tutorialDrag.id&&Math.hypot(e.clientX-tutorialDrag.x,e.clientY-tutorialDrag.y)>6){
+        completeTutorialAction(7,'View explored.');
+        tutorialDrag=null;
+      }
+    });
+    window.addEventListener('pointerup',()=>{tutorialDrag=null;});
+    window.addEventListener('pointercancel',()=>{tutorialDrag=null;});
+    ['viewReset','viewFaceOn','viewEdgeOn','toggleOrbits','viewFullHalo'].forEach(id=>{
+      document.getElementById(id).addEventListener('click',()=>completeTutorialAction(7,'View explored.'));
+    });
+    viewToggle.addEventListener('click',()=>{
+      completeTutorialAction(8,'View controls toggled.');
+      refreshTutorialGuidance();
+      if(!tutorialCard.hidden&&tutorialIndex===9)scrollTutorialTarget();
+    });
+    fullHaloBtn.addEventListener('click',()=>completeTutorialAction(9,'Full halo view selected.'));
+    document.querySelectorAll('#theoryGuide details').forEach(details=>{
+      details.addEventListener('toggle',()=>{if(details.open)completeTutorialAction(10,'Theory guide opened.');});
+    });
+    window.addEventListener('pointerup',()=>tutorialSpotlight.classList.remove('is-interacting'));
+    window.addEventListener('pointercancel',()=>tutorialSpotlight.classList.remove('is-interacting'));
+    [visibleMatterOnly,document.getElementById('applyObservedFit')].forEach(button=>button.addEventListener('click',refreshTutorialGuidance));
+    mondToggle.addEventListener('change',()=>{
+      if(mondMode)completeTutorialAction(5,'MOND selected.');
+      refreshTutorialGuidance();
+      if(!tutorialCard.hidden&&tutorialIndex===9)scrollTutorialTarget();
+    });
+    document.getElementById('tutorialStart').addEventListener('click',startTutorial);
+    document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
+    tutorialLaunch.addEventListener('click',startTutorial);
+    document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
+    tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0){tutorialIndex--;showTutorialStep();}});
+    tutorialNext.addEventListener('click',()=>{
+      if(tutorialIndex===tutorialSteps.length-1){endTutorial();return;}
+      tutorialIndex++;showTutorialStep();
+    });
+    document.addEventListener('keydown',e=>{
+      if(tutorialCard.hidden||tutorialIsFullscreen()||e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
+      if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+      const control=e.target instanceof Element?e.target.closest('input,select,textarea,button,a,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="radio"]'):null;
+      if(control&&control!==tutorialBack&&control!==tutorialNext)return;
+      e.preventDefault();
+      (e.key==='ArrowRight'?tutorialNext:tutorialBack).click();
+    });
+    tutorialWelcome.showModal();
   </script>
 </body>
 </html>

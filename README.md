@@ -63,6 +63,16 @@ Then open <http://localhost:8000/>. Commit the regenerated `index.html` when
 the dashboard is meant to change. Keep the checked-in data and generated QR
 images in sync with any change to the page's data or destination URL.
 
+The dashboard offers an optional hands-on tutorial when opened. Visitors can
+skip it at any point and restart it using the Tutorial button beside the
+gravity model switch. The tour does not reset or change simulator settings.
+It covers the View controls and the scale of the full halo. On a keyboard,
+the left and right arrow keys navigate the tour when a control is not being
+edited. During the tutorial, the Visible Matter Only shortcut appears after
+the halo mass is first moved to zero; skipping the tutorial makes it available.
+In NFW mode, Visible Matter Only sets the halo mass to zero without changing
+the scale radius; Apply Observed Fit restores the starting halo settings.
+
 ## Project map
 
 - `Baseline_Baryonic_Model_3d`: orbit simulation that writes trajectory data
