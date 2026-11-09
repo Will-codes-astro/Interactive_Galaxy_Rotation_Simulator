@@ -325,7 +325,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div id="haloCaption" style="position:absolute;left:12px;bottom:12px;color:rgba(255,255,255,0.75);font-family:monospace;font-size:11px;background:rgba(0,0,0,0.45);padding:4px 8px;border-radius:4px;pointer-events:none;z-index:100;max-width:60%"></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewVisible" title="Move in close to watch the stars orbit">View Visible Galaxy</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND assumes one fixed a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
     </section>
     <section class="learn" aria-label="Theory guide">
@@ -611,7 +611,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             constructor(camera,element,options={}) {
                 this.camera=camera;this.element=element;this.dragMode='rotate';
                 this.o=Object.assign({damping:11,touchDamping:5,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
-                    minDistance:5,maxDistance:450,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
+                    minDistance:5,maxDistance:1000,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
                     initial:{theta:-0.82,phi:1.01,radius:72,target:[0,0,0]},onChange:()=>{}},options);
                 const i=this.o.initial;
                 this.goal={theta:i.theta,phi:i.phi,radius:i.radius,target:new THREE.Vector3(...i.target)};
@@ -767,7 +767,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         renderer.setClearColor(0x020206, 1.0); // Deep space dark navy/black.
         orbitPlot.appendChild(renderer.domElement);
         const scene=new THREE.Scene();
-        const camera=new THREE.PerspectiveCamera(40,1,1,2000);
+        const camera=new THREE.PerspectiveCamera(40,1,1,3000);
         const distantStarCount=900,distantStarPositions=new Float32Array(distantStarCount*3);
         let starSeed=3198;
         const randomStar=()=>{starSeed=(starSeed*1664525+1013904223)>>>0;return starSeed/4294967296;};
@@ -916,6 +916,90 @@ HTML_TEMPLATE = r"""<!doctype html>
         orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(orbitLineIdx.length*orbitSegs*6),3));
         const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x9ff0ff,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
+
+        /* ---------- NFW dark matter halo visual ----------
+           Points are drawn from the true NFW enclosed-mass profile M(<r) ~ ln(1+x)-x/(1+x), x=r/rs,
+           truncated at r200. Fixed uniform samples are re-mapped whenever M200 or rs changes, so the
+           cloud's size (r200 ~ M200^(1/3)) and central concentration (c=r200/rs) track the sliders. */
+        const HALO_POINTS=16000,HALO_TABLE=512;
+        const haloGroup=new THREE.Group();haloGroup.visible=false;scene.add(haloGroup);
+        const haloU=new Float32Array(HALO_POINTS),haloDirs=new Float32Array(HALO_POINTS*3);
+        (()=>{const rng=mulberry32(8200);for(let i=0;i<HALO_POINTS;i++){
+            haloU[i]=rng();const cz=2*rng()-1,sz=Math.sqrt(1-cz*cz),ph=2*Math.PI*rng();
+            haloDirs[i*3]=sz*Math.cos(ph);haloDirs[i*3+1]=sz*Math.sin(ph);haloDirs[i*3+2]=cz;}})();
+        const haloGeom=new THREE.BufferGeometry();
+        haloGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(HALO_POINTS*3),3));
+        haloGeom.setAttribute('aFrac',new THREE.BufferAttribute(new Float32Array(HALO_POINTS),1));
+        const haloUniforms={uScale:{value:600},uAlpha:{value:0.2},uSize:{value:2.5}};
+        const haloPoints=new THREE.Points(haloGeom,new THREE.ShaderMaterial({
+            uniforms:haloUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+            vertexShader:`            attribute float aFrac;uniform float uScale;uniform float uSize;varying float vFrac;varying float vFade;
+                            void main(){vFrac=aFrac;vec4 mv=modelViewMatrix*vec4(position,1.0);vFade=0.08+0.92*smoothstep(40.0,200.0,-mv.z);
+                            gl_PointSize=clamp(uSize*uScale/max(-mv.z,1.0),2.0,10.0);gl_Position=projectionMatrix*mv;}`,
+                        fragmentShader:`varying float vFrac;varying float vFade;uniform float uAlpha;
+                void main(){vec2 d=gl_PointCoord-0.5;float r2=dot(d,d)*4.0;if(r2>1.0)discard;
+                vec3 inner=vec3(0.55,0.35,1.0),outer=vec3(0.15,0.35,0.9);
+                float a=exp(-3.0*r2)*uAlpha*vFade*mix(1.0,0.55,vFrac);
+                gl_FragColor=vec4(mix(inner,outer,sqrt(vFrac)),a);}`
+        }));
+        haloPoints.frustumCulled=false;haloPoints.renderOrder=1;haloGroup.add(haloPoints);
+        // Faint rim marking the virial radius r200.
+        const haloShell=new THREE.Mesh(new THREE.IcosahedronGeometry(1,4),new THREE.ShaderMaterial({
+            uniforms:{uFade:{value:1}},
+            transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+            vertexShader:`varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);
+                vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`,
+            fragmentShader:`varying vec3 vN;varying vec3 vV;uniform float uFade;void main(){float f=1.0-abs(dot(normalize(vN),normalize(vV)));
+                gl_FragColor=vec4(0.3,0.45,1.0,uFade*(0.05+0.4*pow(f,2.5)));}`
+        }));
+        haloShell.frustumCulled=false;haloShell.renderOrder=1;haloGroup.add(haloShell);
+        // Geodesic (icosahedral) grid: uniform cells with no pole pinching.
+                const haloGrid=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1,2)),
+            new THREE.LineBasicMaterial({color:0x5a7dff,transparent:true,opacity:0.13,depthWrite:false,blending:THREE.AdditiveBlending}));
+        haloGrid.frustumCulled=false;haloGrid.renderOrder=1;haloGroup.add(haloGrid);
+        let haloR200=158;
+        const haloToggle=document.getElementById('toggleHalo'),haloCaption=document.getElementById('haloCaption');
+        let haloHidden=false;
+        const fullHaloBtn=document.getElementById('viewFullHalo');
+        document.getElementById('viewVisible').addEventListener('click',()=>controls.flyTo({theta:GALAXY_VIEW.theta,phi:GALAXY_VIEW.phi,radius:GALAXY_VIEW.radius*0.6,target:[0,0,0]}));
+        fullHaloBtn.addEventListener('click',()=>{
+            if(haloHidden)haloToggle.click();
+            controls.flyTo({theta:GALAXY_VIEW.theta,phi:1.2,radius:haloR200*4.2,target:[0,0,0]});
+        });
+        const nfwShape=x=>Math.log1p(x)-x/(1+x);
+        function updateHaloVisual(massT,rs){
+            const show=!mondMode&&!haloHidden&&massT>0;
+            haloGroup.visible=show;
+            haloToggle.disabled=mondMode;fullHaloBtn.disabled=mondMode||massT<=0;
+            haloToggle.setAttribute('aria-disabled',String(mondMode));
+            haloCaption.hidden=mondMode||massT<=0;
+            if(mondMode||massT<=0){requestRender();return;}
+            const rhoCrit=3*H0*H0/(8*Math.PI*G);
+            const r200=Math.cbrt(3*massT*1e12/(4*Math.PI*200*rhoCrit)),c=r200/rs,mc=nfwShape(c);
+            // Invert the enclosed-mass fraction -> x table by bisection.
+            const table=new Float32Array(HALO_TABLE+1);
+            for(let k=1;k<=HALO_TABLE;k++){
+                const target=k/HALO_TABLE*mc;let lo=0,hi=c;
+                for(let it=0;it<40;it++){const mid=(lo+hi)/2;if(nfwShape(mid)<target)lo=mid;else hi=mid;}
+                table[k]=(lo+hi)/2*rs;
+            }
+            const pos=haloGeom.attributes.position.array,frac=haloGeom.attributes.aFrac.array;
+            for(let i=0;i<HALO_POINTS;i++){
+                const t=haloU[i]*HALO_TABLE,k=Math.min(Math.floor(t),HALO_TABLE-1),r=table[k]+(t-k)*(table[k+1]-table[k]);
+                pos[i*3]=haloDirs[i*3]*r;pos[i*3+1]=haloDirs[i*3+1]*r;pos[i*3+2]=haloDirs[i*3+2]*r;frac[i]=r/r200;
+            }
+            haloGeom.attributes.position.needsUpdate=true;haloGeom.attributes.aFrac.needsUpdate=true;
+            haloShell.scale.setScalar(r200);haloGrid.scale.setScalar(r200);haloR200=r200;
+            haloUniforms.uAlpha.value=0.05+0.28*Math.min(1,massT/2);
+            haloCaption.textContent=`NFW halo · r200 ${r200.toFixed(0)} kpc · rs ${rs.toFixed(1)} kpc · c ${c.toFixed(1)}`;
+            requestRender();
+        }
+        haloToggle.addEventListener('click',()=>{
+            haloHidden=!haloHidden;
+            haloToggle.setAttribute('aria-pressed',String(haloHidden));
+            haloToggle.textContent=haloHidden?'Show halo':'Hide halo';
+            updateHaloVisual(Number(massSlider.value),Number(scaleSlider.value));
+        });
         function fillOrbitLines(){
             const a=orbitLineGeom.attributes.position.array;let o=0;
             for(const idx of orbitLineIdx){
@@ -1153,7 +1237,10 @@ HTML_TEMPLATE = r"""<!doctype html>
                 }
                 needsRender=true;
             }
-            if(needsRender){needsRender=false;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);}
+            if(needsRender){needsRender=false;haloUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
+                // Fade the boundary grid as the camera closes in on the visible galaxy.
+                const haloFade=0.3+0.7*Math.min(1,Math.max(0,(controls.view.radius-30)/120));
+                haloShell.material.uniforms.uFade.value=haloFade;haloGrid.material.opacity=0.13*haloFade;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);}
             requestAnimationFrame(renderLoop);
         }
         resizeOrbit();requestAnimationFrame(renderLoop);
@@ -1192,6 +1279,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       Plotly.relayout('curvePlot',{'yaxis.range':[0,yMax]});
+      updateHaloVisual(massT,rs);
       clearTimeout(orbitModelTimer);
       orbitModelTimer=setTimeout(()=>{
           activeTrajectories=integrateTrajectories(massT,rs);
