@@ -325,7 +325,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div id="haloCaption" style="position:absolute;left:12px;bottom:12px;color:rgba(255,255,255,0.75);font-family:monospace;font-size:11px;background:rgba(0,0,0,0.45);padding:4px 8px;border-radius:4px;pointer-events:none;z-index:100;max-width:60%"></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewVisible" title="Move in close to watch the stars orbit">View Visible Galaxy</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div id="haloCaption" style="position:absolute;left:12px;bottom:12px;color:rgba(255,255,255,0.75);font-family:monospace;font-size:11px;background:rgba(0,0,0,0.45);padding:4px 8px;border-radius:4px;pointer-events:none;z-index:100;max-width:60%"></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export Raw Data (CSV)</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div></div></article>
       <article class="panel"><div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div><div class="key" aria-label="Colour key"><div class="key-title">What the colours mean</div><ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of NGC 3198 (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li></ul></div><details class="chi-note"><summary>Why isn't χ² exactly 0?</summary><p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p><p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND assumes one fixed a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p></details></article>
     </section>
     <section class="learn" aria-label="Theory guide">
@@ -643,8 +643,9 @@ HTML_TEMPLATE = r"""<!doctype html>
                 el.removeEventListener('contextmenu',h.menu);el.removeEventListener('dblclick',h.dbl);
             }
             // Eases to a preset; theta takes the shortest way round so the camera never spins the long way.
-            flyTo({theta,phi,radius,target}={}) {
+            flyTo({theta,phi,radius,target,rate}={}) {
                 const g=this.goal;
+                this.flyRate=rate||0;
                 if(theta!==undefined){
                     const turn=Math.PI*2;
                     g.theta=theta+Math.round((this.view.theta-theta)/turn)*turn;
@@ -655,12 +656,13 @@ HTML_TEMPLATE = r"""<!doctype html>
                 this.velocity.theta=this.velocity.phi=0;
                 this.o.onChange();
             }
-            reset() {this.flyTo(this.o.initial);}
+            reset() {this.flyTo(Object.assign({rate:this.view.radius>200?3:0},this.o.initial));}
             _down(e) {
                 if(e.pointerType==='mouse'&&e.button>2)return;
                 try{this.element.setPointerCapture(e.pointerId);}catch(_){}
                 this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:e.button,shift:e.shiftKey||e.ctrlKey||e.metaKey,type:e.pointerType});
                 this.touchActive=e.pointerType==='touch';
+                this.flyRate=0;
                 this.velocity.theta=this.velocity.phi=0;
                 if(this.pointers.size===2)this.pinch=this._pinchState();
                 this.element.classList.add('dragging');
@@ -733,6 +735,7 @@ HTML_TEMPLATE = r"""<!doctype html>
                 this.o.onChange();
             }
             _wheel(e) {
+                this.flyRate=0;
                 e.preventDefault();
                 const unit=e.deltaMode===1?16:e.deltaMode===2?100:1;
                 const delta=Math.max(-400,Math.min(400,e.deltaY*unit))*(e.ctrlKey?2.5:1);
@@ -743,10 +746,11 @@ HTML_TEMPLATE = r"""<!doctype html>
             _clampRadius(v) {return Math.max(this.o.minDistance,Math.min(this.o.maxDistance,v));}
             // Returns true while the view is still easing toward the goal (caller keeps rendering).
             update(dt) {
-                const g=this.goal,v=this.view,rate=this.touchActive?this.o.touchDamping:this.o.damping,a=1-Math.exp(-rate*Math.min(dt,0.1));
+                const g=this.goal,v=this.view,rate=this.flyRate||(this.touchActive?this.o.touchDamping:this.o.damping),a=1-Math.exp(-rate*Math.min(dt,0.1));
                 const dTheta=g.theta-v.theta,dPhi=g.phi-v.phi,dR=g.radius-v.radius;
                 const dT=g.target.distanceTo(v.target);
                 if(Math.abs(dTheta)<1e-5&&Math.abs(dPhi)<1e-5&&Math.abs(dR)<1e-3&&dT<1e-3) {
+                    this.flyRate=0;
                     if(dTheta||dPhi||dR||dT){v.theta=g.theta;v.phi=g.phi;v.radius=g.radius;v.target.copy(g.target);this._apply();return true;}
                     return false;
                 }
@@ -961,10 +965,9 @@ HTML_TEMPLATE = r"""<!doctype html>
         const haloToggle=document.getElementById('toggleHalo'),haloCaption=document.getElementById('haloCaption');
         let haloHidden=false;
         const fullHaloBtn=document.getElementById('viewFullHalo');
-        document.getElementById('viewVisible').addEventListener('click',()=>controls.flyTo({theta:GALAXY_VIEW.theta,phi:GALAXY_VIEW.phi,radius:GALAXY_VIEW.radius*0.6,target:[0,0,0]}));
         fullHaloBtn.addEventListener('click',()=>{
             if(haloHidden)haloToggle.click();
-            controls.flyTo({theta:GALAXY_VIEW.theta,phi:1.2,radius:haloR200*4.2,target:[0,0,0]});
+            controls.flyTo({theta:GALAXY_VIEW.theta,phi:1.2,radius:haloR200*4.2,target:[0,0,0],rate:3});
         });
         const nfwShape=x=>Math.log1p(x)-x/(1+x);
         function updateHaloVisual(massT,rs){
