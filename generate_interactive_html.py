@@ -49,6 +49,8 @@ ROTATION_COLUMNS = (
 )
 HALO_MASS_STEP_MSUN = 1e10  # resolution of the halo mass slider (0.01 x 10^12 Msun)
 HALO_SCALE_STEP_KPC = 0.5  # resolution of the scale radius slider
+# Concentrations c = r200 / rs of stable NFW halos; outside this range the sandbox shows its warning.
+STABLE_CONCENTRATION = (3.0, 25.0)
 
 
 def load_trajectories(path: Path) -> list[dict[str, Any]]:
@@ -325,6 +327,49 @@ HTML_TEMPLATE = r"""<!doctype html>
     .galaxy-bar select:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
     .galaxy-bar option { background:#0a111b; color:var(--ink); }
     .galaxy-summary { color:var(--muted); font-size:12px; }
+    .preset-picker { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+    .preset-picker[hidden], .sandbox[hidden], .stability-chip[hidden] { display:none; }
+    .source-toggle { display:inline-grid; grid-template-columns:1fr 1fr; padding:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
+    .source-toggle label { position:relative; cursor:pointer; }
+    .source-toggle input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
+    .source-toggle span { display:block; padding:5px 14px; border-radius:999px; color:var(--muted); font-size:12px; text-align:center; white-space:nowrap; transition:background .15s,color .15s; }
+    .source-toggle label:hover input:not(:checked) + span { color:var(--ink); }
+    .source-toggle input:checked + span { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    .source-toggle input:focus-visible + span { outline:2px solid var(--cyan); outline-offset:2px; }
+    .sandbox { margin-bottom:14px; padding:13px 16px 14px; border:1px solid var(--line); background:var(--panel); border-radius:5px; }
+    .sandbox-head { display:flex; align-items:baseline; justify-content:space-between; gap:6px 16px; flex-wrap:wrap; margin-bottom:12px; }
+    .sandbox-head p { margin:0; color:var(--muted); font-size:12px; }
+    .sandbox-groups { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px 22px; }
+    .sandbox-group { display:flex; flex-direction:column; gap:10px; min-width:0; }
+    .sandbox-group h3 { margin:0; color:var(--cyan); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
+    .sandbox .control-help { min-height:0; }
+    .sandbox-summary { margin:0; display:grid; grid-template-columns:1fr auto; gap:3px 12px; padding:9px 11px; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); font-size:12px; }
+    .sandbox-summary dt { color:var(--muted); }
+    .sandbox-summary dd { margin:0; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
+    .sandbox-footer { display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:11px; }
+    .sandbox-footer p { margin:0; }
+    .stability { margin-top:14px; padding:12px 14px; border:1px solid rgba(95,208,224,0.3); border-radius:8px; background:rgba(95,208,224,0.05); }
+    .stability[data-state=diffuse], .stability[data-state=dense] { border-color:rgba(255,138,128,0.55); background:rgba(255,138,128,0.07); }
+    .stability[data-state=none] { border-color:rgba(120,150,180,0.25); background:rgba(120,150,180,0.05); }
+    .stability-head { display:flex; align-items:center; justify-content:space-between; gap:8px 14px; flex-wrap:wrap; }
+    .stability-title { color:#c3cfdb; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+    .stability-badge { padding:3px 11px; border-radius:999px; border:1px solid rgba(95,208,224,0.55); background:rgba(95,208,224,0.1); color:#8fe3ee; font-size:12px; font-weight:600; }
+    .stability[data-state=diffuse] .stability-badge, .stability[data-state=dense] .stability-badge { border-color:rgba(255,138,128,0.7); background:rgba(255,138,128,0.14); color:#ffb4ac; }
+    .stability[data-state=none] .stability-badge { border-color:rgba(120,150,180,0.35); background:rgba(120,150,180,0.08); color:var(--muted); font-weight:400; }
+    .stability-reading { display:flex; align-items:baseline; flex-wrap:wrap; gap:4px 14px; margin:10px 0 2px; }
+    .stability-c { font-size:20px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
+    .stability-detail { color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+    .c-gauge { position:relative; height:8px; margin:12px 6px 0; border-radius:999px; background:rgba(255,138,128,0.28); }
+    .c-band { position:absolute; top:0; bottom:0; border-radius:999px; background:rgba(95,208,224,0.55); }
+    .c-marker { position:absolute; top:-4px; width:4px; height:16px; margin-left:-2px; border-radius:2px; background:#f4f7fb; box-shadow:0 0 0 2px rgba(5,9,16,0.8); transition:left .12s; }
+    .stability[data-state=none] .c-marker { opacity:0; }
+    .c-ticks { position:relative; height:16px; margin:5px 6px 0; color:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; }
+    .c-ticks span { position:absolute; transform:translateX(-50%); }
+    .stability-message { margin:8px 0 0; color:#9fb0c2; font-size:12px; }
+    .stability-chip { position:absolute; top:44px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
+    @media (prefers-reduced-motion:reduce) { .c-marker { transition:none; } }
+    @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
+    @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
     .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .learn details { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px; }
     .learn summary { cursor:pointer; padding:12px 0; font-size:14px; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center; }
@@ -490,10 +535,49 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
   </header>
   <main>
-    <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy preset">
-      <label class="model-label" for="galaxySelect">Galaxy</label>
-      <select id="galaxySelect" autocomplete="off" aria-describedby="galaxySummary" title="Choose which SPARC galaxy to model"></select>
-      <span class="galaxy-summary" id="galaxySummary" role="status" aria-live="polite"></span>
+    <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
+      <div class="source-toggle" role="radiogroup" aria-label="Galaxy source">
+        <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span>Preset Galaxies</span></label>
+        <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span>Custom Sandbox</span></label>
+      </div>
+      <div class="preset-picker" id="presetPicker">
+        <label class="model-label" for="galaxySelect">Galaxy</label>
+        <select id="galaxySelect" autocomplete="off" aria-describedby="galaxySummary" title="Choose which SPARC galaxy to model"></select>
+        <span class="galaxy-summary" id="galaxySummary" role="status" aria-live="polite"></span>
+      </div>
+    </section>
+    <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
+      <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2><p>Build a galaxy from its visible anatomy. Nothing is blocked: push the sliders to extremes to build a “monster galaxy”.</p></div>
+      <div class="sandbox-groups">
+        <div class="sandbox-group">
+          <h3>Stellar disk</h3>
+          <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Total mass of the stars in the flat disk.</p></div>
+          <div class="control"><label for="sbDiskScale"><span>Scale length, R<sub>d</sub></span><output id="sbDiskScaleValue" for="sbDiskScale"></output></label><input id="sbDiskScale" type="range" min="1.5" max="6" step="0.1" value="3.1" autocomplete="off"><p class="control-help">How quickly the disk fades outwards: the brightness falls by a factor of e every R<sub>d</sub>.</p></div>
+          <div class="control"><label for="sbTruncation"><span>Truncation radius, R<sub>max</sub></span><output id="sbTruncationValue" for="sbTruncation"></output></label><input id="sbTruncation" type="range" min="15" max="40" step="0.5" value="30" autocomplete="off"><p class="control-help">Outer edge of the galaxy's visible matter.</p></div>
+        </div>
+        <div class="sandbox-group">
+          <h3>Bulge</h3>
+          <div class="control"><label for="sbBulgeMass"><span>Bulge mass, M<sub>bulge</sub></span><output id="sbBulgeMassValue" for="sbBulgeMass"></output></label><input id="sbBulgeMass" type="range" min="0" max="5e10" step="1e8" value="0" autocomplete="off"><p class="control-help">Mass of the round central cluster of stars. Zero gives a pure disk galaxy.</p></div>
+          <div class="control" id="sbBulgeRadiusControl"><label for="sbBulgeRadius"><span>Effective radius, r<sub>b</sub></span><output id="sbBulgeRadiusValue" for="sbBulgeRadius"></output></label><input id="sbBulgeRadius" type="range" min="0.2" max="2" step="0.1" value="1" autocomplete="off"><p class="control-help" id="sbBulgeRadiusHelp">The radius containing half of the bulge's light.</p></div>
+        </div>
+        <div class="sandbox-group">
+          <h3>Gas</h3>
+          <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of the cold gas, mostly hydrogen, that extends beyond the stars.</p></div>
+          <dl class="sandbox-summary" aria-label="Sandbox galaxy summary">
+            <dt>Total visible mass</dt><dd id="sbTotalMass"></dd>
+            <dt>Bulge-to-total (stars)</dt><dd id="sbBulgeFraction"></dd>
+            <dt>Gas fraction</dt><dd id="sbGasFraction"></dd>
+          </dl>
+        </div>
+      </div>
+      <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor">
+        <div class="stability-head"><span class="stability-title">Halo stability monitor</span><span class="stability-badge" id="stabilityBadge" role="status"></span></div>
+        <div class="stability-reading"><span class="stability-c" id="stabilityC">c = —</span><span class="stability-detail" id="stabilityDetail"></span></div>
+        <div class="c-gauge" aria-hidden="true"><div class="c-band" id="cBand"></div><div class="c-marker" id="cMarker"></div></div>
+        <div class="c-ticks" id="cTicks" aria-hidden="true"></div>
+        <p class="stability-message" id="stabilityMessage"></p>
+      </div>
+      <div class="sandbox-footer"><p>Preview: the anatomy sliders define your galaxy and update the summary, and the stability monitor reads the halo sliders below. The rotation curve and 3D orbits still show <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> until the next update couples them to this physics.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
     </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
@@ -507,7 +591,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;">Escaped: <span id="escape-count-val">0</span> / 800</div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -1616,8 +1700,112 @@ __GALAXIES_JS__
       const total=mondMode?vBary.map((v,i)=>mondVelocity(v,radii[i])):vBary.map((v,i)=>Math.hypot(v,halo[i]));
       return{halo,total};
     }
+    /* ---------- Custom sandbox ----------
+       "Custom Sandbox" swaps the galaxy dropdown for six anatomy sliders (disk, bulge, gas) and a halo stability
+       monitor. sandbox holds the current anatomy; a 'sandboxchange' event announces every change. The monitor
+       never blocks anything: out-of-range halos only raise a warning so unphysical "monster galaxies" can be run. */
+    const [STABLE_C_MIN,STABLE_C_MAX]=DATA.stable_concentration;
+    const superscript=n=>String(n).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d]);
+    const formatMass=m=>{
+      if(!(m>0))return '0 M☉';
+      const e=Math.floor(Math.log10(m));
+      return `${(m/10**e).toFixed(2)} × 10${superscript(e)} M☉`;
+    };
+    const formatKpc=v=>`${v.toFixed(1)} kpc`;
+    const formatPercent=f=>`${(100*f).toFixed(1)}%`;
+    const SANDBOX_SLIDERS=[
+      {key:'diskMass',id:'sbDiskMass',format:formatMass},
+      {key:'diskScale',id:'sbDiskScale',format:formatKpc},
+      {key:'truncation',id:'sbTruncation',format:formatKpc},
+      {key:'bulgeMass',id:'sbBulgeMass',format:formatMass},
+      {key:'bulgeRadius',id:'sbBulgeRadius',format:formatKpc},
+      {key:'gasMass',id:'sbGasMass',format:formatMass},
+    ].map(slider=>({...slider,input:document.getElementById(slider.id),output:document.getElementById(slider.id+'Value')}));
+    const sandbox={};
+    const sandboxPanel=document.getElementById('sandboxPanel'),presetPicker=document.getElementById('presetPicker');
+    const bulgeRadiusControl=document.getElementById('sbBulgeRadiusControl');
+    const bulgeRadiusHelp=document.getElementById('sbBulgeRadiusHelp');
+    const BULGE_RADIUS_HELP=bulgeRadiusHelp.textContent;
+    function updateSandbox(){
+      SANDBOX_SLIDERS.forEach(({key,input,output,format})=>{
+        sandbox[key]=Number(input.value);
+        output.textContent=format(sandbox[key]);
+      });
+      const noBulge=sandbox.bulgeMass<=0;
+      bulgeRadiusControl.classList.toggle('disabled',noBulge);
+      bulgeRadiusControl.setAttribute('aria-disabled',String(noBulge));
+      document.getElementById('sbBulgeRadius').disabled=noBulge;
+      bulgeRadiusHelp.textContent=noBulge?'No bulge: this is a pure disk galaxy.':BULGE_RADIUS_HELP;
+      const stellar=sandbox.diskMass+sandbox.bulgeMass,visible=stellar+sandbox.gasMass;
+      document.getElementById('sbTotalMass').textContent=formatMass(visible);
+      document.getElementById('sbBulgeFraction').textContent=formatPercent(sandbox.bulgeMass/stellar);
+      document.getElementById('sbGasFraction').textContent=formatPercent(sandbox.gasMass/visible);
+      document.dispatchEvent(new CustomEvent('sandboxchange',{detail:{...sandbox}}));
+    }
+    SANDBOX_SLIDERS.forEach(({input})=>input.addEventListener('input',updateSandbox));
+    document.getElementById('sandboxReset').addEventListener('click',()=>{
+      SANDBOX_SLIDERS.forEach(({input})=>{input.value=input.defaultValue;});
+      updateSandbox();
+    });
+    updateSandbox();
+
+    // Halo stability monitor: concentration c = r200 / rs of the current NFW halo.
+    const stabilityMonitor=document.getElementById('stabilityMonitor'),stabilityBadge=document.getElementById('stabilityBadge');
+    const stabilityChip=document.getElementById('stabilityChip');
+    const C_GAUGE_MIN=1,C_GAUGE_MAX=100;
+    const gaugePosition=c=>100*Math.min(1,Math.max(0,Math.log(c/C_GAUGE_MIN)/Math.log(C_GAUGE_MAX/C_GAUGE_MIN)))+'%';
+    const cBand=document.getElementById('cBand');
+    cBand.style.left=gaugePosition(STABLE_C_MIN);
+    cBand.style.width=`${parseFloat(gaugePosition(STABLE_C_MAX))-parseFloat(gaugePosition(STABLE_C_MIN))}%`;
+    [C_GAUGE_MIN,STABLE_C_MIN,10,STABLE_C_MAX,C_GAUGE_MAX].forEach(c=>{
+      const tick=document.createElement('span');
+      tick.textContent=c;tick.style.left=gaugePosition(c);
+      document.getElementById('cTicks').append(tick);
+    });
+    const UNSTABLE_BADGE='⚠️ Unphysical / Unstable Galaxy Profile';
+    function stabilityReport(){
+      if(mondMode)return{state:'none',badge:'No halo to assess',message:'MOND has no dark matter halo, so there is no concentration to check. Switch back to the NFW halo to see it.'};
+      const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
+      if(massT<=0)return{state:'none',badge:'No halo to assess',message:'With the halo mass at zero there is no halo to check. Raise it to see its concentration.'};
+      const r200=Math.cbrt(3*massT*1e12/(4*Math.PI*200*(3*H0*H0/(8*Math.PI*G))));
+      const c=r200/rs,range=`${STABLE_C_MIN} and ${STABLE_C_MAX}`;
+      const report={c,r200,rs};
+      if(c<STABLE_C_MIN)return{...report,state:'diffuse',badge:UNSTABLE_BADGE,
+        message:`c is below ${STABLE_C_MIN}: this halo is far more spread out than real NFW halos, whose concentrations stay between ${range}. You can still run the simulation to see how the galaxy behaves.`};
+      if(c>STABLE_C_MAX)return{...report,state:'dense',badge:UNSTABLE_BADGE,
+        message:`c is above ${STABLE_C_MAX}: this halo packs its mass into an extremely dense centre, beyond real NFW halos, whose concentrations stay between ${range}. You can still run the simulation to see how the galaxy behaves.`};
+      return{...report,state:'stable',badge:'✓ Stable halo profile',message:`c is inside the ${STABLE_C_MIN}–${STABLE_C_MAX} range seen for real NFW halos. The monitor follows the halo mass and scale radius sliders.`};
+    }
+    function updateStability(){
+      const report=stabilityReport(),unstable=report.state==='diffuse'||report.state==='dense';
+      stabilityMonitor.dataset.state=report.state;
+      if(stabilityBadge.textContent!==report.badge)stabilityBadge.textContent=report.badge;
+      document.getElementById('stabilityC').textContent=report.c===undefined?'c = —':`c = ${report.c.toFixed(1)}`;
+      document.getElementById('stabilityDetail').innerHTML=report.c===undefined?'':`r<sub>200</sub> ${report.r200.toFixed(0)} kpc ÷ r<sub>s</sub> ${report.rs.toFixed(1)} kpc`;
+      document.getElementById('cMarker').style.left=report.c===undefined?'0%':gaugePosition(report.c);
+      document.getElementById('stabilityMessage').textContent=report.message;
+      const showChip=galaxyMode==='custom'&&unstable;
+      stabilityChip.hidden=!showChip;
+      if(showChip&&stabilityChip.textContent!==UNSTABLE_BADGE)stabilityChip.textContent=UNSTABLE_BADGE;
+    }
+
+    let galaxyMode='preset';
+    const galaxyModeRadios=[...document.querySelectorAll('input[name=galaxyMode]')];
+    function setGalaxyMode(mode){
+      galaxyMode=mode;
+      const custom=mode==='custom';
+      galaxyModeRadios.forEach(radio=>{radio.checked=radio.value===mode;});
+      presetPicker.hidden=custom;
+      sandboxPanel.hidden=!custom;
+      updateStability();
+      document.dispatchEvent(new CustomEvent('galaxymodechange',{detail:{mode}}));
+    }
+    galaxyModeRadios.forEach(radio=>radio.addEventListener('change',()=>{if(radio.checked)setGalaxyMode(radio.value);}));
+    setGalaxyMode(galaxyModeRadios.find(radio=>radio.checked).value);
+
     function updateHalo(){
       syncFsSliders();
+      updateStability();
       clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
       const{halo,total}=modelCurves(massT,rs);
@@ -1677,6 +1865,7 @@ __GALAXIES_JS__
       updateHalo();
     });
     function queueSliderUpdate(){
+      updateStability();
       document.getElementById('massValue').textContent=`${Number(massSlider.value).toFixed(2)} × 10¹² M☉`;
       document.getElementById('scaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
       if(sliderUpdateTimer===null)sliderUpdateTimer=setTimeout(updateHalo,100);
@@ -1849,6 +2038,8 @@ __GALAXIES_JS__
       tutorialLastTime=Number(timeSlider.value);
       refreshTutorialGuidance();
     });
+    // Opening or closing the sandbox panel moves the page content, so re-aim the tutorial pointer.
+    document.addEventListener('galaxymodechange',refreshTutorialGuidance);
     function tutorialInstruction(){
       const step=tutorialSteps[tutorialIndex];
       if(tutorialIndex>=1&&tutorialIndex<=4&&mondMode)return 'Switch back to NFW first. '+step.action;
@@ -2113,6 +2304,7 @@ def main() -> None:
         "frame_step_myr": 1.0,
         "total_time_myr": 1000.0,
         "default_galaxy_id": DEFAULT_PRESET.sparc_id,
+        "stable_concentration": list(STABLE_CONCENTRATION),
     }
     html = HTML_TEMPLATE.replace(
         "__DATA_JSON__",

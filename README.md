@@ -81,6 +81,18 @@ offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
 `table2.dat`) and run the generator again. It reads that galaxy's rows, fits
 its starting NFW halo and rewrites both files.
 
+The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
+a builder with six anatomy sliders: stellar disk mass, disk scale length,
+truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
+radius is disabled while the bulge mass is zero. The sandbox never blocks a
+configuration. Its halo stability monitor computes the concentration
+c = r200 / rs of the current NFW halo from the halo mass and scale radius
+sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile" badge (also over
+the 3D view) whenever c falls outside 3–25 (`STABLE_CONCENTRATION` in the
+generator). The anatomy sliders currently drive only the sandbox summary and a
+`sandboxchange` event; the rotation curve and 3D orbits keep showing the last
+preset galaxy until the physics is coupled in a later stage.
+
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tour does not reset or change simulator settings.
