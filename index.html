@@ -100,7 +100,11 @@
     .c-ticks { position:relative; height:16px; margin:5px 6px 0; color:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; }
     .c-ticks span { position:absolute; transform:translateX(-50%); }
     .stability-message { margin:8px 0 0; color:#9fb0c2; font-size:12px; }
-    .stability-chip { position:absolute; top:64px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
+    .telemetry { position:absolute; top:12px; left:12px; z-index:100; min-width:176px; padding:7px 11px 8px; border:1px solid rgba(255,255,255,.14); border-radius:10px; background:rgba(8,14,24,.42); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); box-shadow:0 4px 18px rgba(0,0,0,.3); color:rgba(255,255,255,.78); font:11px/1.5 ui-monospace,Consolas,monospace; letter-spacing:.4px; pointer-events:none; }
+    .tm-row { display:flex; justify-content:space-between; gap:16px; }
+    .tm-row b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
+    .tm-sub { margin:1px 0 3px; padding-bottom:3px; border-bottom:1px solid rgba(255,255,255,.1); font-size:10px; opacity:.7; }
+    .stability-chip { position:absolute; top:112px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
     @media (prefers-reduced-motion:reduce) { .c-marker { transition:none; } }
     @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
     @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
@@ -328,7 +332,7 @@
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" style="position: absolute; top: 12px; left: 12px; color: rgba(255,255,255,0.75); font-family: monospace; font-size: 11px; background: rgba(0,0,0,0.45); padding: 4px 8px; border-radius: 4px; pointer-events: none; z-index: 100; letter-spacing: 0.5px;"><div>Ejected: <span id="escape-count-val">0</span> / <span id="star-total-val">800</span></div><div id="star-detail" style="font-size: 10px; opacity: 0.7;"></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation telemetry"><div class="tm-row"><span id="tm-eject-label">Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div id="star-detail" class="tm-sub"></div><div class="tm-row"><span>Disk R<sub>d</sub> / edge</span><b id="tm-disk">—</b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -663,7 +667,7 @@ window.GALAXIES = {
                 const gasMass=rotation.v_gas_kms[n-1]**2*rLast/G;
                 return{diskMass,diskScale,rMax:rLast,bulgeMass:bulgeMass>1e6?bulgeMass:0,bulgeRadius:Math.max(0.05,halfRadius/(1+Math.SQRT2)),gasMass};
             }
-            return{buildGalaxy,baselineHalo,anatomyFromRotation};
+            return{buildGalaxy,baselineHalo,anatomyFromRotation,GAS_SCALE_RATIO};
         })();
 
         /* ---------- Test-star population ----------
@@ -1286,8 +1290,44 @@ window.GALAXIES = {
         const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x9ff0ff,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
 
+        // Cold gas: a faint, thicker, more extended exponential cloud (PhysicsEngine.GAS_SCALE_RATIO x the stellar scale
+        // length, cut at R_max) drawn as soft points; its brightness follows the gas mass.
+        const GAS_POINTS=2400,GAS_SCALE_HEIGHT=0.35,GAS_REFERENCE_MASS=2e10;
+        const gasSeeds=(()=>{
+            const rng=mulberry32(2403),uniform=new Float32Array(GAS_POINTS*2),gauss=new Float32Array(GAS_POINTS*3);
+            for(let i=0;i<GAS_POINTS*2;i++)uniform[i]=rng();
+            for(let i=0;i<GAS_POINTS*3;i++)gauss[i]=boxMuller(0,1,rng);
+            return{uniform,gauss};
+        })();
+        function createSoftTexture(){
+            const canvas=document.createElement('canvas');
+            canvas.width=canvas.height=64;
+            const ctx=canvas.getContext('2d'),grad=ctx.createRadialGradient(32,32,0,32,32,32);
+            grad.addColorStop(0,'rgba(255,255,255,0.9)');grad.addColorStop(0.45,'rgba(255,255,255,0.3)');grad.addColorStop(1,'rgba(255,255,255,0)');
+            ctx.fillStyle=grad;ctx.fillRect(0,0,64,64);
+            return new THREE.CanvasTexture(canvas);
+        }
+        const gasGeometry=new THREE.BufferGeometry();
+        gasGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(GAS_POINTS*3),3).setUsage(THREE.DynamicDrawUsage));
+        const gasMaterial=new THREE.PointsMaterial({map:createSoftTexture(),color:0x5fc8e6,size:1.6,sizeAttenuation:true,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,depthWrite:false});
+        const gasCloud=new THREE.Points(gasGeometry,gasMaterial);
+        gasCloud.frustumCulled=false;gasCloud.renderOrder=0;scene.add(gasCloud);
+        function fillGasCloud(anatomy){
+            const a=gasGeometry.attributes.position.array,scale=PhysicsEngine.GAS_SCALE_RATIO*anatomy.diskScale;
+            for(let i=0;i<GAS_POINTS;i++){
+                const R=diskRadius(gasSeeds.uniform[2*i],scale,0,anatomy.rMax),phi=2*Math.PI*gasSeeds.uniform[2*i+1];
+                a[3*i]=R*Math.cos(phi);a[3*i+1]=R*Math.sin(phi);a[3*i+2]=gasSeeds.gauss[3*i]*GAS_SCALE_HEIGHT;
+            }
+            gasGeometry.attributes.position.needsUpdate=true;
+            gasMaterial.opacity=0.1+0.2*Math.min(1,Math.sqrt(anatomy.gasMass/GAS_REFERENCE_MASS));
+        }
+
         // Refills the star meshes (position, size, colour) and the orbit-line selection from the current population.
         function syncStarMeshes(){
+            fillGasCloud(currentAnatomy);
+            // Camera framing for Reset / Face-on / Edge-on: NGC 3198 (extent 22 kpc) keeps its original distance.
+            const extent=Math.min(55,Math.max(11,Math.max(6*currentAnatomy.diskScale,0.5*currentAnatomy.rMax)));
+            GALAXY_VIEW.radius=Math.hypot(0.55,-1.0,0.8)*40*extent/22;
             starMesh.count=starCount;
             glowGeometry.setDrawRange(0,starCount);
             const m=new THREE.Matrix4(),c=new THREE.Color(),glowColors=glowGeometry.attributes.color.array;
@@ -1365,6 +1405,7 @@ window.GALAXIES = {
         const nfwShape=x=>Math.log1p(x)-x/(1+x);
         function updateHaloVisual(massT,rs){
             const show=!mondMode&&!haloHidden&&massT>0;
+            document.getElementById('tm-r200').textContent=mondMode||massT<=0?'no halo':`${Math.cbrt(3*massT*1e12/(4*Math.PI*200*(3*H0*H0/(8*Math.PI*G)))).toFixed(0)} kpc`;
             haloGroup.visible=show;
             haloToggle.disabled=mondMode;fullHaloBtn.disabled=mondMode||massT<=0;
             haloToggle.setAttribute('aria-disabled',String(mondMode));
@@ -1425,7 +1466,9 @@ window.GALAXIES = {
             const diskStars=starCount-bulgeStarCount;
             document.getElementById('star-total-val').textContent=starCount;
             document.getElementById('starCountStat').textContent=starCount;
-            document.getElementById('star-detail').textContent=`${diskStars} disk${bulgeStarCount>0?` + ${bulgeStarCount} bulge`:''} · ejected beyond ${ejectionRadius.toFixed(0)} kpc`;
+            document.getElementById('tm-eject-label').textContent=`Ejected > ${ejectionRadius.toFixed(0)} kpc`;
+            document.getElementById('star-detail').textContent=`${diskStars} disk${bulgeStarCount>0?` + ${bulgeStarCount} bulge`:''} stars`;
+            document.getElementById('tm-disk').textContent=`${currentAnatomy.diskScale.toFixed(1)} / ${currentAnatomy.rMax.toFixed(0)} kpc`;
             document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
             lastEscaped=-1;
         }
@@ -2007,7 +2050,7 @@ window.GALAXIES = {
       referenceSpeedSquared=presetReferenceSpeedSquared;
       const anatomy=presetAnatomy(galaxy);
       setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),PRESET_TEMPLATE_MASS));
-      syncStarMeshes();updateStarTelemetry();
+      syncStarMeshes();updateStarTelemetry();controls.reset();
       // Restart the orbit clock and integrate the new population in the new galaxy's potential.
       simTime=0;window.simTime=0;syncTimelineUI(0);
       refreshOrbits();

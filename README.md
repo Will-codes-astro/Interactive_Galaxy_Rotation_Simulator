@@ -142,6 +142,14 @@ Test stars:
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
   dense centres never meet a force singularity.
 
+The 3D view also draws the cold gas as a faint blue cloud: an exponential disk
+three times as extended as the stars, cut at R_max, whose brightness follows
+the gas mass. The Reset view, Face-on and Edge-on distances scale with the
+galaxy (NGC 3198 keeps its original framing), and switching galaxy or mode
+re-frames the camera. The glass telemetry panel over the 3D view shows the
+ejected count and ejection radius, the disk / bulge star split, the disk scale
+length and edge, and the halo r200 ("no halo" in MOND or at zero halo mass).
+
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tour does not reset or change simulator settings.
