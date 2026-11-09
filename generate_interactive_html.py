@@ -468,10 +468,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     document.querySelectorAll('details').forEach(details=>{
       const summary=details.querySelector('summary');
       const content=summary.nextElementSibling;
-      let animation=null, closing=false;
-      summary.addEventListener('click',event=>{
-        event.preventDefault();
-        const opening=!details.open||closing;
+      let animation=null, pinned=details.open, hovered=false, targetOpen=details.open;
+      function updateDisclosure(){
+        const opening=pinned||hovered;
+        if(opening===targetOpen)return;
+        targetOpen=opening;
         const height=details.open?content.getBoundingClientRect().height:0;
         const opacity=details.open?Number(getComputedStyle(content).opacity):0;
         if(animation){
@@ -479,12 +480,10 @@ HTML_TEMPLATE = r"""<!doctype html>
           animation=null;
           content.style.overflow='';
         }
-        closing=!opening;
         details.open=true;
         content.inert=!opening;
         if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
           details.open=opening;
-          closing=false;
           content.inert=false;
           return;
         }
@@ -499,8 +498,18 @@ HTML_TEMPLATE = r"""<!doctype html>
           content.style.overflow='';
           animation.cancel();
           animation=null;
-          closing=false;
         };
+      }
+      details.addEventListener('pointerenter',event=>{
+        if(event.pointerType!=='touch'){hovered=true;updateDisclosure();}
+      });
+      details.addEventListener('pointerleave',event=>{
+        if(event.pointerType!=='touch'){hovered=false;updateDisclosure();}
+      });
+      summary.addEventListener('click',event=>{
+        event.preventDefault();
+        pinned=!pinned;
+        updateDisclosure();
       });
     });
     const DATA = __DATA_JSON__;

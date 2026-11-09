@@ -73,8 +73,8 @@ the halo mass is first moved to zero; skipping the tutorial makes it available.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
 the scale radius; Apply Observed Fit restores the starting halo settings.
 The View controls start collapsed. The rotation-curve guide combines the
-colour key and fit explanation, and the halo values reveal their definitions
-on hover or when selected with a mouse, touch, or keyboard.
+colour key and fit explanation. The guide, theory boxes and halo values reveal
+their explanations on hover or when selected with a mouse, touch, or keyboard.
 
 ## Project map
 
