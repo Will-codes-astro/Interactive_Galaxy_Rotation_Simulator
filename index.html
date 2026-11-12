@@ -2285,75 +2285,75 @@ window.GALAXIES = {
       main:{label:'Tutorial',steps:[
         {id:'puzzle',target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
          text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
-         action:'Move your mouse (or tap) along the right-hand side of the graph and compare the two. Do the white points fall away with the cyan line, or stay above it? Hover over any point to read its exact speed.'},
+         action:'Move your mouse (or tap) along the right of the graph. Do the white points fall with the cyan line, or stay above it?'},
         {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',title:'Take the dark matter away',
          text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
          action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
         {id:'addHalo',nfw:true,target:'massSlider',gesture:'increase',title:'Add the halo back',
-         text:'A dark matter halo is a huge cloud of invisible matter surrounding the galaxy. It gives off no light, but its gravity pulls on the stars and makes them orbit faster. This slider sets how much mass the halo has.',
+         text:'A dark matter halo is a huge cloud of invisible matter around the galaxy. Its gravity makes the stars orbit faster. This slider sets its mass.',
          action:'Drag halo mass to the right and watch the orange line rise. Can you make it run through the white points?'},
         {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
          text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
          action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it.'},
         {id:'haloNumbers',nfw:true,halo:true,cardRight:true,target:'haloMetrics',gesture:'click',title:'Read the halo’s numbers',
-         text:'These three cards describe the halo your two sliders have built. The halo radius, r₂₀₀, is how far the halo reaches: far beyond the stars. The scale radius is the one you just set. Concentration, c, is the halo radius divided by the scale radius, so a high c means the dark matter is packed towards the centre.',
-         action:'Press each card to read what its number means. The numbers update whenever you move a halo slider.'},
+         text:'These cards describe the halo you have built. r₂₀₀ is how far it reaches, far beyond the stars. Concentration, c, is r₂₀₀ divided by the scale radius: a high c means the dark matter is packed towards the centre.',
+         action:'Press each card to read what it means.'},
         {id:'fit',nfw:true,target:'applyObservedFit',gesture:'click',title:'Score your fit',
-         text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap. “Understanding the colours and χ²”, just under the graph, is a key to every colour.',
-         action:'Try to lower χ² using both halo sliders. Then press the button under the halo mass slider to jump back to the starting fit.'},
+         text:'χ² (chi-squared), in the badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better. The residual bars under the graph show each gap.',
+         action:'Try to lower χ² with both halo sliders. Apply Observed Fit jumps back to the starting fit.'},
         {id:'mond',target:'modelBar',gesture:'switch',title:'Test a rival idea',
-         text:'MOND takes the opposite approach: there is no dark matter at all. Instead, gravity is stronger than Newton’s law predicts wherever it is extremely weak, as it is in the outer galaxy. The halo sliders switch off because MOND has no halo.',
-         action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the one you had for the halo.'},
+         text:'MOND has no dark matter at all. Instead, gravity is stronger than Newton’s law predicts where it is very weak, as in the outer galaxy. The halo sliders switch off.',
+         action:'Switch to MOND. The orange line is now MOND’s prediction. Compare its χ² with the halo’s.'},
         {id:'mondFit',mond:true,mode:'preset',target:'mondFitWrap',gesture:'click',title:'Give MOND its best shot',
-         text:'MOND has one tuning number, a₀, and the visible matter depends on the mass-to-light ratio, which is only an estimate. The MOND best fit switch adjusts both until χ² is as low as it can go for this galaxy. It only appears in MOND mode.',
+         text:'MOND has one tuning number, a₀, and the visible matter depends on the mass-to-light ratio, which is only an estimate. MOND best fit adjusts both to get the lowest χ².',
          action:'Turn on MOND best fit, at the top right of the page, and see how far χ² drops. Then switch the gravity model back to NFW.'},
         {id:'play',nfw:true,target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
-         text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones. The Orbit time slider beside Play jumps to any moment, and the Space bar also plays and pauses.',
+         text:'The 3D view moves simulated test stars under the chosen model’s gravity for one billion years. The Orbit time slider jumps to any moment; Space plays and pauses.',
          action:'Press Play. Then drag halo mass down to 0 and watch again: without the halo’s gravity, the outer stars drift away.'},
         {id:'look',cardRight:true,target:'orbitPlot',gesture:'drag',title:'Look around the galaxy',
-         text:'The small readout in the top corner counts “ejected” stars: those further out than 1.5 times the galaxy’s outer radius. It is a simple distance check, so an ejected star has not necessarily escaped for good. Below it is the halo radius, r₂₀₀.',
+         text:'The readout in the top corner counts “ejected” stars: those beyond 1.5 times the galaxy’s outer radius. It is only a distance check, so they may not have escaped for good.',
          action:'Drag to spin the galaxy. Use the mouse wheel or a pinch gesture to zoom.'},
         {id:'view',target:'viewToggle',gesture:'click',title:'Change what you see',
-         text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. The speed buttons slow down or speed up the orbits. Fullscreen fills the screen with the galaxy and keeps the two halo sliders in a corner; press Esc to leave it.',
-         action:'Press View to open or close the panel, then try Edge-on or Orbit lines. The two dimmed halo buttons come next.'},
+         text:'The View panel sets the camera and what is drawn: set angles, orbit lines, hiding the gas or halo, playback speed and fullscreen (Esc leaves it).',
+         action:'Try Edge-on or Orbit lines.'},
         {id:'fullHalo',nfw:true,halo:true,target:'viewFullHalo',gesture:'click',title:'See how big the halo is',
-         text:'In this model the visible galaxy is only the small bright middle of a far larger halo. The blue sphere reaches out to r₂₀₀, the radius used to mark where the halo ends. It is an illustration: a real halo is invisible and fades out gradually, with no sharp edge.',
+         text:'The visible galaxy is only the bright middle of a far larger halo. The blue sphere marks r₂₀₀. It is only an illustration: a real halo is invisible and has no sharp edge.',
          action:'Press View Full Halo to zoom right out and see how small the galaxy looks. Use Reset view to come back.'},
         {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',title:'Try another galaxy',
-         text:'Everything so far used one galaxy. The Galaxy menu loads other real galaxies from the SPARC survey. Each has its own measured speeds, its own visible matter and its own starting halo.',
+         text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo.',
          action:'Choose a different galaxy. Does it show the same gap between the white points and the cyan line?'},
         {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',title:'How heavy are the stars?',
-         text:'Telescopes measure a galaxy’s light, not its mass. The mass-to-light ratio turns one into the other, and it sets how high the cyan line sits. The values used here are standard averages, not measured for each galaxy, so they are an assumption.',
+         text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. The values here are standard averages, so they are an assumption.',
          action:'Hover over or tap the ? beside Mass-to-light at the top of the page to read more.'},
         {id:'finish',target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
          text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
-         action:'Open the theory guide below to read more. Export raw data, at the very bottom, downloads the numbers as CSV files. Sandbox tour, below, shows you how to build a galaxy of your own. You can restart this tutorial from the button beside the gravity model switch.'}
+         action:'Open the theory guide below to read more, or take the Sandbox tour to build your own galaxy. Export raw data, at the bottom, downloads the numbers.'}
       ]},
       sandbox:{label:'Sandbox tour',steps:[
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',title:'Build your own galaxy',
-         text:'The Custom Sandbox swaps the real galaxy for one you design. You choose how much mass its stars and gas have and how they are spread out. The simulator then works out its rotation curve, gives it a matching dark matter halo and sets its stars in orbit.',
-         action:'Look at the three groups of sliders: stellar disk, bulge and gas. Each one is a part of a galaxy that telescopes can see.'},
+         text:'The Custom Sandbox swaps the real galaxy for one you design. You set the mass of its stars and gas and how they are spread out; the simulator does the rest.',
+         action:'There are three groups of sliders: stellar disk, bulge and gas.'},
         {id:'sbDisk',mode:'custom',target:'sbDiskMass',gesture:'adjust',title:'Make the disk heavier or lighter',
-         text:'The disk is the flat, spinning part of a galaxy, where most of its stars are. More mass means stronger gravity, so the cyan visible-matter line rises. The halo grows too, because galaxies with more stars are found in bigger halos.',
+         text:'The disk is the flat, spinning part of a galaxy, where most stars are. More mass lifts the cyan line, and the halo grows too, since galaxies with more stars sit in bigger halos.',
          action:'Drag the disk mass up and down. Watch the cyan line, and the halo mass slider further down the page.'},
         {id:'sbSize',mode:'custom',target:'sbDiskScale',gesture:'adjust',title:'Spread the stars out',
-         text:'The scale length sets how quickly the disk fades from the centre outwards. A short one crowds the stars into the middle; a long one spreads them out. The truncation radius, below it, is where the galaxy’s visible matter ends.',
+         text:'The scale length sets how quickly the disk fades outwards. The truncation radius, below it, is where the visible matter ends.',
          action:'Change the scale length, then the truncation radius. Watch the peak of the cyan line move and the 3D galaxy change size.'},
         {id:'sbBulge',mode:'custom',target:'sbBulgeMass',gesture:'increase',title:'Add a bulge',
          text:'A bulge is the round ball of stars at the centre of some galaxies. It puts a lot of mass in a small space, so it speeds up the innermost orbits.',
          action:'Raise the bulge mass above zero. The inner part of the cyan line climbs, and the effective radius slider switches on so you can set the bulge’s size.'},
         {id:'sbGas',mode:'custom',target:'sbGasMass',gesture:'adjust',title:'Add the gas',
-         text:'Galaxies also hold cold gas, mostly hydrogen. Here it lies in a disk three times more spread out than the stars, so it matters most in the outer galaxy. The 3D view draws it as a faint blue cloud.',
+         text:'Galaxies also hold cold gas, mostly hydrogen, in a disk three times wider than the stars, so it matters most far out.',
          action:'Change the gas mass and watch the outer part of the cyan line.'},
         {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',title:'Check the totals',
-         text:'This list adds your galaxy up. The baseline halo is the dark matter halo a galaxy with this mass of stars would typically have, taken from a published link between stellar mass and halo mass (Moster et al. 2013). The number of test stars grows with the galaxy’s mass.',
-         action:'Read the list, then move any slider above it and see which numbers change.'},
+         text:'This list adds your galaxy up. The baseline halo is the typical halo for this mass of stars (Moster et al. 2013).',
+         action:'Move any slider above and see which numbers change.'},
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',scroll:'stabilityMonitor',gesture:'adjust',title:'Is the halo realistic?',
-         text:`The halo stability monitor, under the rotation curve, checks the halo’s concentration, c: its radius divided by its scale radius. Real halos have c between ${STABLE_C_MIN} and ${STABLE_C_MAX}. Outside that range the monitor warns you that the halo is unrealistic, but it never stops you.`,
+         text:`The halo stability monitor, under the rotation curve, checks the halo’s concentration, c. Real halos have c between ${STABLE_C_MIN} and ${STABLE_C_MAX}; outside that it warns you, but never stops you.`,
          action:'Drag the scale radius all the way to one end, then the other, until the warning appears.'},
         {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',gesture:'adjust',title:'Tune the halo yourself',
-         text:'The halo sliders still work here. Halo mass runs from 0 to 5 times the baseline. The stars begin on orbits that suit the baseline halo, so changing the halo shows what too little or too much dark matter does to them.',
-         action:'Lower the halo mass and press Play: with too little dark matter the outer stars drift away and the ejected count climbs. Apply SHMR Baseline puts the halo back, and Reset anatomy starts the galaxy again.'}
+         text:'The halo sliders still work here, from 0 to 5 times the baseline. The stars start on orbits that suit the baseline halo.',
+         action:'Lower the halo mass and press Play: the outer stars drift away. Apply SHMR Baseline puts the halo back.'}
       ]}
     };
     const tutorialWelcome=document.getElementById('tutorialWelcome'),tutorialCard=document.getElementById('tutorialCard');
@@ -2437,6 +2437,10 @@ window.GALAXIES = {
       tutorialSpotlight.classList.add('is-complete');
     }
     function tutorialIsFullscreen(){return !!nativeFsElement()||orbitPlot.classList.contains('fullscreen-active');}
+    // Keeps the highlight glued to its control when the control or the page changes size without a scroll or window
+    // resize: a hover box opening inside it, a <details> section expanding above it, the sandbox panel appearing.
+    const spotlightResize=window.ResizeObserver?new ResizeObserver(()=>{if(!tutorialCard.hidden)updateTutorialSpotlight();}):null;
+    if(spotlightResize)spotlightResize.observe(document.body);
     function updateTutorialSpotlight(){
       if(tutorialCard.hidden||tutorialIsFullscreen()){tutorialSpotlight.hidden=true;return;}
       const step=tutorialStep(),blocker=tutorialBlocker();
@@ -2447,7 +2451,10 @@ window.GALAXIES = {
         target=document.querySelector('#theoryGuide summary');gesture='click';
       }
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
-      if(target!==tutorialAimTarget){tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached');}
+      if(target!==tutorialAimTarget){
+        if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
+        tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached');
+      }
       const rect=target.getBoundingClientRect();
       if((!rect.width&&!rect.height)||rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
       tutorialSpotlight.hidden=false;
@@ -2553,7 +2560,8 @@ window.GALAXIES = {
     }
     window.addEventListener('pointermove',tutorialPointerReach,{capture:true,passive:true});
     window.addEventListener('pointerdown',tutorialPointerReach,{capture:true,passive:true});
-    window.addEventListener('scroll',updateTutorialSpotlight,{passive:true});
+    // Capture also catches scrolling inside panels, not just the page.
+    window.addEventListener('scroll',updateTutorialSpotlight,{capture:true,passive:true});
     window.addEventListener('resize',updateTutorialSpotlight);
     const sandboxInputs=SANDBOX_SLIDERS.map(slider=>slider.input);
     [massSlider,scaleSlider,...sandboxInputs].forEach(slider=>{
