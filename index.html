@@ -93,6 +93,14 @@
     .source-toggle input:checked + span { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
     .source-toggle input:focus-visible + span { outline:2px solid var(--cyan); outline-offset:2px; }
     .sandbox { margin-bottom:14px; padding:13px 16px 14px; border:1px solid var(--line); background:var(--panel); border-radius:5px; }
+    .galaxy-type { margin:0 0 12px; padding:10px 14px 11px; border:1px solid rgba(242,200,121,0.3); border-left:3px solid var(--gold); border-radius:6px; background:linear-gradient(160deg,rgba(242,200,121,0.08),rgba(242,200,121,0.01)); }
+    .galaxy-type-kicker { margin:0; color:var(--muted); font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
+    .galaxy-type h3 { margin:2px 0 4px; color:var(--gold); font-size:16px; }
+    .galaxy-type p { margin:0 0 5px; font-size:12.5px; line-height:1.45; }
+    .galaxy-type .galaxy-type-example { color:var(--muted); font-size:12px; }
+    .galaxy-type-tags { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; padding:0; list-style:none; }
+    .galaxy-type-tags li { padding:2px 9px; border:1px solid var(--line); border-radius:999px; color:var(--cyan); font-size:11px; }
+    .galaxy-type .galaxy-type-note { margin:0; color:var(--muted); font-size:10.5px; }
     .sandbox-head { display:flex; align-items:baseline; justify-content:space-between; gap:6px 16px; flex-wrap:wrap; margin-bottom:12px; }
     .sandbox-head p { margin:0; color:var(--muted); font-size:12px; }
     .sandbox-groups { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px 22px; }
@@ -372,6 +380,14 @@
     </section>
     <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
       <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2><p>Build a galaxy from its visible anatomy. Nothing is blocked: push the sliders to extremes to build a “monster galaxy”.</p></div>
+      <div class="galaxy-type" id="galaxyType">
+        <p class="galaxy-type-kicker">What you have built</p>
+        <h3 id="gtName" aria-live="polite"></h3>
+        <p id="gtText"></p>
+        <p class="galaxy-type-example" id="gtExample"></p>
+        <ul class="galaxy-type-tags" id="gtTags" aria-label="Galaxy traits"></ul>
+        <p class="galaxy-type-note">A rough guide, not a strict rule: the type comes from the star mass, bulge-to-total ratio, gas fraction and disk surface density (Hubble 1926; Freeman 1970; Graham &amp; Worley 2008).</p>
+      </div>
       <div class="sandbox-groups" id="sandboxGroups">
         <div class="sandbox-group">
           <h3>Stellar disk</h3>
@@ -2050,6 +2066,57 @@ window.GALAXIES = {
     const bulgeRadiusControl=document.getElementById('sbBulgeRadiusControl');
     const bulgeRadiusHelp=document.getElementById('sbBulgeRadiusHelp');
     const BULGE_RADIUS_HELP=bulgeRadiusHelp.textContent;
+    // Galaxy type card: names the kind of galaxy the anatomy sliders describe. Thresholds are rules of thumb:
+    // Hubble-type bulge-to-total ratios (Graham & Worley 2008) and low surface brightness meaning a central stellar
+    // surface density well below Freeman's (1970) typical disk value.
+    function classifyGalaxy(g){
+      const stellar=g.diskMass+g.bulgeMass,bt=g.bulgeMass/stellar,gasFrac=g.gasMass/(stellar+g.gasMass);
+      const sigma0=g.diskMass/(2*Math.PI*(g.diskScale*1e3)**2); // central disk surface density, M☉/pc²
+      const tags=[];
+      if(stellar>=8e10)tags.push('Giant');
+      if(stellar<3e9)tags.push('Dark matter dominated');
+      if(gasFrac>=0.4)tags.push('Gas-rich: lots of fuel for new stars');else if(gasFrac<0.1)tags.push('Gas-poor: few new stars');
+      if(g.bulgeMass<=0)tags.push('No bulge');else if(bt>=0.4)tags.push('Big bulge');
+      if(sigma0<100)tags.push('Faint, spread-out disk');else if(g.diskScale<=2)tags.push('Compact disk');
+      let type;
+      if(stellar>=1.2e11&&g.gasMass>=1.5e10)type={name:'Monster galaxy',
+        text:'Every dial turned up. This is heavier than almost any spiral known: a bright, gas-stuffed giant that needs a huge halo to keep its outer stars from flying off.',
+        example:'Closest real cousin: UGC 2885 (“Rubin’s galaxy”), one of the largest spirals known.'};
+      else if(stellar<3e9&&gasFrac>=0.5)type={name:'Gas-rich dwarf irregular',
+        text:'A small, scruffy galaxy with more gas than stars. Its gravity is so weak that dark matter (or MOND) does almost all the work, which makes dwarfs some of the best tests in this project.',
+        example:'Real example: DDO 154, where the gas outweighs the stars.'};
+      else if(stellar<3e9)type={name:'Dwarf galaxy',
+        text:'A lightweight with only a few billion suns of stars. Dwarfs are the most common galaxies in the Universe, but they are faint, and their slow-spinning stars are mostly held in by dark matter.',
+        example:'Real example: the Large Magellanic Cloud, a dwarf orbiting the Milky Way.'};
+      else if(sigma0<100&&bt<0.25)type={name:'Low surface brightness galaxy',
+        text:'A ghostly disk: its stars are spread so thinly that it barely shows up against the night sky. These galaxies are packed with dark matter compared with their stars.',
+        example:'Real examples: UGC 128, and the giant Malin 1.'};
+      else if(bt>=0.6&&gasFrac<0.1)type={name:'Lenticular (S0) galaxy',
+        text:'A big, bright bulge with a smooth disk and almost no gas left. With no fuel, it has stopped making new stars: halfway between a spiral and an elliptical.',
+        example:'Real example: NGC 5866, the Spindle Galaxy.'};
+      else if(bt>=0.6)type={name:'Bulge-heavy spiral (Sa)',
+        text:'The central bulge outshines the disk, so the spiral arms are tightly wound and faint. Push the bulge any further and it starts to look like an elliptical.',
+        example:'Real example: M104, the Sombrero Galaxy.'};
+      else if(bt>=0.25)type={name:'Spiral with a bright bulge (Sb)',
+        text:'A classic grand spiral: a glowing central bulge wrapped in a disk of stars and gas. The bulge makes the inner stars orbit fast, so the curve rises steeply.',
+        example:'Real example: Andromeda (M31), our nearest big neighbour.'};
+      else if(bt>0)type={name:'Late-type spiral (Sbc–Sc)',
+        text:'Mostly disk with a small bulge at its heart and open, loose spiral arms. Plenty of gas keeps new stars forming.',
+        example:'Real example: the Milky Way, our home galaxy.'};
+      else type={name:'Bulgeless disk galaxy (Sc–Sd)',
+        text:'A flat, pure disk with no central bulge. Its rotation curve stays flat far beyond the stars, one of the clearest signs that something unseen is there.',
+        example:'Real examples: NGC 3198 (this project’s main galaxy) and M33.'};
+      if(stellar>=8e10&&type.name!=='Monster galaxy'&&!type.name.startsWith('Giant'))type.name='Giant '+type.name.charAt(0).toLowerCase()+type.name.slice(1);
+      return{...type,tags};
+    }
+    function updateGalaxyType(g){
+      const t=classifyGalaxy(g);
+      const nameEl=document.getElementById('gtName');
+      if(nameEl.textContent!==t.name)nameEl.textContent=t.name;
+      document.getElementById('gtText').textContent=t.text;
+      document.getElementById('gtExample').textContent=t.example;
+      document.getElementById('gtTags').replaceChildren(...t.tags.map(tag=>{const li=document.createElement('li');li.textContent=tag;return li;}));
+    }
     function updateSandbox(){
       SANDBOX_SLIDERS.forEach(({key,input,output,format})=>{
         sandbox[key]=Number(input.value);
@@ -2064,6 +2131,7 @@ window.GALAXIES = {
       document.getElementById('sbTotalMass').textContent=formatMass(visible);
       document.getElementById('sbBulgeFraction').textContent=formatPercent(sandbox.bulgeMass/stellar);
       document.getElementById('sbGasFraction').textContent=formatPercent(sandbox.gasMass/visible);
+      updateGalaxyType(sandbox);
       document.dispatchEvent(new CustomEvent('sandboxchange',{detail:{...sandbox}}));
     }
     SANDBOX_SLIDERS.forEach(({input})=>input.addEventListener('input',updateSandbox));

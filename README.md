@@ -86,7 +86,12 @@ its starting NFW halo and rewrites both files.
 The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
 a builder with six anatomy sliders: stellar disk mass, disk scale length,
 truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
-radius is disabled while the bulge mass is zero. The sandbox never blocks a
+radius is disabled while the bulge mass is zero. A "What you have built" card
+above the sliders names the galaxy type (dwarf, gas-rich dwarf irregular, low
+surface brightness, Sa/Sb/Sc spirals, bulgeless disk, lenticular, giant or
+monster) from the star mass, bulge-to-total ratio, gas fraction and disk
+surface density (`classifyGalaxy` in the generator), with a real example and
+trait tags. The thresholds are rough rules of thumb. The sandbox never blocks a
 configuration. Its halo stability monitor, under the rotation curve, computes
 the concentration c = r200 / rs of the current NFW halo from the halo mass and
 scale radius sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile"
