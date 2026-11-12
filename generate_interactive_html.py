@@ -629,7 +629,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
     @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
     body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
-    #top, #simulator, #results, #theoryGuide, #method { scroll-margin-top:72px; }
+    #top, #simulator, #results, #curvePanel, #theoryGuide, #method { scroll-margin-top:72px; }
     .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
     .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:600; font-size:14px; letter-spacing:.01em; text-decoration:none; white-space:nowrap; }
     .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
@@ -712,7 +712,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .schematic figcaption { margin-top:6px; font-size:11.5px; line-height:1.5; }
     footer { flex-wrap:wrap; align-items:baseline; gap:8px 24px; margin:28px 0 0; padding:18px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); font-size:12px; }
     .footer-title { flex-basis:100%; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
-    #footerModel, #footerCustom { color:var(--ink-2); font-family:var(--f-mono); font-size:11.5px; }
+    footer { display:block; margin-top:0; }
+    @media (max-width:900px) { .method-grid { grid-template-columns:1fr 1fr !important; } } @media (max-width:560px) { .method-grid { grid-template-columns:1fr !important; } }
+    .method-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px 28px; margin:0 0 16px; }
+    .method-grid dt { margin-bottom:4px; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .method-grid dd { margin:0; color:var(--ink-2); font-size:12.5px; line-height:1.55; }
     .tutorial-welcome, .tutorial-card { border-color:rgba(138,180,248,.24); background:linear-gradient(155deg,#121b2e,#0a101c 70%); }
     .tutorial-welcome h2, .tutorial-card h2 { font-family:var(--f-serif); }
     .tutorial-eyebrow { font-family:var(--f-mono); }
@@ -726,7 +730,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#top"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
-    <div class="topnav"><a href="#simulator">Model</a><a href="#results">Results</a><a href="#theoryGuide">Theory</a><a href="#method">Method &amp; data</a></div>
+    <div class="topnav"><a href="#simulator">Model Setup</a><a href="#results">Simulation</a><a href="#curvePanel">Rotation curve</a><a href="#theoryGuide">Theory</a><a href="#method">Method &amp; data</a></div>
   </nav>
   <header id="top">
     <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Compare a dark matter halo (NFW) with modified gravity (MOND) against measured rotation curves from the SPARC survey (Lelli, McGaugh &amp; Schombert 2016).</p></div>
@@ -814,7 +818,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number, e.g. 120"><p class="control-help">Rings one star and counts its laps round the centre since 0 Myr, with its speed and distance. Clear the box to stop.</p><p class="control-help">Stars are numbered from the centre outwards: star 1 starts closest to the centre and star <span id="trackLast">800</span> starts furthest out.</p></div>
     </section>
-    <div class="section-head" id="results"><span class="kicker">02</span><h2>Results</h2><p>Star orbits in 3D, and the model's rotation curve against the measured speeds.</p></div>
+    <div class="section-head" id="results"><span class="kicker">02</span><h2>Simulation</h2><p>Star orbits in 3D, and the model's rotation curve against the measured speeds.</p></div>
     <section class="panel-grid">
     <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 Gyr</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
@@ -828,7 +832,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <p class="halo-empty" id="haloEmpty" hidden></p>
       </section>
     </article>
-      <article class="panel">
+      <article class="panel" id="curvePanel">
         <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
         <div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
@@ -876,11 +880,39 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) is an alternative idea: it changes the usual prediction for gravity at very low accelerations, rather than adding a dark matter halo.</p>
         <p>In a galaxy's outskirts, the gravitational acceleration from visible matter is very small. MOND predicts a stronger effect than Newtonian gravity there, helping explain why orbital speeds remain high. The change becomes important around an acceleration called a<sub>0</sub>; the default here is 1.2×10⁻¹⁰ m/s².</p>
+        <figure class="schematic">
+          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
+            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+            <path d="M118 18V124" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="2 3"/>
+            <path d="M36 124C58 52 78 38 108 42S196 78 302 98" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M36 124C58 52 78 38 108 42S170 45 302 43" fill="none" stroke="#ffae5c" stroke-width="2.4"/>
+            <g fill="#f4f7fb"><circle cx="58" cy="70" r="3"/><circle cx="84" cy="49" r="3"/><circle cx="110" cy="42" r="3"/><circle cx="140" cy="40" r="3"/><circle cx="170" cy="39" r="3"/><circle cx="200" cy="40" r="3"/><circle cx="230" cy="38" r="3"/><circle cx="260" cy="40" r="3"/><circle cx="290" cy="39" r="3"/></g>
+            <text x="122" y="24">g ≈ a₀</text>
+            <text x="300" y="30" text-anchor="end" fill="#ffae5c">MOND: levels off</text>
+            <text x="300" y="114" text-anchor="end" fill="#5fd0e0">Newton, visible matter: falls</text>
+            <text x="172" y="142" text-anchor="middle">radius →</text>
+            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
+          </svg>
+          <figcaption>Schematic only, not real data. Inside the dotted line gravity is strong and MOND matches Newton. Outside it, gravity from visible matter drops below a₀ and MOND boosts it, so the speed levels off instead of falling (Milgrom 1983).</figcaption>
+        </figure>
+        <p>In symbols, MOND links the real acceleration g to the Newtonian one from visible matter, g<sub>N</sub>, by μ(g/a<sub>0</sub>)·g = g<sub>N</sub>. This simulator uses μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012). When g is much larger than a<sub>0</sub>, μ ≈ 1 and gravity is ordinary Newtonian gravity. Far out, where g is much smaller than a<sub>0</sub>, the speed stops changing with radius and settles at v⁴ = G M a<sub>0</sub>, where M is the visible mass.</p>
+        <p>So in MOND the flat outer speed is fixed by the visible mass alone, with no extra matter. The only tuning numbers are a<sub>0</sub> and the mass-to-light ratio, which is why the <b>MOND best fit</b> switch changes those two.</p>
         <p>Switch between the two models and compare their curves with the white observed points. A close match is informative, but one galaxy alone cannot settle which explanation is correct.</p>
         </div>
       </details>
     </section>
-    <footer id="method"><span class="footer-title">Method &amp; data</span><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span data-preset-only>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
+    <div class="section-head" id="method"><span class="kicker">04</span><h2>Method &amp; data</h2><p>What the simulator calculates, and where the numbers come from.</p></div>
+    <footer>
+      <dl class="method-grid">
+        <div data-preset-only><dt>Data</dt><dd>Measured speeds V<sub>obs</sub> ± σ and the gas, disk and bulge speeds at each radius, from SPARC (Lelli, McGaugh &amp; Schombert 2016), read from the project’s table2.dat.</dd></div>
+        <div><dt>Visible matter</dt><dd><span id="footerModel">V<sub>bar</sub>² = V<sub>gas</sub>|V<sub>gas</sub>| + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². The numbers are the disk and bulge M/L ratios.</span><span id="footerCustom" hidden>V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge.</span></dd></div>
+        <div><dt>Dark matter</dt><dd>NFW halo (Navarro, Frenk &amp; White 1996), set by M<sub>200</sub> and r<sub>s</sub>. Model speed V<sub>model</sub>² = V<sub>bar</sub>² + V<sub>halo</sub>².</dd></div>
+        <div><dt>MOND</dt><dd>No halo. μ(g/a<sub>0</sub>)·g = g<sub>N</sub> with μ(x) = x/√(1+x²) and a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (Milgrom 1983).</dd></div>
+        <div><dt>Simulation</dt><dd>Massless test stars (800 for the presets) moved by Velocity-Verlet steps, 2 per Myr, over 1 Gyr.</dd></div>
+        <div data-preset-only><dt>Goodness of fit</dt><dd>χ² = Σ[(V<sub>obs</sub> − V<sub>model</sub>)/σ]², and χ²ᵣ = χ²/(N − 2) for N points.</dd></div>
+      </dl>
+      <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
+    </footer>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span></div>
