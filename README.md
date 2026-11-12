@@ -156,9 +156,9 @@ Test stars:
   dense centres never meet a force singularity.
 
 The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
-Hide gas button switches it off): an exponential disk
+Gas switch turns it off): an exponential disk
 three times as extended as the stars, cut at R_max, whose brightness follows
-the gas mass. The Reset view, Face-on and Edge-on distances scale with the
+the gas mass. The Reset, Face-on and Edge-on distances scale with the
 galaxy (NGC 3198 keeps its original framing), and switching galaxy or mode
 re-frames the camera. In fullscreen a corner panel holds Play, Restart (back
 to 0 Myr and play), the clock and the two halo sliders. A small, faint readout in the top-left corner of the 3D

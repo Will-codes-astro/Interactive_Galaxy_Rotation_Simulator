@@ -207,6 +207,21 @@
     .view-panel button[aria-pressed=true] { background:rgba(123,228,241,.22); border-color:var(--cyan); color:var(--ink); }
     .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
     .view-panel .view-row button { text-align:center; }
+    .view-panel { min-width:188px; }
+    .view-panel .view-primary button { font-weight:600; }
+    .view-panel .view-label { color:var(--muted); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; padding:4px 2px 0; opacity:.8; }
+    .view-panel .view-seg { display:grid; grid-template-columns:repeat(3,1fr); padding:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
+    .view-panel .view-seg button { padding:4px 2px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
+    .view-panel .view-seg button:hover, .view-panel .view-seg button:focus-visible { color:var(--ink); background:rgba(123,228,241,.16); }
+    .view-panel .view-switches { display:grid; grid-template-columns:1fr 1fr; gap:2px 8px; }
+    .view-panel .view-switches button { display:flex; align-items:center; gap:7px; padding:4px 2px; font-size:11px; white-space:nowrap; border:0; background:transparent; color:var(--muted); }
+    .view-panel .view-switches button:hover, .view-panel .view-switches button:focus-visible { background:transparent; color:var(--ink); }
+    .view-panel .view-switches button[aria-checked=true] { background:transparent; color:var(--ink); }
+    .view-panel .sw { position:relative; flex:none; width:24px; height:13px; border-radius:999px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); transition:background .15s,border-color .15s; }
+    .view-panel .sw::after { content:""; position:absolute; top:1px; left:1px; width:9px; height:9px; border-radius:50%; background:#cfd8e3; transition:transform .15s; }
+    .view-panel [aria-checked=true] .sw { background:rgba(123,228,241,.45); border-color:var(--cyan); }
+    .view-panel [aria-checked=true] .sw::after { transform:translateX(11px); background:#fff; }
+    .view-panel .sw-eject[aria-checked=true] .sw { background:rgba(255,138,128,.45); border-color:#ff8a80; }
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
     .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
@@ -220,7 +235,7 @@
     .view-panel .view-head:hover, .view-panel .view-head:focus-visible { background:transparent; color:var(--ink); }
     .view-panel .chev { display:inline-block; font-size:12px; transition:transform .2s; }
     .view-panel.collapsed { min-width:0; padding:0; border-radius:999px; }
-    .view-panel > :not(.view-head) { max-height:80px; margin-top:6px; opacity:1; visibility:visible; overflow:hidden; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s; }
+    .view-panel > :not(.view-head) { max-height:120px; margin-top:6px; opacity:1; visibility:visible; overflow:hidden; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s; }
     .view-panel.collapsed > :not(.view-head) { width:0; min-width:0; max-height:0; margin-top:0; padding:0; border-width:0; opacity:0; visibility:hidden; pointer-events:none; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s linear .2s; }
     .view-panel.collapsed .view-head { padding:7px 10px; border-radius:999px; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
@@ -241,7 +256,7 @@
     .halo-metric dd > span { min-height:0; overflow:hidden; }
     .halo-metric dd > span > span { display:block; padding-top:5px; }
     .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition-delay:0s; }
-    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
+    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .view-panel .sw, .view-panel .sw::after, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
@@ -379,7 +394,7 @@
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number, e.g. 120"><p class="control-help">Rings one star and counts its laps round the centre since 0 Myr, with its speed and distance. Clear the box to stop.</p></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>3D galaxy simulation</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleGas" aria-pressed="false" title="Hide the faint cold-gas cloud around the stars">Hide gas</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>3D galaxy simulation</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -1356,10 +1371,11 @@ window.GALAXIES = {
         orbitLineGeom.setAttribute('position',new THREE.BufferAttribute(new Float32Array(ORBIT_LINE_STARS*orbitSegs*6),3).setUsage(THREE.DynamicDrawUsage));
         const orbitLines=new THREE.LineSegments(orbitLineGeom,new THREE.LineBasicMaterial({color:0x9ff0ff,transparent:true,opacity:0.6,depthWrite:false,blending:THREE.AdditiveBlending}));
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
-        // Tutorial aid: a faint circle in the disk plane at the ejection radius (1.5 x R_max). Hidden otherwise.
+        // A faint circle in the disk plane at the ejection radius (1.5 x R_max), shown by the Ejection line switch or the tutorial.
         const ejectionRing=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:128},(_,i)=>new THREE.Vector3(Math.cos(i*Math.PI/64),Math.sin(i*Math.PI/64),0))),
             new THREE.LineBasicMaterial({color:0xff8a80,transparent:true,opacity:0.55,depthWrite:false}));
         ejectionRing.frustumCulled=false;ejectionRing.visible=false;scene.add(ejectionRing);
+        let ejectionLineShown=false;
 
         // Cold gas: a faint, thicker, more extended exponential cloud (PhysicsEngine.GAS_SCALE_RATIO x the stellar scale
         // length, cut at R_max) drawn as soft points; its brightness follows the gas mass.
@@ -1508,8 +1524,7 @@ window.GALAXIES = {
         }
         haloToggle.addEventListener('click',()=>{
             haloHidden=!haloHidden;
-            haloToggle.setAttribute('aria-pressed',String(haloHidden));
-            haloToggle.textContent=haloHidden?'Show halo':'Hide halo';
+            setSwitch(haloToggle,!haloHidden);
             updateHaloVisual(Number(massSlider.value),Number(scaleSlider.value));
         });
         function fillOrbitLines(){
@@ -1536,6 +1551,7 @@ window.GALAXIES = {
         function updateStarTelemetry(){
             document.getElementById('star-total-val').textContent=starCount;
             document.getElementById('starCountStat').textContent=starCount;
+            if(typeof ejectionRing!=='undefined')ejectionRing.scale.setScalar(ejectionRadius);
             document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
             lastEscaped=-1;
         }
@@ -1584,6 +1600,7 @@ window.GALAXIES = {
         function requestRender(){needsRender=true;}
         // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
         const viewPanel=document.getElementById('viewPanel');
+        function setSwitch(btn,on){btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-pressed',String(on));}
         ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>viewPanel.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
         const viewToggle=document.getElementById('viewToggle');
         viewPanel.classList.add('collapsed');
@@ -1698,14 +1715,21 @@ window.GALAXIES = {
         const orbitToggle=document.getElementById('toggleOrbits');
         orbitToggle.addEventListener('click',()=>{
             orbitLines.visible=!orbitLines.visible;
-            orbitToggle.setAttribute('aria-pressed',String(orbitLines.visible));
+            setSwitch(orbitToggle,orbitLines.visible);
             requestRender();
         });
         const gasToggle=document.getElementById('toggleGas');
         gasToggle.addEventListener('click',()=>{
             gasCloud.visible=!gasCloud.visible;
-            gasToggle.setAttribute('aria-pressed',String(!gasCloud.visible));
-            gasToggle.textContent=gasCloud.visible?'Hide gas':'Show gas';
+            setSwitch(gasToggle,gasCloud.visible);
+            requestRender();
+        });
+        // Ejection line: the red ring at PM.ejection_factor x R_max. Off by default; the tutorial can also show it.
+        const ejectionToggle=document.getElementById('toggleEjection');
+        ejectionToggle.addEventListener('click',()=>{
+            ejectionLineShown=!ejectionLineShown;
+            setSwitch(ejectionToggle,ejectionLineShown);
+            ejectionRing.scale.setScalar(ejectionRadius);ejectionRing.visible=ejectionLineShown;
             requestRender();
         });
         document.getElementById('viewFaceOn').addEventListener('click',()=>controls.flyTo({phi:0.04,target:[0,0,0],radius:GALAXY_VIEW.radius,rate:3}));
@@ -2458,11 +2482,11 @@ window.GALAXIES = {
          action:'Press Fullscreen. The tour comes with you, and you can drag to spin the galaxy or scroll to zoom at any time.'},
         {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',gesture:'click',title:'Clear the stage',
          text:'Two layers sit over the stars. The blue haze is the cold gas, drawn as a still backdrop to show where it lies. The purple cloud is the dark matter halo, drawn so you can see it, though real dark matter is invisible.',
-         action:'Press Hide gas and Hide halo, so only the test stars are left.',
+         action:'Under Show, switch off Gas and Halo, so only the test stars are left.',
          done:()=>!gasCloud.visible&&(haloHidden||mondMode||Number(massSlider.value)===0),doneText:'Clear view: everything left is a test star.'},
         {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',gesture:'click',title:'Look down on the disk',
-         text:'Face-on, you look straight down on the galaxy. With Orbit lines on, each line is one star’s path over the whole billion years. The disk stars trace near-perfect circles: they start on circular orbits and the halo’s gravity keeps them there. The glow and black hole at the centre are decoration only.',
-         action:'Press Face-on, then Orbit lines.',
+         text:'Face-on, you look straight down on the galaxy. With Orbits on, each line is one star’s path over the whole billion years. The disk stars trace near-perfect circles: they start on circular orbits and the halo’s gravity keeps them there. The glow and black hole at the centre are decoration only.',
+         action:'Press Face-on, then switch on Orbits.',
          done:()=>orbitLines.visible&&controls.view.phi<0.3,doneText:'Circles everywhere: a galaxy in balance.'},
         {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',title:'The inner star laps the outer one',
          text:'Two stars are ringed, one near the centre and one far out, with live lap counts and speeds. Their speeds are similar (that is the flat rotation curve), but the outer star has a far longer track, so it falls behind lap after lap. This is differential rotation: a galaxy does not turn like a solid wheel.',
@@ -2478,7 +2502,7 @@ window.GALAXIES = {
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Gone: visible matter alone cannot hold the outer stars.'},
         {id:'fsFullHalo',fs:true,nfw:true,halo:true,viewPanel:true,target:'viewFullHalo',gesture:'click',title:'Put the halo back, and step back',
          text:'With the halo back, press Restart and the same stars stay put. Now zoom right out: the bright speck in the middle is the whole visible galaxy, and the sphere is the halo’s edge, r₂₀₀. Real halos have no sharp edge; the sphere just marks it.',
-         action:'Raise Halo mass, then press View Full Halo. Reset view brings you back.'},
+         action:'Raise Halo mass, then press Full halo. Reset brings you back.'},
         {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',title:'Try another galaxy',
          text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo.',
          action:'Choose a different galaxy. Does it show the same gap between the white points and the cyan line?'},
@@ -2522,7 +2546,7 @@ window.GALAXIES = {
          action:'Press Fullscreen.'},
         {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',gesture:'click',title:'Two kinds of orbit',
          text:'Disk stars trace neat circles. Bulge stars, if your galaxy has a bulge, trace tangled loops tilted every way: a bulge is held up by its stars’ random motions, not by spinning, which is why it stays round. The ringed star is one of them.',
-         action:'Press Orbit lines, and Hide gas and Hide halo for a clearer view. No tangle in the middle? Your galaxy has no bulge.',
+         action:'Switch on Orbits, and switch off Gas and Halo for a clearer view. No tangle in the middle? Your galaxy has no bulge.',
          done:()=>orbitLines.visible,doneText:'Circles in the disk, a tangle in the bulge.'},
         {id:'sbFsEscape',fs:true,nfw:true,marks:['escaper'],ring:true,target:'fsMassSlider',gesture:'zero',title:'Starve it of dark matter',
          text:'The red circle is the ejection line. Take the halo away and the ringed star is the first your galaxy loses. A heavier disk holds on to more of its stars: try it after the tour.',
@@ -2718,7 +2742,7 @@ window.GALAXIES = {
       tutorialMore.hidden=!(lastStep&&tutorialTour==='main');
       tutorialCard.classList.toggle('on-left',innerWidth>960&&!step.cardRight);
       setStarMarks(step.marks);
-      ejectionRing.scale.setScalar(ejectionRadius);ejectionRing.visible=!!step.ring;
+      ejectionRing.scale.setScalar(ejectionRadius);ejectionRing.visible=!!step.ring||ejectionLineShown;
       // The ejection steps pull the camera back far enough to frame the ring, so the escaping star stays in view.
       if(step.ring&&tutorialIsFullscreen())controls.flyTo({phi:0.35,radius:ejectionRadius*4,target:[0,0,0],rate:2.4});
       tutorialPlayedMyr=0;tutorialWatchLast=simTime;
@@ -2749,7 +2773,7 @@ window.GALAXIES = {
       visibleMatterOnly.hidden=false;
       tutorialSpotlight.classList.remove('is-interacting');
       document.body.classList.remove('tutorial-active');
-      setStarMarks([]);ejectionRing.visible=false;
+      setStarMarks([]);ejectionRing.visible=ejectionLineShown;
       (tutorialIsFullscreen()?fsBtn:tutorialLaunch).focus({preventScroll:true});
     }
     ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>tutorialCard.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
