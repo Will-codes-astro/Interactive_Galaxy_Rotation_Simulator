@@ -38,10 +38,8 @@
     .ml-info { padding:0 6px; border:1px solid rgba(242,200,121,0.45); border-radius:999px; background:transparent; color:var(--gold); font:600 10px/1.5 "Segoe UI",sans-serif; letter-spacing:0; text-transform:none; cursor:pointer; }
     .ml-info:hover, .ml-info[aria-expanded="true"] { background:rgba(242,200,121,0.16); }
     .ml-info:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
-    .ml-off-note { display:none; margin-top:3px; font-size:11px; color:var(--muted); white-space:normal; max-width:150px; line-height:1.3; }
-    .stat.ml.off { background:rgba(120,140,160,0.05); border-color:var(--line); }
-    .stat.ml.off .ml-pair { display:none; }
-    .stat.ml.off .ml-off-note { display:block; }
+    .stat.ml.off { display:none; }
+    [data-preset-only][hidden], .stability[hidden] { display:none !important; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
     .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
     .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
@@ -285,7 +283,7 @@
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
-        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><div class="ml-off-note">Not used: sandbox masses are set directly</div></div>
+        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div></div>
         <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
           <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
           <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
@@ -341,14 +339,7 @@
           </dl>
         </div>
       </div>
-      <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor">
-        <div class="stability-head"><span class="stability-title">Halo stability monitor</span><span class="stability-badge" id="stabilityBadge" role="status"></span></div>
-        <div class="stability-reading"><span class="stability-c" id="stabilityC">c = —</span><span class="stability-detail" id="stabilityDetail"></span></div>
-        <div class="c-gauge" aria-hidden="true"><div class="c-band" id="cBand"></div><div class="c-marker" id="cMarker"></div></div>
-        <div class="c-ticks" id="cTicks" aria-hidden="true"></div>
-        <p class="stability-message" id="stabilityMessage"></p>
-      </div>
-      <div class="sandbox-footer"><p id="sandboxNote">The anatomy sliders drive the rotation curve, χ², halo and 3D stars live. The halo follows the stellar-to-halo mass relation: fine-tune its mass and scale radius with the halo sliders below. The white points and χ² come from the SPARC galaxy chosen under Compare with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
+      <div class="sandbox-footer"><p id="sandboxNote">The anatomy sliders drive the rotation curve, halo and 3D stars live. The halo follows the stellar-to-halo mass relation: fine-tune its mass and scale radius with the halo sliders below. This galaxy is imaginary, so there are no measured speeds to compare it with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
     </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
@@ -377,13 +368,22 @@
       <article class="panel">
         <div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
         <div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div>
+        <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
+          <div class="stability-head"><span class="stability-title">Halo stability monitor</span><span class="stability-badge" id="stabilityBadge" role="status"></span></div>
+          <div class="stability-reading"><span class="stability-c" id="stabilityC">c = —</span><span class="stability-detail" id="stabilityDetail"></span></div>
+          <div class="c-gauge" aria-hidden="true"><div class="c-band" id="cBand"></div><div class="c-marker" id="cMarker"></div></div>
+          <div class="c-ticks" id="cTicks" aria-hidden="true"></div>
+          <p class="stability-message" id="stabilityMessage"></p>
+        </div>
         <details class="key">
-          <summary>Understanding the colours and χ²</summary>
+          <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode). The closer it hugs the white points, the better the fit.</li><li><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li data-preset-only><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
+            <div data-preset-only>
             <h3>Why isn't χ² exactly 0?</h3>
             <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
             <p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p>
+            </div>
           </div>
         </details>
       </article>
@@ -404,7 +404,7 @@
         </div>
       </details>
     </section>
-    <footer><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
+    <footer><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span data-preset-only>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>NGC 3198</span></div>
@@ -541,6 +541,7 @@ window.GALAXIES = {
     let DEFAULTS = haloDefaultsOf(activeGalaxy);
     let customActive = false; // true while the Custom Sandbox, not a SPARC preset, drives the physics
     let customModel = null; // PhysicsEngine circular-speed functions of the sandbox galaxy
+    let customGridRmax = null; // R_max of the sandbox's radius grid (null while a preset's SPARC data are loaded)
     const G = 4.30091e-6;
     const H0 = 0.07;
     const BG = '#050910';
@@ -786,6 +787,15 @@ window.GALAXIES = {
             vBary=baryonsFor(mlState.disk,mlState.bulge);
         }
         loadGalaxyData(activeGalaxy);
+        // The Custom Sandbox galaxy is imaginary, so it has no measured speeds: its curves are drawn on an even
+        // grid of 60 radii out to 1.25 x R_max instead of at a SPARC galaxy's data radii.
+        function loadCustomGrid(rMax){
+            const n=60,rEnd=1.25*rMax;
+            rotationRows=Array.from({length:n},(_,i)=>({radius_kpc:rEnd*(i+1)/n,observed_kms:0,error_kms:0,gas_kms:0,gas_sq:0,disk_kms:0,bulge_kms:0}));
+            radii=rotationRows.map(p=>p.radius_kpc);
+            vObs=radii.map(()=>0);obsV=vObs.slice();obsErr=vObs.slice();
+            vBary=radii.map(()=>0);
+        }
         function observedVelocity(radius){
             const last=radii.length-1;
             if(radius<=radii[0])return vObs[0]*radius/radii[0];
@@ -1625,11 +1635,13 @@ window.GALAXIES = {
             const disk=customActive?componentCurves[0].map((v,i)=>Math.hypot(v,componentCurves[1][i])):rotationRows.map(p=>Math.sqrt(mlState.disk*p.disk_kms**2+mlState.bulge*p.bulge_kms**2)),err=rotationRows.map(p=>p.error_kms);
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3);
-            let csv="Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
+            // The sandbox galaxy has no measurements, so its file leaves out the observed and residual columns.
+            let csv=customActive?"Radius_kpc,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model\n":"Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
             for(let r=Math.max(1,Math.ceil(radii[0]-1e-9));r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r),vd=interpolateAt(disk,r);
                 const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);
-                csv+=[r,f(vo),f(eo),f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh)),f(vo-vb)].join(',')+"\n";
+                const row=customActive?[r,f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh))]:[r,f(vo),f(eo),f(vg),f(vd),f(vb),f(vh),f(Math.hypot(vb,vh)),f(vo-vb)];
+                csv+=row.join(',')+"\n";
             }
             return csv;
         }
@@ -1748,7 +1760,8 @@ window.GALAXIES = {
 
     const initialHalo=haloCurve(DEFAULTS.massT,DEFAULTS.scaleRadius);
     const totalCurve=vBary.map((v,i)=>Math.hypot(v,initialHalo[i]));
-    function updateChi(total){const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),dof=Math.max(1,obsV.length-2),red=chi/dof,b=document.getElementById('chiBadge');b.textContent='χ² '+chi.toFixed(0)+' · χ²ᵣ '+red.toFixed(2);b.className=red<2?'good':red<10?'ok':'poor';}
+    // χ² needs measured speeds, so the badge is hidden for the imaginary sandbox galaxy.
+    function updateChi(total){const b=document.getElementById('chiBadge');b.hidden=customActive;if(customActive)return;const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),dof=Math.max(1,obsV.length-2),red=chi/dof;b.textContent='χ² '+chi.toFixed(0)+' · χ²ᵣ '+red.toFixed(2);b.className=red<2?'good':red<10?'ok':'poor';}
     const residualsOf=total=>obsV.map((v,i)=>v-total[i]);
     const AXIS={gridcolor:'rgba(120,150,180,0.10)',zerolinecolor:'rgba(120,150,180,0.22)',linecolor:'rgba(120,150,180,0.25)',tickcolor:'rgba(120,150,180,0.25)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#9fb0c2'}};
     // Residual bars are about half the mean spacing of the SPARC radii, so dense and sparse curves both read clearly.
@@ -1758,11 +1771,11 @@ window.GALAXIES = {
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
     const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
     const buildCurveData=(halo,total)=>[
-      {type:'scatter',mode:'markers',name:'Observed (SPARC)',x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'Observed <b>%{y:.0f}</b><extra></extra>'},
+      {type:'scatter',mode:'markers',name:'Observed (SPARC)',visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'Observed <b>%{y:.0f}</b><extra></extra>'},
       {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'Baryonic <b>%{y:.0f}</b><extra></extra>'},
       {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b><extra></extra>'},
       {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b><extra></extra>'},
-      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
+      {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
@@ -1772,7 +1785,9 @@ window.GALAXIES = {
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.03,xanchor:'left',x:0,font:{size:11,color:'#c3cfdb'},itemsizing:'constant'},
       hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.72)',bordercolor:'rgba(120,150,180,0.25)',font:{color:'#f1f5f9',size:10}},dragmode:false};
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
-    Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayout,curveConfig);
+    // The sandbox has no residuals, so its velocity axis fills the whole plot.
+    const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout;
+    Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayoutNow(),curveConfig);
     updateChi(totalCurve);
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
@@ -1928,6 +1943,8 @@ window.GALAXIES = {
       const custom=mode==='custom';
       galaxyModeRadios.forEach(radio=>{radio.checked=radio.value===mode;});
       sandboxPanel.hidden=!custom;
+      stabilityMonitor.hidden=!custom;
+      document.getElementById('presetPicker').hidden=custom; // nothing real to compare an imaginary galaxy with
       if(changed){if(custom)activateCustom();else loadPreset(activeGalaxy);}
       updateStability();
       document.dispatchEvent(new CustomEvent('galaxymodechange',{detail:{mode}}));
@@ -1948,7 +1965,7 @@ window.GALAXIES = {
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
       const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)');
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,true,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
@@ -1976,11 +1993,9 @@ window.GALAXIES = {
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
       document.getElementById('mondFitWrap').hidden=!mondMode||customActive;
       const mlStat=document.getElementById('mlStat');
-      mlStat.classList.toggle('off',customActive);
-      mlStat.title=customActive?'Not used: the Custom Sandbox sets the stellar masses directly':'Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories';
-      const ratioText=ratio=>customActive?'—':ratio.toFixed(2);
-      document.getElementById('mlDisk').textContent=ratioText(mlState.disk);
-      document.getElementById('mlBulge').textContent=ratioText(mlState.bulge);
+      mlStat.classList.toggle('off',customActive); // hidden in the sandbox, which sets stellar masses directly
+      document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
+      document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
       const e=Math.floor(Math.log10(MOND_A0));
@@ -2072,15 +2087,15 @@ window.GALAXIES = {
     /* ---------- Galaxy presets and the Custom Sandbox physics ----------
        The dropdown swaps the active SPARC galaxy: its baryonic baseline, observed halo fit, slider ranges,
        rotation-curve plot, chi-squared and orbits are all rebuilt from that galaxy's galaxies.js entry.
-       In the Custom Sandbox the same dropdown ("Compare with") only chooses which galaxy's measured speeds the
-       custom galaxy is compared with; the anatomy sliders then drive every output through PhysicsEngine. */
+       The Custom Sandbox hides the dropdown: its imaginary galaxy has no measurements to compare with, and the
+       anatomy sliders drive every output through PhysicsEngine. */
     const galaxySelect=document.getElementById('galaxySelect'),galaxySummary=document.getElementById('galaxySummary');
     Object.values(GALAXIES).forEach(galaxy=>galaxySelect.add(new Option(galaxy.name,galaxy.id)));
     function applyGalaxyLabels(galaxy){
       document.querySelectorAll('[data-galaxy-name]').forEach(el=>{el.textContent=galaxy.name;});
-      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.rotation.radius_kpc.length} measured speeds (SPARC)${galaxyMode==='custom'?' · data points and χ² for your galaxy':''}`;
+      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.rotation.radius_kpc.length} measured speeds (SPARC)`;
       orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxyMode==='custom'?'custom galaxy':galaxy.name} star trajectories`);
-      document.getElementById('curvePlot').setAttribute('aria-label',`${galaxyMode==='custom'?'Custom galaxy compared with '+galaxy.name:galaxy.name} observed, baryonic, and fitted rotation curves`);
+      document.getElementById('curvePlot').setAttribute('aria-label',galaxyMode==='custom'?'Custom galaxy baryonic, halo and model rotation curves':`${galaxy.name} observed, baryonic, and fitted rotation curves`);
       document.getElementById('viewReset').title=`Return to the default ${galaxyMode==='custom'?'custom galaxy':galaxy.name} view`;
     }
     galaxySelect.value=activeGalaxy.id;
@@ -2088,8 +2103,7 @@ window.GALAXIES = {
     // Wording that differs between a preset galaxy and the sandbox.
     function applyModeLabels(){
       const custom=customActive,fitButton=document.getElementById('applyObservedFit');
-      document.getElementById('galaxyLabel').textContent=custom?'Compare with':'Galaxy';
-      galaxySelect.title=custom?'Choose the SPARC galaxy whose measured speeds your custom galaxy is compared with':'Choose which SPARC galaxy to model';
+      document.querySelectorAll('[data-preset-only]').forEach(el=>{el.hidden=custom;});
       document.getElementById('massHelp').textContent=custom
         ?'How much dark matter surrounds your galaxy. It starts at the halo mass expected for a galaxy with this mass of stars (the stellar-to-halo mass relation, Moster et al. 2013), and the slider runs from 0 to 5 times that. Set it to 0 for visible matter only.'
         :'How much dark matter surrounds the galaxy. More mass means stronger gravity, so stars orbit faster and the orange curve rises. Set it to 0 for visible matter only.';
@@ -2105,7 +2119,7 @@ window.GALAXIES = {
     }
     // Makes a SPARC preset the active galaxy: the page then follows its data, with stars on its observed orbits.
     function loadPreset(galaxy){
-      customActive=false;
+      customActive=false;customGridRmax=null;
       activeGalaxy=galaxy;
       DEFAULTS=haloDefaultsOf(galaxy);
       mondBest=null; // a cached MOND fit belongs to the previous galaxy
@@ -2122,7 +2136,7 @@ window.GALAXIES = {
       simTime=0;window.simTime=0;syncTimelineUI(0);
       refreshOrbits();
       const{halo,total}=modelCurves(DEFAULTS.massT,DEFAULTS.scaleRadius);
-      Plotly.react('curvePlot',buildCurveData(halo,total),curveLayout,curveConfig);
+      Plotly.react('curvePlot',buildCurveData(halo,total),curveLayoutNow(),curveConfig);
       updateHalo();clearTimeout(orbitModelTimer);
       document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy}}));
     }
@@ -2152,6 +2166,7 @@ window.GALAXIES = {
     }
     function rebuildCustomGalaxy({replot=false}={}){
       const anatomy={diskMass:sandbox.diskMass,diskScale:sandbox.diskScale,rMax:sandbox.truncation,bulgeMass:sandbox.bulgeMass,bulgeRadius:sandbox.bulgeRadius,gasMass:sandbox.gasMass};
+      if(anatomy.rMax!==customGridRmax){loadCustomGrid(anatomy.rMax);customGridRmax=anatomy.rMax;replot=true;}
       // Rotation curve: the baryonic speed of the new anatomy on the force-table grid and at the data radii.
       customModel=PhysicsEngine.buildGalaxy(anatomy,PM.softening_kpc[0]);
       const shapeKey=`${anatomy.diskScale}|${anatomy.rMax}`;
@@ -2175,7 +2190,7 @@ window.GALAXIES = {
       syncStarMeshes();updateStarTelemetry();updateCustomSummary(baseline);
       if(replot){
         const{halo,total}=modelCurves(Number(massSlider.value),Number(scaleSlider.value));
-        Plotly.react('curvePlot',buildCurveData(halo,total),curveLayout,curveConfig);
+        Plotly.react('curvePlot',buildCurveData(halo,total),curveLayoutNow(),curveConfig);
       }
       refreshOrbits();
       updateHalo();clearTimeout(orbitModelTimer);
@@ -2196,15 +2211,8 @@ window.GALAXIES = {
     document.getElementById('sandboxReset').addEventListener('click',()=>{haloFine=1;rsManual=false;});
     function selectGalaxy(id){
       const galaxy=GALAXIES[id];
-      if(!galaxy||galaxy===activeGalaxy)return;
-      if(!customActive){loadPreset(galaxy);return;}
-      // Custom Sandbox: only the measured data change; the anatomy and halo stay as built.
-      activeGalaxy=galaxy;
-      mondBest=null;
-      loadGalaxyData(galaxy);
-      applyGalaxyLabels(galaxy);
-      rebuildCustomGalaxy({replot:true});
-      document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy}}));
+      if(!galaxy||galaxy===activeGalaxy||customActive)return;
+      loadPreset(galaxy);
     }
     galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
 
@@ -2341,14 +2349,11 @@ window.GALAXIES = {
          text:'This list adds your galaxy up. The baseline halo is the dark matter halo a galaxy with this mass of stars would typically have, taken from a published link between stellar mass and halo mass (Moster et al. 2013). The number of test stars grows with the galaxy’s mass.',
          action:'Read the list, then move any slider above it and see which numbers change.'},
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',scroll:'stabilityMonitor',gesture:'adjust',title:'Is the halo realistic?',
-         text:`The halo stability monitor, just above, checks the halo’s concentration, c: its radius divided by its scale radius. Real halos have c between ${STABLE_C_MIN} and ${STABLE_C_MAX}. Outside that range the monitor warns you that the halo is unrealistic, but it never stops you.`,
+         text:`The halo stability monitor, under the rotation curve, checks the halo’s concentration, c: its radius divided by its scale radius. Real halos have c between ${STABLE_C_MIN} and ${STABLE_C_MAX}. Outside that range the monitor warns you that the halo is unrealistic, but it never stops you.`,
          action:'Drag the scale radius all the way to one end, then the other, until the warning appears.'},
         {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',gesture:'adjust',title:'Tune the halo yourself',
          text:'The halo sliders still work here. Halo mass runs from 0 to 5 times the baseline. The stars begin on orbits that suit the baseline halo, so changing the halo shows what too little or too much dark matter does to them.',
-         action:'Lower the halo mass and press Play: with too little dark matter the outer stars drift away and the ejected count climbs. Apply SHMR Baseline puts the halo back.'},
-        {id:'sbCompare',mode:'custom',target:'galaxySelect',gesture:'click',title:'Compare with a real galaxy',
-         text:'The white points still come from a real galaxy, the one chosen under Compare with. χ² now scores how closely your invented galaxy matches that real one.',
-         action:'Try to rebuild the real galaxy: adjust the builder’s sliders until the orange line follows the white points. Reset anatomy starts you again.'}
+         action:'Lower the halo mass and press Play: with too little dark matter the outer stars drift away and the ejected count climbs. Apply SHMR Baseline puts the halo back, and Reset anatomy starts the galaxy again.'}
       ]}
     };
     const tutorialWelcome=document.getElementById('tutorialWelcome'),tutorialCard=document.getElementById('tutorialCard');

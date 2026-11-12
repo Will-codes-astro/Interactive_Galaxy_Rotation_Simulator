@@ -87,17 +87,19 @@ The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
 a builder with six anatomy sliders: stellar disk mass, disk scale length,
 truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
 radius is disabled while the bulge mass is zero. The sandbox never blocks a
-configuration. Its halo stability monitor computes the concentration
-c = r200 / rs of the current NFW halo from the halo mass and scale radius
-sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile" badge (also over
-the 3D view) whenever c falls outside 3–25 (`STABLE_CONCENTRATION` in the
-generator).
+configuration. Its halo stability monitor, under the rotation curve, computes
+the concentration c = r200 / rs of the current NFW halo from the halo mass and
+scale radius sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile"
+badge (also over the 3D view) whenever c falls outside 3–25
+(`STABLE_CONCENTRATION` in the generator).
 
-In the sandbox the anatomy sliders drive the rotation curve, the χ² badge, the
-halo and the 3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the
-generator's page script). The dropdown stays visible as "Compare with": it
-picks the SPARC galaxy whose measured points and radii the custom curve and χ²
-are compared with, without touching the anatomy.
+In the sandbox the anatomy sliders drive the rotation curve, the halo and the
+3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the generator's
+page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
+Galaxy dropdown, the observed SPARC points, the residual bars and the χ² badge
+are hidden, and the curves are drawn on an even grid of 60 radii out to
+1.25 × the truncation radius. Its CSV export leaves out the observed and
+residual columns.
 
 - Stellar disk and gas are exponential disks cut at the truncation radius, each
   holding the slider's mass inside it; the gas disk is three times more
@@ -115,9 +117,8 @@ are compared with, without touching the anatomy.
   baseline), and the scale radius follows the relation until it is moved.
   Apply SHMR Baseline restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
-- The header's Mass-to-light (M/L) tile is greyed out in the sandbox and reads
-  "Not used", because sandbox masses are set directly rather than converted
-  from light.
+- The header's Mass-to-light (M/L) tile is hidden in the sandbox, because
+  sandbox masses are set directly rather than converted from light.
 
 Hovering over the "?" on the M/L tile fades in a short explainer (tap or
 press it on touch screens and keyboards): what a mass-to-light ratio
@@ -173,9 +174,9 @@ play the orbits, cover the View controls (including fullscreen) and the scale
 of the full halo, and end with the Galaxy menu, the mass-to-light explainer,
 the theory guide and the CSV export. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
-highlighted control, and comes back only when the step points somewhere new. A second, 9-step Sandbox tour covers
+highlighted control, and comes back only when the step points somewhere new. A second, 8-step Sandbox tour covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
-halo stability monitor, the halo sliders and Compare with. It starts from the
+halo stability monitor and the halo sliders. It starts from the
 Sandbox tour button on the tutorial's last step (which opens the Custom
 Sandbox), or from the Tutorial button, which reads "Sandbox tour" while the
 sandbox is open. If a step needs a different mode (NFW or MOND, a halo above
