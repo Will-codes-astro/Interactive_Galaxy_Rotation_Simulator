@@ -9,8 +9,9 @@ SPARC rotation curves.
 - Live site: <https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/>
 - Report: `C:\Users\willp\OneDrive\EPQ Write-up\Simulating The Invisible EPQ Report.docx`
   (outside this repo; ask Will to connect that folder if you need it)
-- Notion: EPQ Main Hub, with Diary, Top-Band Plan, Source Evaluations (CRAAP),
-  My Websites Creation, Explain My Code (flashcards) and User Testing Kit
+- Notion: EPQ Main Hub, with Top-Band Plan, Source Evaluations (CRAAP),
+  My Websites Creation (the build log), Explain My Code (flashcards) and
+  User Testing Kit. The Diary database is Will's own: never write to it.
 - Next deadline: 1500-word checkpoint, 11 Dec 2026
 
 ## Keep token use low (Will's credits are limited)
@@ -50,11 +51,11 @@ SPARC rotation curves.
 
 - **Small** (wording, labels, colours, layout, tutorial text, README, a bug
   in UI code): edit, regenerate, commit with a plain message. No Stage
-  number, no physics checks, no Diary entry unless Will asks. If a living
+  number, no physics checks, no build-log entry unless Will asks. If a living
   document quotes the exact text you changed, fix that one line.
 - **Medium** (a new feature or button, a real behaviour change): commit, run
   physics checks only if the physics trigger below applies, and add a short
-  Diary entry.
+  build-log entry.
 - **Big** (a new Stage Will names, a UI overhaul, new physics or a new
   galaxy): run the full Stage routine.
 
@@ -92,9 +93,13 @@ star count 800 / cap 2400, generated files match, baseline.)
 
 ## Notion writing: short by default
 
-- **Diary entry:** 2–4 bullet points. What changed, how (one line), why if
-  not obvious. Big changes may add decisions, sources and open questions,
-  still under ~150 words. No headings for small entries, no restating code.
+- **Build log = the "My Websites Creation" page** (id
+  416c4fda4ef4813fa741fda5b6f61f5b, under EPQ Main Hub). Append to the
+  bottom of Part 2, matching its style: a `## <date> — <title>` heading
+  (reuse today's heading if it exists), then 1–3 bullets saying what
+  changed, why if not obvious, and the commit ID in brackets. Use a callout
+  only for a mistake or an open decision. Big changes may add a little
+  more, still under ~150 words. Never create Diary pages.
 - **Living documents** (Explain My Code flashcards, User Testing Kit): edit
   only the cards or tasks whose facts changed (physics, formulas, numbers,
   features, buttons, labels). Add a card or task for a new feature. Update
@@ -110,7 +115,7 @@ star count 800 / cap 2400, generated files match, baseline.)
 1. Physics checks if the physics trigger applies. Stop if any fail.
 2. Regenerate the site; update `README.md` if anything visible changed.
 3. Commit as "... (Stage N)".
-4. Short Diary entry (see Notion writing), then living documents and
+4. Short build-log entry (see Notion writing), then living documents and
    `project-status.md`.
 5. Check the AI declaration still covers the work.
 6. Ask Will before pushing. Screenshots only if Will asks for them.
@@ -132,7 +137,7 @@ source. List the problems.
 - List the proposed edits, then apply them directly (no tracked changes).
 
 ### Stage screenshots (only when Will asks)
-Open the live site, capture the new feature, attach to that Stage's Diary
+Open the live site, capture the new feature, attach to that Stage's build-log
 entry.
 
 ## If something is unavailable
