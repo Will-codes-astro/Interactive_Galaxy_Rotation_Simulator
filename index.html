@@ -149,12 +149,9 @@
     @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
     @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
     .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-    .learn details { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px; }
-    .learn summary { cursor:pointer; padding:12px 0; font-size:14px; font-weight:600; list-style:none; display:flex; justify-content:space-between; align-items:center; }
-    .learn summary::-webkit-details-marker { display:none; }
-    .learn summary::after { content:"▾"; color:var(--muted); transition:transform .2s; }
-    .learn details[open] summary::after { transform:rotate(180deg); }
-    .learn details.nfw summary { color:#b39ae8; } .learn details.mond summary { color:#ffae5c; }
+    .learn article { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px 6px; }
+    .learn h3 { margin:0; padding:12px 0; font-size:14px; font-weight:600; }
+    .learn article.nfw h3 { color:#b39ae8; } .learn article.mond h3 { color:#ffae5c; }
     .learn p { color:#9fb0c2; font-size:13px; margin:0 0 10px; }
     .learn p.tldr { color:#dbe7f4; }
     @media (max-width:900px) { .learn { grid-template-columns:1fr; } }
@@ -381,7 +378,7 @@
     .section-head .kicker { grid-row:span 2; color:var(--accent); font:500 12px var(--f-mono); letter-spacing:.06em; }
     .section-head h2 { font:600 22px/1.2 var(--f-serif); letter-spacing:-.005em; }
     .section-head p { grid-column:2; margin:3px 0 0; color:var(--muted); font-size:13px; }
-    .model-bar, .controls, .sandbox, .panel, .learn details { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
+    .model-bar, .controls, .sandbox, .panel, .learn article { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
     .model-bar { padding:12px 18px; margin-bottom:12px; gap:14px 20px; }
     .model-bar .model-label { font:500 10.5px var(--f-mono); letter-spacing:.14em; }
     .controls { gap:22px 30px; padding:20px 22px; margin-bottom:0; }
@@ -425,8 +422,8 @@
     .halo-metric .metric-value { font:500 17px var(--f-mono); }
     .stability-c { font-family:var(--f-mono); }
     .learn { gap:16px; margin-top:0; }
-    .learn details { padding:0 22px; }
-    .learn summary { padding:16px 0; font:600 18px var(--f-serif); }
+    .learn article { padding:0 22px 8px; }
+    .learn h3 { padding:16px 0; font:600 18px var(--f-serif); }
     .learn p { color:var(--ink-2); font-size:13.5px; line-height:1.65; }
     .learn p.tldr { color:var(--ink); font-size:14px; }
     .schematic { margin:4px 0 16px; padding:12px 14px 10px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); color:var(--muted); }
@@ -450,7 +447,7 @@
     .stat-q::after { background:var(--panel-2); border-color:var(--line-strong); }
     .telemetry { font-family:var(--f-mono); }
     @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
-    @media (max-width:640px) { .topbar { padding:0 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn details { padding:0 16px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
+    @media (max-width:640px) { .topbar { padding:0 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
     .key summary::before { content:""; display:inline-block; width:4px; }
   </style>
 </head>
@@ -584,7 +581,7 @@
     </section>
     <div class="section-head"><span class="kicker">03</span><h2>Background</h2><p>The two explanations this simulator tests.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
-      <details class="nfw"><summary>What is a dark matter halo?</summary>
+      <article class="nfw"><h3>What is a dark matter halo?</h3>
         <div class="learn-content">
         <p class="tldr">Dark matter is matter we cannot see; we only notice it through its gravity. A halo is a huge cloud of it surrounding a galaxy.</p>
         <figure class="schematic">
@@ -602,8 +599,8 @@
         <p>The outer stars in <span data-galaxy-name>NGC 3198</span> move too fast for the visible matter alone to hold them in orbit. A halo adds the extra gravity needed to keep them there.</p>
         <p>This simulator uses an NFW halo (Navarro, Frenk &amp; White 1996): packed tightly in the middle and thinning out further away. Two sliders control it: the halo's mass (M<sub>200</sub>) and its scale radius (r<sub>s</sub>), which sets how spread out it is.</p>
         </div>
-      </details>
-      <details class="mond"><summary>What is MOND?</summary>
+      </article>
+      <article class="mond"><h3>What is MOND?</h3>
         <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves a little differently when it is extremely weak.</p>
         <p>Near a galaxy's centre gravity is strong, and MOND gives the same answer as Newton. Out in the edges gravity becomes tiny, weaker than a threshold called a<sub>0</sub> (1.2×10⁻¹⁰ m/s² here). Below that, MOND makes gravity stronger than Newton predicts, so the outer stars keep moving fast.</p>
@@ -631,7 +628,7 @@
         <p>So the flat outer speed comes from visible matter alone. The only things to tune are a<sub>0</sub> and the mass-to-light ratio, which is why the <b>MOND best fit</b> switch changes those two.</p>
         <p>Switch between the two models and compare each curve with the white measured points. One galaxy alone cannot settle which idea is right.</p>
         </div>
-      </details>
+      </article>
     </section>
     <div class="section-head" id="method"><span class="kicker">04</span><h2>Method &amp; data</h2><p>What the simulator calculates, and where the numbers come from.</p></div>
     <footer>
@@ -2868,9 +2865,9 @@ window.GALAXIES = {
         {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. The values here are standard averages, so they are an assumption.',
          action:'Hover over or tap the ? beside Mass-to-light at the top of the page to read more.'},
-        {id:'finish',target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
+        {id:'finish',target:'theoryGuide',gesture:'scan',title:'What this does and doesn’t show',
          text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
-         action:'Open the theory guide below to read more. One last thing to try: switch to MOND and watch in fullscreen. There is no halo, yet the outer stars stay put, because MOND’s boosted gravity does the halo’s job. Sandbox tour, below, lets you build a galaxy of your own.'}
+         action:'Read the theory guide below to learn more. One last thing to try: switch to MOND and watch in fullscreen. There is no halo, yet the outer stars stay put, because MOND’s boosted gravity does the halo’s job. Sandbox tour, below, lets you build a galaxy of your own.'}
       ]},
       sandbox:{label:'Sandbox tour',steps:[
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',title:'Build your own galaxy',
@@ -3033,8 +3030,6 @@ window.GALAXIES = {
       let target=blocker?blocker.target:tutorialTarget,gesture=blocker?blocker.gesture:step.gesture;
       if(gesture==='switch'){
         target=document.querySelector('#modelBar .track');gesture='click';
-      }else if(gesture==='guide'){
-        target=document.querySelector('#theoryGuide summary');gesture='click';
       }
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
       if(target!==tutorialAimTarget){
@@ -3217,9 +3212,6 @@ window.GALAXIES = {
     fullHaloBtn.addEventListener('click',()=>completeTutorialAction('fsFullHalo','Zoomed out: the whole visible galaxy is that bright speck.'));
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{onSliderInput(0);setPlaying(true);});
-    document.querySelectorAll('#theoryGuide details').forEach(details=>{
-      details.addEventListener('toggle',()=>{if(details.open)completeTutorialAction('finish','Theory guide opened.');});
-    });
     galaxySelect.addEventListener('change',()=>{
       completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo.');
     });
