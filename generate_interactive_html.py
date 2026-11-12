@@ -1024,6 +1024,8 @@ __GALAXIES_JS__
                     list[k]={kind:'disk',position:[R*Math.cos(phi),R*Math.sin(phi),g[4*k]*GALAXY.scaleHeight],radius:R,kick,colorSeed:u[4*k+3]};
                 }
             }
+            // Number the stars from the centre outwards (by starting distance), so star 1 is innermost and the last is outermost.
+            list.sort((a,b)=>Math.hypot(...a.position)-Math.hypot(...b.position));
             return{particles:list,bulgeCount,bulgeCut};
         }
         /* ---------- Active galaxy: SPARC rotation curve ----------
@@ -1663,8 +1665,10 @@ __GALAXIES_JS__
             const bulgeLines=bulgeStarCount>0?Math.min(bulgeStarCount,Math.max(6,Math.round(ORBIT_LINE_STARS*bulgeStarCount/starCount))):0;
             const diskLines=Math.min(diskStars,ORBIT_LINE_STARS-bulgeLines);
             orbitLineIdx=[];
-            for(let j=0;j<bulgeLines;j++)orbitLineIdx.push(Math.floor(j*bulgeStarCount/bulgeLines));
-            for(let j=0;j<diskLines;j++)orbitLineIdx.push(bulgeStarCount+Math.floor(j*diskStars/diskLines));
+            const bulgeIdx=[],diskIdx=[];
+            for(let k=0;k<starCount;k++)(particles[k].kind==='bulge'?bulgeIdx:diskIdx).push(k);
+            for(let j=0;j<bulgeLines;j++)orbitLineIdx.push(bulgeIdx[Math.floor(j*bulgeStarCount/bulgeLines)]);
+            for(let j=0;j<diskLines;j++)orbitLineIdx.push(diskIdx[Math.floor(j*diskStars/diskLines)]);
             orbitLineGeom.setDrawRange(0,orbitLineIdx.length*orbitSegs*2);
         }
 
@@ -1779,6 +1783,9 @@ __GALAXIES_JS__
         function updateStarTelemetry(){
             document.getElementById('star-total-val').textContent=starCount;
             document.getElementById('starCountStat').textContent=starCount;
+            // The star locator's range follows the population, so a bigger galaxy offers more stars to find.
+            ['trackInput','fsTrack'].forEach(id=>{const el=document.getElementById(id);if(el)el.max=starCount;});
+            const trackMaxEl=document.getElementById('trackMax');if(trackMaxEl)trackMaxEl.textContent=`1–${starCount}`;
             if(typeof ejectionRing!=='undefined')ejectionRing.scale.setScalar(ejectionRadius);
             document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
             lastEscaped=-1;
@@ -2594,10 +2601,11 @@ __GALAXIES_JS__
       }
       return Math.abs(angle)/(2*Math.PI);
     }
-    // Disk stars follow the bulge stars in the particle list.
+    // Stars are numbered by radius, so bulge and disk stars are mixed in the list: filter by kind.
     function diskStarNear(radius,tilted){
       let best=-1,score=Infinity;
-      for(let k=bulgeStarCount;k<starCount;k++){
+      for(let k=0;k<starCount;k++){
+        if(particles[k].kind!=='disk')continue;
         const p=particles[k].position,R=Math.hypot(p[0],p[1]),off=Math.abs(R-radius)/radius;
         const s=tilted?(off<0.25?-Math.abs(p[2]):Infinity):off+Math.abs(p[2]);
         if(s<score){score=s;best=k;}
@@ -2612,7 +2620,7 @@ __GALAXIES_JS__
     function bulgeStar(){
       if(!bulgeStarCount)return -1;
       let best=0,score=Infinity;
-      for(let k=0;k<bulgeStarCount;k++){const s=Math.abs(particles[k].radius-1.5*currentAnatomy.bulgeRadius);if(s<score){score=s;best=k;}}
+      for(let k=0;k<starCount;k++){if(particles[k].kind!=='bulge')continue;const s=Math.abs(particles[k].radius-1.5*currentAnatomy.bulgeRadius);if(s<score){score=s;best=k;}}
       return best;
     }
     const lapText=(name,idx)=>`${name} · ${lapsAt(idx,simTime).toFixed(1)} laps · ${starSpeedAt(idx,simTime).toFixed(0)} km/s`;
