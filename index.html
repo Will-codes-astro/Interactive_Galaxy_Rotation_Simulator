@@ -379,7 +379,7 @@
       </div>
     </section>
     <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
-      <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2><p>Build a galaxy from its visible anatomy. Nothing is blocked: push the sliders to extremes to build a “monster galaxy”.</p></div>
+      <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2></div>
       <div class="galaxy-type" id="galaxyType">
         <p class="galaxy-type-kicker">What you have built</p>
         <h3 id="gtName" aria-live="polite"></h3>
@@ -391,18 +391,18 @@
       <div class="sandbox-groups" id="sandboxGroups">
         <div class="sandbox-group">
           <h3>Stellar disk</h3>
-          <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Total mass of the stars in the flat disk (exponential profile).</p></div>
-          <div class="control"><label for="sbDiskScale"><span>Scale length, R<sub>d</sub></span><output id="sbDiskScaleValue" for="sbDiskScale"></output></label><input id="sbDiskScale" type="range" min="1.5" max="6" step="0.1" value="3.1" autocomplete="off"><p class="control-help">How quickly the disk fades outwards: the brightness falls by a factor of e every R<sub>d</sub>.</p></div>
-          <div class="control"><label for="sbTruncation"><span>Truncation radius, R<sub>max</sub></span><output id="sbTruncationValue" for="sbTruncation"></output></label><input id="sbTruncation" type="range" min="15" max="40" step="0.5" value="30" autocomplete="off"><p class="control-help">Outer edge of the galaxy's visible matter. Stars that stray beyond 1.5 × R<sub>max</sub> count as ejected.</p></div>
+          <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Mass of the stars in the flat disk.</p></div>
+          <div class="control"><label for="sbDiskScale"><span>Scale length, R<sub>d</sub></span><output id="sbDiskScaleValue" for="sbDiskScale"></output></label><input id="sbDiskScale" type="range" min="1.5" max="6" step="0.1" value="3.1" autocomplete="off"><p class="control-help">How quickly the disk fades outwards. Bigger means more spread out.</p></div>
+          <div class="control"><label for="sbTruncation"><span>Truncation radius, R<sub>max</sub></span><output id="sbTruncationValue" for="sbTruncation"></output></label><input id="sbTruncation" type="range" min="15" max="40" step="0.5" value="30" autocomplete="off"><p class="control-help">Outer edge of the visible galaxy. Stars beyond 1.5 × R<sub>max</sub> count as ejected.</p></div>
         </div>
         <div class="sandbox-group">
           <h3>Bulge</h3>
-          <div class="control"><label for="sbBulgeMass"><span>Bulge mass, M<sub>bulge</sub></span><output id="sbBulgeMassValue" for="sbBulgeMass"></output></label><input id="sbBulgeMass" type="range" min="0" max="5e10" step="1e8" value="0" autocomplete="off"><p class="control-help">Mass of the round central cluster of stars. Zero gives a pure disk galaxy.</p></div>
-          <div class="control" id="sbBulgeRadiusControl"><label for="sbBulgeRadius"><span>Effective radius, r<sub>b</sub></span><output id="sbBulgeRadiusValue" for="sbBulgeRadius"></output></label><input id="sbBulgeRadius" type="range" min="0.2" max="2" step="0.1" value="1" autocomplete="off"><p class="control-help" id="sbBulgeRadiusHelp">Scale radius of the bulge's Hernquist profile. Half of the bulge's mass lies within about 2.4 times this radius.</p></div>
+          <div class="control"><label for="sbBulgeMass"><span>Bulge mass, M<sub>bulge</sub></span><output id="sbBulgeMassValue" for="sbBulgeMass"></output></label><input id="sbBulgeMass" type="range" min="0" max="5e10" step="1e8" value="0" autocomplete="off"><p class="control-help">Mass of the round ball of stars at the centre. Zero means no bulge.</p></div>
+          <div class="control" id="sbBulgeRadiusControl"><label for="sbBulgeRadius"><span>Effective radius, r<sub>b</sub></span><output id="sbBulgeRadiusValue" for="sbBulgeRadius"></output></label><input id="sbBulgeRadius" type="range" min="0.2" max="2" step="0.1" value="1" autocomplete="off"><p class="control-help" id="sbBulgeRadiusHelp">Size of the bulge (Hernquist profile). Half its mass lies within about 2.4 × r<sub>b</sub>.</p></div>
         </div>
         <div class="sandbox-group">
           <h3>Gas</h3>
-          <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of the cold gas, mostly hydrogen, in a disk three times more extended than the stars.</p></div>
+          <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of cold hydrogen gas, spread three times wider than the stars.</p></div>
           <dl class="sandbox-summary" id="sandboxSummary" aria-label="Sandbox galaxy summary">
             <dt>Total visible mass</dt><dd id="sbTotalMass"></dd>
             <dt>Bulge-to-total (stars)</dt><dd id="sbBulgeFraction"></dd>
@@ -2065,7 +2065,7 @@ window.GALAXIES = {
     const sandboxPanel=document.getElementById('sandboxPanel');
     const bulgeRadiusControl=document.getElementById('sbBulgeRadiusControl');
     const bulgeRadiusHelp=document.getElementById('sbBulgeRadiusHelp');
-    const BULGE_RADIUS_HELP=bulgeRadiusHelp.textContent;
+    const BULGE_RADIUS_HELP=bulgeRadiusHelp.innerHTML;
     // Galaxy type card: names the kind of galaxy the anatomy sliders describe. Thresholds are rules of thumb:
     // Hubble-type bulge-to-total ratios (Graham & Worley 2008) and low surface brightness meaning a central stellar
     // surface density well below Freeman's (1970) typical disk value.
@@ -2126,7 +2126,7 @@ window.GALAXIES = {
       bulgeRadiusControl.classList.toggle('disabled',noBulge);
       bulgeRadiusControl.setAttribute('aria-disabled',String(noBulge));
       document.getElementById('sbBulgeRadius').disabled=noBulge;
-      bulgeRadiusHelp.textContent=noBulge?'No bulge: this is a pure disk galaxy.':BULGE_RADIUS_HELP;
+      bulgeRadiusHelp.innerHTML=noBulge?'No bulge: this is a pure disk galaxy.':BULGE_RADIUS_HELP;
       const stellar=sandbox.diskMass+sandbox.bulgeMass,visible=stellar+sandbox.gasMass;
       document.getElementById('sbTotalMass').textContent=formatMass(visible);
       document.getElementById('sbBulgeFraction').textContent=formatPercent(sandbox.bulgeMass/stellar);
