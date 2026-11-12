@@ -282,6 +282,9 @@ HTML_TEMPLATE = r"""<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interactive Galaxy Rotation Simulator: explore SPARC rotation curves and star orbits for __GALAXY_NAMES__">
   <title>Interactive Galaxy Rotation Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
@@ -291,14 +294,14 @@ HTML_TEMPLATE = r"""<!doctype html>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
   <style>
-    :root { color-scheme: dark; --bg:#050910; --panel:#0a111b; --line:#1b2a3a; --ink:#dbe7f4; --muted:#91a4b8; --cyan:#7be4f1; --gold:#f2c879; }
+    :root { color-scheme: dark; --bg:#050910; --panel:#0a111b; --line:#1b2a3a; --ink:#dbe7f4; --muted:#91a4b8; --cyan:#8ab4f8; --gold:#f2c879; }
     * { box-sizing:border-box; }
     body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 "Segoe UI",sans-serif; }
     header { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; padding:22px 26px 16px; border-bottom:1px solid var(--line); background:#070d15; }
     .eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.12em; font-size:11px; }
     h1 { font-size:22px; line-height:1.15; margin:5px 0 0; font-weight:600; }
     .header-stats { display:flex; flex-wrap:nowrap; justify-content:flex-end; gap:8px; flex:0 0 auto; align-items:flex-start; }
-    .stat { min-width:0; padding:7px 12px 8px; border:1px solid var(--line); border-radius:8px; background:linear-gradient(160deg,rgba(123,228,241,0.09),rgba(123,228,241,0.015)); white-space:nowrap; }
+    .stat { min-width:0; padding:7px 12px 8px; border:1px solid var(--line); border-radius:8px; background:linear-gradient(160deg,rgba(138,180,248,0.09),rgba(138,180,248,0.015)); white-space:nowrap; }
     .stat.ml { background:linear-gradient(160deg,rgba(242,200,121,0.12),rgba(242,200,121,0.02)); border-color:rgba(242,200,121,0.28); }
     .stat-label { color:var(--muted); font-size:9px; letter-spacing:.1em; text-transform:uppercase; }
     .stat-value { margin-top:1px; font-size:18px; font-weight:600; line-height:1.15; color:var(--cyan); font-variant-numeric:tabular-nums; }
@@ -367,7 +370,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .source-toggle input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
     .source-toggle span { display:block; padding:5px 14px; border-radius:999px; color:var(--muted); font-size:12px; text-align:center; white-space:nowrap; transition:background .15s,color .15s; }
     .source-toggle label:hover input:not(:checked) + span { color:var(--ink); }
-    .source-toggle input:checked + span { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    .source-toggle input:checked + span { background:rgba(138,180,248,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(138,180,248,.5); }
     .source-toggle input:focus-visible + span { outline:2px solid var(--cyan); outline-offset:2px; }
     .sandbox { margin-bottom:14px; padding:13px 16px 14px; border:1px solid var(--line); background:var(--panel); border-radius:5px; }
     .galaxy-type { margin:0 0 12px; padding:10px 14px 11px; border:1px solid rgba(242,200,121,0.3); border-left:3px solid var(--gold); border-radius:6px; background:linear-gradient(160deg,rgba(242,200,121,0.08),rgba(242,200,121,0.01)); }
@@ -387,7 +390,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .sandbox-summary { margin:0; display:grid; grid-template-columns:1fr auto; gap:3px 12px; padding:9px 11px; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); font-size:12px; }
     .sandbox-stats-title { margin:10px 0 5px; }
     .sandbox-summary dt { color:var(--muted); white-space:nowrap; }
-    .stat-q { position:relative; display:inline-grid; place-items:center; margin-left:5px; vertical-align:1px; width:14px; height:14px; flex:none; border:1px solid rgba(123,228,241,0.45); border-radius:3px; color:var(--cyan); font-size:9px; font-weight:600; line-height:1; cursor:help; }
+    .stat-q { position:relative; display:inline-grid; place-items:center; margin-left:5px; vertical-align:1px; width:14px; height:14px; flex:none; border:1px solid rgba(138,180,248,0.45); border-radius:3px; color:var(--cyan); font-size:9px; font-weight:600; line-height:1; cursor:help; }
     .stat-q::after { content:attr(data-tip); position:absolute; left:-4px; bottom:calc(100% + 6px); z-index:20; width:210px; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:#0d1825; color:var(--ink); font-size:11px; font-weight:400; line-height:1.4; text-align:left; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,0.5); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .12s; }
     .stat-q:hover::after,.stat-q:focus-visible::after { opacity:1; visibility:visible; }
     .sandbox-summary dd { margin:0; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
@@ -460,8 +463,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     #orbitPlot:-webkit-full-screen, #orbit-plot-container:-webkit-full-screen { width:100vw; height:100vh; max-height:none; border:0; border-radius:0; background:#020206; }
     .timeline-row { display:flex; align-items:center; gap:12px; }
     .timeline-row input[type=range] { flex:1; min-width:0; }
-    .play-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:44px; min-height:44px; padding:0 14px; flex:none; font-size:13px; border-radius:22px; background:rgba(123,228,241,.12); border-color:var(--cyan); touch-action:manipulation; }
-    .play-btn[aria-pressed=true] { background:rgba(123,228,241,.28); }
+    .play-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-width:44px; min-height:44px; padding:0 14px; flex:none; font-size:13px; border-radius:22px; background:rgba(138,180,248,.12); border-color:var(--cyan); touch-action:manipulation; }
+    .play-btn[aria-pressed=true] { background:rgba(138,180,248,.28); }
     @media(max-width:560px) { .play-btn .play-text { display:none; } .play-btn { width:44px; padding:0; } }
     .fullscreen-active { position:fixed !important; inset:0; z-index:9999; width:100vw !important; height:100dvh !important; max-height:none !important; min-height:0 !important; border:0 !important; border-radius:0 !important; background:#020206; }
     body.fullscreen-lock { overflow:hidden; }
@@ -479,7 +482,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .star-mark.track { color:#b8f58c; }
     .fs-time output { color:var(--muted); font-variant-numeric:tabular-nums; }
     /* Tutorial star marks: rings that follow chosen test stars, with a live label. Tutorial aids only. */
-    .star-mark { position:absolute; left:0; top:0; z-index:4; width:0; height:0; color:#8ceaf5; pointer-events:none; }
+    .star-mark { position:absolute; left:0; top:0; z-index:4; width:0; height:0; color:#8ab4f8; pointer-events:none; }
     .star-mark.warm { color:#ffb27a; }
     .star-mark.edge::before { border-style:dashed; animation:none; }
     .star-mark.flip span { left:auto; right:17px; }
@@ -497,9 +500,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel { position:absolute; top:12px; right:12px; z-index:2; display:flex; flex-direction:column; gap:0; padding:10px; min-width:136px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.45); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); box-shadow:0 8px 28px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); cursor:default; }
     .view-panel-title { color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; padding:0 2px 2px; }
     .view-panel button { width:100%; padding:6px 10px; font-size:12px; text-align:left; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:8px; transition:background .15s,border-color .15s; }
-    .view-panel button:hover, .view-panel button:focus-visible { background:rgba(123,228,241,.16); border-color:var(--cyan); outline:none; }
-    .view-panel button:active { background:rgba(123,228,241,.28); border-color:var(--cyan); }
-    .view-panel button[aria-pressed=true] { background:rgba(123,228,241,.22); border-color:var(--cyan); color:var(--ink); }
+    .view-panel button:hover, .view-panel button:focus-visible { background:rgba(138,180,248,.16); border-color:var(--cyan); outline:none; }
+    .view-panel button:active { background:rgba(138,180,248,.28); border-color:var(--cyan); }
+    .view-panel button[aria-pressed=true] { background:rgba(138,180,248,.22); border-color:var(--cyan); color:var(--ink); }
     .view-panel .view-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
     .view-panel .view-row button { text-align:center; }
     .view-panel { min-width:188px; }
@@ -507,14 +510,14 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel .view-label { color:var(--muted); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; padding:4px 2px 0; opacity:.8; }
     .view-panel .view-seg { display:grid; grid-template-columns:repeat(3,1fr); padding:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .view-seg button { padding:4px 2px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
-    .view-panel .view-seg button:hover, .view-panel .view-seg button:focus-visible { color:var(--ink); background:rgba(123,228,241,.16); }
+    .view-panel .view-seg button:hover, .view-panel .view-seg button:focus-visible { color:var(--ink); background:rgba(138,180,248,.16); }
     .view-panel .view-switches { display:grid; grid-template-columns:1fr 1fr; gap:2px 8px; }
     .view-panel .view-switches button { display:flex; align-items:center; gap:7px; padding:4px 2px; font-size:11px; white-space:nowrap; border:0; background:transparent; color:var(--muted); }
     .view-panel .view-switches button:hover, .view-panel .view-switches button:focus-visible { background:transparent; color:var(--ink); }
     .view-panel .view-switches button[aria-checked=true] { background:transparent; color:var(--ink); }
     .view-panel .sw { position:relative; flex:none; width:24px; height:13px; border-radius:999px; background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.18); transition:background .15s,border-color .15s; }
     .view-panel .sw::after { content:""; position:absolute; top:1px; left:1px; width:9px; height:9px; border-radius:50%; background:#cfd8e3; transition:transform .15s; }
-    .view-panel [aria-checked=true] .sw { background:rgba(123,228,241,.45); border-color:var(--cyan); }
+    .view-panel [aria-checked=true] .sw { background:rgba(138,180,248,.45); border-color:var(--cyan); }
     .view-panel [aria-checked=true] .sw::after { transform:translateX(11px); background:#fff; }
     .view-panel .sw-eject[aria-checked=true] .sw { background:rgba(255,138,128,.45); border-color:#ff8a80; }
     /* Outside fullscreen the panel sits over a small plot, so it drops the section labels and tightens up. */
@@ -531,11 +534,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel [aria-checked=true] .sw::after { transform:translateX(9px); }
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
-    .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    .view-panel .mode-toggle button[aria-checked=true] { background:rgba(138,180,248,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(138,180,248,.5); }
     .view-panel .speed-toggle { display:grid; grid-template-columns:repeat(4,1fr); padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .speed-toggle button { padding:4px 2px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); transition:background .15s,color .15s; }
     .view-panel .speed-toggle button:hover, .view-panel .speed-toggle button:focus-visible { color:var(--ink); outline:none; }
-    .view-panel .speed-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
+    .view-panel .speed-toggle button[aria-checked=true] { background:rgba(138,180,248,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(138,180,248,.5); }
     #orbitPlot.pan-mode { cursor:move; }
     #orbitPlot.pan-mode.dragging { cursor:grabbing; }
     .view-panel .view-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
@@ -569,25 +572,25 @@ HTML_TEMPLATE = r"""<!doctype html>
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
     .tutorial-launch { margin-left:auto; background:transparent; color:var(--muted); font-size:12px; }
     .tutorial-launch:hover, .tutorial-launch:focus-visible { color:var(--ink); }
-    .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(123,228,241,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
+    .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(138,180,248,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
     .tutorial-welcome::backdrop { background:rgba(2,6,12,.8); }
     .tutorial-eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:600; }
     .tutorial-welcome h2 { margin:8px 0; font-size:22px; }
     .tutorial-welcome p { color:#b5c5d5; margin:0 0 18px; }
     .tutorial-welcome-actions { display:flex; flex-wrap:wrap; gap:9px; }
-    .tutorial-primary { background:rgba(123,228,241,.16); border-color:var(--cyan); color:#e4fbff; font-weight:600; }
-    .tutorial-card { position:fixed; z-index:10000; right:16px; bottom:16px; display:flex; flex-direction:column; width:min(380px,calc(100% - 32px)); max-height:min(65vh,480px); overflow:hidden; padding:18px; border:1px solid rgba(123,228,241,.24); border-radius:16px; background:linear-gradient(155deg,#142838,#0b1623 70%); box-shadow:0 16px 48px rgba(0,0,0,.58); cursor:default; user-select:text; }
+    .tutorial-primary { background:rgba(138,180,248,.16); border-color:var(--cyan); color:#e4fbff; font-weight:600; }
+    .tutorial-card { position:fixed; z-index:10000; right:16px; bottom:16px; display:flex; flex-direction:column; width:min(380px,calc(100% - 32px)); max-height:min(65vh,480px); overflow:hidden; padding:18px; border:1px solid rgba(138,180,248,.24); border-radius:16px; background:linear-gradient(155deg,#142838,#0b1623 70%); box-shadow:0 16px 48px rgba(0,0,0,.58); cursor:default; user-select:text; }
     .tutorial-card.on-left { left:16px; right:auto; }
     .tutorial-card[hidden] { display:none; }
     .tutorial-top { display:flex; flex:none; align-items:center; justify-content:space-between; gap:12px; }
     .tutorial-content { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
     .tutorial-skip { border:0; padding:4px; background:transparent; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; }
     .tutorial-skip:hover, .tutorial-skip:focus-visible { color:var(--ink); }
-    .tutorial-progress-track { flex:none; height:3px; margin:10px 0 4px; background:rgba(123,228,241,.13); border-radius:4px; }
+    .tutorial-progress-track { flex:none; height:3px; margin:10px 0 4px; background:rgba(138,180,248,.13); border-radius:4px; }
     .tutorial-progress-fill { height:100%; width:0; border-radius:inherit; background:var(--cyan); transition:width .25s ease; }
     .tutorial-card h2 { margin:10px 0 7px; font-size:18px; line-height:1.25; }
     .tutorial-card p { margin:0 0 10px; color:#c3d0de; font-size:13px; line-height:1.5; }
-    .tutorial-card .tutorial-try { margin:2px 0 0; padding:10px 12px; border-left:2px solid var(--cyan); border-radius:0 7px 7px 0; background:rgba(123,228,241,.07); color:#c7f5fa; }
+    .tutorial-card .tutorial-try { margin:2px 0 0; padding:10px 12px; border-left:2px solid var(--cyan); border-radius:0 7px 7px 0; background:rgba(138,180,248,.07); color:#c7f5fa; }
     .tutorial-feedback { flex:none; margin:9px 0 0; color:#a5e3c2; font-size:12px; }
     .tutorial-feedback[hidden] { display:none; }
     .tutorial-actions { display:flex; flex:none; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
@@ -595,7 +598,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
     .tutorial-actions button { min-height:36px; }
     .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
-    .tutorial-spotlight { position:fixed; z-index:9998; pointer-events:none; border:2px solid #8ceaf5; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 4px rgba(123,228,241,.16); transition:opacity .45s ease; }
+    .tutorial-spotlight { position:fixed; z-index:9998; pointer-events:none; border:2px solid #8ab4f8; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 4px rgba(138,180,248,.16); transition:opacity .45s ease; }
     .tutorial-spotlight[hidden] { display:none; }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
@@ -621,11 +624,112 @@ HTML_TEMPLATE = r"""<!doctype html>
     }
     @media(max-width:960px) { .panel-grid { grid-template-columns:1fr; } .plot { height:62vh; } .controls { grid-template-columns:1fr 1fr; } .control:last-child { grid-column:1/-1; } }
     @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } footer { flex-direction:column; } }
+    /* ===== Design system: tokens and component layer (visual only; no physics). ===== */
+    :root { --bg:#060a12; --panel:#0c1322; --panel-2:#101929; --line:rgba(148,170,200,.14); --line-strong:rgba(148,170,200,.28); --ink:#e7edf6; --ink-2:#b8c4d6; --muted:#8392a8; --accent:#8ab4f8; --cyan:var(--accent); --gold:#e9c88a;
+      --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
+    @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
+    body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
+    #top, #simulator, #results, #theoryGuide, #method { scroll-margin-top:72px; }
+    .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
+    .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:600; font-size:14px; letter-spacing:.01em; text-decoration:none; white-space:nowrap; }
+    .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
+    .topnav { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
+    .topnav a { padding:6px 11px; border-radius:7px; color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; white-space:nowrap; transition:color .15s,background .15s; }
+    .topnav a:hover, .topnav a:focus-visible { color:var(--ink); background:rgba(255,255,255,.05); outline:none; }
+    a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
+    .eyebrow { color:var(--accent); font:500 11px/1.4 var(--f-mono); letter-spacing:.14em; }
+    h1 { margin:12px 0; font:600 clamp(28px,3.4vw,40px)/1.08 var(--f-serif); letter-spacing:-.012em; color:var(--ink); }
+    .lead { max-width:62ch; margin:0; color:var(--ink-2); font-size:15px; line-height:1.6; }
+    .header-stats { gap:10px; align-items:stretch; }
+    .stat, .stat.ml { padding:10px 14px 11px; border:1px solid var(--line); border-radius:var(--r); background:var(--panel); }
+    .stat-label { font-size:10px; letter-spacing:.13em; color:var(--muted); }
+    .stat-value, .stat.ml .stat-value { margin-top:4px; font:500 19px/1.15 var(--f-mono); color:var(--ink); }
+    .stat-value small { font:400 11px var(--f-ui); }
+    .ml-pair span { font-family:var(--f-ui); }
+    .ml-info { border-color:var(--line-strong); color:var(--ink-2); font-family:var(--f-ui); }
+    .ml-info:hover, .ml-info[aria-expanded="true"] { background:rgba(138,180,248,.14); color:var(--ink); }
+    .ml-explainer { border-color:var(--line-strong); border-radius:var(--r); background:var(--panel-2); }
+    .ml-explainer h3 { color:var(--ink); font-family:var(--f-serif); font-size:15px; }
+    .fit-toggle { border-radius:var(--r); background:var(--panel); }
+    main { padding:8px 28px 48px; }
+    .section-head { display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:14px; align-items:baseline; margin:36px 0 14px; padding-top:20px; border-top:1px solid var(--line); }
+    main > .section-head:first-child { margin-top:20px; }
+    .section-head .kicker { grid-row:span 2; color:var(--accent); font:500 12px var(--f-mono); letter-spacing:.06em; }
+    .section-head h2 { font:600 22px/1.2 var(--f-serif); letter-spacing:-.005em; }
+    .section-head p { grid-column:2; margin:3px 0 0; color:var(--muted); font-size:13px; }
+    .model-bar, .controls, .sandbox, .panel, .learn details { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
+    .model-bar { padding:12px 18px; margin-bottom:12px; gap:14px 20px; }
+    .model-bar .model-label { font:500 10.5px var(--f-mono); letter-spacing:.14em; }
+    .controls { gap:22px 30px; padding:20px 22px; margin-bottom:0; }
+    .control label { color:var(--ink-2); font-size:12.5px; font-weight:500; }
+    .control output, .fs-sliders output { font-family:var(--f-mono); font-size:12px; color:var(--ink); }
+    .control-help { font-size:12px; line-height:1.5; }
+    input[type=range] { -webkit-appearance:none; appearance:none; height:22px; margin:0; background:transparent; cursor:pointer; }
+    input[type=range]::-webkit-slider-runnable-track { height:4px; border-radius:999px; background:rgba(148,170,200,.22); }
+    input[type=range]::-moz-range-track { height:4px; border-radius:999px; background:rgba(148,170,200,.22); }
+    input[type=range]::-moz-range-progress { height:4px; border-radius:999px; background:var(--accent); }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:16px; height:16px; margin-top:-6px; border-radius:50%; background:#eef3fa; border:2px solid var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.5); transition:box-shadow .15s; }
+    input[type=range]::-moz-range-thumb { width:12px; height:12px; border-radius:50%; background:#eef3fa; border:2px solid var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.5); }
+    input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow:0 0 0 5px rgba(138,180,248,.2); }
+    input[type=range]:focus-visible { outline:none; }
+    input[type=range]:focus-visible::-moz-range-thumb { box-shadow:0 0 0 5px rgba(138,180,248,.25); }
+    input[type=range]:disabled { cursor:not-allowed; }
+    button { padding:7px 13px; border:1px solid var(--line-strong); border-radius:8px; background:rgba(255,255,255,.035); color:var(--ink); font:500 12.5px/1.2 var(--f-ui); transition:background .15s,border-color .15s,color .15s; }
+    button:hover { border-color:rgba(138,180,248,.6); background:rgba(138,180,248,.08); }
+    button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    #applyObservedFit, .tutorial-primary { background:rgba(138,180,248,.16); border-color:rgba(138,180,248,.6); color:#eef4ff; }
+    #applyObservedFit:hover, .tutorial-primary:hover { background:rgba(138,180,248,.26); }
+    .galaxy-bar select { padding:7px 34px 7px 12px; border:1px solid var(--line-strong); border-radius:8px; background-color:var(--panel-2); font:500 13px var(--f-ui); }
+    .galaxy-summary { color:var(--ink-2); font-size:12.5px; }
+    .source-toggle span { padding:6px 16px; font-weight:500; }
+    .switch .opt { font-size:13px; }
+    .track-input { border-color:var(--line-strong); background:rgba(0,0,0,.25); font-family:var(--f-mono); }
+    .sandbox-group h3 { font:500 10.5px var(--f-mono); letter-spacing:.14em; color:var(--accent); }
+    .sandbox-summary, .key, .halo-info, .stability, .galaxy-type { border-radius:var(--r); }
+    .sandbox-summary dd { font-family:var(--f-mono); }
+    .galaxy-type h3 { font:600 18px var(--f-serif); }
+    .panel-grid { gap:16px; }
+    .panel-heading { align-items:center; padding:16px 18px 8px; }
+    .panel-heading h2 { font:600 15px var(--f-ui); color:var(--ink); }
+    .panel-heading .fig { margin-right:10px; color:var(--accent); font:500 11px var(--f-mono); letter-spacing:.08em; text-transform:uppercase; }
+    .panel-heading > span:not(#chiBadge) { color:var(--muted); font-size:12px; }
+    #chiBadge { font:500 11.5px var(--f-mono); }
+    .key { background:rgba(148,170,200,.035); }
+    .key summary { font:500 10.5px var(--f-mono); letter-spacing:.12em; color:var(--ink-2); }
+    .sw.ldash { background:none; height:0; border-top:2.5px dashed; }
+    .halo-info h3 { font:600 14px var(--f-ui); }
+    .halo-metric .metric-value { font:500 17px var(--f-mono); }
+    .stability-c { font-family:var(--f-mono); }
+    .learn { gap:16px; margin-top:0; }
+    .learn details { padding:0 22px; }
+    .learn summary { padding:16px 0; font:600 18px var(--f-serif); }
+    .learn p { color:var(--ink-2); font-size:13.5px; line-height:1.65; }
+    .learn p.tldr { color:var(--ink); font-size:14px; }
+    .schematic { margin:4px 0 16px; padding:12px 14px 10px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); color:var(--muted); }
+    .schematic svg { display:block; width:100%; max-width:440px; height:auto; margin:auto; font:10.5px var(--f-ui); }
+    .schematic text:not([fill]) { fill:currentColor; }
+    .schematic figcaption { margin-top:6px; font-size:11.5px; line-height:1.5; }
+    footer { flex-wrap:wrap; align-items:baseline; gap:8px 24px; margin:28px 0 0; padding:18px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); font-size:12px; }
+    .footer-title { flex-basis:100%; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    #footerModel, #footerCustom { color:var(--ink-2); font-family:var(--f-mono); font-size:11.5px; }
+    .tutorial-welcome, .tutorial-card { border-color:rgba(138,180,248,.24); background:linear-gradient(155deg,#121b2e,#0a101c 70%); }
+    .tutorial-welcome h2, .tutorial-card h2 { font-family:var(--f-serif); }
+    .tutorial-eyebrow { font-family:var(--f-mono); }
+    .stat-q::after { background:var(--panel-2); border-color:var(--line-strong); }
+    .telemetry { font-family:var(--f-mono); }
+    @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
+    @media (max-width:640px) { .topbar { padding:0 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn details { padding:0 16px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
+    .key summary::before { content:""; display:inline-block; width:4px; }
   </style>
 </head>
 <body>
-  <header>
-    <div><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1></div>
+  <nav class="topbar" aria-label="Page sections">
+    <a class="brand" href="#top"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
+    <div class="topnav"><a href="#simulator">Model</a><a href="#results">Results</a><a href="#theoryGuide">Theory</a><a href="#method">Method &amp; data</a></div>
+  </nav>
+  <header id="top">
+    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Compare a dark matter halo (NFW) with modified gravity (MOND) against measured rotation curves from the SPARC survey (Lelli, McGaugh &amp; Schombert 2016).</p></div>
     <div class="header-stats" aria-label="Simulation summary">
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
@@ -648,6 +752,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
   </header>
   <main>
+    <div class="section-head" id="simulator"><span class="kicker">01</span><h2>Model setup</h2><p>Choose a galaxy, a theory of gravity and the halo parameters.</p></div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
       <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
         <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span>Preset Galaxies</span></label>
@@ -709,8 +814,9 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number, e.g. 120"><p class="control-help">Rings one star and counts its laps round the centre since 0 Myr, with its speed and distance. Clear the box to stop.</p><p class="control-help">Stars are numbered from the centre outwards: star 1 starts closest to the centre and star <span id="trackLast">800</span> starts furthest out.</p></div>
     </section>
+    <div class="section-head" id="results"><span class="kicker">02</span><h2>Results</h2><p>Star orbits in 3D, and the model's rotation curve against the measured speeds.</p></div>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>3D galaxy simulation</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 Gyr</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -723,7 +829,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </section>
     </article>
       <article class="panel">
-        <div class="panel-heading"><h2>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
+        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
         <div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
           <div class="stability-head"><span class="stability-title">Halo stability monitor</span><span class="stability-badge" id="stabilityBadge" role="status"></span></div>
@@ -735,7 +841,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <details class="key">
           <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw" style="background:#5fd0e0"></i><b>Cyan</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li data-preset-only><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li data-preset-only><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
             <div data-preset-only>
             <h3>Why isn't χ² exactly 0?</h3>
             <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
@@ -745,10 +851,23 @@ HTML_TEMPLATE = r"""<!doctype html>
         </details>
       </article>
     </section>
+    <div class="section-head"><span class="kicker">03</span><h2>Background</h2><p>The two explanations this simulator tests.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <details class="nfw"><summary>What is a dark matter halo?</summary>
         <div class="learn-content">
         <p class="tldr">A dark matter halo is an extended region of invisible matter whose gravity adds to that of a galaxy's stars and gas.</p>
+        <figure class="schematic">
+          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: the speed expected from visible matter falls with radius, but measured speeds stay roughly flat">
+            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+            <path d="M36 124C58 52 78 38 108 42S196 78 302 98" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
+            <g fill="#f4f7fb"><circle cx="58" cy="70" r="3"/><circle cx="84" cy="49" r="3"/><circle cx="110" cy="42" r="3"/><circle cx="140" cy="40" r="3"/><circle cx="170" cy="39" r="3"/><circle cx="200" cy="40" r="3"/><circle cx="230" cy="38" r="3"/><circle cx="260" cy="40" r="3"/><circle cx="290" cy="39" r="3"/></g>
+            <text x="300" y="30" text-anchor="end" fill="#f4f7fb">measured: stays flat</text>
+            <text x="300" y="114" text-anchor="end" fill="#5fd0e0">visible matter only: falls</text>
+            <text x="172" y="142" text-anchor="middle">radius →</text>
+            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
+          </svg>
+          <figcaption>Schematic only, not real data. Far from most of the visible mass, Newtonian gravity predicts speeds falling roughly as 1/√r, yet measured curves stay roughly flat (Rubin, Ford &amp; Thonnard 1980).</figcaption>
+        </figure>
         <p>Stars and gas far from the centre of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
         <p>This simulator uses an NFW halo: a simple model that is denser near the centre and more diffuse farther out. Adjust the halo mass (M<sub>200</sub>, the mass within r<sub>200</sub>) and scale radius (r<sub>s</sub>) to see how its gravity changes the predicted rotation curve.</p>
         </div>
@@ -761,7 +880,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         </div>
       </details>
     </section>
-    <footer><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span data-preset-only>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
+    <footer id="method"><span class="footer-title">Method &amp; data</span><span id="footerModel">Baryons: V<sub>bar</sub>² = V<sub>gas</sub>² + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². Halo: NFW, M<sub>200</sub> and r<sub>s</sub> update locally.</span><span id="footerCustom" hidden>Baryons: V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge. Halo: NFW, starting from the stellar-to-halo mass relation.</span><span data-preset-only>SPARC values from the project’s local table2.dat.</span><button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button></footer>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span></div>
@@ -834,7 +953,7 @@ __GALAXIES_JS__
     const H0 = 0.07;
     const BG = '#050910';
     const GRID = '#1c2936';
-    const textColor = '#bac9d8';
+    const textColor = '#b8c4d6';
     const SIM_TOTAL_TIME_MYR = 1000.0;
     const SIM_DT_MYR = 1.0;
     const frameCount = 1001; // 0 to 1000 Myr (1 Gyr)
@@ -2171,7 +2290,7 @@ __GALAXIES_JS__
     // χ² needs measured speeds, so the badge is hidden for the imaginary sandbox galaxy.
     function updateChi(total){const b=document.getElementById('chiBadge');b.hidden=customActive;document.getElementById('tmChiRow').hidden=customActive;if(customActive)return;const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),dof=Math.max(1,obsV.length-2),red=chi/dof;b.textContent='χ² '+chi.toFixed(0)+' · χ²ᵣ '+red.toFixed(2);b.className=red<2?'good':red<10?'ok':'poor';const fc=document.getElementById('tm-chi');fc.textContent=red.toFixed(2);fc.className=b.className;}
     const residualsOf=total=>obsV.map((v,i)=>v-total[i]);
-    const AXIS={gridcolor:'rgba(120,150,180,0.10)',zerolinecolor:'rgba(120,150,180,0.22)',linecolor:'rgba(120,150,180,0.25)',tickcolor:'rgba(120,150,180,0.25)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#9fb0c2'}};
+    const AXIS={gridcolor:'rgba(148,170,200,0.08)',gridwidth:1,zerolinecolor:'rgba(148,170,200,0.3)',linecolor:'rgba(148,170,200,0.32)',showline:true,mirror:false,tickcolor:'rgba(148,170,200,0.32)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#8e9db3',family:'JetBrains Mono,ui-monospace,Consolas,monospace'},title:{font:{size:12,color:'#b8c4d6'}}};
     // Residual bars are about half the mean spacing of the SPARC radii, so dense and sparse curves both read clearly.
     const residualBarWidth=()=>Math.round(53*(radii[radii.length-1]-radii[0])/(radii.length-1))/100;
     // The custom galaxy's stellar disk, bulge and gas speeds are drawn as thin dotted lines (hidden for presets).
@@ -2179,19 +2298,19 @@ __GALAXIES_JS__
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
     const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
     const buildCurveData=(halo,total)=>[
-      {type:'scatter',mode:'markers',name:'Observed (SPARC)',visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'Observed <b>%{y:.0f}</b><extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'Baryonic <b>%{y:.0f}</b><extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b><extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b><extra></extra>'},
-      {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
+      {type:'scatter',mode:'markers',name:'Observed (SPARC)',visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(232,238,246,0.5)',thickness:1.1,width:3},marker:{size:6.5,color:'#f4f7fb',line:{color:'#070b14',width:1.4}},customdata:obsErr,hovertemplate:'Observed <b>%{y:.0f}</b> ± %{customdata:.0f} km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Visible matter (baryons)',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.2,dash:'6px,4px',shape:'spline',smoothing:0.6},hovertemplate:'Baryons <b>%{y:.0f}</b> km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.08)',line:{color:'#b39ae8',width:1.8,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b> km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b> km/s<extra></extra>'},
+      {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
     ];
-    const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
-      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor',hoverformat:'.1f'},
-      yaxis:{...AXIS,title:{text:'Orbital velocity (km/s)',standoff:10},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
-      yaxis2:{...AXIS,title:{text:'Residual',standoff:6},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
-      bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.03,xanchor:'left',x:0,font:{size:11,color:'#c3cfdb'},itemsizing:'constant'},
-      hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.72)',bordercolor:'rgba(120,150,180,0.25)',font:{color:'#f1f5f9',size:10}},dragmode:false};
+    const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
+      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor',hoverformat:'.1f'},
+      yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
+      yaxis2:{...AXIS,title:{text:'Obs − model',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
+      bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,tracegroupgap:4},
+      hovermode:'x unified',hoverlabel:{bgcolor:'rgba(10,15,26,0.94)',bordercolor:'rgba(148,170,200,0.3)',font:{color:'#eef2f8',size:11,family:'Inter,Segoe UI,sans-serif'}},dragmode:false};
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
     const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout;
@@ -2424,8 +2543,8 @@ __GALAXIES_JS__
       document.getElementById('chiBadge').title=mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points';
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
-      const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)');
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Baryonic',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
+      const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)');
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Visible matter (baryons)',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
