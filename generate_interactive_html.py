@@ -320,7 +320,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stat.ml.off .ml-pair { display:none; }
     .stat.ml.off .ml-off-note { display:block; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
-    .ml-explainer[hidden] { display:none; }
+    .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
+    .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
+    @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
     .ml-explainer p { margin:0 0 8px; }
     .ml-explainer ul { margin:0 0 8px; padding-left:18px; }
@@ -561,7 +563,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
         <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><div class="ml-off-note">Not used: sandbox masses are set directly</div></div>
-        <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" hidden>
+        <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
           <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
           <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
           <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L, or the Greek letter upsilon, Υ) converts one into the other: it is how many Suns' worth of mass the stars hold for every Sun's worth of light they give off.</p>
@@ -2198,19 +2200,37 @@ __GALAXIES_JS__
       document.getElementById('mondA0Text').textContent=`${(MOND_A0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;
     }
     mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
-    // "?" on the M/L tile opens a short explainer; closes on ×, Escape or a click elsewhere.
+    // "?" on the M/L tile: a mouse hover fades the explainer in and moving away fades it out
+    // (a short grace period lets the pointer travel into the box). Touch and keyboard users tap/press
+    // the button instead, and close it with ×, Escape or a tap elsewhere.
     const mlInfoBtn=document.getElementById('mlInfoBtn'),mlExplainer=document.getElementById('mlExplainer');
-    const setMlExplainer=open=>{
-      mlExplainer.hidden=!open;mlInfoBtn.setAttribute('aria-expanded',String(open));
-      if(!open)return;
-      // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
-      mlExplainer.style.left='';mlExplainer.style.right='';
-      if(mlExplainer.getBoundingClientRect().left<16){mlExplainer.style.left='0';mlExplainer.style.right='auto';}
+    let mlHover=false,mlPinned=false,mlCloseTimer=null,mlLastPointer='';
+    const mlIsOpen=()=>mlExplainer.classList.contains('open');
+    const renderMlExplainer=()=>{
+      const open=mlHover||mlPinned;
+      if(open&&!mlIsOpen()){
+        // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
+        mlExplainer.style.left='';mlExplainer.style.right='';
+        if(mlExplainer.getBoundingClientRect().left<16){mlExplainer.style.left='0';mlExplainer.style.right='auto';}
+      }
+      mlExplainer.classList.toggle('open',open);
+      mlExplainer.setAttribute('aria-hidden',String(!open));
+      mlInfoBtn.setAttribute('aria-expanded',String(open));
     };
-    mlInfoBtn.addEventListener('click',e=>{e.stopPropagation();setMlExplainer(mlExplainer.hidden);});
-    document.getElementById('mlExplainerClose').addEventListener('click',()=>{setMlExplainer(false);mlInfoBtn.focus();});
-    document.addEventListener('click',e=>{if(!mlExplainer.hidden&&!mlExplainer.contains(e.target))setMlExplainer(false);});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!mlExplainer.hidden){setMlExplainer(false);mlInfoBtn.focus();}});
+    const closeMlExplainer=()=>{mlHover=false;mlPinned=false;clearTimeout(mlCloseTimer);renderMlExplainer();};
+    [mlInfoBtn,mlExplainer].forEach(el=>{
+      el.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(mlCloseTimer);mlHover=true;renderMlExplainer();});
+      el.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;clearTimeout(mlCloseTimer);mlCloseTimer=setTimeout(()=>{mlHover=false;renderMlExplainer();},150);});
+    });
+    mlInfoBtn.addEventListener('pointerdown',e=>{mlLastPointer=e.pointerType;});
+    mlInfoBtn.addEventListener('click',e=>{
+      e.stopPropagation();
+      if(mlLastPointer==='mouse'){mlLastPointer='';return;}  // mouse users already see it on hover
+      mlLastPointer='';mlPinned=!mlPinned;renderMlExplainer();
+    });
+    document.getElementById('mlExplainerClose').addEventListener('click',()=>{closeMlExplainer();mlInfoBtn.focus();});
+    document.addEventListener('click',e=>{if(mlIsOpen()&&!mlExplainer.contains(e.target)&&e.target!==mlInfoBtn)closeMlExplainer();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mlIsOpen()){closeMlExplainer();mlInfoBtn.focus();}});
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
       if(!mondMode)mondFitToggle.checked=false;

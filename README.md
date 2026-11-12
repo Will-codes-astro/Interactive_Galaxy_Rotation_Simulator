@@ -119,11 +119,13 @@ are compared with, without touching the anatomy.
   "Not used", because sandbox masses are set directly rather than converted
   from light.
 
-The "?" on the M/L tile opens a short explainer: what a mass-to-light ratio
+Hovering over the "?" on the M/L tile fades in a short explainer (tap or
+press it on touch screens and keyboards): what a mass-to-light ratio
 is, why young stellar populations have low M/L and old ones high M/L, and that
-the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 Î¼m are standard averages
+the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 μm are standard averages
 (Lelli, McGaugh & Schombert 2016; McGaugh & Schombert 2014), not values
-measured for each galaxy. It closes on Ã—, Escape or a click elsewhere.
+measured for each galaxy. It fades out when the pointer leaves, or on ×,
+Escape or a tap elsewhere.
 
 Test stars:
 
