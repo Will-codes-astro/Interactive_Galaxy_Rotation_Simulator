@@ -311,7 +311,34 @@
     .tutorial-card h2 { margin:10px 0 7px; font-size:18px; line-height:1.25; }
     .tutorial-card p { margin:0 0 10px; color:#c3d0de; font-size:13px; line-height:1.5; }
     .tutorial-card .tutorial-try { margin:2px 0 0; padding:10px 12px; border-left:2px solid var(--cyan); border-radius:0 7px 7px 0; background:rgba(138,180,248,.07); color:#c7f5fa; }
-    .tutorial-feedback { flex:none; margin:9px 0 0; color:#a5e3c2; font-size:12px; }
+    .tutorial-feedback { flex:none; display:flex; align-items:center; gap:10px; margin:9px 0 0; color:#a5e3c2; font-size:12px; animation:tutorial-pop .3s cubic-bezier(.2,.8,.2,1) both; }
+    #tutorialFeedbackText { flex:1; min-width:0; }
+    .tutorial-auto { flex:none; display:inline-flex; align-items:center; gap:6px; padding:3px 4px 3px 10px; border:1px solid rgba(165,227,194,.35); border-radius:999px; background:rgba(165,227,194,.08); color:#a5e3c2; font-size:11px; font-weight:600; cursor:pointer; transition:background .15s ease, opacity .2s ease; }
+    .tutorial-auto[hidden] { display:none; }
+    .tutorial-auto:hover, .tutorial-auto:focus-visible { background:rgba(165,227,194,.17); }
+    .tutorial-auto.is-paused { opacity:.55; }
+    .tutorial-clock { position:relative; width:20px; height:20px; }
+    .tutorial-clock svg { display:block; width:100%; height:100%; transform:rotate(-90deg); }
+    .tutorial-clock circle { fill:none; stroke-width:2; }
+    .tutorial-clock .track { stroke:rgba(165,227,194,.2); }
+    .tutorial-clock .ring { stroke:#a5e3c2; stroke-linecap:round; stroke-dasharray:43.98; }
+    .tutorial-clock b { position:absolute; inset:0; display:grid; place-items:center; font-size:10px; font-variant-numeric:tabular-nums; }
+    /* Moving between cards: the old text slides out the way you are going, the new text follows in, line by line. */
+    .tutorial-card { transition:opacity .2s ease, transform .2s ease; }
+    .tutorial-content, .tutorial-feedback { transition:opacity .14s ease, transform .14s ease; }
+    .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { opacity:0; transform:translateX(calc(var(--dir,1) * -12px)); }
+    .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry) { animation:tutorial-in .34s cubic-bezier(.2,.8,.2,1) both; }
+    .tutorial-card.enter #tutorialText { animation-delay:.04s; }
+    .tutorial-card.enter #tutorialTry { animation-delay:.08s; }
+    /* When the card swaps sides of the page it fades out and rises back in, rather than jumping across. */
+    .tutorial-card.leave-side { opacity:0; transform:translateY(10px) scale(.98); }
+    .tutorial-card.enter-side { animation:tutorial-card-in .34s cubic-bezier(.2,.8,.2,1); }
+    @keyframes tutorial-in { from { opacity:0; transform:translateX(calc(var(--dir,1) * 16px)); } }
+    @keyframes tutorial-card-in { from { opacity:0; transform:translateY(10px) scale(.98); } }
+    @keyframes tutorial-pop { from { opacity:0; transform:translateY(4px); } }
+    /* The highlight settles onto each new control instead of appearing there. */
+    .tutorial-spotlight.is-arriving { animation:tutorial-pulse 2.2s ease-in-out infinite, tutorial-arrive .45s cubic-bezier(.2,.8,.2,1); }
+    @keyframes tutorial-arrive { from { opacity:0; transform:scale(1.06); } }
     .tutorial-feedback[hidden] { display:none; }
     .tutorial-actions { display:flex; flex:none; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
     .tutorial-keys { align-self:center; margin-right:auto; color:var(--muted); font-size:11px; }
@@ -330,7 +357,7 @@
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight { transition:none; } .tutorial-spotlight { animation:none; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-feedback, .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -658,7 +685,7 @@
     <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
     <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
-    <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
+    <div class="tutorial-feedback" id="tutorialFeedback" hidden><span id="tutorialFeedbackText" role="status" aria-live="polite"></span><button type="button" class="tutorial-auto" id="tutorialAuto" aria-label="Go to the next slide now" title="Moving on in a few seconds. Press to go now." hidden>Next slide<span class="tutorial-clock" aria-hidden="true"><svg viewBox="0 0 20 20"><circle class="track" cx="10" cy="10" r="7"/><circle class="ring" id="tutorialAutoRing" cx="10" cy="10" r="7"/></svg><b id="tutorialAutoNum">5</b></span></button></div>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" id="tutorialMore" hidden>Sandbox tour</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
   <script>
@@ -3018,7 +3045,8 @@ window.GALAXIES = {
       if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
       tutorialCompleted[id]=message;
       tutorialFeedback.hidden=false;
-      tutorialFeedback.textContent='✓ '+message;
+      tutorialFeedbackText.textContent='✓ '+message;
+      startTutorialAuto();
       tutorialSpotlight.classList.add('is-complete');
       updateTutorialNextGate();
     }
@@ -3043,7 +3071,8 @@ window.GALAXIES = {
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
       if(target!==tutorialAimTarget){
         if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
-        tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached');
+        tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached','is-arriving');
+        void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
       }
       const rect=tutorialSpotRect(target);
       tutorialSpotLast=rectKey(rect);
@@ -3124,7 +3153,8 @@ window.GALAXIES = {
       tutorialText.textContent=step.text;
       tutorialTry.textContent='Try it: '+tutorialInstruction();
       tutorialFeedback.hidden=!tutorialCompleted[step.id];
-      tutorialFeedback.textContent=tutorialCompleted[step.id]?'✓ '+tutorialCompleted[step.id]:'';
+      tutorialFeedbackText.textContent=tutorialCompleted[step.id]?'✓ '+tutorialCompleted[step.id]:'';
+      stopTutorialAuto();
       tutorialSpotlight.classList.toggle('is-complete',!!tutorialCompleted[step.id]);
       document.getElementById('tutorialContent').scrollTop=0;
       tutorialBack.disabled=tutorialIndex===0;
@@ -3148,6 +3178,7 @@ window.GALAXIES = {
       if(tutorialWelcome.open)tutorialWelcome.close();
       tutorialTour=TOURS[tour]?tour:'main';
       tutorialSteps=TOURS[tutorialTour].steps;
+      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('leave','leave-side');
       tutorialIndex=0;
       tutorialCompleted={};
       // In the main tour the Visible Matter Only shortcut is revealed by the step that sets the halo to zero.
@@ -3157,7 +3188,51 @@ window.GALAXIES = {
       showTutorialStep();
       tutorialTitle.focus({preventScroll:true});
     }
+    // After the step's action is done, a 5 s countdown moves to the next card. It pauses while a mouse button or
+    // finger is held down (mid-drag), and pressing it goes straight on.
+    const tutorialFeedbackText=document.getElementById('tutorialFeedbackText'),tutorialAuto=document.getElementById('tutorialAuto');
+    const tutorialAutoNum=document.getElementById('tutorialAutoNum'),tutorialAutoRing=document.getElementById('tutorialAutoRing');
+    const TUTORIAL_AUTO_MS=5000,TUTORIAL_RING=2*Math.PI*7;
+    let tutorialAutoLeft=0,tutorialAutoLast=0,tutorialAutoFrame=0,tutorialHolding=false,tutorialSwitchTimer=0;
+    function startTutorialAuto(){
+      stopTutorialAuto();
+      if(tutorialIndex>=tutorialSteps.length-1)return;
+      tutorialAutoLeft=TUTORIAL_AUTO_MS;tutorialAutoLast=performance.now();
+      tutorialAutoNum.textContent='5';tutorialAutoRing.style.strokeDashoffset='0';
+      tutorialAuto.hidden=false;
+      tutorialAutoFrame=requestAnimationFrame(tickTutorialAuto);
+    }
+    function stopTutorialAuto(){cancelAnimationFrame(tutorialAutoFrame);tutorialAutoFrame=0;tutorialAuto.hidden=true;}
+    function tickTutorialAuto(now){
+      const dt=Math.min(100,Math.max(0,now-tutorialAutoLast));tutorialAutoLast=now;
+      if(!tutorialHolding&&!document.hidden)tutorialAutoLeft-=dt;
+      tutorialAuto.classList.toggle('is-paused',tutorialHolding);
+      if(tutorialAutoLeft<=0){stopTutorialAuto();goTutorialStep(tutorialIndex+1,1);return;}
+      tutorialAutoNum.textContent=String(Math.ceil(tutorialAutoLeft/1000));
+      tutorialAutoRing.style.strokeDashoffset=String(TUTORIAL_RING*(1-tutorialAutoLeft/TUTORIAL_AUTO_MS));
+      tutorialAutoFrame=requestAnimationFrame(tickTutorialAuto);
+    }
+    tutorialAuto.addEventListener('click',()=>goTutorialStep(tutorialIndex+1,1));
+    window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target);},{capture:true,passive:true});
+    ['pointerup','pointercancel'].forEach(type=>window.addEventListener(type,()=>{tutorialHolding=false;},{capture:true,passive:true}));
+    // Card-to-card animation: dir is 1 going forward, -1 going back.
+    function goTutorialStep(index,dir){
+      if(index<0||index>=tutorialSteps.length||tutorialCard.hidden)return;
+      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches){tutorialIndex=index;showTutorialStep();return;}
+      const sideChange=!tutorialIsFullscreen()&&(innerWidth>960&&!tutorialSteps[index].cardRight)!==tutorialCard.classList.contains('on-left');
+      tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
+      tutorialCard.style.setProperty('--dir',dir);
+      tutorialCard.classList.add(sideChange?'leave-side':'leave');
+      tutorialSwitchTimer=setTimeout(()=>{
+        tutorialCard.classList.remove('leave','leave-side');
+        tutorialIndex=index;showTutorialStep();
+        void tutorialCard.offsetWidth;
+        tutorialCard.classList.add(sideChange?'enter-side':'enter');
+      },sideChange?200:140);
+    }
     function endTutorial(){
+      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
       tutorialTarget=null;
       tutorialCard.hidden=true;
       tutorialSpotlight.hidden=true;
@@ -3280,10 +3355,10 @@ window.GALAXIES = {
     document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
     tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
-    tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0){tutorialIndex--;showTutorialStep();}});
+    tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0)goTutorialStep(tutorialIndex-1,-1);});
     tutorialNext.addEventListener('click',()=>{
       if(tutorialIndex===tutorialSteps.length-1){endTutorial();return;}
-      tutorialIndex++;showTutorialStep();
+      goTutorialStep(tutorialIndex+1,1);
     });
     // The main tour's last step offers the sandbox tour; pressing it opens the Custom Sandbox.
     tutorialMore.addEventListener('click',()=>{
