@@ -109,13 +109,14 @@ residual columns.
   used. The bulge is a Hernquist sphere, Φ = −GM/(r + r_b), with r_b as its scale
   radius. The components add in quadrature to the baryonic curve and are
   drawn as thin dotted lines.
-- The halo starts at the stellar-to-halo mass relation baseline: M200 is
+- The halo starts at the typical halo for the galaxy's stellar mass (the
+  stellar-to-halo mass relation): M200 is
   Moster et al. (2013) inverted for the stellar mass (disk + bulge) and r_s
   comes from the Dutton & Macciò (2014) mass–concentration relation.
   The existing halo mass slider becomes the fine-tuning control, spanning
   0 to 5 times the baseline (it keeps its multiple when the anatomy moves the
   baseline), and the scale radius follows the relation until it is moved.
-  Apply SHMR Baseline restores both. The MOND mass-to-light fit does not apply
+  The Typical Halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
 - The header's Mass-to-light (M/L) tile is hidden in the sandbox, because
   sandbox masses are set directly rather than converted from light.
@@ -154,33 +155,43 @@ Test stars:
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
   dense centres never meet a force singularity.
 
-The 3D view also draws the cold gas as a faint blue cloud (the View panel's
+The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
 Hide gas button switches it off): an exponential disk
 three times as extended as the stars, cut at R_max, whose brightness follows
 the gas mass. The Reset view, Face-on and Edge-on distances scale with the
 galaxy (NGC 3198 keeps its original framing), and switching galaxy or mode
-re-frames the camera. A small, faint readout in the top-left corner of the 3D
+re-frames the camera. In fullscreen a corner panel holds Play, Restart (back
+to 0 Myr and play), the clock and the two halo sliders. A small, faint readout in the top-left corner of the 3D
 view shows only the ejected count and the halo r200 ("no halo" in MOND or at
 zero halo mass).
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tours do not reset or change simulator settings.
-The main tutorial's 15 steps start from the puzzle in the rotation curve
+The main tutorial's 18 steps start from the puzzle in the rotation curve
 (measured speeds stay above the visible-matter prediction), then remove and
 restore the halo, change its shape, read the halo cards (r200, scale radius,
-concentration), score the fit with χ², compare MOND and its best-fit switch,
-play the orbits, cover the View controls (including fullscreen) and the scale
-of the full halo, and end with the Galaxy menu, the mass-to-light explainer,
-the theory guide and the CSV export. An animated pointer shows where to go on
+concentration), score the fit with χ², and compare MOND and its best-fit
+switch. A "watch it happen" chapter then runs inside fullscreen, where the
+tour card follows: hide the gas and halo, look face-on with orbit lines,
+watch two ringed stars race (live lap counts and speeds show differential
+rotation on a flat rotation curve), turn edge-on to see a ringed star bob
+through the thin disk, remove the halo and follow the first star to cross a
+red ejection-line ring, then restore the halo and zoom out to the full halo.
+It ends with the Galaxy menu, the mass-to-light explainer and the theory
+guide. The rings, labels and ejection ring are tutorial aids drawn from the
+already computed trajectories; they never change the simulation. Watch steps
+tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
-highlighted control, and comes back only when the step points somewhere new. A second, 8-step Sandbox tour covers
+highlighted control, and comes back only when the step points somewhere new. A second, 12-step Sandbox tour covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
-halo stability monitor and the halo sliders. It starts from the
+halo stability monitor (what it reads, then pushing a halo out of range), the
+halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
+orbits, then the first star lost without dark matter). It starts from the
 Sandbox tour button on the tutorial's last step (which opens the Custom
 Sandbox), or from the Tutorial button, which reads "Sandbox tour" while the
 sandbox is open. If a step needs a different mode (NFW or MOND, a halo above
-zero, or the other galaxy source), the card says so and points at the control. Each halo and
+zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
 the left and right arrow keys navigate the tour when a control is not being
