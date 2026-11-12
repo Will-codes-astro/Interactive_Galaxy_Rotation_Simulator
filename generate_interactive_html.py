@@ -2305,8 +2305,10 @@ __GALAXIES_JS__
       sliderDragging=false;
       scheduleOrbitUpdate();
     }
-    window.addEventListener('pointerup',finishSliderDrag);
-    window.addEventListener('pointercancel',finishSliderDrag);
+    // Capture phase: the fullscreen panel stops pointer events bubbling (so drags don't spin the camera), and a
+    // bubbling listener here never heard its sliders being released, so the orbits were never rebuilt.
+    window.addEventListener('pointerup',finishSliderDrag,true);
+    window.addEventListener('pointercancel',finishSliderDrag,true);
     updateHalo();
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
         massSlider.value=DEFAULTS.massT;
