@@ -318,7 +318,9 @@
     @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
     .tutorial-actions button { min-height:36px; }
     .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
-    .tutorial-spotlight { position:fixed; z-index:9998; pointer-events:none; border:2px solid #8ab4f8; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 4px rgba(138,180,248,.16); transition:opacity .45s ease; }
+    .tutorial-spotlight { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #8ab4f8; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 3px rgba(138,180,248,.18); transition:opacity .45s ease; animation:tutorial-pulse 2.2s ease-in-out infinite; }
+    /* Gentle pulse on the highlight ring (visual only). */
+    @keyframes tutorial-pulse { 0%,100% { border-color:#8ab4f8; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 3px rgba(138,180,248,.18); } 50% { border-color:#b9d3ff; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 7px rgba(138,180,248,.07); } }
     .tutorial-spotlight[hidden] { display:none; }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
@@ -328,7 +330,7 @@
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight { transition:none; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight { transition:none; } .tutorial-spotlight { animation:none; } }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -3018,6 +3020,13 @@ window.GALAXIES = {
       tutorialFeedback.hidden=false;
       tutorialFeedback.textContent='✓ '+message;
       tutorialSpotlight.classList.add('is-complete');
+      updateTutorialNextGate();
+    }
+    // The 'press Fullscreen' steps cannot be skipped with Next: the steps after them need fullscreen.
+    function updateTutorialNextGate(){
+      const step=tutorialStep(),gated=/^(fsEnter|sbFs)$/.test(step.id)&&!tutorialCompleted[step.id];
+      tutorialNext.disabled=gated;
+      tutorialNext.title=gated?'Press Fullscreen to carry on':'';
     }
     function tutorialIsFullscreen(){return !!nativeFsElement()||orbitPlot.classList.contains('fullscreen-active');}
     // Keeps the highlight glued to its control when the control or the page changes size without a scroll or window
@@ -3036,14 +3045,17 @@ window.GALAXIES = {
         if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
         tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached');
       }
-      const rect=target.getBoundingClientRect();
+      const rect=tutorialSpotRect(target);
+      tutorialSpotLast=rectKey(rect);
       if((!rect.width&&!rect.height)||rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
       tutorialSpotlight.hidden=false;
-      const pad=gesture==='scan'||gesture==='drag'?4:6;
+      // The ring is border-box, so it sits exactly pad px outside the control on every side, with matching corners.
+      const pad=4,radius=parseFloat(getComputedStyle(target).borderTopLeftRadius)||0;
       tutorialSpotlight.style.left=(rect.left-pad)+'px';
       tutorialSpotlight.style.top=(rect.top-pad)+'px';
       tutorialSpotlight.style.width=(rect.width+2*pad)+'px';
       tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
+      tutorialSpotlight.style.borderRadius=(Math.min(radius,rect.height/2)+pad)+'px';
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
@@ -3054,11 +3066,35 @@ window.GALAXIES = {
         const destination=gesture==='zero'?0:gesture==='increase'?Math.min(1,Math.max(.55,fraction+.2)):(fraction>.5?.2:.8);
         toX=8+(rect.width-16)*destination;
       }
-      tutorialSpotlight.style.setProperty('--from-x',(fromX+pad)+'px');
-      tutorialSpotlight.style.setProperty('--to-x',(toX+pad)+'px');
-      tutorialSpotlight.style.setProperty('--from-y',(fromY+pad)+'px');
-      tutorialSpotlight.style.setProperty('--to-y',(toY+pad)+'px');
+      tutorialSpotlight.style.setProperty('--from-x',(fromX+pad-2)+'px');
+      tutorialSpotlight.style.setProperty('--to-x',(toX+pad-2)+'px');
+      tutorialSpotlight.style.setProperty('--from-y',(fromY+pad-2)+'px');
+      tutorialSpotlight.style.setProperty('--to-y',(toY+pad-2)+'px');
     }
+    // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
+    // highlight grows to cover a box that expands out of it.
+    function tutorialSpotRect(target){
+      const r=target.getBoundingClientRect();
+      let left=r.left,top=r.top,right=r.right,bottom=r.bottom;
+      const openers=[...target.querySelectorAll('[aria-expanded="true"][aria-controls]')];
+      if(target.matches('[aria-expanded="true"][aria-controls]'))openers.push(target);
+      openers.forEach(btn=>{
+        const pop=document.getElementById(btn.getAttribute('aria-controls'));
+        if(!pop||pop.hidden)return;
+        const p=pop.getBoundingClientRect();
+        if(!p.width||!p.height)return;
+        left=Math.min(left,p.left);top=Math.min(top,p.top);right=Math.max(right,p.right);bottom=Math.max(bottom,p.bottom);
+      });
+      return{left,top,right,bottom,width:right-left,height:bottom-top};
+    }
+    const rectKey=r=>[r.left,r.top,r.width,r.height].map(v=>Math.round(v*2)).join();
+    // Every frame, re-measure the control and re-fit the ring if it has moved or changed size (an expanding box,
+    // a layout shift above it, a CSS transition), so the highlight always hugs it.
+    let tutorialSpotLast='';
+    (function trackTutorialSpot(){
+      if(!tutorialCard.hidden&&tutorialAimTarget&&!tutorialIsFullscreen()&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
+      requestAnimationFrame(trackTutorialSpot);
+    })();
     function syncTutorialFullscreen(){
       const fullscreen=tutorialIsFullscreen();
       const parent=fullscreen?orbitPlot:document.body;
@@ -3093,6 +3129,7 @@ window.GALAXIES = {
       document.getElementById('tutorialContent').scrollTop=0;
       tutorialBack.disabled=tutorialIndex===0;
       tutorialNext.textContent=lastStep?'Finish':'Next';
+      updateTutorialNextGate();
       tutorialMore.hidden=!(lastStep&&tutorialTour==='main');
       tutorialCard.classList.toggle('on-left',innerWidth>960&&!step.cardRight);
       setStarMarks(step.marks);
