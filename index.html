@@ -7,6 +7,12 @@
   <title>Interactive Galaxy Rotation Simulator</title>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
   <style>
     :root { color-scheme: dark; --bg:#050910; --panel:#0a111b; --line:#1b2a3a; --ink:#dbe7f4; --muted:#91a4b8; --cyan:#7be4f1; --gold:#f2c879; }
     * { box-sizing:border-box; }
@@ -1258,6 +1264,26 @@ window.GALAXIES = {
         orbitPlot.appendChild(renderer.domElement);
         const scene=new THREE.Scene();
         const camera=new THREE.PerspectiveCamera(40,1,1,3000);
+        // Bloom (visual choice, like a camera exposure): bright light bleeds softly into its surroundings, then a soft
+        // highlight shoulder stops piled-up light clipping to flat white. Falls back to a plain render if the add-ons fail to load.
+        const composer=(()=>{
+            if(!THREE.EffectComposer||!THREE.UnrealBloomPass)return null;
+            try{
+                const gl2=renderer.capabilities&&renderer.capabilities.isWebGL2;
+                const opts={type:THREE.HalfFloatType,format:THREE.RGBAFormat};
+                const target=gl2&&THREE.WebGLMultisampleRenderTarget?new THREE.WebGLMultisampleRenderTarget(1,1,opts):new THREE.WebGLRenderTarget(1,1,opts);
+                if(gl2)target.samples=4;
+                const fx=new THREE.EffectComposer(renderer,target);
+                fx.addPass(new THREE.RenderPass(scene,camera));
+                fx.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(256,256),0.55,0.45,0.62));
+                fx.addPass(new THREE.ShaderPass({uniforms:{tDiffuse:{value:null}},
+                    vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+                    fragmentShader:`uniform sampler2D tDiffuse;varying vec2 vUv;
+                        void main(){vec4 c=texture2D(tDiffuse,vUv);vec3 x=c.rgb,k=0.7+0.3*(1.0-exp(-(x-0.7)/0.3));
+                            gl_FragColor=vec4(mix(x,k,step(0.7,x)),1.0);}`}));
+                return fx;
+            }catch(e){console.warn('Bloom unavailable',e);return null;}
+        })();
         const distantStarCount=900,distantStarPositions=new Float32Array(distantStarCount*3);
         let starSeed=3198;
         const randomStar=()=>{starSeed=(starSeed*1664525+1013904223)>>>0;return starSeed/4294967296;};
@@ -1276,45 +1302,91 @@ window.GALAXIES = {
         distantStars.frustumCulled=false;scene.add(distantStars);
         // Three-quarter view: ~39 degrees above the disk plane, framed to fit the galaxy.
         const GALAXY_VIEW=(()=>{const e=[0.55,-1.0,0.8],r=Math.hypot(...e);return{theta:Math.atan2(e[1],e[0]),phi:Math.acos(e[2]/r),radius:r*40,target:[0,0,0]};})();
-        // Every star (bulge + disk) is an InstancedMesh sphere; no glowing orbs or halo clutter. The mesh holds the largest
-        // possible population and draws only the first starCount instances; syncStarMeshes() refills it.
-        const STAR_BASE_RADIUS=0.13;
-        const starMaterial = new THREE.MeshBasicMaterial({
-            color: 0xffffff, // Neutral base so per-instance colors show unchanged
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending,
-            depthWrite: false // Crucial for additive blending so overlapping stars glow properly
-        });
-        const starMesh=new THREE.InstancedMesh(new THREE.SphereGeometry(STAR_BASE_RADIUS,10,8),starMaterial,MAX_STARS);
-        starMesh.setColorAt(0,new THREE.Color(0xffffff)); // allocates the per-instance colours while count is still the capacity
-        starMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-        starMesh.frustumCulled=false;starMesh.renderOrder=1;
-        scene.add(starMesh);
-
-        function createGlowTexture(){
-            const canvas=document.createElement('canvas');
-            canvas.width=128;canvas.height=128;
-            const ctx=canvas.getContext('2d');
-            const grad=ctx.createRadialGradient(64,64,0,64,64,64);
-            grad.addColorStop(0.0,'rgba(255, 255, 255, 1.0)');
-            grad.addColorStop(0.15,'rgba(255, 235, 200, 0.9)');
-            grad.addColorStop(0.4,'rgba(255, 170, 60, 0.4)');
-            // Fade to transparent white (not black) to preserve color vibrancy
-            grad.addColorStop(1.0,'rgba(255, 255, 255, 0.0)');
-            ctx.fillStyle=grad;ctx.fillRect(0,0,128,128);
-            return new THREE.CanvasTexture(canvas);
-        }
-        // Soft glow halo per star, tinted by the star's instance color and following the instanced spheres.
-        const glowGeometry=new THREE.BufferGeometry();
-        glowGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3).setUsage(THREE.DynamicDrawUsage));
-        glowGeometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3).setUsage(THREE.DynamicDrawUsage));
-        const glowPoints=new THREE.Points(glowGeometry,new THREE.PointsMaterial({
-            map:createGlowTexture(),size:1.6,sizeAttenuation:true,vertexColors:true,transparent:true,
-            opacity:0.55,blending:THREE.AdditiveBlending,depthWrite:false
+        // Every simulated star (bulge + disk) is one point of light: a bright core with soft wings, like a star seen through
+        // a telescope, and diffraction spikes on the brightest few (visual choice). The buffers hold the largest possible
+        // population and draw only the first starCount; syncStarMeshes() fills colour and brightness, updateStarTransforms() positions.
+        const starGeometry=new THREE.BufferGeometry();
+        starGeometry.setAttribute('position',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3).setUsage(THREE.DynamicDrawUsage));
+        starGeometry.setAttribute('aColor',new THREE.BufferAttribute(new Float32Array(MAX_STARS*3),3));
+        starGeometry.setAttribute('aLum',new THREE.BufferAttribute(new Float32Array(MAX_STARS),1));
+        const starUniforms={uScale:{value:600},uDpr:{value:1},uWorld:{value:1.1}};
+        const starPoints=new THREE.Points(starGeometry,new THREE.ShaderMaterial({
+            uniforms:starUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+            vertexShader:`attribute vec3 aColor;attribute float aLum;uniform float uScale;uniform float uDpr;uniform float uWorld;
+                varying vec3 vCol;varying float vInt;varying float vSpike;
+                void main(){vCol=aColor;vSpike=step(0.88,aLum);vInt=0.3+0.7*aLum;
+                    vec4 mv=modelViewMatrix*vec4(position,1.0);
+                    float px=clamp(uWorld*(0.55+0.9*aLum)*uScale/max(-mv.z,1.0),2.2*uDpr,22.0*uDpr);
+                    gl_PointSize=px*mix(1.0,2.6,vSpike);gl_Position=projectionMatrix*mv;}`,
+            fragmentShader:`varying vec3 vCol;varying float vInt;varying float vSpike;
+                void main(){vec2 d=gl_PointCoord*2.0-1.0;float r=length(d);if(r>1.0)discard;
+                    vec2 q=d*mix(1.0,2.6,vSpike);float qr=length(q),q2=qr*qr;
+                    float core=exp(-q2*22.0);
+                    float wing=0.28/(1.0+q2*40.0)*(1.0-smoothstep(0.45,1.0,qr));
+                    float spike=vSpike*(exp(-abs(d.x)*70.0)+exp(-abs(d.y)*70.0))*pow(1.0-r,2.0)*0.55;
+                    vec3 col=mix(vCol,vec3(1.0),core*0.35);
+                    gl_FragColor=vec4(col*(core+wing+spike)*vInt,1.0);}`
         }));
-        glowPoints.frustumCulled=false;glowPoints.renderOrder=0;
-        scene.add(glowPoints);
+        starPoints.frustumCulled=false;starPoints.renderOrder=1;
+        scene.add(starPoints);
+
+        // Star colour and brightness from a stellar mass drawn per star (its colorSeed):
+        //   masses follow the Kroupa (2001) IMF slope dN/dM ~ M^-2.3 above 0.5 solar masses,
+        //   main-sequence luminosity L ~ M^3.5 and radius R ~ M^0.8, so temperature T ~ (L/R^2)^(1/4) ~ M^0.475 (T_sun = 5772 K),
+        //   and the colour is that temperature's blackbody colour. Brightness is shown on a log scale, like magnitudes.
+        // Old bulge stars stop at ~1 solar mass (heavier ones have died) plus a few red giants; the disk gets more young,
+        // massive blue stars further out, so discs look bluer outwards (de Jong 1996). Simplified, visual only.
+        const IMF_SLOPE=2.3,M_LO=0.5,M_HI=8,LOG_L_RANGE=3.5*Math.log10(M_HI/M_LO);
+        function blackbodyRGB(T,c){ // Approximate blackbody colour (fit to the CIE colour-matching data, 1000-40000 K)
+            const t=T/100,k=v=>Math.min(255,Math.max(0,v))/255;
+            if(t<=66)c.setRGB(1,k(99.4708025861*Math.log(t)-161.1195681661),t<=19?0:k(138.5177312231*Math.log(t-10)-305.0447927307));
+            else c.setRGB(k(329.698727446*Math.pow(t-60,-0.1332047592)),k(288.1221695283*Math.pow(t-60,-0.0755148492)),1);
+            return c;
+        }
+        function starAppearance(pt,c){ // returns brightness 0..1 and fills c with the star's colour
+            if(pt.kind==='bulge'&&pt.colorSeed>0.92){blackbodyRGB(4000+4000*(pt.colorSeed-0.92),c);return 0.62;} // red giant
+            const mHi=pt.kind==='bulge'?1.0:1.2+(M_HI-1.2)*Math.min(1,pt.radius/(3*currentAnatomy.diskScale));
+            const a=1-IMF_SLOPE,lo=M_LO**a,u=pt.kind==='bulge'?pt.colorSeed/0.92:pt.colorSeed;
+            const M=(lo+u*(mHi**a-lo))**(1/a);
+            blackbodyRGB(5772*M**0.475,c);
+            const grey=(c.r+c.g+c.b)/3,sat=1.7; // colours boosted like an astrophoto (visual choice)
+            c.setRGB(Math.max(0,grey+(c.r-grey)*sat),Math.max(0,grey+(c.g-grey)*sat),Math.max(0,grey+(c.b-grey)*sat));
+            return Math.min(1,3.5*Math.log10(M/M_LO)/LOG_L_RANGE);
+        }
+
+        // Diffuse starlight (visual layer drawn from the real model): the billions of stars too faint to see one by one.
+        // The disk glow follows the exponential disk the physics uses, I(R) ~ exp(-R/R_d) (Freeman 1970), with the galaxy's own
+        // scale length; the bulge glow is a de Vaucouleurs profile (Hernquist 1990 links it to the bulge model), always facing the camera.
+        // Their relative brightness comes from the disk and bulge masses (same mass-to-light ratio assumed).
+        const diskGlowUniforms={uRd:{value:3},uRmax:{value:20},uGain:{value:0.3},
+            uInner:{value:new THREE.Color(0xffd9a8)},uOuter:{value:new THREE.Color(0xc4d4ff)}};
+        const diskGlow=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({
+            uniforms:diskGlowUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,
+            vertexShader:`varying vec2 vP;uniform float uRmax;void main(){vP=position.xy*uRmax;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+            fragmentShader:`varying vec2 vP;uniform float uRd;uniform float uRmax;uniform float uGain;uniform vec3 uInner;uniform vec3 uOuter;
+                void main(){float R=length(vP);float I=exp(-R/uRd)*(1.0-smoothstep(0.8*uRmax,uRmax,R));
+                    vec3 col=mix(uInner,uOuter,smoothstep(0.0,3.0*uRd,R));I=uGain*I/(1.0+0.5*I);
+                    gl_FragColor=vec4(col*I,1.0);}`
+        }));
+        diskGlow.frustumCulled=false;diskGlow.renderOrder=-1;scene.add(diskGlow);
+        const bulgeGlowUniforms={uRe:{value:0.5},uAmp:{value:0},uGain:{value:0.3},uColor:{value:new THREE.Color(0xffcc88)}};
+        const bulgeGlow=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.ShaderMaterial({
+            uniforms:bulgeGlowUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+            vertexShader:`varying vec2 vP;uniform float uRe;void main(){vP=position.xy*6.0*uRe;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+            fragmentShader:`varying vec2 vP;uniform float uRe;uniform float uAmp;uniform float uGain;uniform vec3 uColor;
+                void main(){float R=length(vP);float I=uAmp*exp(-7.669*(pow(max(R,0.03*uRe)/uRe,0.25)-1.0))*(1.0-smoothstep(0.7,1.0,R/(6.0*uRe)));
+                    I=uGain*I/(1.0+0.5*I);gl_FragColor=vec4(uColor*I,1.0);}`
+        }));
+        bulgeGlow.frustumCulled=false;bulgeGlow.renderOrder=-1;scene.add(bulgeGlow);
+        function updateDiffuseGlow(anatomy){
+            const Rd=anatomy.diskScale;
+            diskGlowUniforms.uRd.value=Rd;diskGlowUniforms.uRmax.value=anatomy.rMax;
+            diskGlow.scale.set(anatomy.rMax,anatomy.rMax,1);
+            const Re=1.8153*anatomy.bulgeRadius; // projected half-light radius of a Hernquist bulge
+            const amp=anatomy.bulgeMass>0&&anatomy.diskMass>0?anatomy.bulgeMass*2*Rd*Rd/(7.215*anatomy.diskMass*Re*Re):0;
+            bulgeGlowUniforms.uRe.value=Re;bulgeGlowUniforms.uAmp.value=amp;
+            bulgeGlow.visible=amp>0;bulgeGlow.scale.set(6*Re,6*Re,1);
+        }
 
         // Black hole (visual choice only, not a physics result): shadow, thin photon ring, an accretion disk
         // that tilts with the camera, the far side of the disk lensed over and under the shadow, Doppler
@@ -1463,22 +1535,18 @@ window.GALAXIES = {
             // Camera framing for Reset / Face-on / Edge-on: NGC 3198 (extent 22 kpc) keeps its original distance.
             const extent=Math.min(55,Math.max(11,Math.max(6*currentAnatomy.diskScale,0.5*currentAnatomy.rMax)));
             GALAXY_VIEW.radius=Math.hypot(0.55,-1.0,0.8)*40*extent/22;
-            starMesh.count=starCount;
-            glowGeometry.setDrawRange(0,starCount);
-            const m=new THREE.Matrix4(),c=new THREE.Color(),glowColors=glowGeometry.attributes.color.array;
+            updateDiffuseGlow(currentAnatomy);
+            starGeometry.setDrawRange(0,starCount);
+            const c=new THREE.Color(),pos=starGeometry.attributes.position.array,
+                cols=starGeometry.attributes.aColor.array,lums=starGeometry.attributes.aLum.array;
             for(let k=0;k<starCount;k++){
                 const pt=particles[k],p=pt.position;
-                // ~85% warm gold/amber, ~15% crisp ice-blue (seeded for reproducibility)
-                if(pt.colorSeed<0.15)c.set(0x88ccff);
-                else c.set((pt.colorSeed-0.15)/0.85>0.5?0xffeedd:0xffaa33);
-                const sc=pt.kind==='bulge'?0.30+0.08*Math.min(1,pt.radius/bulgeCutRadius):0.32+0.12*(pt.radius/currentAnatomy.rMax);
-                m.makeScale(sc,sc,sc).setPosition(p[0],p[1],p[2]);
-                starMesh.setMatrixAt(k,m);
-                starMesh.setColorAt(k,c);
-                glowColors[k*3]=c.r;glowColors[k*3+1]=c.g;glowColors[k*3+2]=c.b;
+                lums[k]=starAppearance(pt,c);
+                cols[k*3]=c.r;cols[k*3+1]=c.g;cols[k*3+2]=c.b;
+                pos[k*3]=p[0];pos[k*3+1]=p[1];pos[k*3+2]=p[2];
             }
-            starMesh.instanceMatrix.needsUpdate=true;starMesh.instanceColor.needsUpdate=true;
-            glowGeometry.attributes.color.needsUpdate=true;
+            starGeometry.attributes.position.needsUpdate=true;
+            starGeometry.attributes.aColor.needsUpdate=true;starGeometry.attributes.aLum.needsUpdate=true;
             const diskStars=starCount-bulgeStarCount;
             const bulgeLines=bulgeStarCount>0?Math.min(bulgeStarCount,Math.max(6,Math.round(ORBIT_LINE_STARS*bulgeStarCount/starCount))):0;
             const diskLines=Math.min(diskStars,ORBIT_LINE_STARS-bulgeLines);
@@ -1629,20 +1697,15 @@ window.GALAXIES = {
             const f0=Math.floor(fFloat);
             const f1=Math.min(f0+1,frameCount-1);
             const alpha=fFloat-f0;
-            const matArray=starMesh.instanceMatrix.array;
-            const glowArray=glowGeometry.attributes.position.array;
+            const posArray=starGeometry.attributes.position.array;
             const i0=f0*3,i1=f1*3;
             for(let k=0;k<starCount;k++){
                 const t=activeTrajectories[k];
-                const x=t[i0]+(t[i1]-t[i0])*alpha;
-                const y=t[i0+1]+(t[i1+1]-t[i0+1])*alpha;
-                const z=t[i0+2]+(t[i1+2]-t[i0+2])*alpha;
-                const off=k*16;
-                matArray[off+12]=x;matArray[off+13]=y;matArray[off+14]=z;
-                glowArray[k*3]=x;glowArray[k*3+1]=y;glowArray[k*3+2]=z;
+                posArray[k*3]=t[i0]+(t[i1]-t[i0])*alpha;
+                posArray[k*3+1]=t[i0+1]+(t[i1+1]-t[i0+1])*alpha;
+                posArray[k*3+2]=t[i0+2]+(t[i1+2]-t[i0+2])*alpha;
             }
-            starMesh.instanceMatrix.needsUpdate=true;
-            glowGeometry.attributes.position.needsUpdate=true;
+            starGeometry.attributes.position.needsUpdate=true;
         }
 
         // Render loop: continuous delta-time playback spanning 0 to 1000 Myr (1 Gyr)
@@ -1823,6 +1886,8 @@ window.GALAXIES = {
             }
             const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
             renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
+            if(composer){composer.setPixelRatio(dpr);composer.setSize(w,h);}
+            starUniforms.uDpr.value=dpr;
             camera.aspect=w/h;camera.updateProjectionMatrix();
             needsRender=true;
         }
@@ -1858,10 +1923,15 @@ window.GALAXIES = {
                 }
                 needsRender=true;
             }
-            if(needsRender){needsRender=false;haloUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
+            if(needsRender){needsRender=false;haloUniforms.uScale.value=starUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
+                // Diffuse glow: dimmer close up so single stars stand out; the disk plane brightens edge-on (longer line of sight).
+                const glowZoom=0.35+0.65*smoothStep(20,GAS_RESET_RADIUS,controls.view.radius);
+                const tilt=Math.abs(Math.cos(controls.view.phi));
+                diskGlowUniforms.uGain.value=0.6*glowZoom*Math.min(3,1/Math.max(tilt,0.33));
+                bulgeGlowUniforms.uGain.value=0.6*glowZoom;bulgeGlow.quaternion.copy(camera.quaternion);
                 // Fade the boundary grid as the camera closes in on the visible galaxy.
                 const haloFade=0.3+0.7*Math.min(1,Math.max(0,(controls.view.radius-30)/120));
-                haloShell.material.uniforms.uFade.value=haloFade;gasMaterial.opacity=gasZoomOpacity(controls.view.radius);haloGrid.material.opacity=0.13*haloFade;updateBlackHole(simTime);renderer.render(scene,camera);updateStarMarks();}
+                haloShell.material.uniforms.uFade.value=haloFade;gasMaterial.opacity=gasZoomOpacity(controls.view.radius);haloGrid.material.opacity=0.13*haloFade;updateBlackHole(simTime);if(composer)composer.render();else renderer.render(scene,camera);updateStarMarks();}
             requestAnimationFrame(renderLoop);
         }
         resizeOrbit();requestAnimationFrame(renderLoop);

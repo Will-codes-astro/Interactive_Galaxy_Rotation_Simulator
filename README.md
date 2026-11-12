@@ -155,6 +155,15 @@ Test stars:
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
   dense centres never meet a force singularity.
 
+Each simulated star is drawn as a point of light whose colour and brightness
+come from a mass drawn from the Kroupa (2001) IMF (L ∝ M^3.5, T ∝ M^0.475,
+blackbody colour, brightness on a log scale). Bulge stars are old (≤ 1 M☉ plus
+a few red giants) and the disk gets bluer outwards (de Jong 1996). Underneath,
+a diffuse glow shows the unresolved starlight: an exponential disk with the
+galaxy's own scale length (Freeman 1970) and a de Vaucouleurs bulge, weighted
+by their masses. Colour saturation, diffraction spikes and bloom are visual
+choices only.
+
 The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
 Gas switch turns it off): an exponential disk
 three times as extended as the stars, cut at R_max, whose brightness follows
