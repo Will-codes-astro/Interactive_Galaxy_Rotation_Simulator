@@ -28,13 +28,13 @@ Run commands from the project root:
 
 ```powershell
 python NGC3198_Baryonic_Baseline.py
-python .\Baseline_Baryonic_Model_3d
+python Baseline_Baryonic_Model_3d.py
 python visualize_3d_model.py
 python generate_interactive_html.py
 python generate_qr.py
 ```
 
-`Baseline_Baryonic_Model_3d` uses the local `table2.dat` and downloads SPARC
+`Baseline_Baryonic_Model_3d.py` uses the local `table2.dat` and downloads SPARC
 data only if that file is missing or invalid. `NGC3198_Baryonic_Baseline.py`
 fetches SPARC data from the network. The 3D Blender model script,
 `NGC3198_Blender_Model.py`, must be run inside Blender 4.0 or later; Blender's
@@ -178,7 +178,7 @@ or keyboard.
 
 ## Project map
 
-- `Baseline_Baryonic_Model_3d`: orbit simulation that writes trajectory data
+- `Baseline_Baryonic_Model_3d.py`: orbit simulation that writes trajectory data
   to `results/`.
 - `NGC3198_Baryonic_Baseline.py`: SPARC baryonic rotation-curve analysis.
 - `NGC3198_Blender_Model.py`: Blender scene and add-on for the interactive
@@ -189,3 +189,6 @@ or keyboard.
 - `visualize_3d_model.py`, `plot_galaxy1.py`: trajectory plots and animation.
 - `results/`, `plots/`: input/output data and generated figures.
 - `table2.dat`: local SPARC rotation-curve data.
+- `main.tex`: LaTeX stub for the EPQ write-up (embeds the QR code).
+- `docs/`: development notes (e.g. the Module 2 rendering summary).
+- `CLAUDE.md` / `AGENTS.md`: instructions for AI coding assistants.

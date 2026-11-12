@@ -1,0 +1,22 @@
+{
+  "star_count": 800,
+  "default_halo": {
+    "massT": 0.45,
+    "scaleRadius": 16
+  },
+  "escaped_with_halo": 0,
+  "escaped_visible_only": 142,
+  "reduced_chi2_visible_only": 796.0810543521825,
+  "reduced_chi2_nfw_default": 1.4055026264284927,
+  "reduced_chi2_mond": 22.344051055002847,
+  "presets": {
+    "NGC2403": {
+      "reduced_chi2_visible_only": 4497.427271033742,
+      "reduced_chi2_nfw_default": 13.303295144309628
+    },
+    "NGC7331": {
+      "reduced_chi2_visible_only": 255.8134228050882,
+      "reduced_chi2_nfw_default": 10.532443388707275
+    }
+  }
+}

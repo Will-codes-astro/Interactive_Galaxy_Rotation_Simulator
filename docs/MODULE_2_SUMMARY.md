@@ -1,4 +1,4 @@
-﻿# Module 2 Summary: GPU-Instanced Stellar Rendering
+# Module 2 Summary: GPU-Instanced Stellar Rendering
 
 ## What changed
 - Stars in the 3D view are now one `THREE.InstancedMesh` (200 spheres, a single draw call) instead of `THREE.Points` sprites.
@@ -10,7 +10,7 @@
 - The changes are in the generator, [generate_interactive_html.py](generate_interactive_html.py), and the published [index.html](index.html) was regenerated.
 
 ## Physics
-- Orbits are unchanged: they come from the RK4 integration in the page, using the SPARC baryonic velocity plus the NFW halo (`V_barÂ² + V_haloÂ²`).
+- Orbits are unchanged: they come from the RK4 integration in the page, using the SPARC baryonic velocity plus the NFW halo (`V_bar² + V_halo²`).
 - Rendering only reads these positions, so the halo sliders still reshape the orbits.
 - Between frames, star positions are linearly interpolated (1 Myr per frame).
 

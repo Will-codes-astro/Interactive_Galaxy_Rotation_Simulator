@@ -1,4 +1,23 @@
+# Python
 .venv/
 __pycache__/
 *.py[cod]
+
+# Blender backups
 *.blend1
+*.blend2
+
+# LaTeX build output
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Local tooling / OS
+_site/
+.claude/settings.local.json
+.DS_Store
+Thumbs.db
+desktop.ini

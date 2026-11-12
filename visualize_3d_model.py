@@ -1,4 +1,4 @@
-"""Visualise the baryonic orbit CSV produced by Baseline_Baryonic_Model_3d."""
+"""Visualise the baryonic orbit CSV produced by Baseline_Baryonic_Model_3d.py."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ def load_trajectories(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(
             f"Trajectory file not found: {path}\n"
-            "Run Baseline_Baryonic_Model_3d first."
+            "Run Baseline_Baryonic_Model_3d.py first."
         )
 
     data = pd.read_csv(path)
