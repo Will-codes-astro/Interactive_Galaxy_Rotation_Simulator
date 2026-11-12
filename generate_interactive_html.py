@@ -385,7 +385,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .sandbox-group h3 { margin:0; color:var(--cyan); font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; }
     .sandbox .control-help { min-height:0; }
     .sandbox-summary { margin:0; display:grid; grid-template-columns:1fr auto; gap:3px 12px; padding:9px 11px; border:1px solid rgba(120,150,180,0.2); border-radius:8px; background:rgba(120,150,180,0.05); font-size:12px; }
-    .sandbox-summary dt { color:var(--muted); }
+    .sandbox-stats-title { margin:10px 0 5px; }
+    .sandbox-summary dt { color:var(--muted); white-space:nowrap; }
+    .stat-q { position:relative; display:inline-grid; place-items:center; margin-left:5px; vertical-align:1px; width:14px; height:14px; flex:none; border:1px solid rgba(123,228,241,0.45); border-radius:3px; color:var(--cyan); font-size:9px; font-weight:600; line-height:1; cursor:help; }
+    .stat-q::after { content:attr(data-tip); position:absolute; left:-4px; bottom:calc(100% + 6px); z-index:20; width:210px; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:#0d1825; color:var(--ink); font-size:11px; font-weight:400; line-height:1.4; text-align:left; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,0.5); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .12s; }
+    .stat-q:hover::after,.stat-q:focus-visible::after { opacity:1; visibility:visible; }
     .sandbox-summary dd { margin:0; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
     .sandbox-footer { display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:11px; }
     .sandbox-footer p { margin:0; }
@@ -680,13 +684,14 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="sandbox-group">
           <h3>Gas</h3>
           <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of cold hydrogen gas, spread three times wider than the stars.</p></div>
-          <dl class="sandbox-summary" id="sandboxSummary" aria-label="Sandbox galaxy summary">
-            <dt>Total visible mass</dt><dd id="sbTotalMass"></dd>
-            <dt>Bulge-to-total (stars)</dt><dd id="sbBulgeFraction"></dd>
-            <dt>Gas fraction</dt><dd id="sbGasFraction"></dd>
-            <dt>Typical halo M<sub>200</sub> for these stars</dt><dd id="sbHaloBaseline"></dd>
-            <dt>Test stars</dt><dd id="sbStarCount"></dd>
-            <dt>Ejection radius</dt><dd id="sbEjectRadius"></dd>
+          <h3 class="sandbox-stats-title">Stats</h3>
+          <dl class="sandbox-summary" id="sandboxSummary" aria-label="Sandbox galaxy stats">
+            <dt>Visible mass<span class="stat-q" tabindex="0" role="img" aria-label="Disk stars + bulge stars + gas: everything you could see with a telescope." data-tip="Disk stars + bulge stars + gas: everything you could see with a telescope.">?</span></dt><dd id="sbTotalMass"></dd>
+            <dt>Bulge-to-total<span class="stat-q" tabindex="0" role="img" aria-label="Share of the stars that sit in the central bulge. 0% is a pure disk." data-tip="Share of the stars that sit in the central bulge. 0% is a pure disk.">?</span></dt><dd id="sbBulgeFraction"></dd>
+            <dt>Gas fraction<span class="stat-q" tabindex="0" role="img" aria-label="Share of the visible mass that is gas rather than stars." data-tip="Share of the visible mass that is gas rather than stars.">?</span></dt><dd id="sbGasFraction"></dd>
+            <dt>Typical halo M<sub>200</sub><span class="stat-q" tabindex="0" role="img" aria-label="The dark matter halo mass usually found around this many stars (Moster et al. 2013). The halo mass slider starts here." data-tip="The dark matter halo mass usually found around this many stars (Moster et al. 2013). The halo mass slider starts here.">?</span></dt><dd id="sbHaloBaseline"></dd>
+            <dt>Test stars<span class="stat-q" tabindex="0" role="img" aria-label="Stars in the 3D simulation, split between the disk and the bulge." data-tip="Stars in the 3D simulation, split between the disk and the bulge.">?</span></dt><dd id="sbStarCount"></dd>
+            <dt>Ejection radius<span class="stat-q" tabindex="0" role="img" aria-label="A star that moves beyond this distance counts as ejected: gravity failed to hold it." data-tip="A star that moves beyond this distance counts as ejected: gravity failed to hold it.">?</span></dt><dd id="sbEjectRadius"></dd>
           </dl>
         </div>
       </div>
