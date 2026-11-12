@@ -710,6 +710,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .schematic svg { display:block; width:100%; max-width:440px; height:auto; margin:auto; font:10.5px var(--f-ui); }
     .schematic text:not([fill]) { fill:currentColor; }
     .schematic figcaption { margin-top:6px; font-size:11.5px; line-height:1.5; }
+    .eq { display:block; margin:8px 0 12px; padding:10px 12px; border-left:2px solid var(--line-strong); border-radius:var(--r); background:rgba(0,0,0,.22); overflow-x:auto; color:var(--ink); }
+    .eq math { font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math,serif; font-size:1.25em; margin:0; }
+    .method-grid .eq { margin:6px 0; padding:6px 10px; }
+    .method-grid .eq math { font-size:1.1em; }
     footer { flex-wrap:wrap; align-items:baseline; gap:8px 24px; margin:28px 0 0; padding:18px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); font-size:12px; }
     .footer-title { flex-basis:100%; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
     footer { display:block; margin-top:0; }
@@ -859,7 +863,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <details class="nfw"><summary>What is a dark matter halo?</summary>
         <div class="learn-content">
-        <p class="tldr">A dark matter halo is an extended region of invisible matter whose gravity adds to that of a galaxy's stars and gas.</p>
+        <p class="tldr">Dark matter is matter we cannot see; we only notice it through its gravity. A halo is a huge cloud of it surrounding a galaxy.</p>
         <figure class="schematic">
           <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: the speed expected from visible matter falls with radius, but measured speeds stay roughly flat">
             <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
@@ -872,14 +876,14 @@ HTML_TEMPLATE = r"""<!doctype html>
           </svg>
           <figcaption>Schematic only, not real data. Far from most of the visible mass, Newtonian gravity predicts speeds falling roughly as 1/√r, yet measured curves stay roughly flat (Rubin, Ford &amp; Thonnard 1980).</figcaption>
         </figure>
-        <p>Stars and gas far from the centre of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> orbit faster than we would expect from the visible matter alone. A halo provides extra gravity that can help explain these speeds. Dark matter does not emit light, but its gravity can reveal its presence.</p>
-        <p>This simulator uses an NFW halo: a simple model that is denser near the centre and more diffuse farther out. Adjust the halo mass (M<sub>200</sub>, the mass within r<sub>200</sub>) and scale radius (r<sub>s</sub>) to see how its gravity changes the predicted rotation curve.</p>
+        <p>The outer stars in <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> move too fast for the visible matter alone to hold them in orbit. A halo adds the extra gravity needed to keep them there.</p>
+        <p>This simulator uses an NFW halo (Navarro, Frenk &amp; White 1996): packed tightly in the middle and thinning out further away. Two sliders control it: the halo's mass (M<sub>200</sub>) and its scale radius (r<sub>s</sub>), which sets how spread out it is.</p>
         </div>
       </details>
       <details class="mond"><summary>What is MOND?</summary>
         <div class="learn-content">
-        <p class="tldr">MOND (Modified Newtonian Dynamics) is an alternative idea: it changes the usual prediction for gravity at very low accelerations, rather than adding a dark matter halo.</p>
-        <p>In a galaxy's outskirts, the gravitational acceleration from visible matter is very small. MOND predicts a stronger effect than Newtonian gravity there, helping explain why orbital speeds remain high. The change becomes important around an acceleration called a<sub>0</sub>; the default here is 1.2×10⁻¹⁰ m/s².</p>
+        <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves a little differently when it is extremely weak.</p>
+        <p>Near a galaxy's centre gravity is strong, and MOND gives the same answer as Newton. Out in the edges gravity becomes tiny, weaker than a threshold called a<sub>0</sub> (1.2×10⁻¹⁰ m/s² here). Below that, MOND makes gravity stronger than Newton predicts, so the outer stars keep moving fast.</p>
         <figure class="schematic">
           <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
             <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
@@ -895,9 +899,14 @@ HTML_TEMPLATE = r"""<!doctype html>
           </svg>
           <figcaption>Schematic only, not real data. Inside the dotted line gravity is strong and MOND matches Newton. Outside it, gravity from visible matter drops below a₀ and MOND boosts it, so the speed levels off instead of falling (Milgrom 1983).</figcaption>
         </figure>
-        <p>In symbols, MOND links the real acceleration g to the Newtonian one from visible matter, g<sub>N</sub>, by μ(g/a<sub>0</sub>)·g = g<sub>N</sub>. This simulator uses μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012). When g is much larger than a<sub>0</sub>, μ ≈ 1 and gravity is ordinary Newtonian gravity. Far out, where g is much smaller than a<sub>0</sub>, the speed stops changing with radius and settles at v⁴ = G M a<sub>0</sub>, where M is the visible mass.</p>
-        <p>So in MOND the flat outer speed is fixed by the visible mass alone, with no extra matter. The only tuning numbers are a<sub>0</sub> and the mass-to-light ratio, which is why the <b>MOND best fit</b> switch changes those two.</p>
-        <p>Switch between the two models and compare their curves with the white observed points. A close match is informative, but one galaxy alone cannot settle which explanation is correct.</p>
+        <p>The rule in symbols:</p>
+        <div class="eq"><math display="block"><mi>μ</mi><mo>(</mo><mfrac><mi>g</mi><msub><mi>a</mi><mn>0</mn></msub></mfrac><mo>)</mo><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub></math></div>
+        <p>Here g is the real pull of gravity and g<sub>N</sub> is what Newton predicts from the visible matter. μ acts like a dial: it is about 1 when gravity is strong (plain Newton) and drops below 1 when gravity is weak, which boosts g. This simulator uses (Famaey &amp; McGaugh 2012):</p>
+        <div class="eq"><math display="block"><mi>μ</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac><mi>x</mi><msqrt><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></msqrt></mfrac></math></div>
+        <p>Far out, the speed stops falling and settles at a fixed value, where M is the visible mass:</p>
+        <div class="eq"><math display="block"><msup><mi>v</mi><mn>4</mn></msup><mo>=</mo><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></math></div>
+        <p>So the flat outer speed comes from visible matter alone. The only things to tune are a<sub>0</sub> and the mass-to-light ratio, which is why the <b>MOND best fit</b> switch changes those two.</p>
+        <p>Switch between the two models and compare each curve with the white measured points. One galaxy alone cannot settle which idea is right.</p>
         </div>
       </details>
     </section>
@@ -905,11 +914,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     <footer>
       <dl class="method-grid">
         <div data-preset-only><dt>Data</dt><dd>Measured speeds V<sub>obs</sub> ± σ and the gas, disk and bulge speeds at each radius, from SPARC (Lelli, McGaugh &amp; Schombert 2016), read from the project’s table2.dat.</dd></div>
-        <div><dt>Visible matter</dt><dd><span id="footerModel">V<sub>bar</sub>² = V<sub>gas</sub>|V<sub>gas</sub>| + <span id="ftDisk">0.50</span>V<sub>disk</sub>² + <span id="ftBulge">0.70</span>V<sub>bulge</sub>². The numbers are the disk and bulge M/L ratios.</span><span id="footerCustom" hidden>V<sub>bar</sub>² = V<sub>disk</sub>² + V<sub>bulge</sub>² + V<sub>gas</sub>², from exponential disks and a Hernquist bulge.</span></dd></div>
-        <div><dt>Dark matter</dt><dd>NFW halo (Navarro, Frenk &amp; White 1996), set by M<sub>200</sub> and r<sub>s</sub>. Model speed V<sub>model</sub>² = V<sub>bar</sub>² + V<sub>halo</sub>².</dd></div>
-        <div><dt>MOND</dt><dd>No halo. μ(g/a<sub>0</sub>)·g = g<sub>N</sub> with μ(x) = x/√(1+x²) and a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (Milgrom 1983).</dd></div>
+        <div><dt>Visible matter</dt><dd><span id="footerModel"><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msub><mi>V</mi><mi>gas</mi></msub><mo>|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo>|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></math></span>The numbers are the disk and bulge M/L ratios.</span><span id="footerCustom" hidden><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></math></span>From exponential disks and a Hernquist bulge.</span></dd></div>
+        <div><dt>Dark matter</dt><dd>NFW halo (Navarro, Frenk &amp; White 1996), set by M<sub>200</sub> and r<sub>s</sub>. Model speed:<span class="eq"><math display="block"><msubsup><mi>V</mi><mi>model</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></math></span></dd></div>
+        <div><dt>MOND</dt><dd>No halo (Milgrom 1983). a<sub>0</sub> = 1.2×10⁻¹⁰ m/s².<span class="eq"><math display="block"><mi>μ</mi><mo>(</mo><mfrac><mi>g</mi><msub><mi>a</mi><mn>0</mn></msub></mfrac><mo>)</mo><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>,</mo><mspace width="1em"/><mi>μ</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mfrac><mi>x</mi><msqrt><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></msqrt></mfrac></math></span></dd></div>
         <div><dt>Simulation</dt><dd>Massless test stars (800 for the presets) moved by Velocity-Verlet steps, 2 per Myr, over 1 Gyr.</dd></div>
-        <div data-preset-only><dt>Goodness of fit</dt><dd>χ² = Σ[(V<sub>obs</sub> − V<sub>model</sub>)/σ]², and χ²ᵣ = χ²/(N − 2) for N points.</dd></div>
+        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="1em"/><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mn>2</mn></mrow></mfrac></math></span>for N measured points.</dd></div>
       </dl>
       <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
     </footer>
