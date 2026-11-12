@@ -165,6 +165,11 @@ to 0 Myr and play), the clock and the two halo sliders. A small, faint readout i
 view shows only the ejected count and the halo r200 ("no halo" in MOND or at
 zero halo mass).
 
+Below the orbit timeline, "Track a star" takes a star number and rings that
+star in the 3D view with its laps round the centre since 0 Myr, speed and
+distance (also in the fullscreen corner panel, beside the round Play and
+Restart buttons). It only reads the computed orbits.
+
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tours do not reset or change simulator settings.
