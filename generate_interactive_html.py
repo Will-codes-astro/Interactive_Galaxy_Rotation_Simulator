@@ -395,11 +395,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .c-ticks { position:relative; height:16px; margin:5px 6px 0; color:var(--muted); font-size:10px; font-variant-numeric:tabular-nums; }
     .c-ticks span { position:absolute; transform:translateX(-50%); }
     .stability-message { margin:8px 0 0; color:#9fb0c2; font-size:12px; }
-    .telemetry { position:absolute; top:12px; left:12px; z-index:100; min-width:176px; padding:7px 11px 8px; border:1px solid rgba(255,255,255,.14); border-radius:10px; background:rgba(8,14,24,.42); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); box-shadow:0 4px 18px rgba(0,0,0,.3); color:rgba(255,255,255,.78); font:11px/1.5 ui-monospace,Consolas,monospace; letter-spacing:.4px; pointer-events:none; }
-    .tm-row { display:flex; justify-content:space-between; gap:16px; }
-    .tm-row b { color:#fff; font-weight:600; font-variant-numeric:tabular-nums; }
-    .tm-sub { margin:1px 0 3px; padding-bottom:3px; border-bottom:1px solid rgba(255,255,255,.1); font-size:10px; opacity:.7; }
-    .stability-chip { position:absolute; top:112px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
+    .telemetry { position:absolute; top:8px; left:8px; z-index:100; padding:2px 6px; border:1px solid rgba(255,255,255,.07); border-radius:5px; background:rgba(8,14,24,.28); color:rgba(255,255,255,.5); font:9px/1.45 ui-monospace,Consolas,monospace; letter-spacing:.2px; pointer-events:none; }
+    .tm-row { display:flex; justify-content:space-between; gap:9px; }
+    .tm-row b { color:rgba(255,255,255,.78); font-weight:600; font-variant-numeric:tabular-nums; }
+    .stability-chip { position:absolute; top:44px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
     @media (prefers-reduced-motion:reduce) { .c-marker { transition:none; } }
     @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
     @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
@@ -523,7 +522,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-feedback { flex:none; margin:9px 0 0; color:#a5e3c2; font-size:12px; }
     .tutorial-feedback[hidden] { display:none; }
     .tutorial-card .tutorial-fullscreen { color:#ffc48a; }
-    .tutorial-actions { display:flex; flex:none; justify-content:flex-end; gap:8px; margin-top:12px; }
+    .tutorial-actions { display:flex; flex:none; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
     .tutorial-keys { align-self:center; margin-right:auto; color:var(--muted); font-size:11px; }
     @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
     .tutorial-actions button { min-height:36px; }
@@ -581,7 +580,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   </header>
   <main>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
-      <div class="source-toggle" role="radiogroup" aria-label="Galaxy source">
+      <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
         <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span>Preset Galaxies</span></label>
         <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span>Custom Sandbox</span></label>
       </div>
@@ -593,7 +592,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     </section>
     <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
       <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2><p>Build a galaxy from its visible anatomy. Nothing is blocked: push the sliders to extremes to build a “monster galaxy”.</p></div>
-      <div class="sandbox-groups">
+      <div class="sandbox-groups" id="sandboxGroups">
         <div class="sandbox-group">
           <h3>Stellar disk</h3>
           <div class="control"><label for="sbDiskMass"><span>Disk mass, M<sub>disk</sub></span><output id="sbDiskMassValue" for="sbDiskMass"></output></label><input id="sbDiskMass" type="range" min="1e9" max="1e11" step="1e8" value="2e10" autocomplete="off"><p class="control-help">Total mass of the stars in the flat disk (exponential profile).</p></div>
@@ -608,7 +607,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="sandbox-group">
           <h3>Gas</h3>
           <div class="control"><label for="sbGasMass"><span>Gas mass, M<sub>gas</sub></span><output id="sbGasMassValue" for="sbGasMass"></output></label><input id="sbGasMass" type="range" min="5e8" max="2e10" step="1e8" value="1.4e10" autocomplete="off"><p class="control-help">Mass of the cold gas, mostly hydrogen, in a disk three times more extended than the stars.</p></div>
-          <dl class="sandbox-summary" aria-label="Sandbox galaxy summary">
+          <dl class="sandbox-summary" id="sandboxSummary" aria-label="Sandbox galaxy summary">
             <dt>Total visible mass</dt><dd id="sbTotalMass"></dd>
             <dt>Bulge-to-total (stars)</dt><dd id="sbBulgeFraction"></dd>
             <dt>Gas fraction</dt><dd id="sbGasFraction"></dd>
@@ -639,7 +638,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation telemetry"><div class="tm-row"><span id="tm-eject-label">Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div id="star-detail" class="tm-sub"></div><div class="tm-row"><span>Disk R<sub>d</sub> / edge</span><b id="tm-disk">—</b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleGas" aria-pressed="false" title="Hide the faint cold-gas cloud around the stars">Hide gas</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleGas" aria-pressed="false" title="Hide the faint cold-gas cloud around the stars">Hide gas</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
@@ -686,7 +685,7 @@ HTML_TEMPLATE = r"""<!doctype html>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span></div>
     <h2 id="welcomeTitle">Welcome to the simulator</h2>
-    <p id="welcomeDescription">New here? Take a short, hands-on tour. You will find the puzzle hidden in a real galaxy’s rotation curve, then test two explanations for it: dark matter and modified gravity. You can skip the tour at any time.</p>
+    <p id="welcomeDescription">New here? Take a short, hands-on tour. You will find the puzzle hidden in a real galaxy’s rotation curve, then test two explanations for it: dark matter and modified gravity. You can skip the tour at any time. The Custom Sandbox, where you build your own galaxy, has a tour of its own.</p>
     <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
   </dialog>
   <div class="tutorial-spotlight" id="tutorialSpotlight" aria-hidden="true" hidden>
@@ -698,7 +697,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
     <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
     <p class="tutorial-fullscreen" id="tutorialFullscreen" hidden>Exit fullscreen to continue the tutorial.</p>
-    <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
+    <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" id="tutorialMore" hidden>Sandbox tour</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
   <script>
 __GALAXIES_JS__
@@ -1700,14 +1699,10 @@ __GALAXIES_JS__
         // A star is ejected once it passes the ejection radius, PM.ejection_factor x R_max of the active galaxy.
         const escapeCountVal=document.getElementById('escape-count-val');
         let lastEscaped=-1;
-        // Live telemetry follows the active population: total stars, the disk / bulge split and the ejection radius.
+        // The corner readout follows the active population: its star total and where the ejection radius lies.
         function updateStarTelemetry(){
-            const diskStars=starCount-bulgeStarCount;
             document.getElementById('star-total-val').textContent=starCount;
             document.getElementById('starCountStat').textContent=starCount;
-            document.getElementById('tm-eject-label').textContent=`Ejected > ${ejectionRadius.toFixed(0)} kpc`;
-            document.getElementById('star-detail').textContent=`${diskStars} disk${bulgeStarCount>0?` + ${bulgeStarCount} bulge`:''} stars`;
-            document.getElementById('tm-disk').textContent=`${currentAnatomy.diskScale.toFixed(1)} / ${currentAnatomy.rMax.toFixed(0)} kpc`;
             document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
             lastEscaped=-1;
         }
@@ -2480,51 +2475,147 @@ __GALAXIES_JS__
     timeSlider.addEventListener('input',()=>onSliderInput(timeSlider.value));
     updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
 
-    const tutorialSteps=[
-      {target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
-       text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
-       action:'Follow both to the right-hand side of the graph. Do the white points fall away with the cyan line, or stay above it?'},
-      {target:'massSlider',gesture:'zero',title:'Take the dark matter away',
-       text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
-       action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
-      {target:'massSlider',gesture:'increase',title:'Add the halo back',
-       text:'A dark matter halo is a huge cloud of invisible matter surrounding the galaxy. It gives off no light, but its gravity pulls on the stars and makes them orbit faster. This slider sets how much mass the halo has.',
-       action:'Drag halo mass to the right and watch the orange line rise. Can you make it run through the white points?'},
-      {target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
-       text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
-       action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it. The halo cards below the 3D view show the halo’s size.'},
-      {target:'applyObservedFit',gesture:'click',title:'Score your fit',
-       text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap.',
-       action:'Try to lower χ² using both halo sliders. Then press the button under the halo mass slider to jump back to the starting fit.'},
-      {target:'modelBar',gesture:'switch',title:'Test a rival idea',
-       text:'MOND takes the opposite approach: there is no dark matter at all. Instead, gravity is stronger than Newton’s law predicts wherever it is extremely weak, as it is in the outer galaxy. The halo sliders switch off because MOND has no halo.',
-       action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the halo’s, then switch back to NFW.'},
-      {target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
-       text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones.',
-       action:'Press Play. Then drag halo mass down to 0 and watch again: without the halo’s gravity, the outer stars drift away.'},
-      {target:'orbitPlot',gesture:'drag',title:'Look around the galaxy',
-       text:'The counter in the corner shows how many stars are “ejected”: further out than 1.5 times the galaxy’s outer radius. It is a simple distance check, so an ejected star has not necessarily escaped for good.',
-       action:'Drag to spin the galaxy. Use the mouse wheel or a pinch gesture to zoom.'},
-      {target:'viewToggle',gesture:'click',title:'Change what you see',
-       text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. Speed and Fullscreen are here too.',
-       action:'Press View to open or close the panel, then try Edge-on or Orbit lines. The two dimmed halo buttons come next.'},
-      {target:'viewFullHalo',gesture:'click',title:'See how big the halo is',
-       text:'In this model the visible galaxy is only the small bright middle of a far larger halo. The blue sphere reaches out to r₂₀₀, the radius used to mark where the halo ends. It is an illustration: a real halo is invisible and fades out gradually, with no sharp edge.',
-       action:'Press View Full Halo to zoom right out and see how small the galaxy looks. Use Reset view to come back.'},
-      {target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
-       text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
-       action:'Open the theory guide below to read more, or choose another galaxy and compare. You can restart this tutorial from the button beside the gravity model switch.'}
-    ];
+    /* ---------- Guided tours ----------
+       Two tours share one card: 'main' (the rotation-curve puzzle, the halo, MOND and the 3D view) and 'sandbox'
+       (building a custom galaxy). Steps are looked up by id, never by position, so they can be added or reordered.
+       A step can need NFW mode (nfw), a halo mass above zero (halo) or one galaxy source (mode). When the page is
+       not in that state, the card says how to get there and the pointer moves to the control that does it.
+       The tours never change the simulator's settings themselves. */
+    const TOURS={
+      main:{label:'Tutorial',steps:[
+        {id:'puzzle',target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
+         text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
+         action:'Follow both to the right-hand side of the graph. Do the white points fall away with the cyan line, or stay above it?'},
+        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',title:'Take the dark matter away',
+         text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
+         action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
+        {id:'addHalo',nfw:true,target:'massSlider',gesture:'increase',title:'Add the halo back',
+         text:'A dark matter halo is a huge cloud of invisible matter surrounding the galaxy. It gives off no light, but its gravity pulls on the stars and makes them orbit faster. This slider sets how much mass the halo has.',
+         action:'Drag halo mass to the right and watch the orange line rise. Can you make it run through the white points?'},
+        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
+         text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
+         action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it.'},
+        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,target:'haloMetrics',gesture:'click',title:'Read the halo’s numbers',
+         text:'These three cards describe the halo your two sliders have built. The halo radius, r₂₀₀, is how far the halo reaches: far beyond the stars. The scale radius is the one you just set. Concentration, c, is the halo radius divided by the scale radius, so a high c means the dark matter is packed towards the centre.',
+         action:'Press each card to read what its number means. The numbers update whenever you move a halo slider.'},
+        {id:'fit',nfw:true,target:'applyObservedFit',gesture:'click',title:'Score your fit',
+         text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap.',
+         action:'Try to lower χ² using both halo sliders. Then press the button under the halo mass slider to jump back to the starting fit.'},
+        {id:'mond',target:'modelBar',gesture:'switch',title:'Test a rival idea',
+         text:'MOND takes the opposite approach: there is no dark matter at all. Instead, gravity is stronger than Newton’s law predicts wherever it is extremely weak, as it is in the outer galaxy. The halo sliders switch off because MOND has no halo.',
+         action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the halo’s, then switch back to NFW.'},
+        {id:'play',target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
+         text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones.',
+         action:'Press Play. Then drag halo mass down to 0 and watch again: without the halo’s gravity, the outer stars drift away.'},
+        {id:'look',cardRight:true,target:'orbitPlot',gesture:'drag',title:'Look around the galaxy',
+         text:'The small readout in the top corner counts “ejected” stars: those further out than 1.5 times the galaxy’s outer radius. It is a simple distance check, so an ejected star has not necessarily escaped for good. Below it is the halo radius, r₂₀₀.',
+         action:'Drag to spin the galaxy. Use the mouse wheel or a pinch gesture to zoom.'},
+        {id:'view',target:'viewToggle',gesture:'click',title:'Change what you see',
+         text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. Speed and Fullscreen are here too.',
+         action:'Press View to open or close the panel, then try Edge-on or Orbit lines. The two dimmed halo buttons come next.'},
+        {id:'fullHalo',nfw:true,halo:true,target:'viewFullHalo',gesture:'click',title:'See how big the halo is',
+         text:'In this model the visible galaxy is only the small bright middle of a far larger halo. The blue sphere reaches out to r₂₀₀, the radius used to mark where the halo ends. It is an illustration: a real halo is invisible and fades out gradually, with no sharp edge.',
+         action:'Press View Full Halo to zoom right out and see how small the galaxy looks. Use Reset view to come back.'},
+        {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',title:'Try another galaxy',
+         text:'Everything so far used one galaxy. The Galaxy menu loads other real galaxies from the SPARC survey. Each has its own measured speeds, its own visible matter and its own starting halo.',
+         action:'Choose a different galaxy. Does it show the same gap between the white points and the cyan line?'},
+        {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',title:'How heavy are the stars?',
+         text:'Telescopes measure a galaxy’s light, not its mass. The mass-to-light ratio turns one into the other, and it sets how high the cyan line sits. The values used here are standard averages, not measured for each galaxy, so they are an assumption.',
+         action:'Hover over or tap the ? beside Mass-to-light at the top of the page to read more.'},
+        {id:'finish',target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
+         text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
+         action:'Open the theory guide below to read more. Sandbox tour, below, shows you how to build a galaxy of your own. You can restart this tutorial from the button beside the gravity model switch.'}
+      ]},
+      sandbox:{label:'Sandbox tour',steps:[
+        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',title:'Build your own galaxy',
+         text:'The Custom Sandbox swaps the real galaxy for one you design. You choose how much mass its stars and gas have and how they are spread out. The simulator then works out its rotation curve, gives it a matching dark matter halo and sets its stars in orbit.',
+         action:'Look at the three groups of sliders: stellar disk, bulge and gas. Each one is a part of a galaxy that telescopes can see.'},
+        {id:'sbDisk',mode:'custom',target:'sbDiskMass',gesture:'adjust',title:'Make the disk heavier or lighter',
+         text:'The disk is the flat, spinning part of a galaxy, where most of its stars are. More mass means stronger gravity, so the cyan visible-matter line rises. The halo grows too, because galaxies with more stars are found in bigger halos.',
+         action:'Drag the disk mass up and down. Watch the cyan line, and the halo mass slider further down the page.'},
+        {id:'sbSize',mode:'custom',target:'sbDiskScale',gesture:'adjust',title:'Spread the stars out',
+         text:'The scale length sets how quickly the disk fades from the centre outwards. A short one crowds the stars into the middle; a long one spreads them out. The truncation radius, below it, is where the galaxy’s visible matter ends.',
+         action:'Change the scale length, then the truncation radius. Watch the peak of the cyan line move and the 3D galaxy change size.'},
+        {id:'sbBulge',mode:'custom',target:'sbBulgeMass',gesture:'increase',title:'Add a bulge',
+         text:'A bulge is the round ball of stars at the centre of some galaxies. It puts a lot of mass in a small space, so it speeds up the innermost orbits.',
+         action:'Raise the bulge mass above zero. The inner part of the cyan line climbs, and the effective radius slider switches on so you can set the bulge’s size.'},
+        {id:'sbGas',mode:'custom',target:'sbGasMass',gesture:'adjust',title:'Add the gas',
+         text:'Galaxies also hold cold gas, mostly hydrogen. Here it lies in a disk three times more spread out than the stars, so it matters most in the outer galaxy. The 3D view draws it as a faint blue cloud.',
+         action:'Change the gas mass and watch the outer part of the cyan line.'},
+        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',title:'Check the totals',
+         text:'This list adds your galaxy up. The baseline halo is the dark matter halo a galaxy with this mass of stars would typically have, taken from a published link between stellar mass and halo mass (Moster et al. 2013). The number of test stars grows with the galaxy’s mass.',
+         action:'Read the list, then move any slider above it and see which numbers change.'},
+        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',scroll:'stabilityMonitor',gesture:'adjust',title:'Is the halo realistic?',
+         text:`The halo stability monitor, just above, checks the halo’s concentration, c: its radius divided by its scale radius. Real halos have c between ${STABLE_C_MIN} and ${STABLE_C_MAX}. Outside that range the monitor warns you that the halo is unrealistic, but it never stops you.`,
+         action:'Drag the scale radius all the way to one end, then the other, until the warning appears.'},
+        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',gesture:'adjust',title:'Tune the halo yourself',
+         text:'The halo sliders still work here. Halo mass runs from 0 to 5 times the baseline. The stars begin on orbits that suit the baseline halo, so changing the halo shows what too little or too much dark matter does to them.',
+         action:'Lower the halo mass and press Play: with too little dark matter the outer stars drift away and the ejected count climbs. Apply SHMR Baseline puts the halo back.'},
+        {id:'sbCompare',mode:'custom',target:'galaxySelect',gesture:'click',title:'Compare with a real galaxy',
+         text:'The white points still come from a real galaxy, the one chosen under Compare with. χ² now scores how closely your invented galaxy matches that real one.',
+         action:'Try to rebuild the real galaxy: adjust the builder’s sliders until the orange line follows the white points. Reset anatomy starts you again.'}
+      ]}
+    };
     const tutorialWelcome=document.getElementById('tutorialWelcome'),tutorialCard=document.getElementById('tutorialCard');
     const tutorialTitle=document.getElementById('tutorialTitle'),tutorialProgress=document.getElementById('tutorialProgress');
     const tutorialText=document.getElementById('tutorialText'),tutorialTry=document.getElementById('tutorialTry');
     const tutorialBack=document.getElementById('tutorialBack'),tutorialNext=document.getElementById('tutorialNext');
+    const tutorialMore=document.getElementById('tutorialMore');
     const tutorialLaunch=document.getElementById('tutorialLaunch'),tutorialFullscreen=document.getElementById('tutorialFullscreen');
     const tutorialSpotlight=document.getElementById('tutorialSpotlight');
     const tutorialProgressFill=document.getElementById('tutorialProgressFill');
     const tutorialFeedback=document.getElementById('tutorialFeedback');
     const visibleMatterOnly=document.getElementById('visibleMatterOnly');
-    let tutorialIndex=0,tutorialTarget=null,tutorialCompleted=[],tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false;
+    const sourceToggle=document.getElementById('sourceToggle');
+    let tutorialTour='main',tutorialSteps=TOURS.main.steps,tutorialIndex=0,tutorialTarget=null,tutorialCompleted={};
+    let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null;
+    const tutorialStep=()=>tutorialSteps[tutorialIndex];
+    // What has to change on the page before this step's own action can be done (null when nothing is in the way).
+    function tutorialBlocker(){
+      const step=tutorialStep();
+      if(step.mode&&step.mode!==galaxyMode){
+        return{target:sourceToggle.querySelector(`input[value=${step.mode}]`).parentElement,gesture:'click',
+          say:step.mode==='custom'?'Switch to Custom Sandbox first. ':'Switch back to Preset Galaxies first. '};
+      }
+      if(step.nfw&&mondMode){
+        return{target:document.querySelector('#modelBar .track'),gesture:'click',
+          say:step.halo?'Switch back to NFW first; MOND does not use a dark matter halo. ':'Switch back to NFW first. '};
+      }
+      if(step.halo&&Number(massSlider.value)===0)return{target:massSlider,gesture:'increase',say:'Increase halo mass above 0 first so there is a halo to see. '};
+      if(step.id==='fullHalo'&&viewPanel.classList.contains('collapsed'))return{target:viewToggle,gesture:'click',say:'Open View first. '};
+      return null;
+    }
+    function tutorialInstruction(){
+      const step=tutorialStep(),blocker=tutorialBlocker();
+      if(blocker)return blocker.say+step.action;
+      if(step.id==='removeHalo'){
+        if(tutorialShortcutUnlocked)return 'The Visible Matter Only button that just appeared is a shortcut back to 0. Compare the orange line with the white points on the right of the graph.';
+        if(Number(massSlider.value)===0)return 'Halo mass is already 0. Drag it up, then all the way back left to 0, and watch the orange line.';
+      }
+      return step.action;
+    }
+    function refreshTutorialGuidance(){
+      if(tutorialCard.hidden)return;
+      tutorialTry.textContent='Try it: '+tutorialInstruction();
+      updateTutorialSpotlight();
+    }
+    function scrollTutorialTarget(){
+      const step=tutorialStep(),blocker=tutorialBlocker();
+      const target=blocker?blocker.target:(step.scroll&&innerWidth>960?document.getElementById(step.scroll):tutorialTarget);
+      const wide=!blocker&&(step.gesture==='scan'||step.gesture==='drag');
+      const top=target.getBoundingClientRect().top+window.scrollY-(wide?16:75);
+      window.scrollTo({top:Math.max(0,top),behavior:'auto'});
+    }
+    // Once whatever was in the way has been sorted out (or something new is), bring the right control into view.
+    function tutorialRecheck(){
+      if(tutorialCard.hidden)return;
+      const blocker=tutorialBlocker(),target=blocker?blocker.target:null;
+      if(target!==tutorialBlockTarget){
+        tutorialBlockTarget=target;
+        if(!tutorialIsFullscreen())scrollTutorialTarget();
+      }
+      refreshTutorialGuidance();
+    }
     // A new galaxy resets the halo sliders and the timeline, so resync what the tutorial last saw.
     document.addEventListener('galaxychange',()=>{
       tutorialLastMass=Number(massSlider.value);
@@ -2533,42 +2624,13 @@ __GALAXIES_JS__
       refreshTutorialGuidance();
     });
     // Opening or closing the sandbox panel moves the page content, so re-aim the tutorial pointer.
-    document.addEventListener('galaxymodechange',refreshTutorialGuidance);
-    function tutorialInstruction(){
-      const step=tutorialSteps[tutorialIndex];
-      if(tutorialIndex>=1&&tutorialIndex<=4&&mondMode)return 'Switch back to NFW first. '+step.action;
-      if(tutorialIndex===1){
-        if(tutorialShortcutUnlocked)return 'The Visible Matter Only button that just appeared is a shortcut back to 0. Compare the orange line with the white points on the right of the graph.';
-        if(Number(massSlider.value)===0)return 'Halo mass is already 0. Drag it up, then all the way back left to 0, and watch the orange line.';
-      }
-      if(tutorialIndex===9){
-        if(mondMode)return 'Switch back to NFW first; MOND does not use a dark matter halo. '+step.action;
-        if(Number(massSlider.value)===0)return 'Increase halo mass above 0 first so there is a halo to see. '+step.action;
-        if(viewPanel.classList.contains('collapsed'))return 'Open View first. '+step.action;
-      }
-      return step.action;
-    }
-    function tutorialAttentionTarget(){
-      if(mondMode&&((tutorialIndex>=1&&tutorialIndex<=4)||tutorialIndex===9))return document.querySelector('#modelBar .track');
-      if(tutorialIndex===9){
-        if(Number(massSlider.value)===0)return massSlider;
-        if(viewPanel.classList.contains('collapsed'))return viewToggle;
-      }
-      return tutorialTarget;
-    }
-    function refreshTutorialGuidance(){
-      if(tutorialCard.hidden)return;
-      tutorialTry.textContent='Try it: '+tutorialInstruction();
-      updateTutorialSpotlight();
-    }
-    function scrollTutorialTarget(){
-      const step=tutorialSteps[tutorialIndex],target=tutorialAttentionTarget();
-      const top=target.getBoundingClientRect().top+window.scrollY-(step.gesture==='scan'||step.gesture==='drag'?16:75);
-      window.scrollTo({top:Math.max(0,top),behavior:'auto'});
-    }
-    function completeTutorialAction(step,message){
-      if(tutorialCard.hidden||tutorialIndex!==step||tutorialCompleted[step])return;
-      tutorialCompleted[step]=message;
+    document.addEventListener('galaxymodechange',()=>{
+      tutorialLaunch.textContent=galaxyMode==='custom'?'Sandbox tour':'Tutorial';
+      tutorialRecheck();
+    });
+    function completeTutorialAction(id,message){
+      if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
+      tutorialCompleted[id]=message;
       tutorialFeedback.hidden=false;
       tutorialFeedback.textContent='✓ '+message;
       tutorialSpotlight.classList.add('is-complete');
@@ -2576,17 +2638,15 @@ __GALAXIES_JS__
     function tutorialIsFullscreen(){return !!nativeFsElement()||orbitPlot.classList.contains('fullscreen-active');}
     function updateTutorialSpotlight(){
       if(tutorialCard.hidden||tutorialIsFullscreen()){tutorialSpotlight.hidden=true;return;}
-      const step=tutorialSteps[tutorialIndex];
-      let target=tutorialAttentionTarget(),gesture=step.gesture;
-      if(target!==tutorialTarget){
-        gesture=target===massSlider?'increase':'click';
-      }else if(gesture==='switch'){
+      const step=tutorialStep(),blocker=tutorialBlocker();
+      let target=blocker?blocker.target:tutorialTarget,gesture=blocker?blocker.gesture:step.gesture;
+      if(gesture==='switch'){
         target=document.querySelector('#modelBar .track');gesture='click';
       }else if(gesture==='guide'){
         target=document.querySelector('#theoryGuide summary');gesture='click';
       }
       const rect=target.getBoundingClientRect();
-      if(rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
+      if((!rect.width&&!rect.height)||rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
       tutorialSpotlight.hidden=false;
       const pad=gesture==='scan'||gesture==='drag'?4:6;
       tutorialSpotlight.style.left=(rect.left-pad)+'px';
@@ -2616,29 +2676,33 @@ __GALAXIES_JS__
       tutorialFullscreen.hidden=!fullscreen;
       tutorialBack.disabled=fullscreen||tutorialIndex===0;
       tutorialNext.disabled=fullscreen;
+      tutorialMore.disabled=fullscreen;
       updateTutorialSpotlight();
     }
     function showTutorialStep(){
-      const step=tutorialSteps[tutorialIndex];
+      const step=tutorialStep(),lastStep=tutorialIndex===tutorialSteps.length-1;
       const backHadFocus=document.activeElement===tutorialBack;
       tutorialLastMass=Number(massSlider.value);
       tutorialLastScale=Number(scaleSlider.value);
       tutorialLastTime=Number(timeSlider.value);
       tutorialDrag=null;
       tutorialTarget=document.getElementById(step.target);
-      tutorialProgress.textContent=`Tutorial · ${tutorialIndex+1} / ${tutorialSteps.length}`;
+      const blocker=tutorialBlocker();
+      tutorialBlockTarget=blocker?blocker.target:null;
+      tutorialProgress.textContent=`${TOURS[tutorialTour].label} · ${tutorialIndex+1} / ${tutorialSteps.length}`;
       tutorialProgressFill.style.width=`${100*(tutorialIndex+1)/tutorialSteps.length}%`;
       tutorialTitle.textContent=step.title;
       tutorialText.textContent=step.text;
       tutorialTry.textContent='Try it: '+tutorialInstruction();
-      tutorialFeedback.hidden=!tutorialCompleted[tutorialIndex];
-      tutorialFeedback.textContent=tutorialCompleted[tutorialIndex]?'✓ '+tutorialCompleted[tutorialIndex]:'';
-      tutorialSpotlight.classList.toggle('is-complete',!!tutorialCompleted[tutorialIndex]);
+      tutorialFeedback.hidden=!tutorialCompleted[step.id];
+      tutorialFeedback.textContent=tutorialCompleted[step.id]?'✓ '+tutorialCompleted[step.id]:'';
+      tutorialSpotlight.classList.toggle('is-complete',!!tutorialCompleted[step.id]);
       document.getElementById('tutorialContent').scrollTop=0;
       tutorialBack.disabled=tutorialIndex===0;
-      tutorialNext.textContent=tutorialIndex===tutorialSteps.length-1?'Finish':'Next';
-      tutorialCard.classList.toggle('on-left',innerWidth>960&&tutorialIndex!==7);
-      document.body.classList.toggle('tutorial-view-intro',tutorialIndex===8);
+      tutorialNext.textContent=lastStep?'Finish':'Next';
+      tutorialMore.hidden=!(lastStep&&tutorialTour==='main');
+      tutorialCard.classList.toggle('on-left',innerWidth>960&&!step.cardRight);
+      document.body.classList.toggle('tutorial-view-intro',step.id==='view');
       syncTutorialFullscreen();
       if(tutorialBack.disabled&&backHadFocus)tutorialNext.focus({preventScroll:true});
       if(!tutorialIsFullscreen()){
@@ -2646,11 +2710,14 @@ __GALAXIES_JS__
       }
       updateTutorialSpotlight();
     }
-    function startTutorial(){
+    function startTutorial(tour){
       if(tutorialWelcome.open)tutorialWelcome.close();
+      tutorialTour=TOURS[tour]?tour:'main';
+      tutorialSteps=TOURS[tutorialTour].steps;
       tutorialIndex=0;
-      tutorialCompleted=[];
-      visibleMatterOnly.hidden=!tutorialShortcutUnlocked;
+      tutorialCompleted={};
+      // In the main tour the Visible Matter Only shortcut is revealed by the step that sets the halo to zero.
+      visibleMatterOnly.hidden=tutorialTour==='main'&&!tutorialShortcutUnlocked;
       document.body.classList.add('tutorial-active');
       tutorialCard.hidden=false;
       showTutorialStep();
@@ -2671,93 +2738,129 @@ __GALAXIES_JS__
     document.addEventListener('webkitfullscreenchange',syncTutorialFullscreen);
     window.addEventListener('scroll',updateTutorialSpotlight,{passive:true});
     window.addEventListener('resize',updateTutorialSpotlight);
-    [massSlider,scaleSlider].forEach(slider=>{
+    const sandboxInputs=SANDBOX_SLIDERS.map(slider=>slider.input);
+    [massSlider,scaleSlider,...sandboxInputs].forEach(slider=>{
       slider.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
       slider.addEventListener('change',updateTutorialSpotlight);
     });
+    // The stability step is done once the halo sliders have pushed the concentration outside the realistic range.
+    function checkStabilityStep(){
+      const state=stabilityReport().state;
+      if(state==='diffuse'||state==='dense')completeTutorialAction('sbStability','Warning shown: this halo is outside the range seen for real halos.');
+    }
     massSlider.addEventListener('input',()=>{
       const value=Number(massSlider.value);
       const crossedZero=(value===0)!==(tutorialLastMass===0);
       if(!mondMode){
-        if(!tutorialCard.hidden&&value===0&&!tutorialShortcutUnlocked){
+        if(!tutorialCard.hidden&&tutorialTour==='main'&&value===0&&!tutorialShortcutUnlocked){
           tutorialShortcutUnlocked=true;
           visibleMatterOnly.hidden=false;
           visibleMatterOnly.classList.add('tutorial-reveal');
         }
-        if(value===0)completeTutorialAction(1,'Halo removed: the orange line now shows visible matter only.');
-        if(value>tutorialLastMass)completeTutorialAction(2,'Halo mass increased: more mass means stronger gravity and faster orbits.');
-        if(value!==tutorialLastMass)completeTutorialAction(4,'Halo changed: check how χ² responded.');
+        if(value===0)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
+        if(value>tutorialLastMass)completeTutorialAction('addHalo','Halo mass increased: more mass means stronger gravity and faster orbits.');
+        if(value!==tutorialLastMass){
+          completeTutorialAction('fit','Halo changed: check how χ² responded.');
+          completeTutorialAction('sbHalo','Halo changed: press Play to see what it does to the orbits.');
+        }
+        checkStabilityStep();
       }
       tutorialLastMass=value;
-      if(crossedZero&&(tutorialIndex===1||tutorialIndex===9))refreshTutorialGuidance();
+      if(crossedZero)refreshTutorialGuidance();
     });
-    massSlider.addEventListener('change',()=>{
-      if(!tutorialCard.hidden&&tutorialIndex===9&&!mondMode&&Number(massSlider.value)>0)scrollTutorialTarget();
-    });
+    // Scrolling waits until the slider is released, so the page never jumps mid-drag.
+    massSlider.addEventListener('change',tutorialRecheck);
     scaleSlider.addEventListener('input',()=>{
       const value=Number(scaleSlider.value);
       if(!mondMode&&value!==tutorialLastScale){
-        completeTutorialAction(3,'Halo shape changed: the same mass, arranged differently.');
-        completeTutorialAction(4,'Halo changed: check how χ² responded.');
+        completeTutorialAction('haloShape','Halo shape changed: the same mass, arranged differently.');
+        completeTutorialAction('fit','Halo changed: check how χ² responded.');
+        checkStabilityStep();
       }
       tutorialLastScale=value;
     });
-    document.getElementById('visibleMatterOnly').addEventListener('click',()=>{
-      if(!mondMode)completeTutorialAction(1,'Halo removed: the orange line now shows visible matter only.');
+    document.querySelectorAll('#haloMetrics button').forEach(button=>{
+      button.addEventListener('click',()=>completeTutorialAction('haloNumbers','Card opened: these numbers follow the halo sliders.'));
+    });
+    visibleMatterOnly.addEventListener('click',()=>{
+      if(!mondMode)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
       tutorialLastMass=Number(massSlider.value);
+      tutorialRecheck();
     });
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
-      if(!mondMode)completeTutorialAction(4,'Starting fit restored.');
+      if(!mondMode)completeTutorialAction('fit','Starting fit restored.');
       tutorialLastMass=Number(massSlider.value);
       tutorialLastScale=Number(scaleSlider.value);
+      tutorialRecheck();
     });
     document.getElementById('playPauseBtn').addEventListener('click',()=>{
-      if(playing)completeTutorialAction(6,'Simulation playing: the model’s gravity is steering every star.');
+      if(playing)completeTutorialAction('play','Simulation playing: the model’s gravity is steering every star.');
     });
     timeSlider.addEventListener('input',()=>{
       const value=Number(timeSlider.value);
-      if(value!==tutorialLastTime)completeTutorialAction(6,'Timeline adjusted.');
+      if(value!==tutorialLastTime)completeTutorialAction('play','Timeline adjusted.');
       tutorialLastTime=value;
     });
     orbitPlot.addEventListener('pointerdown',e=>{
-      if(!tutorialCard.hidden&&tutorialIndex===7&&!e.target.closest('#viewPanel'))tutorialDrag={id:e.pointerId,x:e.clientX,y:e.clientY};
+      if(!tutorialCard.hidden&&tutorialStep().id==='look'&&!e.target.closest('#viewPanel'))tutorialDrag={id:e.pointerId,x:e.clientX,y:e.clientY};
     });
     orbitPlot.addEventListener('pointermove',e=>{
       if(tutorialDrag&&e.pointerId===tutorialDrag.id&&Math.hypot(e.clientX-tutorialDrag.x,e.clientY-tutorialDrag.y)>6){
-        completeTutorialAction(7,'View explored.');
+        completeTutorialAction('look','View explored.');
         tutorialDrag=null;
       }
     });
     window.addEventListener('pointerup',()=>{tutorialDrag=null;});
     window.addEventListener('pointercancel',()=>{tutorialDrag=null;});
     ['viewReset','viewFaceOn','viewEdgeOn','toggleOrbits','toggleGas','viewFullHalo'].forEach(id=>{
-      document.getElementById(id).addEventListener('click',()=>completeTutorialAction(7,'View explored.'));
+      document.getElementById(id).addEventListener('click',()=>completeTutorialAction('look','View explored.'));
     });
     viewToggle.addEventListener('click',()=>{
-      completeTutorialAction(8,'View controls toggled.');
-      refreshTutorialGuidance();
-      if(!tutorialCard.hidden&&tutorialIndex===9)scrollTutorialTarget();
+      completeTutorialAction('view','View controls toggled.');
+      tutorialRecheck();
     });
-    fullHaloBtn.addEventListener('click',()=>completeTutorialAction(9,'Full halo view selected.'));
+    fullHaloBtn.addEventListener('click',()=>completeTutorialAction('fullHalo','Full halo view selected: the galaxy is the small bright patch in the middle.'));
     document.querySelectorAll('#theoryGuide details').forEach(details=>{
-      details.addEventListener('toggle',()=>{if(details.open)completeTutorialAction(10,'Theory guide opened.');});
+      details.addEventListener('toggle',()=>{if(details.open)completeTutorialAction('finish','Theory guide opened.');});
     });
+    galaxySelect.addEventListener('change',()=>{
+      completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo.');
+      completeTutorialAction('sbCompare','Now comparing your galaxy with different measured speeds.');
+    });
+    ['pointerenter','focus','click'].forEach(type=>{
+      document.getElementById('mlInfoBtn').addEventListener(type,()=>completeTutorialAction('ml','Explainer opened.'));
+    });
+    const SANDBOX_STEP_FEEDBACK={
+      sbDiskMass:['sbDisk','Disk mass changed: the baseline halo followed it.'],
+      sbDiskScale:['sbSize','Disk reshaped: the same mass, spread differently.'],
+      sbTruncation:['sbSize','Galaxy edge moved: the ejection radius moves with it.'],
+      sbGasMass:['sbGas','Gas mass changed.']
+    };
+    sandboxInputs.forEach(input=>input.addEventListener('input',()=>{
+      const feedback=SANDBOX_STEP_FEEDBACK[input.id];
+      if(feedback)completeTutorialAction(feedback[0],feedback[1]);
+      if(input.id==='sbBulgeMass'&&Number(input.value)>0)completeTutorialAction('sbBulge','Bulge added: the inner orbits speed up.');
+      completeTutorialAction('sbSummary','Totals updated.');
+    }));
     window.addEventListener('pointerup',()=>tutorialSpotlight.classList.remove('is-interacting'));
     window.addEventListener('pointercancel',()=>tutorialSpotlight.classList.remove('is-interacting'));
-    [visibleMatterOnly,document.getElementById('applyObservedFit')].forEach(button=>button.addEventListener('click',refreshTutorialGuidance));
     mondToggle.addEventListener('change',()=>{
-      if(mondMode)completeTutorialAction(5,'MOND selected: no halo, modified gravity instead.');
-      refreshTutorialGuidance();
-      if(!tutorialCard.hidden&&tutorialIndex===9)scrollTutorialTarget();
+      if(mondMode)completeTutorialAction('mond','MOND selected: no halo, modified gravity instead. The MOND best fit switch at the top of the page re-tunes it for this galaxy.');
+      tutorialRecheck();
     });
-    document.getElementById('tutorialStart').addEventListener('click',startTutorial);
+    document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
     document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
-    tutorialLaunch.addEventListener('click',startTutorial);
+    tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
     tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0){tutorialIndex--;showTutorialStep();}});
     tutorialNext.addEventListener('click',()=>{
       if(tutorialIndex===tutorialSteps.length-1){endTutorial();return;}
       tutorialIndex++;showTutorialStep();
+    });
+    // The main tour's last step offers the sandbox tour; pressing it opens the Custom Sandbox.
+    tutorialMore.addEventListener('click',()=>{
+      setGalaxyMode('custom');
+      startTutorial('sandbox');
     });
     document.addEventListener('keydown',e=>{
       if(tutorialCard.hidden||tutorialIsFullscreen()||e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
