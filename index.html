@@ -357,9 +357,9 @@
       <button type="button" class="tutorial-launch" id="tutorialLaunch">Tutorial</button>
     </section>
     <section class="controls" aria-label="Dark matter controls">
-    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">Updates the rotation curve and star orbits. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
-    <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">Controls halo concentration: a smaller radius packs more dark matter near the center.</p></div>
-      <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div></div>
+    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass means stronger gravity, so stars orbit faster and the orange curve rises. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
+    <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same total mass. A small radius packs the dark matter near the centre and speeds up the inner stars; a large radius spreads it out.</p></div>
+      <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
     </section>
     <section class="panel-grid">
     <article class="panel"><div class="panel-heading"><h2>Stellar orbit trajectories</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation telemetry"><div class="tm-row"><span id="tm-eject-label">Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div id="star-detail" class="tm-sub"></div><div class="tm-row"><span>Disk R<sub>d</sub> / edge</span><b id="tm-disk">—</b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">Reset view</button><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">Fullscreen</button><button type="button" id="toggleOrbits" aria-pressed="false" title="Show or hide the orbit trajectory lines">Orbit lines</button><button type="button" id="toggleGas" aria-pressed="false" title="Hide the faint cold-gas cloud around the stars">Hide gas</button><button type="button" id="toggleHalo" aria-pressed="false" title="Hide the dark matter halo (the halo is not drawn in MOND mode)">Hide halo</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">View Full Halo</button><div class="view-row"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Dark matter parameters"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
@@ -409,7 +409,7 @@
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
     <div class="tutorial-eyebrow">Explore <span data-galaxy-name>NGC 3198</span></div>
     <h2 id="welcomeTitle">Welcome to the simulator</h2>
-    <p id="welcomeDescription">New here? Take a short, hands-on tour of the galaxy, its rotation curve and the ideas behind it. You can skip the tour at any time.</p>
+    <p id="welcomeDescription">New here? Take a short, hands-on tour. You will find the puzzle hidden in a real galaxy’s rotation curve, then test two explanations for it: dark matter and modified gravity. You can skip the tour at any time.</p>
     <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
   </dialog>
   <div class="tutorial-spotlight" id="tutorialSpotlight" aria-hidden="true" hidden>
@@ -2082,7 +2082,7 @@ window.GALAXIES = {
     Object.values(GALAXIES).forEach(galaxy=>galaxySelect.add(new Option(galaxy.name,galaxy.id)));
     function applyGalaxyLabels(galaxy){
       document.querySelectorAll('[data-galaxy-name]').forEach(el=>{el.textContent=galaxy.name;});
-      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.distance_mpc} Mpc · ${galaxy.rotation.radius_kpc.length} SPARC points${galaxyMode==='custom'?' · data points and χ² for your galaxy':''}`;
+      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.rotation.radius_kpc.length} measured speeds (SPARC)${galaxyMode==='custom'?' · data points and χ² for your galaxy':''}`;
       orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxyMode==='custom'?'custom galaxy':galaxy.name} star trajectories`);
       document.getElementById('curvePlot').setAttribute('aria-label',`${galaxyMode==='custom'?'Custom galaxy compared with '+galaxy.name:galaxy.name} observed, baryonic, and fitted rotation curves`);
       document.getElementById('viewReset').title=`Return to the default ${galaxyMode==='custom'?'custom galaxy':galaxy.name} view`;
@@ -2095,11 +2095,11 @@ window.GALAXIES = {
       document.getElementById('galaxyLabel').textContent=custom?'Compare with':'Galaxy';
       galaxySelect.title=custom?'Choose the SPARC galaxy whose measured speeds your custom galaxy is compared with':'Choose which SPARC galaxy to model';
       document.getElementById('massHelp').textContent=custom
-        ?'Fine-tunes the halo around the stellar-to-halo mass relation baseline for your galaxy: the slider spans 0 to 5 times that baseline. Set it to 0 for visible matter only.'
-        :'Updates the rotation curve and star orbits. Set it to 0 for visible matter only.';
+        ?'How much dark matter surrounds your galaxy. It starts at the halo mass expected for a galaxy with this mass of stars (the stellar-to-halo mass relation, Moster et al. 2013), and the slider runs from 0 to 5 times that. Set it to 0 for visible matter only.'
+        :'How much dark matter surrounds the galaxy. More mass means stronger gravity, so stars orbit faster and the orange curve rises. Set it to 0 for visible matter only.';
       document.getElementById('scaleHelp').textContent=custom
-        ?'Controls halo concentration. It follows the mass–concentration relation for your galaxy until you move it.'
-        :'Controls halo concentration: a smaller radius packs more dark matter near the center.';
+        ?'How spread out the halo is: a small radius packs the dark matter near the centre. It follows the typical value for a halo of this mass (the mass–concentration relation, Dutton & Macciò 2014) until you move it.'
+        :'How spread out the halo is, for the same total mass. A small radius packs the dark matter near the centre and speeds up the inner stars; a large radius spreads it out.';
       fitButton.textContent=custom?'Apply SHMR Baseline':'Apply Observed Fit';
       if(custom)fitButton.title='Return the halo to the stellar-to-halo mass relation baseline';else fitButton.removeAttribute('title');
       document.getElementById('footerModel').hidden=custom;
@@ -2272,39 +2272,39 @@ window.GALAXIES = {
     updateStarTransforms(0);updateEscapeCounter(0);syncTimelineUI(0);
 
     const tutorialSteps=[
-      {target:'curvePlot',gesture:'scan',title:'Read the rotation curve',
-       text:'The horizontal axis is distance from the galaxy’s centre; the vertical axis is orbital speed. White points are measured speeds, with bars showing uncertainty. Cyan predicts the speed from visible matter alone.',
-       action:'Look towards the right of the graph: how does the cyan curve compare with the white points?'},
-      {target:'massSlider',gesture:'zero',title:'Try visible matter alone',
-       text:'The orange line is the current model prediction. In NFW mode it combines visible matter with a dark matter halo; the purple line shows the halo contribution.',
-       action:'Drag halo mass all the way left to 0. Compare the orange line with the observed points.'},
-      {target:'massSlider',gesture:'increase',title:'Add a dark matter halo',
-       text:'A halo adds gravity without adding visible light. The mass slider changes the halo mass within its model radius, r₂₀₀.',
-       action:'Increase halo mass and watch the orange curve. Can you bring it closer to the white points?'},
-      {target:'scaleSlider',gesture:'adjust',title:'Change the halo’s shape',
-       text:'The scale radius affects how the halo’s density changes with distance. At the same mass, a smaller scale radius makes the halo more concentrated.',
-       action:'Move the scale radius slider and compare the curve. The halo cards below the 3D view show the resulting size and concentration.'},
-      {target:'applyObservedFit',gesture:'click',title:'How close is the fit?',
-       text:'Residual bars show observed speed minus model speed. χ² combines the differences while accounting for measurement uncertainties; a lower value means a closer fit to these points.',
-       action:'Try different settings, or press Apply Observed Fit to return to the starting fit. A close fit alone does not prove a theory.'},
-      {target:'modelBar',gesture:'switch',title:'Compare another explanation',
-       text:'MOND predicts a stronger gravitational effect at very low accelerations, without a dark matter halo. The orange curve becomes its prediction; halo sliders are unavailable in this mode.',
-       action:'Switch to MOND and compare the orange curve with the observations. Switch back to NFW whenever you like.'},
-      {target:'playPauseBtn',gesture:'click',title:'Watch a galaxy evolve',
-       text:'The 3D view shows simulated, massless test stars, not observations of individual stars. The models calculate their motion over one billion years.',
-       action:'Press Play or move the time slider. Try changing the model and see how the orbits respond.'},
-      {target:'orbitPlot',gesture:'drag',title:'Interpret the animation',
-       text:'“Ejected” counts stars that have travelled beyond 1.5 times the galaxy’s outer radius; it does not necessarily mean they are gravitationally unbound. The halo is a visual representation of the model.',
-       action:'Drag to rotate the view. Use the mouse wheel or a pinch gesture to zoom.'},
-      {target:'viewToggle',gesture:'click',title:'Explore the View controls',
-       text:'View opens the camera and display controls. Face-on and Edge-on change your angle; Reset view returns to the start. With a mouse, Rotate or Pan changes how dragging moves the view. Hide halo and Orbit lines change what is drawn; you can also adjust speed or enter fullscreen.',
-       action:'Press View to open or close the controls. Try a camera angle or turn on orbit lines. We’ll explore the dimmed halo controls next.'},
-      {target:'viewFullHalo',gesture:'click',title:'See the whole halo',
-       text:'In the NFW model, a vast dark matter halo surrounds the much smaller visible galaxy. The blue sphere is a model illustration, not a photograph; its outer radius r₂₀₀ is a conventional boundary, not a sharp edge.',
-       action:'Press View Full Halo to zoom out. The galaxy becomes tiny at this scale. Use Reset view to return.'},
-      {target:'theoryGuide',gesture:'guide',title:'Keep exploring',
-       text:'Both models simplify a real galaxy. The result also depends on measurement uncertainties and the estimated stellar mass. One galaxy alone cannot settle which explanation is correct.',
-       action:'Open the theory guide below for more. You can restart this tutorial from the button beside the gravity model switch.'}
+      {target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
+       text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
+       action:'Follow both to the right-hand side of the graph. Do the white points fall away with the cyan line, or stay above it?'},
+      {target:'massSlider',gesture:'zero',title:'Take the dark matter away',
+       text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
+       action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
+      {target:'massSlider',gesture:'increase',title:'Add the halo back',
+       text:'A dark matter halo is a huge cloud of invisible matter surrounding the galaxy. It gives off no light, but its gravity pulls on the stars and makes them orbit faster. This slider sets how much mass the halo has.',
+       action:'Drag halo mass to the right and watch the orange line rise. Can you make it run through the white points?'},
+      {target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
+       text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
+       action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it. The halo cards below the 3D view show the halo’s size.'},
+      {target:'applyObservedFit',gesture:'click',title:'Score your fit',
+       text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap.',
+       action:'Try to lower χ² using both halo sliders. Then press the button under the halo mass slider to jump back to the starting fit.'},
+      {target:'modelBar',gesture:'switch',title:'Test a rival idea',
+       text:'MOND takes the opposite approach: there is no dark matter at all. Instead, gravity is stronger than Newton’s law predicts wherever it is extremely weak, as it is in the outer galaxy. The halo sliders switch off because MOND has no halo.',
+       action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the halo’s, then switch back to NFW.'},
+      {target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
+       text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones.',
+       action:'Press Play. Then drag halo mass down to 0 and watch again: without the halo’s gravity, the outer stars drift away.'},
+      {target:'orbitPlot',gesture:'drag',title:'Look around the galaxy',
+       text:'The counter in the corner shows how many stars are “ejected”: further out than 1.5 times the galaxy’s outer radius. It is a simple distance check, so an ejected star has not necessarily escaped for good.',
+       action:'Drag to spin the galaxy. Use the mouse wheel or a pinch gesture to zoom.'},
+      {target:'viewToggle',gesture:'click',title:'Change what you see',
+       text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. Speed and Fullscreen are here too.',
+       action:'Press View to open or close the panel, then try Edge-on or Orbit lines. The two dimmed halo buttons come next.'},
+      {target:'viewFullHalo',gesture:'click',title:'See how big the halo is',
+       text:'In this model the visible galaxy is only the small bright middle of a far larger halo. The blue sphere reaches out to r₂₀₀, the radius used to mark where the halo ends. It is an illustration: a real halo is invisible and fades out gradually, with no sharp edge.',
+       action:'Press View Full Halo to zoom right out and see how small the galaxy looks. Use Reset view to come back.'},
+      {target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
+       text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
+       action:'Open the theory guide below to read more, or choose another galaxy and compare. You can restart this tutorial from the button beside the gravity model switch.'}
     ];
     const tutorialWelcome=document.getElementById('tutorialWelcome'),tutorialCard=document.getElementById('tutorialCard');
     const tutorialTitle=document.getElementById('tutorialTitle'),tutorialProgress=document.getElementById('tutorialProgress');
@@ -2329,8 +2329,8 @@ window.GALAXIES = {
       const step=tutorialSteps[tutorialIndex];
       if(tutorialIndex>=1&&tutorialIndex<=4&&mondMode)return 'Switch back to NFW first. '+step.action;
       if(tutorialIndex===1){
-        if(tutorialShortcutUnlocked)return 'The Visible Matter Only button is a shortcut to set halo mass to 0 again. Compare the orange line with the observed points.';
-        if(Number(massSlider.value)===0)return 'The mass is already 0. Move it up, then drag it all the way left to 0.';
+        if(tutorialShortcutUnlocked)return 'The Visible Matter Only button that just appeared is a shortcut back to 0. Compare the orange line with the white points on the right of the graph.';
+        if(Number(massSlider.value)===0)return 'Halo mass is already 0. Drag it up, then all the way back left to 0, and watch the orange line.';
       }
       if(tutorialIndex===9){
         if(mondMode)return 'Switch back to NFW first; MOND does not use a dark matter halo. '+step.action;
@@ -2475,9 +2475,9 @@ window.GALAXIES = {
           visibleMatterOnly.hidden=false;
           visibleMatterOnly.classList.add('tutorial-reveal');
         }
-        if(value===0)completeTutorialAction(1,'Visible matter only selected.');
-        if(value>tutorialLastMass)completeTutorialAction(2,'Halo mass increased.');
-        if(value!==tutorialLastMass)completeTutorialAction(4,'Model settings adjusted.');
+        if(value===0)completeTutorialAction(1,'Halo removed: the orange line now shows visible matter only.');
+        if(value>tutorialLastMass)completeTutorialAction(2,'Halo mass increased: more mass means stronger gravity and faster orbits.');
+        if(value!==tutorialLastMass)completeTutorialAction(4,'Halo changed: check how χ² responded.');
       }
       tutorialLastMass=value;
       if(crossedZero&&(tutorialIndex===1||tutorialIndex===9))refreshTutorialGuidance();
@@ -2488,13 +2488,13 @@ window.GALAXIES = {
     scaleSlider.addEventListener('input',()=>{
       const value=Number(scaleSlider.value);
       if(!mondMode&&value!==tutorialLastScale){
-        completeTutorialAction(3,'Halo shape adjusted.');
-        completeTutorialAction(4,'Model settings adjusted.');
+        completeTutorialAction(3,'Halo shape changed: the same mass, arranged differently.');
+        completeTutorialAction(4,'Halo changed: check how χ² responded.');
       }
       tutorialLastScale=value;
     });
     document.getElementById('visibleMatterOnly').addEventListener('click',()=>{
-      if(!mondMode)completeTutorialAction(1,'Visible matter only selected.');
+      if(!mondMode)completeTutorialAction(1,'Halo removed: the orange line now shows visible matter only.');
       tutorialLastMass=Number(massSlider.value);
     });
     document.getElementById('applyObservedFit').addEventListener('click',()=>{
@@ -2503,7 +2503,7 @@ window.GALAXIES = {
       tutorialLastScale=Number(scaleSlider.value);
     });
     document.getElementById('playPauseBtn').addEventListener('click',()=>{
-      if(playing)completeTutorialAction(6,'Simulation playing.');
+      if(playing)completeTutorialAction(6,'Simulation playing: the model’s gravity is steering every star.');
     });
     timeSlider.addEventListener('input',()=>{
       const value=Number(timeSlider.value);
@@ -2537,7 +2537,7 @@ window.GALAXIES = {
     window.addEventListener('pointercancel',()=>tutorialSpotlight.classList.remove('is-interacting'));
     [visibleMatterOnly,document.getElementById('applyObservedFit')].forEach(button=>button.addEventListener('click',refreshTutorialGuidance));
     mondToggle.addEventListener('change',()=>{
-      if(mondMode)completeTutorialAction(5,'MOND selected.');
+      if(mondMode)completeTutorialAction(5,'MOND selected: no halo, modified gravity instead.');
       refreshTutorialGuidance();
       if(!tutorialCard.hidden&&tutorialIndex===9)scrollTutorialTarget();
     });

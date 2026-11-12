@@ -165,7 +165,12 @@ length and edge, and the halo r200 ("no halo" in MOND or at zero halo mass).
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tour does not reset or change simulator settings.
-It covers the View controls and the scale of the full halo. On a keyboard,
+Its 11 steps start from the puzzle in the rotation curve (measured speeds
+stay above the visible-matter prediction), then remove and restore the halo,
+change its shape, score the fit with χ², compare MOND, play the orbits and
+finish with the View controls and the scale of the full halo. Each halo and
+time slider has a plain-language description underneath it, and the galaxy
+picker shows a one-line summary with the number of measured speeds. On a keyboard,
 the left and right arrow keys navigate the tour when a control is not being
 edited. During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
