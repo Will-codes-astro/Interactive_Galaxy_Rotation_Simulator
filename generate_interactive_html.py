@@ -680,7 +680,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass means stronger gravity, so stars orbit faster and the orange curve rises. Set it to 0 for visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same total mass. A small radius packs the dark matter near the centre and speeds up the inner stars; a large radius spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
-      <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number, e.g. 120"><p class="control-help">Rings one star and counts its laps round the centre since 0 Myr, with its speed and distance. Clear the box to stop.</p></div>
+      <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number, e.g. 120"><p class="control-help">Rings one star and counts its laps round the centre since 0 Myr, with its speed and distance. Clear the box to stop.</p><p class="control-help">Stars are numbered from the centre outwards: star 1 starts closest to the centre and star <span id="trackLast">800</span> starts furthest out.</p></div>
     </section>
     <section class="panel-grid">
     <article class="panel"><div class="panel-heading"><h2>3D galaxy simulation</h2></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
@@ -1525,66 +1525,93 @@ __GALAXIES_JS__
         glowPoints.frustumCulled=false;glowPoints.renderOrder=0;
         scene.add(glowPoints);
 
-        // Black hole: compact core shadow with gravitationally lensed photon ring and warm amber/orange glowing arcs.
+        // Black hole (visual choice only, not a physics result): shadow, thin photon ring, an accretion disk
+        // that tilts with the camera, the far side of the disk lensed over and under the shadow, Doppler
+        // beaming (the side coming towards you is brighter and whiter) and inner gas swirling faster than outer gas.
         const BH_R=GALAXY.blackHoleRadius,BH_EXTENT=3.2;
         const blackHole=new THREE.Mesh(
             new THREE.PlaneGeometry(2*BH_R*BH_EXTENT,2*BH_R*BH_EXTENT),
             new THREE.ShaderMaterial({
+                uniforms:{uView:{value:new THREE.Vector3(0,0,1)},uTime:{value:0}},
                 transparent:true,depthWrite:false,blending:THREE.CustomBlending,
                 blendEquation:THREE.AddEquation,blendSrc:THREE.OneFactor,blendDst:THREE.OneMinusSrcAlphaFactor,
                 vertexShader:`varying vec2 vP;void main(){vP=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
                 fragmentShader:`
                     varying vec2 vP;
+                    uniform vec3 uView;   // galaxy spin axis in camera space
+                    uniform float uTime;
+                    float hash(vec2 q){return fract(sin(dot(q,vec2(127.1,311.7)))*43758.5453);}
+                    float noise(vec2 q){vec2 i=floor(q),f=fract(q);f=f*f*(3.0-2.0*f);
+                        return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+                    float streaks(float r,float phi){
+                        // Keplerian-style shear: angular speed ~ r^-1.5, so inner gas laps the outer gas.
+                        float a=phi+uTime*pow(r,-1.5);
+                        vec2 q=vec2(a*2.5,log(r)*9.0);
+                        return 0.55*noise(q)+0.3*noise(q*2.1+3.7)+0.15*noise(q*4.3+9.1);
+                    }
+                    vec3 heat(float t){ // 0 = cool deep orange, 1 = hot white
+                        return mix(mix(vec3(0.75,0.16,0.02),vec3(1.0,0.55,0.12),smoothstep(0.0,0.5,t)),vec3(1.0,0.93,0.80),smoothstep(0.5,1.0,t));
+                    }
                     void main(){
                         vec2 p=vP/${BH_R.toFixed(3)};
                         float d=length(p);
-                        float shadow=1.0-smoothstep(0.93,0.99,d);
+                        float cosI=clamp(abs(uView.z),0.0,1.0),sinI=sqrt(1.0-cosI*cosI);
+                        float side=uView.z>=0.0?1.0:-1.0;
+                        vec2 ax=length(uView.xy)>1e-4?normalize(uView.xy):vec2(0.0,1.0);
+                        // q.x along the disk's long axis, q.y along its short axis (positive = far side)
+                        vec2 q=vec2(dot(p,vec2(ax.y,-ax.x)),dot(p,ax)*side);
+                        const float RIN=1.25,ROUT=3.0;
 
-                        // Relativistic Doppler beaming across the disk (counter-clockwise spin)
-                        float beam=1.0+0.38*(-p.x/max(d,0.25));
+                        // Direct image of the disk, squashed by the viewing angle, with a little thickness edge-on.
+                        float c=max(cosI,0.04);
+                        float rD=length(vec2(q.x,q.y/c));
+                        float phiD=atan(q.y/c,q.x);
+                        float thick=exp(-pow(q.y/(0.05+0.95*cosI*ROUT),2.0));
+                        float band=smoothstep(RIN-0.05,RIN+0.12,rD)*(1.0-smoothstep(ROUT-0.7,ROUT,rD));
+                        float prof=pow(RIN/max(rD,RIN),1.8);
+                        float vlos=sinI*cos(phiD)*side*inversesqrt(max(rD,RIN));   // + = coming towards you
+                        float beam=pow(max(1.0+0.75*vlos,0.15),3.0);
+                        float diskI=band*prof*(0.45+0.9*streaks(rD,phiD))*beam*mix(1.0,thick,sinI);
+                        float diskT=clamp(prof*0.9+0.35*vlos,0.0,1.0);
+                        // The far half sits behind the hole, so the shadow hides it.
+                        float behind=step(0.0,q.y)*(1.0-smoothstep(0.96,1.02,d));
+                        diskI*=1.0-behind;
 
-                        // 1. Primary circular photon ring hugging the event horizon
-                        float ringDist=abs(d-1.035);
-                        float photonRing=exp(-pow(ringDist/0.040,2.0))*3.6;
-                        float photonShoulder=exp(-pow((d-1.06)/0.10,2.0))*1.2;
+                        // Lensed image of the far disk, bent over the top (and faintly under the bottom).
+                        float ang=atan(q.y,q.x);
+                        float lr=1.0+0.42*max(sinI,0.25);
+                        float ringW=0.10+0.10*cosI;
+                        float lensRing=exp(-pow((d-lr)/ringW,2.0));
+                        float over=mix(0.55,1.0,smoothstep(-0.2,0.8,q.y/max(d,1e-3)));
+                        float under=0.35*smoothstep(0.2,-0.8,q.y/max(d,1e-3));
+                        float lBeam=pow(max(1.0+0.6*sinI*cos(ang)*side,0.2),2.0);
+                        float lensI=lensRing*(over+under)*(0.5+0.8*streaks(lr*1.3,ang))*lBeam*mix(0.6,1.0,sinI);
 
-                        // 2. Gravitational lensing arcs: upper arc bent over top, lower arc bent under bottom
-                        float rUp=length(vec2(p.x/1.80,(p.y+0.25)/1.50));
-                        float arcUp=exp(-pow(abs(rUp-1.0)/0.075,2.0))*2.4*smoothstep(-0.20,0.15,p.y);
+                        // Photon ring: a razor-thin bright circle just outside the shadow.
+                        float photon=exp(-pow((d-1.03)/0.022,2.0))*1.6+exp(-pow((d-1.07)/0.07,2.0))*0.35;
+                        float shadow=1.0-smoothstep(0.95,1.01,d);
+                        float halo=exp(-pow((d-1.2)/0.9,2.0))*0.10;
+                        float fade=1.0-smoothstep(2.6,3.15,d);
 
-                        float rDown=length(vec2(p.x/1.65,(p.y-0.20)/1.30));
-                        float arcDown=exp(-pow(abs(rDown-1.0)/0.070,2.0))*1.9*smoothstep(0.20,-0.15,p.y);
-
-                        // 3. Equatorial accretion disk extending horizontally
-                        float rDisk=length(vec2(p.x/2.15,p.y/0.28));
-                        float disk=exp(-pow(abs(rDisk-1.0)/0.095,2.0))*2.0;
-
-                        // Combined emission with Doppler boosting and diffuse amber halo
-                        float totalRings=(photonRing+photonShoulder+arcUp+arcDown+disk*0.85)*beam;
-                        float glow=exp(-pow((d-1.15)/0.60,2.0))*0.30;
-                        float fade=1.0-smoothstep(2.3,3.1,d);
-
-                        // Warm amber/orange palette
-                        vec3 cDeepOrange=vec3(0.92,0.24,0.02);
-                        vec3 cWarmAmber=vec3(1.0,0.58,0.10);
-                        vec3 cGold=vec3(1.0,0.85,0.38);
-                        vec3 cHotWhite=vec3(1.0,0.96,0.85);
-
-                        vec3 col=cDeepOrange*glow;
-                        col+=cWarmAmber*totalRings;
-                        col+=cGold*(pow(photonRing,1.2)*0.45+(arcUp+arcDown)*0.35);
-                        col+=cHotWhite*pow(photonRing,2.0)*0.16;
-
-                        // Translucent rendering: allow background stars to subtly show through
-                        const float OPACITY = 0.55;
-                        col = col * fade * (1.0 - shadow * 0.70) * OPACITY;
-                        gl_FragColor = vec4(col, shadow * 0.50);
+                        vec3 col=heat(diskT)*diskI*2.4+heat(0.75)*lensI*2.0+vec3(1.0,0.9,0.75)*photon+vec3(0.9,0.35,0.08)*halo;
+                        col=(vec3(1.0)-exp(-col*1.3))*fade*(1.0-shadow);   // soft tone map so nothing clips
+                        // A soft dark backdrop round the hole so the disk stands out against the bright galactic centre.
+                        float backdrop=0.6*(1.0-smoothstep(1.0,2.9,d));
+                        float a=max(max(shadow*0.97,backdrop),clamp(max(col.r,max(col.g,col.b)),0.0,1.0)*0.85)*fade;
+                        gl_FragColor=vec4(col,a);
                     }
                 `
             })
         );
         blackHole.position.set(0,0,0);
         blackHole.renderOrder=3;scene.add(blackHole);
+        const bhAxis=new THREE.Vector3(),bhInv=new THREE.Quaternion();
+        function updateBlackHole(t){
+            blackHole.quaternion.copy(camera.quaternion);
+            bhAxis.set(0,0,1).applyQuaternion(bhInv.copy(camera.quaternion).invert());
+            blackHole.material.uniforms.uView.value.copy(bhAxis);
+            blackHole.material.uniforms.uTime.value=t*0.04;
+        }
 
         // Optional orbit trajectory lines: full paths of an evenly spaced subset of the stars (mostly disk, a few bulge).
         const ORBIT_LINE_STARS=60,ORBIT_LINE_STEP=5;
@@ -1785,7 +1812,7 @@ __GALAXIES_JS__
             document.getElementById('starCountStat').textContent=starCount;
             // The star locator's range follows the population, so a bigger galaxy offers more stars to find.
             ['trackInput','fsTrack'].forEach(id=>{const el=document.getElementById(id);if(el)el.max=starCount;});
-            const trackMaxEl=document.getElementById('trackMax');if(trackMaxEl)trackMaxEl.textContent=`1–${starCount}`;
+            const trackMaxEl=document.getElementById('trackMax');if(trackMaxEl)trackMaxEl.textContent=`1–${starCount}`;const trackLastEl=document.getElementById('trackLast');if(trackLastEl)trackLastEl.textContent=starCount;
             if(typeof ejectionRing!=='undefined')ejectionRing.scale.setScalar(ejectionRadius);
             document.getElementById('escape-counter').title=`Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected`;
             lastEscaped=-1;
@@ -2043,7 +2070,7 @@ __GALAXIES_JS__
             if(needsRender){needsRender=false;haloUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
                 // Fade the boundary grid as the camera closes in on the visible galaxy.
                 const haloFade=0.3+0.7*Math.min(1,Math.max(0,(controls.view.radius-30)/120));
-                haloShell.material.uniforms.uFade.value=haloFade;gasMaterial.opacity=gasZoomOpacity(controls.view.radius);haloGrid.material.opacity=0.13*haloFade;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);updateStarMarks();}
+                haloShell.material.uniforms.uFade.value=haloFade;gasMaterial.opacity=gasZoomOpacity(controls.view.radius);haloGrid.material.opacity=0.13*haloFade;updateBlackHole(simTime);renderer.render(scene,camera);updateStarMarks();}
             requestAnimationFrame(renderLoop);
         }
         resizeOrbit();requestAnimationFrame(renderLoop);
@@ -2645,7 +2672,7 @@ __GALAXIES_JS__
     }};
     function syncTrackLimits(){
       trackInputs.forEach(el=>el.max=starCount);
-      document.getElementById('trackMax').textContent=`1–${starCount}`;
+      document.getElementById('trackMax').textContent=`1–${starCount}`;document.getElementById('trackLast').textContent=starCount;
     }
     trackInputs.forEach(el=>el.addEventListener('input',()=>{
       const n=parseInt(el.value,10);
