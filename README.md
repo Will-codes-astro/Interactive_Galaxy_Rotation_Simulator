@@ -119,8 +119,8 @@ residual columns.
   Moster et al. (2013) inverted for the stellar mass (disk + bulge) and r_s
   comes from the Dutton & Macciò (2014) mass–concentration relation.
   The existing halo mass slider becomes the fine-tuning control, spanning
-  0 to 5 times the baseline (it keeps its multiple when the anatomy moves the
-  baseline), and the scale radius follows the relation until it is moved.
+  0 to 5 times the baseline. Any change to the anatomy sliders resets both
+  halo sliders to the new typical halo.
   The Typical Halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
 - The header's Mass-to-light (M/L) tile is hidden in the sandbox, because

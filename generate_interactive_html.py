@@ -695,7 +695,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           </dl>
         </div>
       </div>
-      <div class="sandbox-footer"><p id="sandboxNote">The anatomy sliders drive the rotation curve, halo and 3D stars live. The halo starts at the typical size for this mass of stars: fine-tune it with the halo sliders below. This galaxy is imaginary, so there are no measured speeds to compare it with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
+      <div class="sandbox-footer"><p id="sandboxNote">Changing the galaxy resets the halo to its typical size. This galaxy is imaginary, so there are no measured speeds to compare with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
     </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
       <span class="model-label">Gravity model</span>
@@ -2203,7 +2203,7 @@ __GALAXIES_JS__
     const fsSliders=document.getElementById('fsSliders'),fsMass=document.getElementById('fsMassSlider'),fsScale=document.getElementById('fsScaleSlider');
     // The mass slider grows for massive halos so a fitted value is never pinned to the end of its track. In the Custom
     // Sandbox it spans 0 to HALO_FINE_RANGE x the stellar-to-halo baseline, so it fine-tunes that baseline: haloFine is
-    // M200 as a multiple of it, kept when the anatomy moves the baseline. rsManual records that the user took over r_s.
+    // M200 as a multiple of it, reset to 1 whenever the anatomy changes. rsManual records that the user took over r_s.
     const HALO_FINE_RANGE=5;
     let haloFine=1,rsManual=false;
     function configureHaloSliders(){
@@ -2567,10 +2567,10 @@ __GALAXIES_JS__
       const custom=customActive,fitButton=document.getElementById('applyObservedFit');
       document.querySelectorAll('[data-preset-only]').forEach(el=>{el.hidden=custom;});
       document.getElementById('massHelp').textContent=custom
-        ?'How much dark matter surrounds your galaxy. It starts at the typical halo for a galaxy with this mass of stars (Moster et al. 2013), and the slider runs from 0 to 5 times that. Set it to 0 for visible matter only.'
+        ?'How much dark matter surrounds your galaxy. Starts at the typical halo for these stars (Moster et al. 2013); runs from 0 to 5 times that.'
         :'How much dark matter surrounds the galaxy. More mass means stronger gravity, so stars orbit faster and the orange curve rises. Set it to 0 for visible matter only.';
       document.getElementById('scaleHelp').textContent=custom
-        ?'How spread out the halo is: a small radius packs the dark matter near the centre. It follows the typical value for a halo of this mass (the mass–concentration relation, Dutton & Macciò 2014) until you move it.'
+        ?'How spread out the halo is. Small packs the dark matter near the centre. Starts at the typical value for this halo mass (Dutton & Macciò 2014).'
         :'How spread out the halo is, for the same total mass. A small radius packs the dark matter near the centre and speeds up the inner stars; a large radius spreads it out.';
       fitButton.textContent=custom?'Typical Halo':'Apply Observed Fit';
       if(custom)fitButton.title='Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)';else fitButton.removeAttribute('title');
@@ -2641,7 +2641,7 @@ __GALAXIES_JS__
       for(let i=0;i<ACCEL_TABLE_SIZE;i++)customBaryonTable[i]=diskShape.stars[i]*anatomy.diskMass+diskShape.gas[i]*anatomy.gasMass+customModel.bulgeSq(i*DR_TABLE);
       applyBaryonState();
       componentCurves=COMPONENT_SQ.map(key=>radii.map(r=>Math.sqrt(customModel[key](r))));
-      // Halo: the stellar-to-halo mass relation sets the baseline; haloFine and rsManual keep the user's own tuning.
+      // Halo: the stellar-to-halo mass relation sets the baseline; haloFine and rsManual hold the user's tuning until the anatomy changes.
       const baseline=PhysicsEngine.baselineHalo(anatomy.diskMass+anatomy.bulgeMass);
       DEFAULTS={massT:baseline.m200/1e12,scaleRadius:snapScaleRadius(baseline.scaleRadius)};
       configureHaloSliders();
@@ -2667,7 +2667,9 @@ __GALAXIES_JS__
     }
     let customUpdateTimer=null;
     document.addEventListener('sandboxchange',()=>{
-      if(!customActive||customUpdateTimer!==null)return;
+      if(!customActive)return;
+      haloFine=1;rsManual=false; // a new galaxy gets its own typical halo: earlier halo tuning is dropped
+      if(customUpdateTimer!==null)return;
       customUpdateTimer=setTimeout(()=>{customUpdateTimer=null;rebuildCustomGalaxy();},40);
     });
     document.getElementById('sandboxReset').addEventListener('click',()=>{haloFine=1;rsManual=false;});
