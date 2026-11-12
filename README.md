@@ -115,6 +115,15 @@ are compared with, without touching the anatomy.
   baseline), and the scale radius follows the relation until it is moved.
   Apply SHMR Baseline restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
+- The header's Mass-to-light (M/L) tile is greyed out in the sandbox and reads
+  "Not used", because sandbox masses are set directly rather than converted
+  from light.
+
+The "?" on the M/L tile opens a short explainer: what a mass-to-light ratio
+is, why young stellar populations have low M/L and old ones high M/L, and that
+the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 Î¼m are standard averages
+(Lelli, McGaugh & Schombert 2016; McGaugh & Schombert 2014), not values
+measured for each galaxy. It closes on Ã—, Escape or a click elsewhere.
 
 Test stars:
 

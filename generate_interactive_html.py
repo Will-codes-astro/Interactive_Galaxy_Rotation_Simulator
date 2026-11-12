@@ -310,6 +310,22 @@ HTML_TEMPLATE = r"""<!doctype html>
     .fit-toggle input:checked ~ .fit-label { color:var(--ink); }
     .ml-pair { display:flex; gap:16px; }
     .ml-pair span { display:block; font-size:10px; font-weight:400; color:var(--muted); letter-spacing:.06em; }
+    .ml-col { position:relative; }
+    .stat.ml .stat-label { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .ml-info { padding:0 6px; border:1px solid rgba(242,200,121,0.45); border-radius:999px; background:transparent; color:var(--gold); font:600 10px/1.5 "Segoe UI",sans-serif; letter-spacing:0; text-transform:none; cursor:pointer; }
+    .ml-info:hover, .ml-info[aria-expanded="true"] { background:rgba(242,200,121,0.16); }
+    .ml-info:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .ml-off-note { display:none; margin-top:3px; font-size:11px; color:var(--muted); white-space:normal; max-width:150px; line-height:1.3; }
+    .stat.ml.off { background:rgba(120,140,160,0.05); border-color:var(--line); }
+    .stat.ml.off .ml-pair { display:none; }
+    .stat.ml.off .ml-off-note { display:block; }
+    .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
+    .ml-explainer[hidden] { display:none; }
+    .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
+    .ml-explainer p { margin:0 0 8px; }
+    .ml-explainer ul { margin:0 0 8px; padding-left:18px; }
+    .ml-explainer .ml-source { font-size:11px; color:var(--muted); margin:0; }
+    .ml-explainer .ml-close { position:absolute; top:8px; right:10px; border:0; background:none; color:var(--muted); font-size:16px; cursor:pointer; }
     main { padding:16px; max-width:1800px; margin:auto; }
     .controls { display:grid; grid-template-columns:minmax(230px,1fr) minmax(230px,1fr) minmax(280px,1.4fr); gap:14px; padding:13px 16px; border:1px solid var(--line); background:var(--panel); border-radius:5px; margin-bottom:14px; }
     .control label { display:flex; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; margin-bottom:7px; }
@@ -544,7 +560,19 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
-        <div class="stat ml" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label">Mass-to-light (M/L)</div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div></div>
+        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><div class="ml-off-note">Not used: sandbox masses are set directly</div></div>
+        <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" hidden>
+          <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
+          <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
+          <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L, or the Greek letter upsilon, Υ) converts one into the other: it is how many Suns' worth of mass the stars hold for every Sun's worth of light they give off.</p>
+          <ul>
+            <li><b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass.</li>
+            <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
+          </ul>
+          <p>The presets use <b>0.5 for the disk</b> and <b>0.7 for the bulge</b>, which is older (both measured in 3.6 μm infrared light). These are standard average values, not measured for each galaxy, and every real galaxy is a little different. Changing them raises or lowers the visible-matter curve, which changes how much dark matter is needed.</p>
+          <p>The Custom Sandbox sets the masses directly, so it does not need an M/L ratio.</p>
+          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
+        </div>
         <label class="fit-toggle" id="mondFitWrap" hidden title="Re-fit a₀ and the disk M/L to the SPARC data to minimise χ² (MOND mode only)"><span class="fit-label">MOND best fit</span><input type="checkbox" id="mondFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
       </div>
     </div>
@@ -2158,6 +2186,9 @@ __GALAXIES_JS__
       MOND_A0=fit?best.a0:MOND_A0_DEFAULT;
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
       document.getElementById('mondFitWrap').hidden=!mondMode||customActive;
+      const mlStat=document.getElementById('mlStat');
+      mlStat.classList.toggle('off',customActive);
+      mlStat.title=customActive?'Not used: the Custom Sandbox sets the stellar masses directly':'Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories';
       const ratioText=ratio=>customActive?'—':ratio.toFixed(2);
       document.getElementById('mlDisk').textContent=ratioText(mlState.disk);
       document.getElementById('mlBulge').textContent=ratioText(mlState.bulge);
@@ -2167,6 +2198,19 @@ __GALAXIES_JS__
       document.getElementById('mondA0Text').textContent=`${(MOND_A0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;
     }
     mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
+    // "?" on the M/L tile opens a short explainer; closes on ×, Escape or a click elsewhere.
+    const mlInfoBtn=document.getElementById('mlInfoBtn'),mlExplainer=document.getElementById('mlExplainer');
+    const setMlExplainer=open=>{
+      mlExplainer.hidden=!open;mlInfoBtn.setAttribute('aria-expanded',String(open));
+      if(!open)return;
+      // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
+      mlExplainer.style.left='';mlExplainer.style.right='';
+      if(mlExplainer.getBoundingClientRect().left<16){mlExplainer.style.left='0';mlExplainer.style.right='auto';}
+    };
+    mlInfoBtn.addEventListener('click',e=>{e.stopPropagation();setMlExplainer(mlExplainer.hidden);});
+    document.getElementById('mlExplainerClose').addEventListener('click',()=>{setMlExplainer(false);mlInfoBtn.focus();});
+    document.addEventListener('click',e=>{if(!mlExplainer.hidden&&!mlExplainer.contains(e.target))setMlExplainer(false);});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!mlExplainer.hidden){setMlExplainer(false);mlInfoBtn.focus();}});
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
       if(!mondMode)mondFitToggle.checked=false;
