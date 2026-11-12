@@ -1621,9 +1621,9 @@ __GALAXIES_JS__
         const gasCloud=new THREE.Points(gasGeometry,gasMaterial);
         gasCloud.frustumCulled=false;gasCloud.renderOrder=0;scene.add(gasCloud);
         let gasBaseOpacity=0.2; // set from the gas mass; the render loop dims it when zoomed in (visual choice)
-        // Visual choice: gas is dim close up (star view), slightly boosted at whole-galaxy distance (~70-160), normal far out.
+        // Visual choice: gas is dim close up (star view), slightly boosted at whole-galaxy distance (~70-120), normal far out.
         const smoothStep=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t);};
-        const gasZoomOpacity=r=>gasBaseOpacity*(0.15+0.85*smoothStep(25,70,r))*(1+0.45*smoothStep(45,80,r)*(1-smoothStep(160,320,r)));
+        const gasZoomOpacity=r=>gasBaseOpacity*(0.15+0.85*smoothStep(25,70,r))*(1+0.25*smoothStep(45,80,r)*(1-smoothStep(110,200,r)));
         function fillGasCloud(anatomy){
             const a=gasGeometry.attributes.position.array,scale=PhysicsEngine.GAS_SCALE_RATIO*anatomy.diskScale;
             for(let i=0;i<GAS_POINTS;i++){
