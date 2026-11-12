@@ -499,6 +499,18 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel [aria-checked=true] .sw { background:rgba(123,228,241,.45); border-color:var(--cyan); }
     .view-panel [aria-checked=true] .sw::after { transform:translateX(11px); background:#fff; }
     .view-panel .sw-eject[aria-checked=true] .sw { background:rgba(255,138,128,.45); border-color:#ff8a80; }
+    /* Outside fullscreen the panel sits over a small plot, so it drops the section labels and tightens up. */
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) { min-width:0; width:172px; padding:7px; top:8px; right:8px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-label { display:none; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) > :not(.view-head) { margin-top:5px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row { gap:5px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row button { padding:4px 4px; font-size:11px; white-space:nowrap; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel :is(.view-seg,.speed-toggle,.mode-toggle) button { padding:3px 2px; font-size:10.5px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-switches { grid-template-columns:auto auto; justify-content:space-between; gap:0 6px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-switches button { width:auto; gap:5px; padding:2px 0; font-size:10.5px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .sw { width:20px; height:11px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .sw::after { width:7px; height:7px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel [aria-checked=true] .sw::after { transform:translateX(9px); }
     .view-panel .mode-toggle { display:grid; grid-template-columns:1fr 1fr; padding:2px; margin-top:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
     .view-panel .mode-toggle button { padding:4px 8px; font-size:11px; text-align:center; border:0; border-radius:999px; background:transparent; color:var(--muted); }
     .view-panel .mode-toggle button[aria-checked=true] { background:rgba(123,228,241,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(123,228,241,.5); }
