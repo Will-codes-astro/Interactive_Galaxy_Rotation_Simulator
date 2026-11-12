@@ -1411,6 +1411,7 @@ window.GALAXIES = {
         const gasMaterial=new THREE.PointsMaterial({map:createSoftTexture(),color:0x5fc8e6,size:1.6,sizeAttenuation:true,transparent:true,opacity:0.2,blending:THREE.AdditiveBlending,depthWrite:false});
         const gasCloud=new THREE.Points(gasGeometry,gasMaterial);
         gasCloud.frustumCulled=false;gasCloud.renderOrder=0;scene.add(gasCloud);
+        let gasBaseOpacity=0.2; // set from the gas mass; the render loop dims it when zoomed in (visual choice)
         function fillGasCloud(anatomy){
             const a=gasGeometry.attributes.position.array,scale=PhysicsEngine.GAS_SCALE_RATIO*anatomy.diskScale;
             for(let i=0;i<GAS_POINTS;i++){
@@ -1418,7 +1419,7 @@ window.GALAXIES = {
                 a[3*i]=R*Math.cos(phi);a[3*i+1]=R*Math.sin(phi);a[3*i+2]=gasSeeds.gauss[3*i]*GAS_SCALE_HEIGHT;
             }
             gasGeometry.attributes.position.needsUpdate=true;
-            gasMaterial.opacity=0.1+0.2*Math.min(1,Math.sqrt(anatomy.gasMass/GAS_REFERENCE_MASS));
+            gasBaseOpacity=0.1+0.2*Math.min(1,Math.sqrt(anatomy.gasMass/GAS_REFERENCE_MASS));
         }
 
         // Refills the star meshes (position, size, colour) and the orbit-line selection from the current population.
@@ -1820,7 +1821,7 @@ window.GALAXIES = {
             if(needsRender){needsRender=false;haloUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
                 // Fade the boundary grid as the camera closes in on the visible galaxy.
                 const haloFade=0.3+0.7*Math.min(1,Math.max(0,(controls.view.radius-30)/120));
-                haloShell.material.uniforms.uFade.value=haloFade;haloGrid.material.opacity=0.13*haloFade;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);updateStarMarks();}
+                haloShell.material.uniforms.uFade.value=haloFade;gasMaterial.opacity=gasBaseOpacity*(0.15+0.85*Math.min(1,Math.max(0,(controls.view.radius-30)/120)));haloGrid.material.opacity=0.13*haloFade;blackHole.quaternion.copy(camera.quaternion);renderer.render(scene,camera);updateStarMarks();}
             requestAnimationFrame(renderLoop);
         }
         resizeOrbit();requestAnimationFrame(renderLoop);
