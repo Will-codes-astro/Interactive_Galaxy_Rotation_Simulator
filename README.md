@@ -165,18 +165,21 @@ zero halo mass).
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Tutorial button beside the
 gravity model switch. The tours do not reset or change simulator settings.
-The main tutorial's 14 steps start from the puzzle in the rotation curve
+The main tutorial's 15 steps start from the puzzle in the rotation curve
 (measured speeds stay above the visible-matter prediction), then remove and
 restore the halo, change its shape, read the halo cards (r200, scale radius,
-concentration), score the fit with χ², compare MOND, play the orbits, cover
-the View controls and the scale of the full halo, and end with the Galaxy
-menu and the mass-to-light explainer. A second, 9-step Sandbox tour covers
+concentration), score the fit with χ², compare MOND and its best-fit switch,
+play the orbits, cover the View controls (including fullscreen) and the scale
+of the full halo, and end with the Galaxy menu, the mass-to-light explainer,
+the theory guide and the CSV export. An animated pointer shows where to go on
+each step; it fades out as soon as the mouse or a finger reaches the
+highlighted control, and comes back only when the step points somewhere new. A second, 9-step Sandbox tour covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
 halo stability monitor, the halo sliders and Compare with. It starts from the
 Sandbox tour button on the tutorial's last step (which opens the Custom
 Sandbox), or from the Tutorial button, which reads "Sandbox tour" while the
-sandbox is open. If a step needs a different mode (NFW, a halo above zero, or
-the other galaxy source), the card says so and points at the control. Each halo and
+sandbox is open. If a step needs a different mode (NFW or MOND, a halo above
+zero, or the other galaxy source), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
 the left and right arrow keys navigate the tour when a control is not being

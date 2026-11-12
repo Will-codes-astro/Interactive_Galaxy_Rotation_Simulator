@@ -529,8 +529,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
     .tutorial-spotlight { position:fixed; z-index:9998; pointer-events:none; border:2px solid #8ceaf5; border-radius:9px; box-shadow:0 0 0 9999px rgba(2,7,14,.30), 0 0 0 4px rgba(123,228,241,.16); transition:opacity .45s ease; }
     .tutorial-spotlight[hidden] { display:none; }
-    .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; }
+    .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
+    .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
     .tutorial-spotlight.is-complete { opacity:0; }
     .is-complete .tutorial-pointer { animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
@@ -1966,19 +1967,19 @@ __GALAXIES_JS__
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
     const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
     const buildCurveData=(halo,total)=>[
-      {type:'scatter',mode:'markers',name:'Observed (SPARC)',x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'V_obs  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'V_baryonic  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'V_halo  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'V_model  <b>%{y:.1f}</b> km/s<extra></extra>'},
-      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual  <b>%{y:+.1f}</b> km/s<extra></extra>'},
-      ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+'  <b>%{y:.1f}</b> km/s<extra></extra>'}))
+      {type:'scatter',mode:'markers',name:'Observed (SPARC)',x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(225,235,245,0.35)',thickness:1,width:2},marker:{size:7,color:'#f4f7fb',line:{color:'rgba(5,9,16,0.9)',width:1.2}},hovertemplate:'Observed <b>%{y:.0f}</b><extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Baryonic',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.5,shape:'spline',smoothing:0.6},hovertemplate:'Baryonic <b>%{y:.0f}</b><extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.10)',line:{color:'#b39ae8',width:2,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b><extra></extra>'},
+      {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3.5,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b><extra></extra>'},
+      {type:'bar',name:'Residual',x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.75)':'rgba(255,138,128,0.75)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
+      ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:70,r:22,t:46,b:56},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
-      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor'},
+      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius (kpc)',standoff:10},anchor:'y2',showgrid:false,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor',hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital velocity (km/s)',standoff:10},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
       yaxis2:{...AXIS,title:{text:'Residual',standoff:6},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.03,xanchor:'left',x:0,font:{size:11,color:'#c3cfdb'},itemsizing:'constant'},
-      hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.96)',bordercolor:'rgba(120,150,180,0.35)',font:{color:'#f1f5f9',size:12}},dragmode:false};
+      hovermode:'x unified',hoverlabel:{bgcolor:'rgba(12,17,24,0.72)',bordercolor:'rgba(120,150,180,0.25)',font:{color:'#f1f5f9',size:10}},dragmode:false};
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayout,curveConfig);
     updateChi(totalCurve);
@@ -2485,7 +2486,7 @@ __GALAXIES_JS__
       main:{label:'Tutorial',steps:[
         {id:'puzzle',target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
          text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
-         action:'Follow both to the right-hand side of the graph. Do the white points fall away with the cyan line, or stay above it?'},
+         action:'Move your mouse (or tap) along the right-hand side of the graph and compare the two. Do the white points fall away with the cyan line, or stay above it? Hover over any point to read its exact speed.'},
         {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',title:'Take the dark matter away',
          text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
          action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
@@ -2499,19 +2500,22 @@ __GALAXIES_JS__
          text:'These three cards describe the halo your two sliders have built. The halo radius, r₂₀₀, is how far the halo reaches: far beyond the stars. The scale radius is the one you just set. Concentration, c, is the halo radius divided by the scale radius, so a high c means the dark matter is packed towards the centre.',
          action:'Press each card to read what its number means. The numbers update whenever you move a halo slider.'},
         {id:'fit',nfw:true,target:'applyObservedFit',gesture:'click',title:'Score your fit',
-         text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap.',
+         text:'χ² (chi-squared), in the badge above the graph, turns the fit into one number. It adds up the gaps between the orange line and the white points, counting the most precise measurements most heavily. Lower is better. The residual bars show each gap. “Understanding the colours and χ²”, just under the graph, is a key to every colour.',
          action:'Try to lower χ² using both halo sliders. Then press the button under the halo mass slider to jump back to the starting fit.'},
         {id:'mond',target:'modelBar',gesture:'switch',title:'Test a rival idea',
          text:'MOND takes the opposite approach: there is no dark matter at all. Instead, gravity is stronger than Newton’s law predicts wherever it is extremely weak, as it is in the outer galaxy. The halo sliders switch off because MOND has no halo.',
-         action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the halo’s, then switch back to NFW.'},
-        {id:'play',target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
-         text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones.',
+         action:'Switch to MOND. The orange line is now MOND’s prediction from the visible matter alone. Compare its χ² with the one you had for the halo.'},
+        {id:'mondFit',mond:true,mode:'preset',target:'mondFitWrap',gesture:'click',title:'Give MOND its best shot',
+         text:'MOND has one tuning number, a₀, and the visible matter depends on the mass-to-light ratio, which is only an estimate. The MOND best fit switch adjusts both until χ² is as low as it can go for this galaxy. It only appears in MOND mode.',
+         action:'Turn on MOND best fit, at the top right of the page, and see how far χ² drops. Then switch the gravity model back to NFW.'},
+        {id:'play',nfw:true,target:'playPauseBtn',gesture:'click',title:'Set the stars moving',
+         text:'The 3D view places test stars on orbits and lets the chosen model’s gravity move them for one billion years. They are simulated stars, not observations of real ones. The Orbit time slider beside Play jumps to any moment, and the Space bar also plays and pauses.',
          action:'Press Play. Then drag halo mass down to 0 and watch again: without the halo’s gravity, the outer stars drift away.'},
         {id:'look',cardRight:true,target:'orbitPlot',gesture:'drag',title:'Look around the galaxy',
          text:'The small readout in the top corner counts “ejected” stars: those further out than 1.5 times the galaxy’s outer radius. It is a simple distance check, so an ejected star has not necessarily escaped for good. Below it is the halo radius, r₂₀₀.',
          action:'Drag to spin the galaxy. Use the mouse wheel or a pinch gesture to zoom.'},
         {id:'view',target:'viewToggle',gesture:'click',title:'Change what you see',
-         text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. Speed and Fullscreen are here too.',
+         text:'The View panel controls the camera and what is drawn. Face-on and Edge-on jump to set angles and Reset view goes back to the start. Orbit lines traces each star’s path; Hide gas and Hide halo remove those layers. With a mouse, Rotate or Pan sets what dragging does. The speed buttons slow down or speed up the orbits. Fullscreen fills the screen with the galaxy and keeps the two halo sliders in a corner; press Esc to leave it.',
          action:'Press View to open or close the panel, then try Edge-on or Orbit lines. The two dimmed halo buttons come next.'},
         {id:'fullHalo',nfw:true,halo:true,target:'viewFullHalo',gesture:'click',title:'See how big the halo is',
          text:'In this model the visible galaxy is only the small bright middle of a far larger halo. The blue sphere reaches out to r₂₀₀, the radius used to mark where the halo ends. It is an illustration: a real halo is invisible and fades out gradually, with no sharp edge.',
@@ -2524,7 +2528,7 @@ __GALAXIES_JS__
          action:'Hover over or tap the ? beside Mass-to-light at the top of the page to read more.'},
         {id:'finish',target:'theoryGuide',gesture:'guide',title:'What this does and doesn’t show',
          text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
-         action:'Open the theory guide below to read more. Sandbox tour, below, shows you how to build a galaxy of your own. You can restart this tutorial from the button beside the gravity model switch.'}
+         action:'Open the theory guide below to read more. Export raw data, at the very bottom, downloads the numbers as CSV files. Sandbox tour, below, shows you how to build a galaxy of your own. You can restart this tutorial from the button beside the gravity model switch.'}
       ]},
       sandbox:{label:'Sandbox tour',steps:[
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',title:'Build your own galaxy',
@@ -2568,7 +2572,7 @@ __GALAXIES_JS__
     const visibleMatterOnly=document.getElementById('visibleMatterOnly');
     const sourceToggle=document.getElementById('sourceToggle');
     let tutorialTour='main',tutorialSteps=TOURS.main.steps,tutorialIndex=0,tutorialTarget=null,tutorialCompleted={};
-    let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null;
+    let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null,tutorialAimTarget=null;
     const tutorialStep=()=>tutorialSteps[tutorialIndex];
     // What has to change on the page before this step's own action can be done (null when nothing is in the way).
     function tutorialBlocker(){
@@ -2581,6 +2585,7 @@ __GALAXIES_JS__
         return{target:document.querySelector('#modelBar .track'),gesture:'click',
           say:step.halo?'Switch back to NFW first; MOND does not use a dark matter halo. ':'Switch back to NFW first. '};
       }
+      if(step.mond&&!mondMode)return{target:document.querySelector('#modelBar .track'),gesture:'click',say:'Switch to MOND first. '};
       if(step.halo&&Number(massSlider.value)===0)return{target:massSlider,gesture:'increase',say:'Increase halo mass above 0 first so there is a halo to see. '};
       if(step.id==='fullHalo'&&viewPanel.classList.contains('collapsed'))return{target:viewToggle,gesture:'click',say:'Open View first. '};
       return null;
@@ -2645,6 +2650,8 @@ __GALAXIES_JS__
       }else if(gesture==='guide'){
         target=document.querySelector('#theoryGuide summary');gesture='click';
       }
+      // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
+      if(target!==tutorialAimTarget){tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached');}
       const rect=target.getBoundingClientRect();
       if((!rect.width&&!rect.height)||rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth){tutorialSpotlight.hidden=true;return;}
       tutorialSpotlight.hidden=false;
@@ -2686,6 +2693,7 @@ __GALAXIES_JS__
       tutorialLastScale=Number(scaleSlider.value);
       tutorialLastTime=Number(timeSlider.value);
       tutorialDrag=null;
+      tutorialAimTarget=null;
       tutorialTarget=document.getElementById(step.target);
       const blocker=tutorialBlocker();
       tutorialBlockTarget=blocker?blocker.target:null;
@@ -2736,6 +2744,19 @@ __GALAXIES_JS__
     ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>tutorialCard.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
     document.addEventListener('fullscreenchange',syncTutorialFullscreen);
     document.addEventListener('webkitfullscreenchange',syncTutorialFullscreen);
+    // The animated pointer only shows the way. Once the mouse (or a finger) reaches the highlighted control it fades
+    // out and stays hidden for that step, so it never keeps sliding about while the user is working.
+    // Listening on window in the capture phase sees the pointer even over the graphs, which stop their own events.
+    function tutorialPointerReach(e){
+      if(tutorialCard.hidden||tutorialSpotlight.hidden||!tutorialAimTarget)return;
+      const r=tutorialAimTarget.getBoundingClientRect(),x=e.clientX,y=e.clientY;
+      if(x<r.left-6||x>r.right+6||y<r.top-6||y>r.bottom+6)return;
+      tutorialSpotlight.classList.add('is-reached');
+      // Spot the puzzle is done once the user has looked at the right-hand half of the graph, where the gap is.
+      if(tutorialStep().id==='puzzle'&&x>r.left+r.width*.5)completeTutorialAction('puzzle','Spotted: out on the right, the white points stay well above the cyan line. Press Next to find out why.');
+    }
+    window.addEventListener('pointermove',tutorialPointerReach,{capture:true,passive:true});
+    window.addEventListener('pointerdown',tutorialPointerReach,{capture:true,passive:true});
     window.addEventListener('scroll',updateTutorialSpotlight,{passive:true});
     window.addEventListener('resize',updateTutorialSpotlight);
     const sandboxInputs=SANDBOX_SLIDERS.map(slider=>slider.input);
@@ -2845,8 +2866,11 @@ __GALAXIES_JS__
     window.addEventListener('pointerup',()=>tutorialSpotlight.classList.remove('is-interacting'));
     window.addEventListener('pointercancel',()=>tutorialSpotlight.classList.remove('is-interacting'));
     mondToggle.addEventListener('change',()=>{
-      if(mondMode)completeTutorialAction('mond','MOND selected: no halo, modified gravity instead. The MOND best fit switch at the top of the page re-tunes it for this galaxy.');
+      if(mondMode)completeTutorialAction('mond','MOND selected: no halo, modified gravity instead.');
       tutorialRecheck();
+    });
+    mondFitToggle.addEventListener('change',()=>{
+      if(mondFitToggle.checked)completeTutorialAction('mondFit','Best fit on: a₀ and the mass-to-light ratio have been re-tuned for this galaxy.');
     });
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
     document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
