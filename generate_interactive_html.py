@@ -3338,14 +3338,15 @@ __GALAXIES_JS__
     let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null,tutorialAimTarget=null;
     const tutorialStep=()=>tutorialSteps[tutorialIndex];
     // Watch steps finish by themselves: each render checks the step's done() test (camera angle, layers, play time).
-    let tutorialPlayedMyr=0,tutorialWatchLast=0;
+    let tutorialPlayedMyr=0,tutorialWatchLast=0,tutorialScaleSeen=[0,0,0];
     function tutorialWatchTick(){
       if(tutorialCard.hidden)return;
       const prev=tutorialWatchLast;
       if(simTime>prev)tutorialPlayedMyr+=simTime-prev;
       tutorialWatchLast=simTime;
       const step=tutorialStep();
-      if(step.done&&!tutorialCompleted[step.id]&&!tutorialBlocker()&&step.done(prev))completeTutorialAction(step.id,step.doneText);
+      // Watch steps never count down: the viewer keeps watching and presses Next when ready.
+      if(step.done&&!tutorialCompleted[step.id]&&!tutorialBlocker()&&step.done(prev))completeTutorialAction(step.id,step.doneText,true);
     }
     // What has to change on the page before this step's own action can be done (null when nothing is in the way).
     function tutorialBlocker(){
@@ -3556,6 +3557,7 @@ __GALAXIES_JS__
       const backHadFocus=document.activeElement===tutorialBack;
       tutorialLastMass=Number(massSlider.value);
       tutorialLastScale=Number(scaleSlider.value);
+      tutorialScaleSeen=[tutorialLastScale,tutorialLastScale,tutorialLastScale];
       tutorialLastTime=Number(timeSlider.value);
       tutorialDrag=null;
       tutorialAimTarget=null;
@@ -3629,6 +3631,11 @@ __GALAXIES_JS__
     }
     tutorialAuto.addEventListener('click',()=>goTutorialStep(tutorialIndex+1,1));
     window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target);},{capture:true,passive:true});
+    // Still using the controls (another drag, a key press on a slider): the countdown starts again from 5 s,
+    // so a card never moves on while the viewer is mid-experiment.
+    ['pointerdown','input'].forEach(type=>window.addEventListener(type,e=>{
+      if(tutorialAutoFrame&&!tutorialCard.contains(e.target)&&e.target.closest&&e.target.closest('input,button,select'))tutorialAutoLeft=TUTORIAL_AUTO_MS;
+    },{capture:true,passive:true}));
     ['pointerup','pointercancel'].forEach(type=>window.addEventListener(type,()=>{tutorialHolding=false;},{capture:true,passive:true}));
     // Card-to-card animation: dir is 1 going forward, -1 going back.
     function goTutorialStep(index,dir){
@@ -3715,7 +3722,12 @@ __GALAXIES_JS__
     scaleSlider.addEventListener('input',()=>{
       const value=Number(scaleSlider.value);
       if(!mondMode&&value!==tutorialLastScale){
-        completeTutorialAction('haloShape','Halo shape changed: the same mass, arranged differently.');
+        // 'Move the scale radius both ways': done once it has gone below and above where the card started
+        // (or reached an end of the track on the other side).
+        const[start]=tutorialScaleSeen,lo=Number(scaleSlider.min),hi=Number(scaleSlider.max);
+        tutorialScaleSeen[1]=Math.min(tutorialScaleSeen[1],value);tutorialScaleSeen[2]=Math.max(tutorialScaleSeen[2],value);
+        const down=tutorialScaleSeen[1]<start||start<=lo,up=tutorialScaleSeen[2]>start||start>=hi;
+        if(down&&up)completeTutorialAction('haloShape','Both ways: the same mass, arranged differently.');
         completeTutorialAction('fit','Halo changed: check how χ² responded.');
         checkStabilityStep();
       }
