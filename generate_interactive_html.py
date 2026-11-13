@@ -621,27 +621,28 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
     /* A finished part's ring turns green and fades away instead of vanishing (visual only). */
-    .tutorial-also.is-leaving { animation:tutorial-ring-done 2.2s ease forwards; }
+    .tutorial-also.is-leaving { animation:tutorial-ring-done 1.6s ease forwards; }
     .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
     @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 25% { opacity:1; border-color:#e6fff1; box-shadow:0 0 26px 9px rgba(165,227,194,.9); } 65% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
-    /* When the task is done the highlight glows green, pulses for a few seconds, sends out a green ripple, then fades slowly (visual only). */
-    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-pulse 1.2s ease-in-out 3; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 6px rgba(165,227,194,.7); transition:opacity 1.6s ease 3.4s, border-color .3s ease, box-shadow .3s ease; }
-    @keyframes tutorial-done-pulse { 0%,100% { border-color:#a5e3c2; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 6px rgba(165,227,194,.7), inset 0 0 12px rgba(165,227,194,.3); } 50% { border-color:#e6fff1; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 32px 12px rgba(165,227,194,.95), inset 0 0 18px rgba(165,227,194,.55); } }
-    .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:3px solid #a5e3c2; border-radius:9px; animation:tutorial-ripple 1.4s ease-out 2 both; }
-    @keyframes tutorial-ripple { from { opacity:.9; transform:scale(1); } to { opacity:0; transform:scale(1.35); } }
-    /* The card's own border glows green once when a task is done, and the tick pops in. */
-    .tutorial-card.is-celebrating { animation:tutorial-card-glow 2.4s ease-out; }
-    @keyframes tutorial-card-glow { 0% { box-shadow:0 0 0 1px rgba(165,227,194,.9), 0 0 28px 6px rgba(165,227,194,.45); } 100% { box-shadow:0 0 0 1px rgba(165,227,194,0), 0 0 28px 6px rgba(165,227,194,0); } }
-    .tutorial-feedback b { display:inline-block; font-weight:700; animation:tutorial-tick-pop .6s cubic-bezier(.3,1.6,.5,1) both; }
-    @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.3); } }
+    /* When the task is done the highlight glows green once, sends out one quick ripple, holds, then fades slowly (visual only). */
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .9s ease-out; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 6px rgba(165,227,194,.7); transition:opacity 1.4s ease 2.2s, border-color .3s ease, box-shadow .3s ease; }
+    @keyframes tutorial-done-glow { 0% { border-color:#e6fff1; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 26px 9px rgba(165,227,194,.9); } }
+    /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
+    .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:2px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .8s ease-out both; }
+    @keyframes tutorial-ripple { from { opacity:.7; } to { opacity:0; inset:-15px; border-radius:18px; } }
+    /* The card's border glows green faintly once when a task is done, and the tick fades in. */
+    .tutorial-card.is-celebrating { animation:tutorial-card-glow 1.6s ease-out; }
+    @keyframes tutorial-card-glow { 0% { box-shadow:0 0 0 1px rgba(165,227,194,.45), 0 0 16px 2px rgba(165,227,194,.2); } 100% { box-shadow:0 0 0 1px rgba(165,227,194,0), 0 0 16px 2px rgba(165,227,194,0); } }
+    #tutorialFeedbackText b { display:inline-block; font-weight:600; animation:tutorial-tick-pop .45s cubic-bezier(.3,1.3,.5,1) both; }
+    @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.7); } }
     .is-complete .tutorial-pointer { animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, .tutorial-feedback b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -3579,7 +3580,7 @@ __GALAXIES_JS__
         if(keep.has(id))return;
         // Ending the tour clears them at once; anything else fades them out gently.
         if(tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
-        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},2250);}
+        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},1650);}
       });
       ids.forEach(item=>{
         let ring=tutorialAlsoRings.get(item.id);
