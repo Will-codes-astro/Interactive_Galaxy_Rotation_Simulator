@@ -104,10 +104,11 @@ star count 800 / cap 2400, generated files match, baseline.)
     commit date in git (`git log --date=short`), never the chat date. If
     today's heading exists, add to it and widen its title if needed.
   - Under it, bullets of the form `<b>Short name:</b> what it does, one
-    sentence (commit ID)`. Add why only if it isn't obvious, and a source
-    if the physics needs one. Group related commits into one bullet.
-  - Callouts only for a mistake or an open decision. No Stage numbers, no
-    file lists, no slider-by-slider detail.
+    sentence`. Add why only if it isn't obvious, and a source if the
+    physics needs one. Group related commits into one bullet.
+  - Callouts only for a mistake or an open decision. No commit IDs or
+    hashes, no Stage numbers, no file lists, no slider-by-slider detail:
+    just a plain description of what changed.
   - Keep each day short (aim for under ~150 words). Never create Diary
     pages.
 - **Living documents** (Explain My Code flashcards, User Testing Kit): edit
