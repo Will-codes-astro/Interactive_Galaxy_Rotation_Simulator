@@ -3397,6 +3397,22 @@ __GALAXIES_JS__
       tutorialTry.textContent='Try it: '+tutorialInstruction();
       updateTutorialSpotlight();
     }
+    // A gentle eased glide (our own animation, so it is smooth in every browser), about 0.6 to 1.1 s depending on
+    // distance. A wheel, touch or key press from the viewer stops it at once.
+    let tutorialGlide=0;
+    function tutorialGlideTo(y){
+      cancelAnimationFrame(tutorialGlide);
+      const from=window.scrollY,dist=y-from;if(Math.abs(dist)<2)return;
+      const dur=Math.min(1100,600+Math.abs(dist)*.25),t0=performance.now();
+      const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+      const stop=()=>{cancelAnimationFrame(tutorialGlide);['wheel','touchstart','keydown'].forEach(t=>window.removeEventListener(t,stop));};
+      ['wheel','touchstart','keydown'].forEach(t=>window.addEventListener(t,stop,{passive:true}));
+      (function step(now){
+        const t=Math.min(1,(now-t0)/dur);
+        window.scrollTo({top:from+dist*ease(t),behavior:'instant'});
+        if(t<1)tutorialGlide=requestAnimationFrame(step);else stop();
+      })(t0);
+    }
     function scrollTutorialTarget(smooth){
       const step=tutorialStep(),blocker=tutorialBlocker();
       const target=blocker?blocker.target:(step.scroll&&innerWidth>960?document.getElementById(step.scroll):tutorialTarget);
@@ -3412,7 +3428,7 @@ __GALAXIES_JS__
         // scrollPad leaves room below for boxes that open on hover (the halo cards' explainers).
         if(inPlots){const need=r.bottom+y-innerHeight+16+(step.scrollPad||0);if(need>top)top=Math.min(need,r.top+y-64-bar.offsetHeight);}
       }
-      window.scrollTo({top:Math.max(0,top),behavior:smooth&&!matchMedia('(prefers-reduced-motion: reduce)').matches?'smooth':'auto'});
+      if(smooth)tutorialGlideTo(Math.max(0,top));else window.scrollTo({top:Math.max(0,top),behavior:'auto'});
     }
     // Once whatever was in the way has been sorted out (or something new is), bring the right control into view.
     function tutorialRecheck(){
