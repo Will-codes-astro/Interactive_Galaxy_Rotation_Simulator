@@ -381,8 +381,18 @@
     @keyframes tutorial-pulse { 0%,100% { border-color:#a8ddff; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); } 50% { border-color:#ffffff; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 26px 9px rgba(120,210,255,.95), inset 0 0 16px rgba(120,210,255,.5); } }
     .tutorial-spotlight[hidden] { display:none; }
     .tutorial-spotlight.in-fs { --spot-dim:transparent; }
-    .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px dashed #a8ddff; border-radius:9px; box-shadow:0 0 10px 2px rgba(120,210,255,.45); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
+    .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
+    /* Blue rings = controls to use; yellow dashed rings = things to watch. Each carries a short label. */
+    .tutorial-also.is-watch { border:2px dashed #ffcf7a; box-shadow:0 0 12px 3px rgba(255,207,122,.45); }
+    .tutorial-tag { position:absolute; left:-3px; bottom:100%; margin-bottom:5px; padding:2px 8px; border-radius:6px; background:#a8ddff; color:#06131f; font-size:11px; font-weight:700; line-height:1.5; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.55); pointer-events:none; }
+    .is-watch .tutorial-tag { background:#ffcf7a; }
+    .tutorial-tag.below { bottom:auto; top:100%; margin:5px 0 0; }
+    .tutorial-tag.flip { left:auto; right:-3px; }
+    .tutorial-tag:empty { display:none; }
+    .tutorial-try ol { margin:5px 0 0; padding-left:20px; }
+    .tutorial-try li { margin:2px 0; }
+    .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
@@ -728,6 +738,7 @@
     <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
   </dialog>
   <div class="tutorial-spotlight" id="tutorialSpotlight" aria-hidden="true" hidden>
+    <span class="tutorial-tag" id="tutorialTag"></span>
     <svg class="tutorial-pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2v23l6-5 4 10 5-2-4-10h8z" fill="#eaffff" stroke="#09212c" stroke-width="2" stroke-linejoin="round"/></svg>
   </div>
   <aside class="tutorial-card" id="tutorialCard" aria-labelledby="tutorialTitle" hidden>
@@ -3012,105 +3023,105 @@ window.GALAXIES = {
        The tours never change the simulator's settings themselves. */
     const TOURS={
       main:{label:'Tutorial',steps:[
-        {id:'puzzle',target:'curvePlot',gesture:'scan',title:'Spot the puzzle',
+        {id:'puzzle',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
          text:'This graph shows how fast things orbit at each distance from the galaxy’s centre. Each white point is a measured speed. The cyan line is the speed you would expect if the stars and gas we can see were all the matter there is.',
-         action:'Move your mouse (or tap) along the right of the graph. Do the white points fall with the cyan line, or stay above it?'},
-        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',title:'Take the dark matter away',
+         action:'Move your mouse (or tap) along the right-hand half of the graph. Do the white points fall with the cyan line, or stay above it?'},
+        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',watch:['curvePlot:Watch the orange line'],title:'Take the dark matter away',
          text:'That gap is the puzzle: the outer galaxy spins faster than its visible matter can explain. The orange line is the model’s prediction, visible matter plus a dark matter halo. The dashed purple line is the halo’s share.',
-         action:'Drag halo mass all the way left to 0. The orange line drops onto the cyan one, because only visible matter is left.'},
-        {id:'addHalo',nfw:true,target:'massSlider',gesture:'increase',title:'Add the halo back',
+         action:'Drag the Halo mass slider (blue ring) all the way left to 0. On the graph, the orange line drops onto the cyan one, because only visible matter is left.'},
+        {id:'addHalo',nfw:true,target:'massSlider',gesture:'increase',watch:['curvePlot:Watch the orange line'],title:'Add the halo back',
          text:'A dark matter halo is a huge cloud of invisible matter around the galaxy. Its gravity makes the stars orbit faster. This slider sets its mass.',
-         action:'Drag halo mass to the right and watch the orange line rise. Can you make it run through the white points?'},
-        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
+         action:'Drag Halo mass back to the right and watch the orange line rise. Can you make it run through the white points?'},
+        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
          text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
-         action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it.'},
-        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloMetrics',gesture:'click',title:'Read the halo’s numbers',
+         action:'1. Drag Scale radius to the left: the inner (left) part of the orange line rises. 2. Drag it to the right: that part drops. Try both directions to carry on.'},
+        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloMetrics',gesture:'click',tag:'Hover over a card',title:'Read the halo’s numbers',
          text:'These cards describe the halo you have built. r₂₀₀ is the halo’s edge by convention: the radius inside which it averages 200 times the critical density of the universe. It reaches far beyond the stars. Concentration, c, is r₂₀₀ divided by the scale radius: a high c means the dark matter is packed towards the centre.',
-         action:'Hover over each card (or tap it on a touch screen) to read what it means.'},
-        {id:'fit',nfw:true,target:'chiBadge',also:['massSlider','scaleSlider','applyObservedFit'],scroll:'massSlider',gesture:'scan',title:'Score your fit',
-         text:'χ² (chi-squared), in the badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better. The residual bars under the graph show each gap.',
-         action:'Try to lower χ² with both halo sliders. Apply Observed Fit jumps back to the starting fit.'},
-        {id:'mond',target:'modelBar',also:['chiBadge'],gesture:'switch',title:'Test a rival idea',
+         action:'Hover over any of the cards in the blue ring (or tap one on a touch screen) to read what it means.'},
+        {id:'fit',nfw:true,target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag','applyObservedFit:Undo: starting fit'],watch:['chiBadge:Watch χ² (lower is better)'],title:'Score your fit',
+         text:'χ² (chi-squared), in the yellow-ringed badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better. The residual bars under the graph show each gap.',
+         action:'1. Drag Halo mass a little either way and watch χ² change. 2. Do the same with Scale radius. Try to get χ² lower than it started; Apply Observed Fit puts the starting fit back.'},
+        {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter at all. Instead, gravity is stronger than Newton’s law predicts where it is very weak, as in the outer galaxy. The halo sliders switch off.',
-         action:'Switch to MOND. The orange line is now MOND’s prediction. Compare its χ² with the halo’s.'},
-        {id:'mondFit',mond:true,mode:'preset',target:'mondFitWrap',also:['chiBadge'],gesture:'click',title:'Give MOND its best shot',
+         action:'Click MOND on the gravity model switch (blue ring). The orange line becomes MOND’s prediction: compare its χ² with the halo’s.'},
+        {id:'mondFit',mond:true,mode:'preset',target:'mondFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ² drop'],title:'Give MOND its best shot',
          text:'MOND has one tuning number, a₀, and the visible matter depends on the mass-to-light ratio, which is only an estimate. MOND best fit adjusts both to get the lowest χ².',
-         action:'Turn on MOND best fit, at the top right of the page, and see how far χ² drops. Then switch the gravity model back to NFW.'},
+         action:'1. Turn on MOND best fit (blue ring, top right of the page) and watch χ² drop. 2. Then switch the gravity model back to NFW, ready for the next step.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
-        {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',title:'Now watch it happen',
+        {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'Click Fullscreen',title:'Now watch it happen',
          text:'The graph shows what the models predict. The 3D view tests it: hundreds of test stars, each pushed by the model’s gravity, step by step, for a billion years. The best details only show up in fullscreen.',
-         action:'Press Fullscreen. The tour comes with you. The stars start paused: press ▶ Play (or the Space bar) to set them going round. Drag to spin the galaxy and scroll to zoom at any time.'},
-        {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',also:['toggleHalo'],gesture:'click',title:'Clear the stage',
+         action:'Press Fullscreen. The tour comes with you. The stars start paused: you will press ▶ Play (or the Space bar) to set them going round. Drag to spin the galaxy and scroll to zoom at any time.'},
+        {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',title:'Clear the stage',
          text:'Two layers sit over the stars. The blue haze is the cold gas, drawn as a still backdrop to show where it lies. The purple cloud is the dark matter halo, drawn so you can see it, though real dark matter is invisible.',
-         action:'Under Show, switch off Gas and Halo, so only the test stars are left. If the stars are standing still, press ▶ Play (or Space).',
+         action:'1. Under Show, switch off Gas. 2. Switch off Halo, so only the test stars are left.',
          done:()=>!gasCloud.visible&&(haloHidden||mondMode||Number(massSlider.value)===0),doneText:'Clear view: everything left is a test star.'},
-        {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',also:['toggleOrbits'],gesture:'click',title:'Look down on the disk',
+        {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',tag:'1 · Face-on',also:['toggleOrbits:2 · Orbits on','fsPlay:3 · Play'],gesture:'click',title:'Look down on the disk',
          text:'Face-on, you look straight down on the galaxy. With Orbits on, each line is one star’s path over the whole billion years. The disk stars trace near-perfect circles: they start on circular orbits and the halo’s gravity keeps them there. The glow and black hole at the centre are decoration only.',
-         action:'Press Face-on, then switch on Orbits. Press ▶ Play (or Space) to watch each star travel round its circle.',
+         action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play (or Space) to watch each star travel round its circle.',
          done:()=>orbitLines.visible&&controls.view.phi<0.3,doneText:'Circles everywhere: a galaxy in balance.'},
-        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',title:'The inner star laps the outer one',
+        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'Play',title:'The inner star laps the outer one',
          text:'Two stars are ringed, one near the centre and one far out, with live lap counts and speeds. Their speeds are similar (that is the flat rotation curve), but the outer star has a far longer track, so it falls behind lap after lap. This is differential rotation: a galaxy does not turn like a solid wheel.',
-         action:'Press Play (or Space) and watch the two labels.',
+         action:'Press ▶ Play (or Space) and watch the lap counts in the two ringed stars’ labels.',
          done:()=>tutorialPlayedMyr>=400,doneText:'Similar speeds, very different lap counts.'},
-        {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',gesture:'click',title:'Turn it on its side',
+        {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',tag:'1 · Edge-on',also:['fsPlay:2 · Keep playing'],gesture:'click',title:'Turn it on its side',
          text:'Edge-on, the disk is a thin line: a typical star sits only about 0.1 kpc above or below the middle, while the disk is tens of kpc across. The ringed star’s orbit is tilted very slightly, so it rises above the middle and dips below it once every lap.',
-         action:'Press Edge-on and keep it playing. Watch the height in the label change sign.',
+         action:'1. Press Edge-on. 2. Keep it playing (▶ or Space) and watch the height in the ringed star’s label change between + and −.',
          done:()=>Math.abs(controls.view.phi-Math.PI/2)<0.2,doneText:'Up, down, up: one bob per lap.'},
-        {id:'fsEscape',fs:true,nfw:true,marks:['escaper'],ring:true,target:'fsMassSlider',also:['fsRestart'],gesture:'zero',title:'Pull the halo away',
+        {id:'fsEscape',fs:true,nfw:true,marks:['escaper'],ring:true,target:'fsMassSlider',tag:'1 · Drag to 0',also:['fsRestart:2 · Restart','fsPlay:3 · Play'],gesture:'zero',title:'Pull the halo away',
          text:'The view pulls back to show the faint red circle: the ejection line, 1.5 times the galaxy’s visible edge. With no halo, the outer stars move too fast for the visible matter to hold. The ringed star is the first to cross the line, and the Ejected count in the top-left corner climbs as others follow. Ejected stars do not vanish; they keep coasting outwards.',
-         action:'Drag Halo mass to 0, press Restart, then make sure it is playing (▶ Play or Space).',
+         action:'1. Drag Halo mass all the way left to 0. 2. Press Restart. 3. Press ▶ Play (or Space) if it is not already playing, and watch the ringed star cross the red circle.',
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Gone: visible matter alone cannot hold the outer stars.'},
-        {id:'fsFullHalo',fs:true,nfw:true,halo:true,viewPanel:true,target:'viewFullHalo',gesture:'click',title:'Put the halo back, and step back',
+        {id:'fsFullHalo',fs:true,nfw:true,halo:true,viewPanel:true,target:'viewFullHalo',gesture:'click',tag:'Click Full halo',title:'Put the halo back, and step back',
          text:'With the halo back, press Restart and the same stars stay put. Now zoom right out: the bright speck in the middle is the whole visible galaxy, and the sphere is the halo’s edge, r₂₀₀. Real halos have no sharp edge; the sphere just marks it.',
-         action:'Raise Halo mass, press Restart and ▶ Play, then press Full halo. Reset brings you back.'},
-        {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',title:'Try another galaxy',
+         action:'Press Full halo (blue ring) to zoom right out. Reset brings you back.'},
+        {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',tag:'Choose a galaxy',title:'Try another galaxy',
          text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo.',
-         action:'Choose a different galaxy. Does it show the same gap between the white points and the cyan line?'},
-        {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',title:'How heavy are the stars?',
+         action:'Open the Galaxy menu (blue ring) and choose a different galaxy. Does it show the same gap between the white points and the cyan line?'},
+        {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. The values here are standard averages, so they are an assumption.',
-         action:'Hover over or tap the ? beside Mass-to-light at the top of the page to read more.'},
-        {id:'finish',target:'theoryGuide',gesture:'scan',title:'What this does and doesn’t show',
+         action:'Hover over or tap the ? (blue ring) beside Mass-to-light at the top of the page to read more.'},
+        {id:'finish',target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
          text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
          action:'Read the theory guide below to learn more. One last thing to try: switch to MOND, go fullscreen and press ▶ Play. There is no halo, yet the outer stars stay put, because MOND’s boosted gravity does the halo’s job. Sandbox tour, below, lets you build a galaxy of your own.'}
       ]},
       sandbox:{label:'Sandbox tour',steps:[
-        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',title:'Build your own galaxy',
+        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
          text:'The Custom Sandbox swaps the real galaxy for one you design. You set the mass of its stars and gas and how they are spread out; the simulator does the rest.',
-         action:'There are three groups of sliders: stellar disk, bulge and gas.'},
-        {id:'sbDisk',mode:'custom',target:'sbDiskMass',also:['massSlider'],gesture:'adjust',title:'Make the disk heavier or lighter',
+         action:'Find the three groups of sliders in the blue ring: stellar disk, bulge and gas. Then press Next.'},
+        {id:'sbDisk',mode:'custom',target:'sbDiskMass',gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the cyan line','massSlider:Watch halo mass'],title:'Make the disk heavier or lighter',
          text:'The disk is the flat, spinning part of a galaxy, where most stars are. More mass lifts the cyan line, and the halo grows too, since galaxies with more stars sit in bigger halos.',
-         action:'Drag the disk mass up and down. Watch the cyan line, and the halo mass slider further down the page.'},
-        {id:'sbSize',mode:'custom',target:'sbDiskScale',also:['sbTruncation'],gesture:'adjust',title:'Spread the stars out',
+         action:'Drag Disk mass up and down. Watch the cyan line on the graph rise and fall, and the Halo mass value change with it.'},
+        {id:'sbSize',mode:'custom',target:'sbDiskScale',tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',title:'Spread the stars out',
          text:'The scale length sets how quickly the disk fades outwards. The truncation radius, below it, is where the visible matter ends.',
-         action:'Change the scale length, then the truncation radius. Watch the peak of the cyan line move and the 3D galaxy change size.'},
+         action:'1. Drag Scale length and watch the peak of the cyan line move. 2. Drag Truncation radius and watch the 3D galaxy change size.'},
         {id:'sbBulge',mode:'custom',target:'sbBulgeMass',gesture:'increase',title:'Add a bulge',
          text:'A bulge is the round ball of stars at the centre of some galaxies. It puts a lot of mass in a small space, so it speeds up the innermost orbits.',
-         action:'Raise the bulge mass above zero. The inner part of the cyan line climbs, and the effective radius slider switches on so you can set the bulge’s size.'},
-        {id:'sbGas',mode:'custom',target:'sbGasMass',gesture:'adjust',title:'Add the gas',
+         action:'Drag Bulge mass above zero. The inner (left) part of the cyan line climbs, and the Effective radius slider below it switches on so you can set the bulge’s size.'},
+        {id:'sbGas',mode:'custom',target:'sbGasMass',gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the right of the cyan line'],title:'Add the gas',
          text:'Galaxies also hold cold gas, mostly hydrogen, in a disk three times wider than the stars, so it matters most far out.',
-         action:'Change the gas mass and watch the outer part of the cyan line.'},
-        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',title:'Check the totals',
+         action:'Drag Gas mass up and down and watch the outer (right-hand) part of the cyan line.'},
+        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',tag:'Watch the totals',also:['sbDiskMass:Drag this'],title:'Check the totals',
          text:'This list adds your galaxy up. You never set the dark matter directly: the simulator gives your galaxy the halo that galaxies with this mass of stars typically have, found by matching galaxy surveys to simulated halos (Moster et al. 2013).',
-         action:'Move any slider above and watch the typical halo mass change with it.'},
-        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',title:'Meet the halo stability monitor',
+         action:'Drag Disk mass (or any slider above) and watch Typical halo mass in the list change with it.'},
+        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo stability monitor',
          text:`Under the graph, the monitor checks that your halo has a believable shape. It reads the concentration, c = r₂₀₀ ÷ r_s: how tightly the dark matter is packed towards the centre. The shaded band on the gauge is the range this simulator treats as realistic, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}. The marker is your halo.`,
-         action:'Find the marker on the gauge. Is your halo inside the band?'},
-        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',also:['stabilityChip','stabilityMonitor'],gesture:'adjust',title:'Break the halo',
+         action:'Move your mouse over the monitor (blue ring) and find the marker on its gauge. Is your halo inside the shaded band?'},
+        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',tag:'Drag to each end',watch:['stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny scale radius crams the dark matter into the centre (c too high); a huge one smears it thinly outwards (c too low). Real halos do not look like either. The monitor turns red and a warning appears on the 3D view too, but nothing is blocked: you can still run an impossible galaxy.',
-         action:'Drag the scale radius to one end, then the other. The warning on the 3D view appears as the halo leaves the realistic range; on the monitor under the graph, the marker leaves the band.'},
-        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',also:['applyObservedFit'],gesture:'adjust',title:'Tune the halo yourself',
+         action:'1. Drag Scale radius all the way to one end, then the other. 2. Watch the marker leave the shaded band on the monitor, and a warning appear on the 3D view.'},
+        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['curvePlot:Watch the orange line'],gesture:'adjust',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 times the typical halo. The stars start on orbits that balance the typical halo, so a lighter or heavier one throws them off balance.',
-         action:'Try a light halo, then a heavy one. Typical Halo, under the slider, puts both halo sliders back.'},
-        {id:'sbFs',mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',title:'Watch your galaxy',
+         action:'1. Drag Halo mass low, then high, and watch the orange line. 2. Press Typical Halo, under the slider, to put both halo sliders back.'},
+        {id:'sbFs',mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'Click Fullscreen',title:'Watch your galaxy',
          text:'As in the main tour, the real test is watching your galaxy run. The tour comes with you into fullscreen.',
          action:'Press Fullscreen, then ▶ Play (or Space) to set your galaxy going round.'},
-        {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',also:['toggleGas','toggleHalo'],gesture:'click',title:'Two kinds of orbit',
+        {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',tag:'1 · Orbits on',also:['toggleGas:2 · Gas off','toggleHalo:3 · Halo off','fsPlay:4 · Play'],gesture:'click',title:'Two kinds of orbit',
          text:'Disk stars trace neat circles. Bulge stars, if your galaxy has a bulge, trace tangled loops tilted every way: a bulge is held up by its stars’ random motions, not by spinning, which is why it stays round. The ringed star is one of them.',
-         action:'Switch on Orbits, and switch off Gas and Halo for a clearer view. No tangle in the middle? Your galaxy has no bulge. Keep it playing to watch the stars move along their paths.',
+         action:'1. Switch on Orbits. 2. Switch off Gas. 3. Switch off Halo. 4. Press ▶ Play (or Space) to watch the stars move along their paths. No tangle in the middle? Your galaxy has no bulge.',
          done:()=>orbitLines.visible,doneText:'Circles in the disk, a tangle in the bulge.'},
-        {id:'sbFsEscape',fs:true,nfw:true,marks:['escaper'],ring:true,target:'fsMassSlider',also:['fsRestart'],gesture:'zero',title:'Starve it of dark matter',
+        {id:'sbFsEscape',fs:true,nfw:true,marks:['escaper'],ring:true,target:'fsMassSlider',tag:'1 · Drag to 0',also:['fsRestart:2 · Restart','fsPlay:3 · Play'],gesture:'zero',title:'Starve it of dark matter',
          text:'The red circle is the ejection line. Take the halo away and the ringed star is the first your galaxy loses. A heavier disk holds on to more of its stars: try it after the tour.',
-         action:'Drag Halo mass to 0, press Restart, then make sure it is playing (▶ Play or Space).',
+         action:'1. Drag Halo mass all the way left to 0. 2. Press Restart. 3. Press ▶ Play (or Space) if it is not already playing, and watch the ringed star cross the red circle.',
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Lost: without dark matter, the outer stars fly off.'}
       ]}
     };
@@ -3175,17 +3186,29 @@ window.GALAXIES = {
       return null;
     }
     function tutorialInstruction(){
-      const step=tutorialStep(),blocker=tutorialBlocker();
-      if(blocker)return blocker.say+step.action;
+      const step=tutorialStep();
       if(step.id==='removeHalo'){
         if(tutorialShortcutUnlocked)return 'The Visible Matter Only button that just appeared is a shortcut back to 0. Compare the orange line with the white points on the right of the graph.';
         if(Number(massSlider.value)===0)return 'Halo mass is already 0. Drag it up, then all the way back left to 0, and watch the orange line.';
       }
       return step.action;
     }
+    // "First:" line for anything in the way, then the action; "1. … 2. …" actions become a numbered list.
+    function renderTutorialTry(){
+      const blocker=tutorialBlocker(),action=tutorialInstruction();
+      tutorialTry.replaceChildren();
+      if(blocker){const first=document.createElement('strong');first.className='tutorial-first';first.textContent='First: '+blocker.say.trim();tutorialTry.appendChild(first);}
+      const head=document.createElement('strong');head.textContent=blocker?'Then: ':'Try it: ';tutorialTry.appendChild(head);
+      const parts=action.split(/\s(?=\d\.\s)/);
+      if(parts.length>1&&/^1\.\s/.test(parts[0])){
+        const list=document.createElement('ol');
+        parts.forEach(p=>{const li=document.createElement('li');li.textContent=p.replace(/^\d\.\s/,'');list.appendChild(li);});
+        tutorialTry.appendChild(list);
+      }else tutorialTry.appendChild(document.createTextNode(action));
+    }
     function refreshTutorialGuidance(){
       if(tutorialCard.hidden)return;
-      tutorialTry.textContent='Try it: '+tutorialInstruction();
+      renderTutorialTry();
       updateTutorialSpotlight();
     }
     // A gentle eased glide (our own animation, so it is smooth in every browser), about 0.6 to 1.1 s depending on
@@ -3290,6 +3313,9 @@ window.GALAXIES = {
       tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
       tutorialSpotlight.style.borderRadius=(Math.min(radius,rect.height/2)+pad)+'px';
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
+      const tag=document.getElementById('tutorialTag'),label=blocker?'Do this first':(step.tag||TUTORIAL_GESTURE_TAG[step.gesture]||'');
+      if(tag.textContent!==label)tag.textContent=label;
+      placeTutorialTag(tag,rect);
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
@@ -3324,10 +3350,11 @@ window.GALAXIES = {
     const tutorialAlsoRings=[];
     function positionTutorialAlso(hideAll){
       const step=tutorialSteps[tutorialIndex];
-      const ids=hideAll||tutorialCard.hidden||!step||!step.also||tutorialBlocker()?[]:step.also;
-      while(tutorialAlsoRings.length<ids.length){const ring=document.createElement('div');ring.className='tutorial-also';ring.setAttribute('aria-hidden','true');tutorialAlsoRings.push(ring);}
+      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()?[]:tutorialRingList(step);
+      while(tutorialAlsoRings.length<ids.length){const ring=document.createElement('div');ring.className='tutorial-also';ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.push(ring);}
       tutorialAlsoRings.forEach((ring,i)=>{
-        const el=i<ids.length?document.getElementById(ids[i]):null;
+        const item=i<ids.length?ids[i]:null,el=item?document.getElementById(item.id):null;
+        if(item){const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;}
         if(ring.parentElement!==tutorialSpotlight.parentElement)tutorialSpotlight.parentElement.appendChild(ring);
         const r=el&&el.getClientRects().length?tutorialSpotRect(el):null;
         if(!r||!r.width||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth){ring.hidden=true;return;}
@@ -3336,8 +3363,21 @@ window.GALAXIES = {
         ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
         ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
         ring.style.borderRadius=(Math.min(radius,r.height/2)+pad)+'px';
+        placeTutorialTag(ring.firstChild,r);
       });
     }
+    // A step's extra rings: also = other controls to use (blue), watch = things to watch (yellow).
+    // Each entry is 'elementId' or 'elementId:Label'.
+    function tutorialRingList(step){
+      const parse=(entry,watch)=>{const k=entry.indexOf(':');return{id:k<0?entry:entry.slice(0,k),label:k<0?(watch?'Watch':'Also use'):entry.slice(k+1),watch};};
+      return[...(step.also||[]).map(e=>parse(e,false)),...(step.watch||[]).map(e=>parse(e,true))];
+    }
+    // Labels sit above their ring, or below it near the top of the screen, and flip left near the right edge.
+    function placeTutorialTag(tag,r){
+      tag.classList.toggle('below',r.top<34);
+      tag.classList.toggle('flip',r.left+tag.offsetWidth>innerWidth-10);
+    }
+    const TUTORIAL_GESTURE_TAG={zero:'Drag to 0',increase:'Drag right',adjust:'Drag',drag:'Drag',click:'Click',switch:'Click',scan:'Look here'};
     const rectKey=r=>[r.left,r.top,r.width,r.height].map(v=>Math.round(v*2)).join();
     // Every frame, re-measure the control and re-fit the ring if it has moved or changed size (an expanding box,
     // a layout shift above it, a CSS transition), so the highlight always hugs it.
@@ -3375,7 +3415,7 @@ window.GALAXIES = {
       tutorialProgressFill.style.width=`${100*(tutorialIndex+1)/tutorialSteps.length}%`;
       tutorialTitle.textContent=step.title;
       tutorialText.textContent=step.text;
-      tutorialTry.textContent='Try it: '+tutorialInstruction();
+      renderTutorialTry();
       tutorialFeedback.hidden=!tutorialCompleted[step.id];
       tutorialFeedbackText.textContent=tutorialCompleted[step.id]?'✓ '+tutorialCompleted[step.id]:'';
       stopTutorialAuto();
@@ -3499,7 +3539,7 @@ window.GALAXIES = {
       if(tutorialCard.hidden||tutorialIsFullscreen())return;
       if(tutorialHolding){tutorialSnapTimer=setTimeout(tutorialSnapBack,600);return;}
       const step=tutorialStep(),blocker=tutorialBlocker();
-      const els=blocker?[blocker.target]:[tutorialTarget,...(step.also||[]).map(id=>document.getElementById(id))];
+      const els=blocker?[blocker.target]:[tutorialTarget,...tutorialRingList(step).map(r=>document.getElementById(r.id))];
       if(!els[0]||!els[0].getClientRects().length||els.some(tutorialOnScreen))return;
       scrollTutorialTarget(true);
       tutorialSpotlight.classList.remove('is-arriving','is-reached');void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
