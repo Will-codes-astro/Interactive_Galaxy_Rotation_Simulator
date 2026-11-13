@@ -453,6 +453,37 @@ HTML_TEMPLATE = r"""<!doctype html>
     #chiBadge { font-variant-numeric:tabular-nums; padding:3px 10px; border-radius:999px; border:1px solid rgba(120,150,180,0.3); background:rgba(120,150,180,0.08); color:#c3cfdb; font-size:12px; }
     #chiBadge.good { border-color:rgba(95,208,224,0.55); color:#8fe3ee; } #chiBadge.ok { border-color:rgba(255,174,92,0.55); color:#ffc48a; } #chiBadge.poor { border-color:rgba(255,138,128,0.6); color:#ff9d94; }
     .plot { width:100%; height:min(68vh,700px); min-height:420px; }
+    /* Rotation-curve readout: a custom box, guide line and dots that glide between SPARC radii (visual only). */
+    .curve-wrap { position:relative; }
+    #curvePlot { touch-action:pan-y; -webkit-tap-highlight-color:transparent; }
+    .curve-hover { position:absolute; inset:0; z-index:5; pointer-events:none; opacity:0; transition:opacity .18s ease; }
+    .curve-hover.on { opacity:1; }
+    .curve-hover .ch-line { position:absolute; left:0; top:0; width:0; border-left:1px dashed rgba(200,215,230,.45); will-change:transform; }
+    .curve-hover .ch-dot { position:absolute; left:-5px; top:-5px; width:10px; height:10px; box-sizing:border-box; border-radius:50%; border:2px solid #070b14; box-shadow:0 0 0 1px rgba(255,255,255,.3),0 0 8px currentColor; background:currentColor; will-change:transform; }
+    .curve-hover .ch-box { position:absolute; left:0; top:0; padding:4px 7px 5px; border:1px solid rgba(148,170,200,.25); border-radius:6px; background:rgba(10,15,26,.8); -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px); color:#eef2f8; font:10.5px/1.4 Inter,"Segoe UI",system-ui,sans-serif; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,.35); will-change:transform; }
+    .ch-box .ch-r { margin-bottom:1px; color:#8e9db3; font:500 10px "JetBrains Mono",ui-monospace,Consolas,monospace; }
+    .ch-row { display:flex; align-items:center; gap:5px; }
+    .ch-row i { flex:none; width:7px; height:2px; border-radius:1px; }
+    .ch-row span { flex:1; margin-right:6px; color:#b8c4d6; }
+    .ch-row b { font-weight:600; font-variant-numeric:tabular-nums; }
+    .ch-row.ch-res { margin-top:2px; padding-top:2px; border-top:1px solid rgba(148,170,200,.16); }
+    .curve-hint { display:none; margin:2px 16px 10px; color:var(--muted); font-size:12px; }
+    .on-touch { display:none; }
+    @media (hover:none) and (pointer:coarse) {
+      .curve-hint { display:block; }
+      .on-touch { display:inline; } .on-mouse { display:none; }
+      .curve-hover .ch-box { padding:4px 7px 5px; font-size:11px; }
+      .ch-box .ch-r { font-size:10.5px; }
+      .stat-q { width:22px; height:22px; font-size:11px; }
+      .stat-q:hover::after, .stat-q:focus-visible::after { opacity:0; visibility:hidden; }
+      .stat-q.open::after { opacity:1; visibility:visible; width:min(210px,62vw); }
+      .telemetry { padding:3px 7px; font-size:11px; }
+      input[type=range] { height:34px; }
+      input[type=range]::-webkit-slider-thumb { width:24px; height:24px; margin-top:-10px; }
+      input[type=range]::-moz-range-thumb { width:20px; height:20px; }
+      .fs-sliders input[type=range] { height:30px; }
+      .fs-play { width:36px; height:36px; }
+    }
     #orbitPlot { position:relative; touch-action:none; overscroll-behavior:contain; user-select:none; -webkit-user-select:none; cursor:grab; }
     #orbitPlot.dragging { cursor:grabbing; }
     #orbitPlot canvas { display:block; width:100% !important; height:100% !important; touch-action:none; }
@@ -857,7 +888,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 Gyr</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
-        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. Hover or select a value to learn more.</p>
+        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over or select a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
         <dl class="halo-metrics" id="haloMetrics">
           <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>The model's outer halo radius; not a sharp physical edge.</span></span></dd></div>
           <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
@@ -868,7 +899,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     </article>
       <article class="panel" id="curvePanel">
         <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
-        <div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div>
+        <div class="curve-wrap"><div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div></div>
+        <p class="curve-hint">Tap the graph, or slide your finger along it, to read the speeds at each radius. Tap outside the graph to close.</p>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
           <div class="stability-head"><span class="stability-title">Halo stability monitor</span><span class="stability-badge" id="stabilityBadge" role="status"></span></div>
           <div class="stability-reading"><span class="stability-c" id="stabilityC">c = —</span><span class="stability-detail" id="stabilityDetail"></span></div>
@@ -2145,6 +2177,12 @@ __GALAXIES_JS__
             const collapsed=viewPanel.classList.toggle('collapsed');
             viewToggle.setAttribute('aria-expanded',String(!collapsed));
         });
+        // The "?" tips open on hover with a mouse; on a touch screen a tap opens one (and closes the others).
+        document.addEventListener('click',e=>{
+            const tip=e.target.closest&&e.target.closest('.stat-q');
+            document.querySelectorAll('.stat-q.open').forEach(q=>{if(q!==tip)q.classList.remove('open');});
+            if(tip)tip.classList.toggle('open');
+        });
         document.querySelectorAll('.halo-metric').forEach(metric=>{
             const button=metric.querySelector('button');
             metric.addEventListener('pointerenter',event=>{
@@ -2377,16 +2415,126 @@ __GALAXIES_JS__
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
     ];
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
-      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,spikemode:'across',spikecolor:'rgba(200,215,230,0.35)',spikethickness:1,spikedash:'dot',spikesnap:'cursor',hoverformat:'.1f'},
+      xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
       yaxis2:{...AXIS,title:{text:'Obs − model',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,tracegroupgap:4},
-      hovermode:'x unified',hoverlabel:{bgcolor:'rgba(10,15,26,0.94)',bordercolor:'rgba(148,170,200,0.3)',font:{color:'#eef2f8',size:11,family:'Inter,Segoe UI,sans-serif'}},dragmode:false};
+      hovermode:false,dragmode:false};
+    // On a phone-width screen the legend sits two entries per row, leaving more height for the graph.
+    if(innerWidth<600)curveLayout.legend={...curveLayout.legend,entrywidth:0.5,entrywidthmode:'fraction',font:{...curveLayout.legend.font,size:11}};
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
     const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout;
     Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayoutNow(),curveConfig);
     updateChi(totalCurve);
+    setupCurveReadout();
+    /* ---------- Rotation-curve readout ----------
+       Replaces Plotly's hover box, which jumped from point to point. The numbers are always the values at a real
+       SPARC radius (the nearest one to the pointer); only the box, guide line and dots glide between radii, so the
+       motion is smooth without inventing values between measurements. Mouse: hover. Touch: tap or slide along the
+       graph; the readout stays put (and updates live as sliders move) until you tap outside the graph. */
+    function setupCurveReadout(){
+      const gd=document.getElementById('curvePlot'),wrap=gd.parentElement;
+      const layer=document.createElement('div');
+      layer.className='curve-hover';layer.setAttribute('aria-hidden','true');
+      layer.innerHTML='<div class="ch-line"></div><div class="ch-dots"></div><div class="ch-box"><div class="ch-r"></div><div class="ch-rows"></div></div>';
+      wrap.appendChild(layer);
+      const line=layer.querySelector('.ch-line'),dotsEl=layer.querySelector('.ch-dots'),box=layer.querySelector('.ch-box');
+      const rEl=layer.querySelector('.ch-r'),rowsEl=layer.querySelector('.ch-rows');
+      const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      // [trace index, short label (null = 'Model' or 'MOND'), colour]; trace 4 (residual) is added as its own row.
+      const ROWS=[[0,'Observed','#f4f7fb'],[3,null,'#ffae5c'],[1,'Visible','#5fd0e0'],[2,'Halo','#b39ae8'],[5,'Disk','#ffd166'],[6,'Bulge','#ff8fab'],[7,'Gas','#7bd88f']];
+      const isOn=t=>!!t&&t.visible!==false&&t.visible!=='legendonly';
+      let active=false,pinned=false,touchDown=false,idx=-1,target=0,shown=0,boxX=0,boxY=0,boxGoal=0,lastT=0,raf=0,dots=[];
+      const axes=()=>{const fl=gd._fullLayout;return fl&&fl.xaxis&&fl.yaxis&&fl.xaxis.p2l?fl:null;};
+      const radiiNow=()=>(gd.data&&gd.data[3]&&gd.data[3].x)||[];
+      // Nearest SPARC radius to a screen point, or null if the point is outside the plotting area (e.g. on the legend).
+      function indexAt(clientX,clientY){
+        const fl=axes(),xs=radiiNow();if(!fl||!xs.length)return null;
+        const rect=gd.getBoundingClientRect(),px=clientX-rect.left-fl.xaxis._offset,py=clientY-rect.top;
+        if(px<-24||px>fl.xaxis._length+24||py<fl.yaxis._offset-8)return null;
+        const x=fl.xaxis.p2l(px);let best=0;
+        for(let i=1;i<xs.length;i++)if(Math.abs(xs[i]-x)<Math.abs(xs[best]-x))best=i;
+        return best;
+      }
+      function fill(i){
+        const d=gd.data,xs=radiiNow();if(!xs.length)return;
+        rEl.textContent=`R = ${Number(xs[i]).toFixed(1)} kpc`;
+        let html='';dots=[];
+        ROWS.forEach(([k,label,colour])=>{
+          const t=d[k];if(!isOn(t)||!t.y||t.y[i]==null)return;
+          const v=Number(t.y[i]);
+          const value=k===0?`${v.toFixed(0)} ± ${Number(t.customdata[i]).toFixed(0)}`:v.toFixed(0);
+          html+=`<div class="ch-row"><i style="background:${colour}"></i><span>${label||(mondMode?'MOND':'Model')}</span><b>${value} km/s</b></div>`;
+          dots.push([k,colour]);
+        });
+        if(isOn(d[4])&&d[4].y){const r=Number(d[4].y[i]);html+=`<div class="ch-row ch-res"><i style="background:${r>=0?'#5fd0e0':'#ff8a80'}"></i><span>Residual</span><b>${r>=0?'+':'−'}${Math.abs(r).toFixed(0)} km/s</b></div>`;}
+        rowsEl.innerHTML=html;
+        dotsEl.innerHTML=dots.map(([,c])=>`<div class="ch-dot" style="color:${c}"></div>`).join('');
+      }
+      // Draw at a fractional radius index f (between two SPARC points while gliding).
+      function place(f){
+        const fl=axes(),xs=radiiNow(),d=gd.data;if(!fl||!xs.length)return;
+        const i0=Math.max(0,Math.min(xs.length-1,Math.floor(f))),i1=Math.min(xs.length-1,i0+1),t=f-i0;
+        const at=arr=>Number(arr[i0])+(Number(arr[i1])-Number(arr[i0]))*t;
+        const xa=fl.xaxis,ya=fl.yaxis,ya2=fl.yaxis2;
+        const x=xa._offset+xa.l2p(at(xs)),top=ya._offset;
+        const bottom=isOn(d[4])&&ya2&&ya2._length?ya2._offset+ya2._length:ya._offset+ya._length;
+        line.style.transform=`translate(${x}px,${top}px)`;line.style.height=`${bottom-top}px`;
+        [...dotsEl.children].forEach((el,j)=>{
+          const k=dots[j]&&dots[j][0],tr=d[k];if(!tr||!tr.y)return;
+          const y=Math.max(top,Math.min(ya._offset+ya._length,ya._offset+ya.l2p(at(tr.y))));
+          el.style.transform=`translate(${x}px,${y}px)`;
+        });
+        // The box sits in the lower part of the speed panel (usually empty: the curves rise to the top), right of
+        // the line and flipping left near the edge; boxX eases so the flip is smooth too.
+        const w=box.offsetWidth,W=gd.clientWidth;
+        boxGoal=x+10+w>W-4?x-10-w:x+10;boxGoal=Math.max(4,Math.min(W-w-4,boxGoal));
+        boxY=Math.max(top+6,ya._offset+ya._length-box.offsetHeight-8);
+        box.style.transform=`translate(${boxX}px,${boxY}px)`;
+        return x;
+      }
+      function tick(now){
+        raf=0;
+        const dt=lastT?Math.min(0.1,(now-lastT)/1000):1/60;lastT=now;
+        const k=reduceMotion?1:1-Math.exp(-16*dt);
+        shown+=(target-shown)*k;if(Math.abs(target-shown)<0.002)shown=target;
+        place(shown);
+        boxX+=(boxGoal-boxX)*k;if(Math.abs(boxGoal-boxX)<0.3)boxX=boxGoal;
+        box.style.transform=`translate(${boxX}px,${boxY}px)`;
+        if(active&&(shown!==target||boxX!==boxGoal))raf=requestAnimationFrame(tick);else lastT=0;
+      }
+      const kick=()=>{if(!raf)raf=requestAnimationFrame(tick);};
+      function show(i){
+        if(i!==idx){idx=i;fill(i);}
+        target=i;
+        if(!active){active=true;shown=i;lastT=0;place(i);boxX=boxGoal;layer.classList.add('on');}
+        kick();
+      }
+      function hide(){active=pinned=false;idx=-1;layer.classList.remove('on');}
+      wrap.addEventListener('pointermove',e=>{
+        if(e.pointerType==='touch'&&!touchDown)return;
+        const i=indexAt(e.clientX,e.clientY);
+        if(i===null){if(!pinned)hide();return;}
+        show(i);
+      },{passive:true});
+      wrap.addEventListener('pointerleave',e=>{if(e.pointerType!=='touch'&&!pinned)hide();},{passive:true});
+      wrap.addEventListener('pointerdown',e=>{
+        if(e.pointerType!=='touch')return;
+        const i=indexAt(e.clientX,e.clientY);if(i===null)return;
+        touchDown=true;pinned=true;show(i);
+      },{passive:true});
+      ['pointerup','pointercancel'].forEach(type=>window.addEventListener(type,()=>{touchDown=false;},{passive:true}));
+      document.addEventListener('pointerdown',e=>{if(pinned&&!wrap.contains(e.target))hide();},{passive:true});
+      // Slider moves, MOND, legend clicks and galaxy changes redraw the plot: refresh the numbers in place.
+      gd.on('plotly_afterplot',()=>{
+        if(!active)return;
+        const n=radiiNow().length;if(!n){hide();return;}
+        if(idx>n-1){target=shown=n-1;}
+        const keep=Math.min(idx,n-1);idx=-1;fill(keep);idx=keep;place(shown);kick();
+      });
+      window.addEventListener('resize',()=>{if(active){place(shown);boxX=boxGoal;kick();}});
+    }
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
     let sliderUpdateTimer=null,sliderDragging=false;

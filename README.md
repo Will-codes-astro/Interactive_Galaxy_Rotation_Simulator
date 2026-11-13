@@ -223,6 +223,14 @@ colour key and fit explanation. Select it or a theory box to open it. Halo
 values reveal their explanations on hover or when selected with a mouse, touch,
 or keyboard.
 
+Rotation-curve readout: hovering over the graph (or, on a touch screen, tapping
+it or sliding a finger along it) shows a box with the speeds at the nearest
+measured SPARC radius. The box, guide line and dots glide smoothly between radii,
+but the numbers are always the values at a real data point, never interpolated.
+On touch screens the readout stays until you tap outside the graph and updates
+live as the sliders move. Touch screens also get larger slider thumbs, tap-to-open
+"?" tips and a two-column legend on narrow screens.
+
 ## Project map
 
 - `Baseline_Baryonic_Model_3d.py`: orbit simulation that writes trajectory data
