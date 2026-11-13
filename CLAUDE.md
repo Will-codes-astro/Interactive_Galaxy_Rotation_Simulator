@@ -78,6 +78,29 @@ mention extras briefly.
 - If AI is used in a new way, remind Will to add it to his Project Q AI
   declaration.
 
+## How the EPQ is marked (AQA 7993, 50 marks)
+
+From AQA's 2026/27 candidate record form: **AO1 Manage** 10 (planning and
+managing the project), **AO2 Use resources** 10 (finding, critically
+evaluating and using sources), **AO3 Develop and realise** 20 (making the
+product: this site and the report), **AO4 Review** 10 (evaluating the
+outcome and own learning). Will's Top-Band Plan in Notion holds the band
+detail. The June 2023 examiner report says marks are lost for: vague aims
+with no criteria for judging success; planning that is only essay planning;
+thin Production Logs that don't show research-driven decisions and changes
+(AO3); describing sources without critically evaluating them (AO2); and
+brief reviews or conclusions based on opinion rather than evidence (AO4).
+
+What this means for you:
+- **Decisions must be Will's.** Examiners reward his own decision-making
+  (AO1, AO3). When proposing ideas, give options with the evidence and
+  trade-offs, so he chooses and can log why.
+- **Make the journey visible.** Build-log entries should record what
+  changed and the research or problem that drove it, since this feeds his
+  Production Log.
+- **Every claim needs evidence.** Support explanations on the site with
+  cited sources and data, never assertion.
+
 ## Where things are
 
 | Task | Read first | Code |
