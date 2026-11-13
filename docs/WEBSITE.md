@@ -147,7 +147,13 @@ guide. The rings, labels and ejection ring are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
-highlighted control, and comes back only when the step points somewhere new. A second, 12-step Sandbox tour covers
+highlighted control, and comes back only when the step points somewhere new.
+When a task is done the highlight turns green with one small ripple, the card
+border tints green briefly, and the done message starts with a short word of
+praise. On screens wider than 700 px every card shows all its text without
+scrolling: a card too long for its space widens step by step (to 540 px at
+most), and in fullscreen can also grow up to just below the view buttons. On
+phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tour covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
 halo stability monitor (what it reads, then pushing a halo out of range), the
 halo sliders, and a fullscreen chapter (disk circles versus tangled bulge

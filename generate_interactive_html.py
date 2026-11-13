@@ -556,7 +556,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-welcome p { color:#b5c5d5; margin:0 0 18px; }
     .tutorial-welcome-actions { display:flex; flex-wrap:wrap; gap:9px; }
     .tutorial-primary { background:rgba(138,180,248,.16); border-color:var(--cyan); color:#e4fbff; font-weight:600; }
-    .tutorial-card { position:fixed; z-index:10000; right:16px; bottom:16px; display:flex; flex-direction:column; width:min(380px,calc(100% - 32px)); max-height:min(65vh,480px); overflow:hidden; padding:18px; border:1px solid rgba(138,180,248,.24); border-radius:16px; background:linear-gradient(155deg,#142838,#0b1623 70%); box-shadow:0 16px 48px rgba(0,0,0,.58); cursor:default; user-select:text; }
+    .tutorial-card { position:fixed; z-index:10000; right:16px; bottom:16px; display:flex; flex-direction:column; width:min(380px,calc(100% - 32px)); max-height:calc(100vh - 88px); overflow:hidden; padding:18px; border:1px solid rgba(138,180,248,.24); border-radius:16px; background:linear-gradient(155deg,#142838,#0b1623 70%); box-shadow:0 16px 48px rgba(0,0,0,.58); cursor:default; user-select:text; }
     .tutorial-card.on-left { left:16px; right:auto; }
     .tutorial-card[hidden] { display:none; }
     .tutorial-top { display:flex; flex:none; align-items:center; justify-content:space-between; gap:12px; }
@@ -621,23 +621,23 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
     /* A finished part's ring turns green and fades away instead of vanishing (visual only). */
-    .tutorial-also.is-leaving { animation:tutorial-ring-done 1.6s ease forwards; }
+    .tutorial-also.is-leaving { animation:tutorial-ring-done 1.2s ease forwards; }
     .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
-    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 25% { opacity:1; border-color:#e6fff1; box-shadow:0 0 26px 9px rgba(165,227,194,.9); } 65% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
+    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 45% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
-    /* When the task is done the highlight glows green once, sends out one quick ripple, holds, then fades slowly (visual only). */
-    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .9s ease-out; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 6px rgba(165,227,194,.7); transition:opacity 1.4s ease 2.2s, border-color .3s ease, box-shadow .3s ease; }
-    @keyframes tutorial-done-glow { 0% { border-color:#e6fff1; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 26px 9px rgba(165,227,194,.9); } }
+    /* When the task is done the highlight turns green with a soft glow and one small ripple, holds, then fades (visual only). */
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease 1.8s, border-color .3s ease, box-shadow .3s ease; }
+    @keyframes tutorial-done-glow { 0% { box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 5px rgba(165,227,194,.7); } }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
-    .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:2px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .8s ease-out both; }
-    @keyframes tutorial-ripple { from { opacity:.7; } to { opacity:0; inset:-15px; border-radius:18px; } }
-    /* The card's border glows green faintly once when a task is done, and the tick fades in. */
-    .tutorial-card.is-celebrating { animation:tutorial-card-glow 1.6s ease-out; }
-    @keyframes tutorial-card-glow { 0% { box-shadow:0 0 0 1px rgba(165,227,194,.45), 0 0 16px 2px rgba(165,227,194,.2); } 100% { box-shadow:0 0 0 1px rgba(165,227,194,0), 0 0 16px 2px rgba(165,227,194,0); } }
-    #tutorialFeedbackText b { display:inline-block; font-weight:600; animation:tutorial-tick-pop .45s cubic-bezier(.3,1.3,.5,1) both; }
-    @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.7); } }
+    .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
+    @keyframes tutorial-ripple { from { opacity:.5; } to { opacity:0; inset:-11px; border-radius:16px; } }
+    /* The card's border tints green for a moment when a task is done. */
+    .tutorial-card.is-celebrating { animation:tutorial-card-glow 1.2s ease-out; }
+    @keyframes tutorial-card-glow { 0% { border-color:rgba(165,227,194,.45); } }
+    #tutorialFeedbackText b { display:inline-block; font-weight:600; animation:tutorial-tick-pop .35s ease-out both; }
+    @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.85); } }
     .is-complete .tutorial-pointer { animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
@@ -733,11 +733,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .sandbox-summary dd { font-family:var(--f-mono); }
     .galaxy-type h3 { font:600 18px var(--f-serif); }
     .panel-grid { gap:16px; }
-    .panel-heading { align-items:center; padding:16px 18px 8px; }
+    .panel-heading { align-items:center; flex-wrap:wrap; row-gap:6px; padding:16px 18px 8px; }
     .panel-heading h2 { font:600 15px var(--f-ui); color:var(--ink); }
     .panel-heading .fig { margin-right:10px; color:var(--accent); font:500 11px var(--f-mono); letter-spacing:.08em; text-transform:uppercase; }
     .panel-heading > span:not(#chiBadge) { color:var(--muted); font-size:12px; }
-    #chiBadge { font:500 11.5px var(--f-mono); }
+    #chiBadge { font:500 11.5px var(--f-mono); white-space:nowrap; }
     .key { background:rgba(148,170,200,.035); }
     .key summary { font:500 10.5px var(--f-mono); letter-spacing:.12em; color:var(--ink-2); }
     .sw.ldash { background:none; height:0; border-top:2.5px dashed; }
@@ -3580,7 +3580,7 @@ __GALAXIES_JS__
         if(keep.has(id))return;
         // Ending the tour clears them at once; anything else fades them out gently.
         if(tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
-        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},1650);}
+        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},1250);}
       });
       ids.forEach(item=>{
         let ring=tutorialAlsoRings.get(item.id);
@@ -3761,6 +3761,31 @@ __GALAXIES_JS__
     // Capture also catches scrolling inside panels, not just the page.
     window.addEventListener('scroll',updateTutorialSpotlight,{capture:true,passive:true});
     window.addEventListener('resize',updateTutorialSpotlight);
+    // Every card should show all its text without scrolling. When it does not fit (mostly in fullscreen, where the
+    // view buttons above it limit its height), the card widens step by step so the text wraps into fewer lines.
+    // Phones keep their full-width card and scroll as a last resort.
+    const TUTORIAL_CARD_MAX_WIDTH_PX=540,TUTORIAL_CARD_WIDEN_STEP_PX=40,TUTORIAL_CARD_SIDE_CLEARANCE_PX=290,TUTORIAL_CARD_PANEL_GAP_PX=12;
+    const tutorialContentBox=document.getElementById('tutorialContent');
+    function fitTutorialCard(){
+      if(tutorialCard.hidden)return;
+      tutorialCard.style.width='';tutorialCard.style.maxHeight='';
+      if(innerWidth<=700)return;
+      const overflows=()=>tutorialContentBox.scrollHeight>tutorialContentBox.clientHeight+1;
+      const maxWidth=Math.min(TUTORIAL_CARD_MAX_WIDTH_PX,innerWidth-TUTORIAL_CARD_SIDE_CLEARANCE_PX);
+      let width=tutorialCard.offsetWidth;
+      while(overflows()&&width<maxWidth){
+        width=Math.min(maxWidth,width+TUTORIAL_CARD_WIDEN_STEP_PX);
+        tutorialCard.style.width=width+'px';
+      }
+      // Still too long in fullscreen (short screens): grow upwards into the gap below the view buttons.
+      if(overflows()&&tutorialIsFullscreen()){
+        const room=tutorialCard.getBoundingClientRect().bottom-tutorialViewPanel.getBoundingClientRect().bottom-TUTORIAL_CARD_PANEL_GAP_PX;
+        if(room>tutorialCard.offsetHeight)tutorialCard.style.maxHeight=room+'px';
+      }
+    }
+    const tutorialViewPanel=document.getElementById('viewPanel');
+    if(window.ResizeObserver){const fitWatch=new ResizeObserver(fitTutorialCard);[tutorialContentBox,tutorialContentBox.firstElementChild,tutorialFeedback,tutorialViewPanel].forEach(el=>fitWatch.observe(el));}
+    window.addEventListener('resize',fitTutorialCard);
     // Scrolled right away from the highlighted control (and anything else the card names)? Once the page stops
     // moving, glide back to it so the viewer never loses their place. Never while a finger or button is held down.
     let tutorialSnapTimer=0;
