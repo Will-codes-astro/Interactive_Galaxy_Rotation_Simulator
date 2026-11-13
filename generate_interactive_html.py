@@ -3524,7 +3524,7 @@ __GALAXIES_JS__
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
       const tag=document.getElementById('tutorialTag'),label=blocker?'Do this first':(step.tag||TUTORIAL_GESTURE_TAG[step.gesture]||'');
       if(tag.textContent!==label)tag.textContent=label;
-      placeTutorialTag(tag,rect);
+      placeTutorialTag(tag,rect,target);
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
@@ -3572,7 +3572,7 @@ __GALAXIES_JS__
         ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
         ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
         ring.style.borderRadius=(Math.min(radius,r.height/2)+pad)+'px';
-        placeTutorialTag(ring.firstChild,r);
+        placeTutorialTag(ring.firstChild,r,el);
       });
     }
     // A step's extra rings: also = other controls to use (blue), watch = things to watch (yellow).
@@ -3582,8 +3582,9 @@ __GALAXIES_JS__
       return[...(step.also||[]).map(e=>parse(e,false)),...(step.watch||[]).map(e=>parse(e,true))];
     }
     // Labels sit above their ring, or below it near the top of the screen, and flip left near the right edge.
-    function placeTutorialTag(tag,r){
-      tag.classList.toggle('below',r.top<34);
+    // Sliders keep their name and value visible: their label goes underneath.
+    function placeTutorialTag(tag,r,el){
+      tag.classList.toggle('below',r.top<34||!!(el&&el.matches('input[type=range]'))&&r.bottom<innerHeight-40);
       tag.classList.toggle('flip',r.left+tag.offsetWidth>innerWidth-10);
     }
     const TUTORIAL_GESTURE_TAG={zero:'Drag to 0',increase:'Drag right',adjust:'Drag',drag:'Drag',click:'Click',switch:'Click',scan:'Look here'};
