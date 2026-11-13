@@ -108,7 +108,7 @@ def _load_sparc_profile(path: Path) -> RotationProfile:
             if radius <= 0.0:
                 continue
             baryonic_squared = (
-                gas * gas + UPSILON_DISK * disk * disk + UPSILON_BULGE * bulge * bulge
+                gas * abs(gas) + UPSILON_DISK * disk * disk + UPSILON_BULGE * bulge * bulge
             )
             radii.append(radius)
             baryonic_speeds.append(math.sqrt(max(baryonic_squared, 0.0)))

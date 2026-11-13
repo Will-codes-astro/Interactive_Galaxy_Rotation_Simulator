@@ -1,7 +1,7 @@
 Plain-English Rotation-Curve Summary
 ====================================
 
-The script downloads the SPARC table from the CDS archive. The table is
+The script reads the local SPARC table (data/sparc/table2.dat). The table is
 read as whitespace-separated columns with galaxy name, distance, radius,
 observed rotation velocity, its observational error, and the gas, disk,
 and bulge velocity components. Only the requested galaxy names are then
@@ -10,7 +10,8 @@ selected for analysis.
 For each galaxy, the baryonic velocity is calculated by adding the squared
 gas, disk, and bulge contributions in quadrature. The disk and bulge
 contributions are scaled by their mass-to-light ratios before this sum:
-Vbar = sqrt(Vgas^2 + Ups_disk*Vdisk^2 + Ups_bul*Vbul^2).
+Vbar = sqrt(Vgas*|Vgas| + Ups_disk*Vdisk^2 + Ups_bul*Vbul^2), keeping the sign
+of the SPARC gas term (a negative Vgas is real and reduces Vbar).
 The adopted mass-to-light ratios are fixed assumptions, not fitted values.
 
 Reduced chi-squared compares the observed and baryonic velocities after

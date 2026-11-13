@@ -2241,7 +2241,7 @@ __GALAXIES_JS__
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3);
             // The sandbox galaxy has no measurements, so its file leaves out the observed and residual columns.
-            let csv=customActive?"Radius_kpc,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model\n":"Radius_kpc,V_obs,V_obs_err,V_gas,V_disk,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
+            let csv=customActive?"Radius_kpc,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model\n":"Radius_kpc,V_obs,V_obs_err,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
             for(let r=Math.max(1,Math.ceil(radii[0]-1e-9));r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r),vd=interpolateAt(disk,r);
                 const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondVelocity(vb,r)**2-vb*vb,0)):halo(r);

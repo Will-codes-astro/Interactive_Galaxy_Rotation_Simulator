@@ -78,8 +78,8 @@ r_data = data['Rad'].to_numpy(dtype=float)
 if not np.all(np.diff(r_data) > 0):
     raise ValueError("SPARC data validation error: Radii array 'Rad' is not strictly increasing.")
 
-# Compute total baryonic velocity: V_bar = sqrt(Vgas^2 + Y_d*Vdisk^2 + Y_b*Vbul^2)
-v_gas_sq = np.sign(data['Vgas']) * (data['Vgas'] ** 2)
+# Compute total baryonic velocity: V_bar^2 = Vgas*|Vgas| + Y_d*Vdisk^2 + Y_b*Vbul^2
+v_gas_sq = data['Vgas'] * np.abs(data['Vgas'])  # keeps SPARC's sign
 v_disk_sq = UPSILON_DISK * (data['Vdisk'] ** 2)
 v_bul_sq = UPSILON_BULGE * (data['Vbul'] ** 2)
 v_bar_sq = v_gas_sq + v_disk_sq + v_bul_sq

@@ -56,11 +56,13 @@ def analyse_galaxy(
 	if galaxy.empty:
 		raise ValueError(f'No SPARC data found for {galaxy_name}.')
 
-	galaxy['Vbar'] = np.sqrt(
+	# A negative SPARC Vgas is real (central gas depression pulls outwards): keep its sign.
+	galaxy['Vbar'] = np.sqrt(np.maximum(
+		0.0,
 		ups_disk * galaxy['Vdisk'] ** 2
 		+ ups_bul * galaxy['Vbul'] ** 2
-		+ galaxy['Vgas'] ** 2
-	)
+		+ galaxy['Vgas'] * galaxy['Vgas'].abs(),
+	))
 	residuals = galaxy['Vobs'] - galaxy['Vbar']
 	valid_errors = galaxy['e_Vobs'].gt(0) & galaxy['Vobs'].notna() & galaxy['Vbar'].notna()
 	if not valid_errors.any():
@@ -225,7 +227,8 @@ def main() -> None:
 		'For each galaxy, the baryonic velocity is calculated by adding the squared',
 		'gas, disk, and bulge contributions in quadrature. The disk and bulge',
 		'contributions are scaled by their mass-to-light ratios before this sum:',
-		'Vbar = sqrt(Vgas^2 + Ups_disk*Vdisk^2 + Ups_bul*Vbul^2).',
+		'Vbar = sqrt(Vgas*|Vgas| + Ups_disk*Vdisk^2 + Ups_bul*Vbul^2), keeping the sign',
+			'of the SPARC gas term (a negative Vgas is real and reduces Vbar).',
 		'The adopted mass-to-light ratios are fixed assumptions, not fitted values.',
 		'',
 		'Reduced chi-squared compares the observed and baryonic velocities after',

@@ -78,13 +78,16 @@ def python_checks() -> None:
     # 2. Gas sign: SPARC's negative V_gas must be kept, never squared away.
     ngc3198 = gen.load_sparc_galaxy("NGC3198")
     negative = sum(1 for v in ngc3198["rotation"]["v_gas_kms"] if v < 0)
-    squared = re.findall(r"gas\s*\*\*\s*2", GENERATOR.read_text(encoding="utf-8"))
+    # Every Python file that builds V_bar: no gas**2 or gas*gas (use gas*abs(gas)).
+    pattern = re.compile(r"gas['\"\]]*\s*\*\*\s*2\b|\bgas\s*\*\s*gas\b", re.IGNORECASE)
+    sources = [GENERATOR, *sorted((ROOT / "analysis").glob("*.py")), *sorted((ROOT / "blender").glob("*.py"))]
+    squared = [f.relative_to(ROOT).as_posix() for f in sources if pattern.search(f.read_text(encoding="utf-8"))]
     check(
         negative > 0 and not squared,
-        "Gas sign kept (generator)",
-        f"{negative} negative V_gas points kept for NGC 3198; no `gas**2` in the generator"
+        "Gas sign kept (all Python)",
+        f"{negative} negative V_gas points kept for NGC 3198; no squared gas term in {len(sources)} files"
         if not squared
-        else f"Found `gas**2` in the generator ({len(squared)}x): use gas*abs(gas)",
+        else f"Squared gas term in {', '.join(squared)}: use gas*abs(gas)",
     )
 
     # 3. Star count can't run away.
