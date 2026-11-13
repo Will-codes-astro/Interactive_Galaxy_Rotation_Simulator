@@ -14,6 +14,69 @@ SPARC rotation curves.
   User Testing Kit. The Diary database is Will's own: never write to it.
 - Next deadline: 1500-word checkpoint, 11 Dec 2026
 
+## Start here: where things are
+
+| Task | Read first | Code |
+|---|---|---|
+| Any physics: equation, constant, unit, fit, orbit | `docs/PHYSICS.md` | generator Python + page JS (`HTML_TEMPLATE`), `analysis/` |
+| Data: columns, units, provenance, outputs | `docs/DATA_DICTIONARY.md` | `analysis/sparc_data.py` |
+| Anything visible on the site | `docs/WEBSITE.md` | `generate_interactive_html.py` |
+| Setup, running, layout | `README.md` | – |
+
+Layout: `data/sparc/table2.dat` (raw, read-only), `analysis/` (offline
+Python; `sparc_data.py` is the only SPARC loader), `blender/`,
+`generate_interactive_html.py` → `index.html` + `galaxies.js` (root, deployed),
+`results/` + `plots/` (generated), `tests/`, `docs/`. The page's JS functions
+are found with a search for `function <name>` in the generator.
+
+## Permanent working rules
+
+**A. Understand before editing.** Read the code you'll change and the doc
+from the table above first. Search (Grep) for an existing implementation
+before writing one. Never trust a file or function name: read it. Before
+changing shared code, find its callers and what it feeds (the site, the
+checks, the analysis outputs).
+
+**B. No unnecessary code.** Don't duplicate functionality or add files,
+classes or helpers that one caller doesn't need. Keep functions short and
+readable, names meaningful and consistent (snake_case Python files). Put
+tunable values in named constants at the top of the file, not inline. Remove
+redundant code only when you've shown it's unused.
+
+**C. Scientific accuracy.** Correctness beats brevity. Never invent data,
+constants or references. Keep units explicit in names (`_kpc`, `_kms`,
+`_msun`) and check dimensions. Keep observations, assumptions and
+predictions distinct. Never silently change the physical model: if you
+suspect a scientific error, explain it and propose the fix, and wait for Will
+before changing it. Flag uncertain assumptions in `docs/PHYSICS.md` ("Open
+questions") instead of guessing. A numerical or code tidy-up must not change
+the results; if it does, it is a physics change.
+
+**D. Data integrity.** Never edit, re-save or replace
+`data/sparc/table2.dat`, and never add another copy of SPARC data. All SPARC
+reads go through `analysis/sparc_data.py` (validated, read-only). Outputs in
+`results/` and `plots/` must come from a script, so they can be reproduced.
+
+**E. Code changes.** Make the smallest change that solves the problem. No
+unrelated refactoring. Preserve behaviour. After moving a file, update
+every import, path and doc reference (Grep the old name). Leave no unused
+code, debug prints or abandoned versions. Update the docs in the same
+commit when behaviour, data or architecture changes.
+
+**F. Testing.** Run the relevant checks (see "Physics checks" below), and
+for moved files make sure every script still compiles and runs. For
+analysis changes, compare outputs with the committed ones (`git diff
+results/`). Say plainly which checks ran, their result, and which could not
+run. Never claim something works without checking.
+
+**G. Communication.** Before a substantial change, say what will change,
+which files, and what is risky. After it: what changed, why, tests and
+results, and anything left uncertain. Keep it short (token rule below).
+
+**H. Navigation.** Consult this file and the table above before working.
+The docs are the reference for architecture and conventions; if the code
+disagrees with them, say so and fix whichever is wrong.
+
 ## Keep token use low (Will's credits are limited)
 
 - Match effort to the size of the change. A text or style tweak gets an
@@ -40,7 +103,7 @@ SPARC rotation curves.
 1. Edit `generate_interactive_html.py`, never `index.html` or `galaxies.js`
    directly. Regenerate with `python generate_interactive_html.py` (in
    `.venv`) and commit the generated files together with the generator.
-2. Keep `README.md` in step with anything visible on the site (only touch it
+2. Keep `docs/WEBSITE.md` in step with anything visible on the site (only touch it
    if the change is visible there).
 3. Pushing to `main` deploys the live site. Always ask Will before pushing.
 4. Physics shown on the page must cite its source (e.g. Moster et al. 2013,
@@ -68,7 +131,7 @@ and phone layout").
 Run `python tests/run_physics_checks.py` (needs Node.js) **only** if the
 change touches: orbit/star integration, star count or positions, halo/NFW
 or MOND formulas or constants, rotation curve or χ² code, SPARC data
-loading (`table2.dat`, gas/disk/bulge maths), or the sliders' effect on the
+loading (`data/sparc/table2.dat`, `analysis/sparc_data.py`, gas/disk/bulge maths), or the sliders' effect on the
 model. Text, CSS, tutorial, tooltips, hover boxes and README never need it.
 If unsure, ask yourself whether the change could move a star or a number;
 if not, skip it.
@@ -124,7 +187,7 @@ star count 800 / cap 2400, generated files match, baseline.)
 
 ### Big change routine
 1. Physics checks if the physics trigger applies. Stop if any fail.
-2. Regenerate the site; update `README.md` if anything visible changed.
+2. Regenerate the site; update `docs/WEBSITE.md` if anything visible changed, and `docs/PHYSICS.md` / `docs/DATA_DICTIONARY.md` if physics or data changed.
 3. Commit with a message naming what was added.
 4. Short build-log entry (see Notion writing), then living documents and
    `project-status.md`.
@@ -159,4 +222,4 @@ line rather than silently skipping a step.
 ## Environment
 
 - Windows, PowerShell, project inside OneDrive.
-- Blender scripts (`NGC3198_Blender_Model.py`) need Blender's own Python.
+- Blender scripts (`blender/ngc3198_blender_model.py`) need Blender's own Python.

@@ -1,5 +1,7 @@
 # Module 2 Summary: GPU-Instanced Stellar Rendering
 
+> **Historical note (Nov 2026):** this describes an earlier version. The site now uses 800 stars (up to 2400) and velocity-Verlet integration, not 200 stars and RK4. See `docs/PHYSICS.md` for the current model.
+
 ## What changed
 - Stars in the 3D view are now one `THREE.InstancedMesh` (200 spheres, a single draw call) instead of `THREE.Points` sprites.
 - A custom GLSL shader gives each star a 3D look: limb darkening, illumination from the galactic core, and a rim glow.

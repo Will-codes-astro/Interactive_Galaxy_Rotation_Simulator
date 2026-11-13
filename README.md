@@ -1,255 +1,95 @@
-# EPQ Rotation Curves
+# Interactive Galaxy Rotation Simulator (EPQ)
 
-Python models and a static GitHub Pages dashboard for exploring the rotation
-curves and stellar orbits of SPARC galaxies (NGC 3198, NGC 2403 and NGC 7331).
+Will's EPQ, *Simulating the Invisible*, compares two explanations for why
+galaxies spin too fast at large radii: a **dark matter halo (NFW)** and
+**modified gravity (MOND)**. Both are tested against measured rotation curves
+from the **SPARC** survey (Lelli, McGaugh & Schombert 2016), mainly NGC 3198.
+
+- **Live site:** <https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/>
+- **Main features:** rotation curve with observed SPARC speeds and gas, disk and
+  bulge components; NFW halo sliders; MOND mode and best fit; χ² fit score;
+  800 test stars integrated live in 3D; NGC 3198, NGC 2403 and NGC 7331 presets;
+  a custom sandbox galaxy; guided tutorials; CSV export.
+- **Offline analysis:** a baryonic-only baseline fit and orbit simulation for
+  NGC 3198 (Python), plus a Blender 3D model.
+
+## Documentation index
+
+| I want to… | Read |
+|---|---|
+| work on the repo (rules for Claude and other assistants) | [CLAUDE.md](CLAUDE.md), [AGENTS.md](AGENTS.md) |
+| understand or change a physics equation, constant or unit | [docs/PHYSICS.md](docs/PHYSICS.md) |
+| know what a data column means, or where a file came from | [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) |
+| change or explain something visible on the site | [docs/WEBSITE.md](docs/WEBSITE.md) |
+| see old development notes | [docs/history/](docs/history/) |
+
+## Repository layout
+
+```
+data/sparc/table2.dat          raw SPARC data (read-only, checksum-checked)
+analysis/                      offline Python
+  sparc_data.py                  the only SPARC loader: validates, never writes
+  baryonic_baseline.py           baryonic-only curve + χ²  -> results/, plots/
+  simulate_baryonic_orbits.py    baryonic-only 2D orbits    -> results/star_trajectories_baryonic.csv
+  plot_orbits_2d.py, plot_orbits_3d.py   plots of that CSV  -> plots/
+blender/                       Blender scene script and saved .blend (needs Blender's Python)
+generate_interactive_html.py   builds the website: index.html + galaxies.js
+index.html, galaxies.js        generated website (do not edit by hand)
+epq_qr_code.png/.svg, generate_qr.py   QR code to the live site
+results/, plots/               generated outputs of analysis/
+tests/                         physics checks (Python + Node.js)
+docs/                          documentation; artefact_appendix.tex = LaTeX QR appendix
+```
+
+The main physics lives in two places. The website version is in
+`generate_interactive_html.py`: the NFW fit is in the Python part, and the
+NFW, MOND, χ² and orbit code are in the page JavaScript. The offline baseline is
+in `analysis/`. [docs/PHYSICS.md](docs/PHYSICS.md) maps every equation to its
+function.
 
 ## Set up on Windows
 
-Install Python 3.12 (64-bit) and Git for Windows, then open this folder in
-VS Code. Accept the recommended Python and Pylance extensions if prompted.
-In a PowerShell terminal at the project root, create and populate the virtual
-environment:
+Install Python 3.12 (64-bit), Git for Windows and Node.js (Node is used by the
+physics checks). In PowerShell at the project root:
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-VS Code is configured to select `.venv` automatically. If PowerShell blocks
-environment activation, run the commands without activating it by replacing
-`python` with `.\.venv\Scripts\python.exe`. Restart VS Code after installing
-Python or Git so it can discover the new executables.
+VS Code selects `.venv` automatically. If PowerShell blocks activation, use
+`.\.venv\Scripts\python.exe` in place of `python`.
 
-## Run the Python tools
+## Run
 
-Run commands from the project root:
+From the project root:
 
 ```powershell
+python generate_interactive_html.py      # rebuild index.html and galaxies.js
+python tests/run_physics_checks.py       # physics checks (add --update-baseline only for intended changes)
+python -m http.server 8000               # preview at http://localhost:8000/
 python analysis/baryonic_baseline.py
 python analysis/simulate_baryonic_orbits.py
-python analysis/plot_orbits_3d.py
 python analysis/plot_orbits_2d.py
-python generate_interactive_html.py
+python analysis/plot_orbits_3d.py
 python generate_qr.py
 ```
 
-All scripts read the local SPARC table `data/sparc/table2.dat` through
-`analysis/sparc_data.py`, which checks its checksum and value ranges and never
-downloads or overwrites it. The 3D Blender model script,
-`blender/ngc3198_blender_model.py`, must be run inside Blender 4.0 or later; Blender's
-`bpy` module is not part of the project virtual environment.
+`blender/ngc3198_blender_model.py` must be run inside Blender 4.0 or later.
 
-## Website
+## Data
 
-The live dashboard is
-<https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/>.
-GitHub Pages deploys from the `main` branch using
-[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml).
-The workflow publishes only `index.html`, `epq_qr_code.png`, and
-`epq_qr_code.svg` from the repository root.
+All code reads the one SPARC table, `data/sparc/table2.dat`, through
+`analysis/sparc_data.py`. That loader checks the file's checksum, header and
+value ranges before any calculation runs, and it never downloads or overwrites
+the file. Provenance and column definitions are in
+[docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md). To add a SPARC galaxy to
+the site, add a `GalaxyPreset` to `GALAXY_PRESETS` in the generator and run it again.
 
-`generate_interactive_html.py` builds the self-contained dashboard in
-`index.html` from `data/sparc/table2.dat`.
-When changing dashboard behavior, update the generator and regenerate
-`index.html` so the published page includes the change. The page loads Plotly
-from a CDN; Python packages are not needed to preview the existing page:
+## Deployment
 
-```powershell
-python -m http.server 8000
-```
-
-Then open <http://localhost:8000/>. Commit the regenerated `index.html` and
-`galaxies.js` when the dashboard is meant to change. Keep the checked-in data
-and generated QR images in sync with any change to the page's data or
-destination URL.
-
-The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
-the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
-the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
-restarts the orbit clock and re-integrates the star orbits. The selected
-gravity model (NFW or MOND) is kept. The 3D stars follow the selected galaxy
-too: a rough disk scale length, outer radius, bulge and visible mass are
-estimated from its SPARC mass-model speeds (`anatomyFromRotation`), and these
-set the star population described under "Test stars" below.
-
-The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
-holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
-speed contributions. The generator creates it from `data/sparc/table2.dat`; do not edit it
-by hand. The generator also inlines the same code into `index.html`, so the
-published page stays a single file and the Pages workflow needs no change. To
-offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
-`generate_interactive_html.py` (its id must match the `Name` column of
-`data/sparc/table2.dat`) and run the generator again. It reads that galaxy's rows, fits
-its starting NFW halo and rewrites both files.
-
-The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
-a builder with six anatomy sliders: stellar disk mass, disk scale length,
-truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
-radius is disabled while the bulge mass is zero. A "What you have built" card
-above the sliders names the galaxy type (dwarf, gas-rich dwarf irregular, low
-surface brightness, Sa/Sb/Sc spirals, bulgeless disk, lenticular, giant or
-monster) from the star mass, bulge-to-total ratio, gas fraction and disk
-surface density (`classifyGalaxy` in the generator), with a real example and
-trait tags. The thresholds are rough rules of thumb. The sandbox never blocks a
-configuration. Its halo stability monitor, under the rotation curve, computes
-the concentration c = r200 / rs of the current NFW halo from the halo mass and
-scale radius sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile"
-badge (also over the 3D view) whenever c falls outside 3–25
-(`STABLE_CONCENTRATION` in the generator).
-
-In the sandbox the anatomy sliders drive the rotation curve, the halo and the
-3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the generator's
-page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
-Galaxy dropdown, the observed SPARC points, the residual bars and the χ² badge
-are hidden, and the curves are drawn on an even grid of 60 radii out to
-1.25 × the truncation radius. Its CSV export leaves out the observed and
-residual columns.
-
-- Stellar disk and gas are exponential disks cut at the truncation radius, each
-  holding the slider's mass inside it; the gas disk is three times more
-  extended than the stars. Their speeds come from Freeman's exact Bessel
-  solution for the infinite disk minus the annulus beyond the truncation
-  radius (softened elliptic-integral rings); beyond it the rings alone are
-  used. The bulge is a Hernquist sphere, Φ = −GM/(r + r_b), with r_b as its scale
-  radius. The components add in quadrature to the baryonic curve and are
-  drawn as thin dotted lines.
-- The halo starts at the typical halo for the galaxy's stellar mass (the
-  stellar-to-halo mass relation): M200 is
-  Moster et al. (2013) inverted for the stellar mass (disk + bulge) and r_s
-  comes from the Dutton & Macciò (2014) mass–concentration relation.
-  The existing halo mass slider becomes the fine-tuning control, spanning
-  0 to 5 times the baseline. Any change to the anatomy sliders resets both
-  halo sliders to the new typical halo.
-  The Typical Halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
-  to a sandbox galaxy and is hidden.
-- The header's Mass-to-light (M/L) tile is hidden in the sandbox, because
-  sandbox masses are set directly rather than converted from light.
-
-Hovering over the "?" on the M/L tile fades in a short explainer (tap or
-press it on touch screens and keyboards): what a mass-to-light ratio
-is, why young stellar populations have low M/L and old ones high M/L, and that
-the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 μm are standard averages
-(Lelli, McGaugh & Schombert 2016; McGaugh & Schombert 2014), not values
-measured for each galaxy. It fades out when the pointer leaves, or on ×,
-Escape or a tap elsewhere.
-
-Test stars:
-
-- The default preset (NGC 3198) and the default sandbox galaxy are the
-  800-star template. Other galaxies scale it by
-  (visible mass / template mass)^0.5, limited to 200–2400 stars
-  (`BASE_STAR_COUNT`, `MIN_STAR_COUNT`, `MAX_STAR_COUNT` and
-  `STAR_COUNT_EXPONENT` in the generator). The "Test stars" header stat, the
-  3D counter and the CSV export all read the active total.
-- A star is ejected once it is farther than 1.5 × R_max from the centre
-  (`EJECTION_RADIUS_FACTOR`), where R_max is the sandbox truncation radius or
-  the outermost SPARC radius of a preset. The 3D counter shows the live count
-  and the ejection radius.
-- With a bulge, a share of the stars proportional to its stellar mass sits in a
-  spheroidal Hernquist cluster. Each bulge star gets an isotropic velocity
-  dispersion from the Jeans equation in the reference gravity, plus a little
-  rotation, so the bulge is held up by pressure and stays put; disk stars start
-  on circular orbits.
-- Stars start on the orbits that balance a reference galaxy: the observed
-  SPARC speeds of a preset, or the baryons plus baseline halo of a sandbox
-  galaxy. Moving the halo sliders, or switching to MOND, changes the gravity
-  under them, so they can spiral in or be ejected (try Visible Matter Only).
-- The orbit integrator uses a cubic-spline gravitational softening of
-  0.5–1.0 kpc (`SOFTENING_RANGE_KPC`; 0.5 kpc for a pure disk, following the
-  bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
-  dense centres never meet a force singularity.
-
-Each simulated star is drawn as a point of light whose colour and brightness
-come from a mass drawn from the Kroupa (2001) IMF (L ∝ M^3.5, T ∝ M^0.475,
-blackbody colour, brightness on a log scale). Bulge stars are old (≤ 1 M☉ plus
-a few red giants) and the disk gets bluer outwards (de Jong 1996). Underneath,
-a diffuse glow shows the unresolved starlight: an exponential disk with the
-galaxy's own scale length (Freeman 1970) and a de Vaucouleurs bulge, weighted
-by their masses. Colour saturation, diffraction spikes and bloom are visual
-choices only.
-
-The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
-Gas switch turns it off): an exponential disk
-three times as extended as the stars, cut at R_max, whose brightness follows
-the gas mass. The Reset, Face-on and Edge-on distances scale with the
-galaxy (NGC 3198 keeps its original framing), and switching galaxy or mode
-re-frames the camera. In fullscreen a corner panel holds Play, Restart (back
-to 0 Myr and play), the clock and the two halo sliders. A small, faint readout in the top-left corner of the 3D
-view shows only the ejected count and the halo r200 ("no halo" in MOND or at
-zero halo mass).
-
-The halo, time and tracking sliders sit in one bar directly above the 3D
-view and rotation curve. On a large enough screen the bar stays pinned under
-the top menu while you scroll the plots, so every slider change is visible at
-once, and the tutorial scrolls so the bar and the plots are both on screen.
-
-Next to the orbit timeline, "Track a star" takes a star number and rings that
-star in the 3D view with its laps round the centre since 0 Myr, speed and
-distance (also in the fullscreen corner panel, beside the round Play and
-Restart buttons). It only reads the computed orbits.
-
-The dashboard offers an optional hands-on tutorial when opened. Visitors can
-skip it at any point and restart it using the Tutorial button beside the
-gravity model switch. The tours do not reset or change simulator settings.
-The main tutorial's 18 steps start from the puzzle in the rotation curve
-(measured speeds stay above the visible-matter prediction), then remove and
-restore the halo, change its shape, read the halo cards (r200, scale radius,
-concentration), score the fit with χ², and compare MOND and its best-fit
-switch. A "watch it happen" chapter then runs inside fullscreen, where the
-tour card follows: hide the gas and halo, look face-on with orbit lines,
-watch two ringed stars race (live lap counts and speeds show differential
-rotation on a flat rotation curve), turn edge-on to see a ringed star bob
-through the thin disk, remove the halo and follow the first star to cross a
-red ejection-line ring, then restore the halo and zoom out to the full halo.
-It ends with the Galaxy menu, the mass-to-light explainer and the theory
-guide. The rings, labels and ejection ring are tutorial aids drawn from the
-already computed trajectories; they never change the simulation. Watch steps
-tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
-each step; it fades out as soon as the mouse or a finger reaches the
-highlighted control, and comes back only when the step points somewhere new. A second, 12-step Sandbox tour covers
-the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
-halo stability monitor (what it reads, then pushing a halo out of range), the
-halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
-orbits, then the first star lost without dark matter). It starts from the
-Sandbox tour button on the tutorial's last step (which opens the Custom
-Sandbox), or from the Tutorial button, which reads "Sandbox tour" while the
-sandbox is open. If a step needs a different mode (NFW or MOND, a halo above
-zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
-time slider has a plain-language description underneath it, and the galaxy
-picker shows a one-line summary with the number of measured speeds. On a keyboard,
-the left and right arrow keys navigate the tour when a control is not being
-edited. During the tutorial, the Visible Matter Only shortcut appears after
-the halo mass is first moved to zero; skipping the tutorial makes it available.
-In NFW mode, Visible Matter Only sets the halo mass to zero without changing
-the scale radius; Apply Observed Fit restores the starting halo settings.
-The View controls start collapsed. The rotation-curve guide combines the
-colour key and fit explanation. Select it or a theory box to open it. Halo
-values reveal their explanations on hover or when selected with a mouse, touch,
-or keyboard.
-
-Rotation-curve readout: hovering over the graph (or, on a touch screen, tapping
-it or sliding a finger along it) shows a box with the speeds at the nearest
-measured SPARC radius. The box, guide line and dots glide smoothly between radii,
-but the numbers are always the values at a real data point, never interpolated.
-On touch screens the readout stays until you tap outside the graph and updates
-live as the sliders move. Touch screens also get larger slider thumbs, tap-to-open
-"?" tips and a two-column legend on narrow screens.
-
-## Project map
-
-- `data/sparc/table2.dat`: raw SPARC rotation-curve data (never edit).
-- `analysis/`: offline Python. `sparc_data.py` (validated loader),
-  `baryonic_baseline.py` (baryonic curve and χ²), `simulate_baryonic_orbits.py`
-  (writes `results/star_trajectories_baryonic.csv`), `plot_orbits_2d.py` and
-  `plot_orbits_3d.py` (trajectory plots and animations).
-- `blender/`: Blender scene script and saved `.blend` model.
-- `generate_interactive_html.py`: static dashboard generator.
-- `galaxies.js`: generated registry of the preset SPARC galaxies (also inlined
-  into `index.html`).
-- `results/`, `plots/`: generated outputs of the analysis scripts.
-- `tests/`: physics checks for the site and data.
-- `docs/`: documentation; `docs/artefact_appendix.tex` is the LaTeX QR-code
-  appendix, `docs/history/` holds old development notes.
-- `CLAUDE.md` / `AGENTS.md`: instructions for AI coding assistants.
+Pushing to `main` runs `.github/workflows/deploy-pages.yml`, which publishes
+only `index.html`, `epq_qr_code.png` and `epq_qr_code.svg` from the repository
+root. Those files must stay in the root. The page loads Plotly and Three.js
+from CDNs.
