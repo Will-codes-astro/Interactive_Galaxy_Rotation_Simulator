@@ -3481,11 +3481,11 @@ window.GALAXIES = {
       showTutorialStep();
       tutorialTitle.focus({preventScroll:true});
     }
-    // After the step's action is done, a 5 s countdown moves to the next card. It pauses while a mouse button or
+    // After the step's action is done, an 8 s countdown moves to the next card. It pauses while a mouse button or
     // finger is held down (mid-drag), and pressing it goes straight on.
     const tutorialFeedbackText=document.getElementById('tutorialFeedbackText'),tutorialAuto=document.getElementById('tutorialAuto');
     const tutorialAutoNum=document.getElementById('tutorialAutoNum'),tutorialAutoRing=document.getElementById('tutorialAutoRing');
-    const TUTORIAL_AUTO_MS=5000,TUTORIAL_RING=2*Math.PI*7;
+    const TUTORIAL_AUTO_MS=8000,TUTORIAL_RING=2*Math.PI*7;
     let tutorialAutoLeft=0,tutorialAutoLast=0,tutorialAutoFrame=0,tutorialHolding=false,tutorialSwitchTimer=0;
     function startTutorialAuto(){
       stopTutorialAuto();
@@ -3507,7 +3507,7 @@ window.GALAXIES = {
     }
     tutorialAuto.addEventListener('click',()=>goTutorialStep(tutorialIndex+1,1));
     window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target);},{capture:true,passive:true});
-    // Still using the controls (another drag, a key press on a slider): the countdown starts again from 5 s,
+    // Still using the controls (another drag, a key press on a slider): the countdown starts again from 8 s,
     // so a card never moves on while the viewer is mid-experiment.
     ['pointerdown','input'].forEach(type=>window.addEventListener(type,e=>{
       if(tutorialAutoFrame&&!tutorialCard.contains(e.target)&&e.target.closest&&e.target.closest('input,button,select'))tutorialAutoLeft=TUTORIAL_AUTO_MS;
