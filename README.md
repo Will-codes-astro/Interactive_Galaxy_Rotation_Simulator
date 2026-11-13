@@ -179,7 +179,12 @@ to 0 Myr and play), the clock and the two halo sliders. A small, faint readout i
 view shows only the ejected count and the halo r200 ("no halo" in MOND or at
 zero halo mass).
 
-Below the orbit timeline, "Track a star" takes a star number and rings that
+The halo, time and tracking sliders sit in one bar directly above the 3D
+view and rotation curve. On a large enough screen the bar stays pinned under
+the top menu while you scroll the plots, so every slider change is visible at
+once, and the tutorial scrolls so the bar and the plots are both on screen.
+
+Next to the orbit timeline, "Track a star" takes a star number and rings that
 star in the 3D view with its laps round the centre since 0 Myr, speed and
 distance (also in the fullscreen corner panel, beside the round Play and
 Restart buttons). It only reads the computed orbits.
