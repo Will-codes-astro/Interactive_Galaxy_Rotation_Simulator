@@ -2890,6 +2890,12 @@ window.GALAXIES = {
         const btn=e.target instanceof Element?e.target.closest('button'):null;
         if(btn&&!btn.disabled)setTimeout(()=>{if(document.activeElement===btn)btn.blur();},0);
     });
+    // Same for sliders and toggle switches once the mouse/finger lets go, so the arrow keys go back to the tour
+    // (or the fullscreen time step) instead of nudging the last slider touched. Keyboard focus via Tab is untouched.
+    document.addEventListener('pointerup',()=>setTimeout(()=>{
+        const a=document.activeElement;
+        if(a&&a.matches&&a.matches('input[type=range],input[type=checkbox],input[type=radio]'))a.blur();
+    },0));
     window.addEventListener('keydown',e=>{
         if(e.code==='Escape'&&orbitPlot.classList.contains('fullscreen-active')){setCssFullscreen(false);return;}
         // Space plays/pauses even when a 3D-view button or the tour card has focus (e.g. just after pressing Next or
@@ -3750,13 +3756,22 @@ window.GALAXIES = {
       setGalaxyMode('custom');
       startTutorial('sandbox');
     });
+    // Left/Right arrows: move between tour cards while the tour is open; otherwise, in fullscreen only, step the
+    // simulation time by ARROW_TIME_STEP_MYR (hold to scrub).
+    const ARROW_TIME_STEP_MYR=50;
     document.addEventListener('keydown',e=>{
-      if(tutorialCard.hidden||e.repeat||e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
+      if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
       if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
       const control=e.target instanceof Element?e.target.closest('input,select,textarea,button,a,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="radio"]'):null;
       if(control&&control!==tutorialBack&&control!==tutorialNext)return;
-      e.preventDefault();
-      (e.key==='ArrowRight'?tutorialNext:tutorialBack).click();
+      const dir=e.key==='ArrowRight'?1:-1;
+      if(!tutorialCard.hidden){
+        e.preventDefault();
+        if(!e.repeat)(dir>0?tutorialNext:tutorialBack).click();
+      }else if(tutorialIsFullscreen()){
+        e.preventDefault();
+        onSliderInput(simTime+dir*ARROW_TIME_STEP_MYR);
+      }
     });
     tutorialWelcome.showModal();
   </script>

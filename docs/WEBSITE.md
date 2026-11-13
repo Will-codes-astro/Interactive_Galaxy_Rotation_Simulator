@@ -165,7 +165,9 @@ zero, the other galaxy source, fullscreen or leaving it), the card says so and p
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
 the left and right arrow keys navigate the tour when a control is not being
-edited. During the tutorial, the Visible Matter Only shortcut appears after
+edited (sliders and switches let go of focus after a mouse or touch drag, so
+the arrows return to the tour). Outside the tour, in fullscreen only, the arrows
+step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
 the scale radius; Apply Observed Fit restores the starting halo settings.
