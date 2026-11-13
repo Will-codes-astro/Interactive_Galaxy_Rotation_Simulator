@@ -770,6 +770,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .sw.ldash { background:none; height:0; border-top:2.5px dashed; }
     .halo-info h3 { font:600 14px var(--f-ui); }
     .halo-metric .metric-value { font:500 17px var(--f-mono); }
+    .halo-metric button, .halo-metric button:hover { background:none; border:0; cursor:default; }
     .stability-c { font-family:var(--f-mono); }
     .learn { gap:16px; margin-top:0; }
     .learn article { padding:0 22px 8px; }
@@ -899,7 +900,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 Gyr</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
-        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over or select a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
+        <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
         <dl class="halo-metrics" id="haloMetrics">
           <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>The model's outer halo radius; not a sharp physical edge.</span></span></dd></div>
           <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
@@ -2203,10 +2204,15 @@ __GALAXIES_JS__
             metric.addEventListener('pointerleave',event=>{
                 if(event.pointerType!=='touch')metric.classList.remove('hovered');
             });
+            // A mouse only hovers (a click does not pin the card open); touch and keyboard toggle it instead.
+            const sync=()=>button.setAttribute('aria-expanded',String(metric.classList.contains('hovered')||metric.classList.contains('expanded')));
+            let lastPointer='';
+            metric.addEventListener('pointerenter',sync);metric.addEventListener('pointerleave',sync);
+            button.addEventListener('pointerdown',event=>{lastPointer=event.pointerType;});
             button.addEventListener('click',()=>{
-                const expanded=button.getAttribute('aria-expanded')!=='true';
-                button.setAttribute('aria-expanded',String(expanded));
-                metric.classList.toggle('expanded',expanded);
+                const mouse=lastPointer==='mouse';lastPointer='';
+                if(mouse)return;
+                metric.classList.toggle('expanded');sync();
             });
         });
         function resetView(){controls.reset();requestRender();}
@@ -3070,7 +3076,11 @@ __GALAXIES_JS__
     });
     window.addEventListener('keydown',e=>{
         if(e.code==='Escape'&&orbitPlot.classList.contains('fullscreen-active')){setCssFullscreen(false);return;}
-        if(e.code==='Space'&&!(e.target&&e.target.closest&&e.target.closest('button,input,select,textarea,a,summary,dialog,#tutorialCard,[contenteditable="true"]'))){
+        // Space plays/pauses even when a 3D-view button or the tour card has focus (e.g. just after pressing Next or
+        // Orbits), so the tour's 'press Space' works; elsewhere it keeps its normal job of pressing the focused button.
+        const t=e.target&&e.target.closest?e.target:null;
+        const busy=t&&(t.closest('input:not([type=range]),select,textarea,dialog,[contenteditable="true"]')||(t.closest('button,a,summary')&&!t.closest('#orbitPlot,#tutorialCard')));
+        if(e.code==='Space'&&!busy){
             e.preventDefault();
             if(!e.repeat)togglePlayback();
         }
@@ -3223,9 +3233,9 @@ __GALAXIES_JS__
         {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',title:'Pack the halo in or spread it out',
          text:'The scale radius changes the halo’s shape without changing its total mass. A small value packs the dark matter close to the centre. A large value spreads it out.',
          action:'Move the scale radius both ways. A small value lifts the inner part of the orange line; a large value lowers it.'},
-        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,target:'haloMetrics',gesture:'click',title:'Read the halo’s numbers',
+        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloMetrics',gesture:'click',title:'Read the halo’s numbers',
          text:'These cards describe the halo you have built. r₂₀₀ is the halo’s edge by convention: the radius inside which it averages 200 times the critical density of the universe. It reaches far beyond the stars. Concentration, c, is r₂₀₀ divided by the scale radius: a high c means the dark matter is packed towards the centre.',
-         action:'Press each card to read what it means.'},
+         action:'Hover over each card (or tap it on a touch screen) to read what it means.'},
         {id:'fit',nfw:true,target:'chiBadge',also:['massSlider','scaleSlider','applyObservedFit'],scroll:'massSlider',gesture:'scan',title:'Score your fit',
          text:'χ² (chi-squared), in the badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better. The residual bars under the graph show each gap.',
          action:'Try to lower χ² with both halo sliders. Apply Observed Fit jumps back to the starting fit.'},
@@ -3398,7 +3408,8 @@ __GALAXIES_JS__
         const y=window.scrollY,r=target.getBoundingClientRect();
         top=anchor.getBoundingClientRect().top+y-56;
         // Something further down (e.g. the halo numbers): scroll on, keeping it clear of the pinned bar.
-        if(inPlots){const need=r.bottom+y-innerHeight+16;if(need>top)top=Math.min(need,r.top+y-64-bar.offsetHeight);}
+        // scrollPad leaves room below for boxes that open on hover (the halo cards' explainers).
+        if(inPlots){const need=r.bottom+y-innerHeight+16+(step.scrollPad||0);if(need>top)top=Math.min(need,r.top+y-64-bar.offsetHeight);}
       }
       window.scrollTo({top:Math.max(0,top),behavior:'auto'});
     }
@@ -3424,12 +3435,13 @@ __GALAXIES_JS__
       tutorialLaunch.textContent=galaxyMode==='custom'?'Sandbox tour':'Tutorial';
       tutorialRecheck();
     });
-    function completeTutorialAction(id,message){
+    // noAuto: no countdown, so the viewer can watch the simulation and press Next when ready.
+    function completeTutorialAction(id,message,noAuto){
       if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
       tutorialCompleted[id]=message;
       tutorialFeedback.hidden=false;
       tutorialFeedbackText.textContent='✓ '+message;
-      startTutorialAuto();
+      if(!noAuto)startTutorialAuto();
       tutorialSpotlight.classList.add('is-complete');
       updateTutorialNextGate();
     }
@@ -3534,8 +3546,8 @@ __GALAXIES_JS__
       if(tutorialSpotlight.parentElement!==parent)parent.appendChild(tutorialSpotlight);
       if(tutorialCard.hidden)return;
       if(fullscreen){
-        completeTutorialAction('fsEnter','Fullscreen: the tour carries on in here. Press Next.');
-        completeTutorialAction('sbFs','Fullscreen: the tour carries on in here. Press Next.');
+        completeTutorialAction('fsEnter','Fullscreen: watch for as long as you like, then press Next.',true);
+        completeTutorialAction('sbFs','Fullscreen: watch for as long as you like, then press Next.',true);
       }
       tutorialRecheck();
     }
@@ -3709,8 +3721,8 @@ __GALAXIES_JS__
       }
       tutorialLastScale=value;
     });
-    document.querySelectorAll('#haloMetrics button').forEach(button=>{
-      button.addEventListener('click',()=>completeTutorialAction('haloNumbers','Card opened: these numbers follow the halo sliders.'));
+    document.querySelectorAll('#haloMetrics .halo-metric').forEach(metric=>{
+      ['pointerenter','click'].forEach(type=>metric.addEventListener(type,()=>completeTutorialAction('haloNumbers','Card opened: these numbers follow the halo sliders.')));
     });
     visibleMatterOnly.addEventListener('click',()=>{
       if(!mondMode)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
