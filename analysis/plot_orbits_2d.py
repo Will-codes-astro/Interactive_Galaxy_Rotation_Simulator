@@ -7,7 +7,7 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 from pathlib import Path
 
 # Load trajectory data
-data_path = Path(__file__).resolve().parent / "results" / "star_trajectories_baryonic.csv"
+data_path = Path(__file__).resolve().parent.parent / "results" / "star_trajectories_baryonic.csv"
 if not data_path.exists():
     raise FileNotFoundError("Could not find star_trajectories_baryonic.csv in results folder.")
 
@@ -48,7 +48,7 @@ def update(frame_num):
 plt.title("NGC 3198 Test Particle Orbits", color='white', pad=15)
 plt.tight_layout()
 
-animation_path = data_path.parent.parent / "plots" / "ngc3198_baryonic_orbits_2d.gif"
+animation_path = Path(__file__).resolve().parent.parent / "plots" / "ngc3198_baryonic_orbits_2d.gif"
 animation_path.parent.mkdir(exist_ok=True)
 anim = FuncAnimation(fig, update, frames=frames, interval=1000 / 30, blit=True)
 anim.save(animation_path, writer=PillowWriter(fps=30))

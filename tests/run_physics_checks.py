@@ -27,6 +27,7 @@ import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))  # the generator imports analysis.sparc_data
 GENERATOR = ROOT / "generate_interactive_html.py"
 INDEX = ROOT / "index.html"
 GALAXIES_JS = ROOT / "galaxies.js"
@@ -75,9 +76,9 @@ def python_checks() -> None:
     )
 
     # 2. Gas sign: SPARC's negative V_gas must be kept, never squared away.
-    ngc3198 = gen.load_sparc_galaxy(gen.SPARC_PATH, "NGC3198")
+    ngc3198 = gen.load_sparc_galaxy("NGC3198")
     negative = sum(1 for v in ngc3198["rotation"]["v_gas_kms"] if v < 0)
-    squared = re.findall(r"\bgas\s*\*\*\s*2\b", GENERATOR.read_text(encoding="utf-8"))
+    squared = re.findall(r"gas\s*\*\*\s*2", GENERATOR.read_text(encoding="utf-8"))
     check(
         negative > 0 and not squared,
         "Gas sign kept (generator)",

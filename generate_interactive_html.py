@@ -9,10 +9,10 @@ from html import escape
 from pathlib import Path
 from typing import Any, NamedTuple
 
+from analysis.sparc_data import SPARC_PATH, galaxy_rows
+
 
 BASE_DIR = Path(__file__).resolve().parent
-TRAJECTORY_PATH = BASE_DIR / "results" / "star_trajectories_baryonic.csv"
-SPARC_PATH = BASE_DIR / "table2.dat"
 OUTPUT_PATH = BASE_DIR / "index.html"
 GALAXIES_JS_PATH = BASE_DIR / "galaxies.js"
 
@@ -20,13 +20,12 @@ G_KPC_KMS2_PER_MSUN = 4.30091e-6
 H0_KMS_PER_KPC = 0.07
 UPSILON_DISK = 0.50
 UPSILON_BULGE = 0.70
-STAR_COUNT = 200
 
 
 class GalaxyPreset(NamedTuple):
     """One entry of the galaxy dropdown."""
 
-    sparc_id: str  # must match the Name column of table2.dat
+    sparc_id: str  # must match the Name column of data/sparc/table2.dat
     name: str
     summary: str
 
@@ -64,69 +63,19 @@ EJECTION_RADIUS_FACTOR = 1.5
 SOFTENING_RANGE_KPC = (0.5, 1.0)
 
 
-def load_trajectories(path: Path) -> list[dict[str, Any]]:
-    by_star: dict[int, dict[str, Any]] = {}
-    with path.open("r", newline="", encoding="utf-8") as source:
-        for row in csv.DictReader(source):
-            star_id = int(row["star_id"])
-            star = by_star.setdefault(
-                star_id,
-                {
-                    "id": star_id,
-                    "v_rot_kms": float(row["v_obs_kms"]),
-                    "initial_r_kpc": float(row["initial_r_kpc"]),
-                    "frames": [],
-                },
-            )
-            star["frames"].append(
-                (
-                    int(row["frame"]),
-                    float(row["x_kpc"]),
-                    float(row["y_kpc"]),
-                    float(row["z_kpc"]),
-                )
-            )
-
-    if len(by_star) < STAR_COUNT:
-        raise ValueError(f"Expected at least {STAR_COUNT} stars in {path}")
-
-    stars = []
-    expected_frames: int | None = None
-    for star_id in sorted(by_star):
-        star = by_star[star_id]
-        star["frames"].sort(key=lambda frame: frame[0])
-        if expected_frames is None:
-            expected_frames = len(star["frames"])
-        if len(star["frames"]) != expected_frames:
-            raise ValueError(f"Star {star_id} has an incomplete trajectory in {path}")
-        star["positions"] = [list(frame[1:]) for frame in star.pop("frames")]
-        stars.append(star)
-
-    return stars[:STAR_COUNT]
-
-
-def load_sparc_galaxy(path: Path, sparc_id: str) -> dict[str, Any]:
-    """Read one galaxy's rotation curve from a SPARC table (the table2.dat column layout)."""
-    distance_mpc = None
-    rows = []
-    with path.open("r", encoding="utf-8", errors="replace") as source:
-        for line in source:
-            columns = line.split()
-            if len(columns) < 10 or columns[0].upper() != sparc_id.upper():
-                continue
-            try:
-                distance, radius, observed, error, gas, disk, bulge = map(float, columns[1:8])
-            except ValueError:
-                continue
-            distance_mpc = distance
-            # Vgas keeps its sign: the gas term is squared with its sign preserved.
-            rows.append((radius, abs(observed), abs(error), gas, abs(disk), abs(bulge)))
-
-    if distance_mpc is None or len(rows) < 3:
-        raise ValueError(f"No usable {sparc_id} SPARC points found in {path}")
-    rows.sort(key=lambda row: row[0])
-    rotation = {name: list(values) for name, values in zip(ROTATION_COLUMNS, zip(*rows))}
-    return {"distance_mpc": distance_mpc, "rotation": rotation}
+def load_sparc_galaxy(sparc_id: str) -> dict[str, Any]:
+    """One galaxy's rotation curve from the validated SPARC table (see analysis/sparc_data.py)."""
+    rows = galaxy_rows(sparc_id, SPARC_PATH)
+    rotation = {
+        "radius_kpc": [row.rad_kpc for row in rows],
+        "v_obs_kms": [abs(row.v_obs_kms) for row in rows],
+        "v_obs_err_kms": [abs(row.e_v_obs_kms) for row in rows],
+        # Vgas keeps its sign: the gas term is squared with its sign preserved.
+        "v_gas_kms": [row.v_gas_kms for row in rows],
+        "v_disk_kms": [abs(row.v_disk_kms) for row in rows],
+        "v_bulge_kms": [abs(row.v_bulge_kms) for row in rows],
+    }
+    return {"distance_mpc": rows[-1].dist_mpc, "rotation": rotation}
 
 
 def _nfw_shape(x: float) -> float:
@@ -218,9 +167,9 @@ def fit_galaxy_halo(rotation: dict[str, list[float]]) -> tuple[float, float]:
     )
 
 
-def build_galaxy_record(preset: GalaxyPreset, sparc_path: Path) -> dict[str, Any]:
+def build_galaxy_record(preset: GalaxyPreset) -> dict[str, Any]:
     """Collect everything the page needs to model one preset galaxy."""
-    galaxy = load_sparc_galaxy(sparc_path, preset.sparc_id)
+    galaxy = load_sparc_galaxy(preset.sparc_id)
     mass_msun, scale_radius_kpc = fit_galaxy_halo(galaxy["rotation"])
     return {
         "id": preset.sparc_id,
@@ -235,7 +184,7 @@ def build_galaxy_record(preset: GalaxyPreset, sparc_path: Path) -> dict[str, Any
 GALAXIES_JS_HEADER = """/*
  * galaxies.js - SPARC rotation-curve presets for the Interactive Galaxy Rotation Simulator.
  *
- * Generated by generate_interactive_html.py from table2.dat (SPARC mass models: Lelli,
+ * Generated by generate_interactive_html.py from data/sparc/table2.dat (SPARC mass models: Lelli,
  * McGaugh & Schombert 2016, AJ 152, 157). Do not edit by hand: add or change presets in
  * GALAXY_PRESETS in the generator and run it again. The generator also inlines this code
  * into index.html, so the published page does not load this file separately.
@@ -3939,21 +3888,15 @@ def join_names(names: list[str]) -> str:
 
 
 def main() -> None:
-    if not TRAJECTORY_PATH.is_file():
-        raise FileNotFoundError(f"Missing trajectory CSV: {TRAJECTORY_PATH}")
     if not SPARC_PATH.is_file():
         raise FileNotFoundError(f"Missing SPARC table: {SPARC_PATH}")
 
-    stars = load_trajectories(TRAJECTORY_PATH)
-    galaxies = [build_galaxy_record(preset, SPARC_PATH) for preset in GALAXY_PRESETS]
+    galaxies = [build_galaxy_record(preset) for preset in GALAXY_PRESETS]
     galaxies_js = render_galaxies_js(galaxies)
     GALAXIES_JS_PATH.write_text(galaxies_js, encoding="utf-8")
     payload = {
-        "stars": stars,
         "upsilon_disk": UPSILON_DISK,
         "upsilon_bulge": UPSILON_BULGE,
-        "frame_step_myr": 1.0,
-        "total_time_myr": 1000.0,
         "default_galaxy_id": DEFAULT_PRESET.sparc_id,
         "stable_concentration": list(STABLE_CONCENTRATION),
         "particle_model": {
@@ -3979,7 +3922,7 @@ def main() -> None:
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")
-    print(f"Embedded {len(stars)} stars and {len(galaxies)} SPARC galaxies")
+    print(f"Embedded {len(galaxies)} SPARC galaxies")
     for galaxy in galaxies:
         halo = galaxy["default_halo"]
         print(

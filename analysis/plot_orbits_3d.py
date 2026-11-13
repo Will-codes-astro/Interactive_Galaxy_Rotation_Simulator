@@ -1,4 +1,4 @@
-"""Visualise the baryonic orbit CSV produced by Baseline_Baryonic_Model_3d.py."""
+"""Visualise the baryonic orbit CSV produced by analysis/simulate_baryonic_orbits.py."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 CSV_PATH = BASE_DIR / "results" / "star_trajectories_baryonic.csv"
 PLOTS_DIR = BASE_DIR / "plots"
 
@@ -23,7 +23,7 @@ def load_trajectories(path: Path) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(
             f"Trajectory file not found: {path}\n"
-            "Run Baseline_Baryonic_Model_3d.py first."
+            "Run analysis/simulate_baryonic_orbits.py first."
         )
 
     data = pd.read_csv(path)

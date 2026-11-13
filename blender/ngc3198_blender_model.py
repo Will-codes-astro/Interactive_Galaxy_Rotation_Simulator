@@ -47,6 +47,7 @@ COSMIC_DARK_TO_BARYON = 5.4
 FRAME_START = 1
 FRAME_END = 301
 STAR_COUNT = 200
+SPARC_RELATIVE_PATH = Path("data") / "sparc" / "table2.dat"
 COLLECTION_NAME = "NGC 3198 Interactive Model"
 STAR_OBJECT_PREFIX = "NGC3198_Star_"
 TRAIL_OBJECT_PREFIX = "NGC3198_Orbit_"
@@ -79,10 +80,12 @@ def _project_dir() -> Path:
         candidates.append(Path(__file__).resolve().parent)
     candidates.append(Path.cwd())
     for candidate in candidates:
-        if (candidate / "table2.dat").is_file():
-            return candidate.resolve()
+        # The script and .blend live in blender/, so also try the folder above.
+        for folder in (candidate, candidate.parent):
+            if (folder / SPARC_RELATIVE_PATH).is_file():
+                return folder.resolve()
     raise FileNotFoundError(
-        "Select the EPQ Rotation Curves folder containing table2.dat and results/."
+        "Select the EPQ Rotation Curves project folder (it contains data/sparc/table2.dat and results/)."
     )
 
 
@@ -726,7 +729,7 @@ if bpy is not None:
             return
         try:
             base_dir = Path(scene.get("ngc3198_source_directory", ""))
-            profile = _load_sparc_profile(base_dir / "table2.dat")
+            profile = _load_sparc_profile(base_dir / SPARC_RELATIVE_PATH)
             trajectory_path = base_dir / "results" / "star_trajectories_baryonic.csv"
             baryonic_trajectories = _load_baryonic_trajectories(trajectory_path)
             initial_conditions = _initial_conditions(trajectory_path)
@@ -784,7 +787,7 @@ def _register_runtime() -> None:
     if not hasattr(scene_type, "ngc3198_data_directory"):
         scene_type.ngc3198_data_directory = bpy.props.StringProperty(
             name="NGC 3198 data folder",
-            description="Folder containing table2.dat and results/star_trajectories_baryonic.csv",
+            description="Project folder containing data/sparc/table2.dat and results/star_trajectories_baryonic.csv",
             subtype="DIR_PATH",
             default=str(Path(__file__).resolve().parent),
         )
@@ -860,7 +863,7 @@ def build_model() -> None:
     global _MODEL
     _register_runtime()
     base_dir = _project_dir()
-    sparc_path = base_dir / "table2.dat"
+    sparc_path = base_dir / SPARC_RELATIVE_PATH
     trajectory_path = base_dir / "results" / "star_trajectories_baryonic.csv"
     profile = _load_sparc_profile(sparc_path)
     baryonic_trajectories = _load_baryonic_trajectories(trajectory_path)
@@ -892,7 +895,7 @@ def build_model() -> None:
                 ).to_quaternion()
                 area.spaces.active.region_3d.view_distance = 105.0
 
-    output_path = base_dir / "NGC3198_Dark_Matter_Interactive.blend"
+    output_path = base_dir / "blender" / "ngc3198_dark_matter_interactive.blend"
     bpy.ops.wm.save_as_mainfile(filepath=str(output_path))
     print(f"Built NGC 3198 scene: {output_path}")
     print(

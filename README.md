@@ -27,17 +27,18 @@ Python or Git so it can discover the new executables.
 Run commands from the project root:
 
 ```powershell
-python NGC3198_Baryonic_Baseline.py
-python Baseline_Baryonic_Model_3d.py
-python visualize_3d_model.py
+python analysis/baryonic_baseline.py
+python analysis/simulate_baryonic_orbits.py
+python analysis/plot_orbits_3d.py
+python analysis/plot_orbits_2d.py
 python generate_interactive_html.py
 python generate_qr.py
 ```
 
-`Baseline_Baryonic_Model_3d.py` uses the local `table2.dat` and downloads SPARC
-data only if that file is missing or invalid. `NGC3198_Baryonic_Baseline.py`
-fetches SPARC data from the network. The 3D Blender model script,
-`NGC3198_Blender_Model.py`, must be run inside Blender 4.0 or later; Blender's
+All scripts read the local SPARC table `data/sparc/table2.dat` through
+`analysis/sparc_data.py`, which checks its checksum and value ranges and never
+downloads or overwrites it. The 3D Blender model script,
+`blender/ngc3198_blender_model.py`, must be run inside Blender 4.0 or later; Blender's
 `bpy` module is not part of the project virtual environment.
 
 ## Website
@@ -50,7 +51,7 @@ The workflow publishes only `index.html`, `epq_qr_code.png`, and
 `epq_qr_code.svg` from the repository root.
 
 `generate_interactive_html.py` builds the self-contained dashboard in
-`index.html` from `results/star_trajectories_baryonic.csv` and `table2.dat`.
+`index.html` from `data/sparc/table2.dat`.
 When changing dashboard behavior, update the generator and regenerate
 `index.html` so the published page includes the change. The page loads Plotly
 from a CDN; Python packages are not needed to preview the existing page:
@@ -75,12 +76,12 @@ set the star population described under "Test stars" below.
 
 The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
-speed contributions. The generator creates it from `table2.dat`; do not edit it
+speed contributions. The generator creates it from `data/sparc/table2.dat`; do not edit it
 by hand. The generator also inlines the same code into `index.html`, so the
 published page stays a single file and the Pages workflow needs no change. To
 offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
 `generate_interactive_html.py` (its id must match the `Name` column of
-`table2.dat`) and run the generator again. It reads that galaxy's rows, fits
+`data/sparc/table2.dat`) and run the generator again. It reads that galaxy's rows, fits
 its starting NFW halo and rewrites both files.
 
 The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
@@ -238,17 +239,17 @@ live as the sliders move. Touch screens also get larger slider thumbs, tap-to-op
 
 ## Project map
 
-- `Baseline_Baryonic_Model_3d.py`: orbit simulation that writes trajectory data
-  to `results/`.
-- `NGC3198_Baryonic_Baseline.py`: SPARC baryonic rotation-curve analysis.
-- `NGC3198_Blender_Model.py`: Blender scene and add-on for the interactive
-  3D model.
+- `data/sparc/table2.dat`: raw SPARC rotation-curve data (never edit).
+- `analysis/`: offline Python. `sparc_data.py` (validated loader),
+  `baryonic_baseline.py` (baryonic curve and χ²), `simulate_baryonic_orbits.py`
+  (writes `results/star_trajectories_baryonic.csv`), `plot_orbits_2d.py` and
+  `plot_orbits_3d.py` (trajectory plots and animations).
+- `blender/`: Blender scene script and saved `.blend` model.
 - `generate_interactive_html.py`: static dashboard generator.
 - `galaxies.js`: generated registry of the preset SPARC galaxies (also inlined
   into `index.html`).
-- `visualize_3d_model.py`, `plot_galaxy1.py`: trajectory plots and animation.
-- `results/`, `plots/`: input/output data and generated figures.
-- `table2.dat`: local SPARC rotation-curve data.
-- `main.tex`: LaTeX stub for the EPQ write-up (embeds the QR code).
-- `docs/`: development notes (e.g. the Module 2 rendering summary).
+- `results/`, `plots/`: generated outputs of the analysis scripts.
+- `tests/`: physics checks for the site and data.
+- `docs/`: documentation; `docs/artefact_appendix.tex` is the LaTeX QR-code
+  appendix, `docs/history/` holds old development notes.
 - `CLAUDE.md` / `AGENTS.md`: instructions for AI coding assistants.
