@@ -383,12 +383,10 @@
     .tutorial-spotlight.in-fs { --spot-dim:transparent; }
     .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
-    /* Blue rings = controls to use; yellow dashed rings = things to watch. Each carries a short label. */
+    /* Blue rings = controls to use; yellow dashed rings = things to watch. */
     .tutorial-also.is-watch { border:2px dashed #ffcf7a; box-shadow:0 0 12px 3px rgba(255,207,122,.45); }
-    .tutorial-tag { position:absolute; left:-3px; bottom:100%; margin-bottom:5px; padding:2px 8px; border-radius:6px; background:#a8ddff; color:#06131f; font-size:11px; font-weight:700; line-height:1.5; white-space:nowrap; box-shadow:0 2px 8px rgba(0,0,0,.55); pointer-events:none; }
-    .is-watch .tutorial-tag { background:#ffcf7a; }
-    .tutorial-tag.below { bottom:auto; top:100%; margin:5px 0 0; }
-    .tutorial-tag.flip { left:auto; right:-3px; }
+    /* A small numbered dot on the corner of each ring when a task has several steps (matches the card's list). */
+    .tutorial-tag { position:absolute; left:-11px; top:-11px; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:#a8ddff; color:#06131f; font-size:11px; font-weight:700; line-height:1; box-shadow:0 0 0 2px #06131f, 0 0 10px rgba(120,210,255,.8); pointer-events:none; }
     .tutorial-tag:empty { display:none; }
     .tutorial-try ol { margin:5px 0 0; padding-left:20px; }
     .tutorial-try li { margin:2px 0; }
@@ -3313,9 +3311,8 @@ window.GALAXIES = {
       tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
       tutorialSpotlight.style.borderRadius=(Math.min(radius,rect.height/2)+pad)+'px';
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
-      const tag=document.getElementById('tutorialTag'),label=blocker?'Do this first':(step.tag||TUTORIAL_GESTURE_TAG[step.gesture]||'');
+      const tag=document.getElementById('tutorialTag'),label=blocker?'':tutorialTagNumber(step.tag);
       if(tag.textContent!==label)tag.textContent=label;
-      placeTutorialTag(tag,rect,target);
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
@@ -3363,22 +3360,16 @@ window.GALAXIES = {
         ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
         ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
         ring.style.borderRadius=(Math.min(radius,r.height/2)+pad)+'px';
-        placeTutorialTag(ring.firstChild,r,el);
       });
     }
     // A step's extra rings: also = other controls to use (blue), watch = things to watch (yellow).
     // Each entry is 'elementId' or 'elementId:Label'.
     function tutorialRingList(step){
-      const parse=(entry,watch)=>{const k=entry.indexOf(':');return{id:k<0?entry:entry.slice(0,k),label:k<0?(watch?'Watch':'Also use'):entry.slice(k+1),watch};};
+      const parse=(entry,watch)=>{const k=entry.indexOf(':');return{id:k<0?entry:entry.slice(0,k),label:k<0||watch?'':tutorialTagNumber(entry.slice(k+1)),watch};};
       return[...(step.also||[]).map(e=>parse(e,false)),...(step.watch||[]).map(e=>parse(e,true))];
     }
-    // Labels sit above their ring, or below it near the top of the screen, and flip left near the right edge.
-    // Sliders keep their name and value visible: their label goes underneath.
-    function placeTutorialTag(tag,r,el){
-      tag.classList.toggle('below',r.top<34||!!(el&&el.matches('input[type=range]'))&&r.bottom<innerHeight-40);
-      tag.classList.toggle('flip',r.left+tag.offsetWidth>innerWidth-10);
-    }
-    const TUTORIAL_GESTURE_TAG={zero:'Drag to 0',increase:'Drag right',adjust:'Drag',drag:'Drag',click:'Click',switch:'Click',scan:'Look here'};
+    // Only the step number of a tag such as '2 · Halo off' is shown on screen; the words are notes for this file.
+    const tutorialTagNumber=t=>((t||'').match(/^(\d)\s·/)||[])[1]||'';
     const rectKey=r=>[r.left,r.top,r.width,r.height].map(v=>Math.round(v*2)).join();
     // Every frame, re-measure the control and re-fit the ring if it has moved or changed size (an expanding box,
     // a layout shift above it, a CSS transition), so the highlight always hugs it.
