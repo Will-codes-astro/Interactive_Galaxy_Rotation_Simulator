@@ -391,6 +391,7 @@
     .tutorial-tag:empty { display:none; }
     .tutorial-try ol { margin:5px 0 0; padding-left:20px; }
     .tutorial-try li { margin:2px 0; }
+    .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
@@ -3109,7 +3110,7 @@ window.GALAXIES = {
          action:'Move your mouse over the monitor (blue ring) and find the marker on its gauge. Is your halo inside the shaded band?'},
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',tag:'Drag to each end',watch:['stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny scale radius crams the dark matter into the centre (c too high); a huge one smears it thinly outwards (c too low). Real halos do not look like either. The monitor turns red and a warning appears on the 3D view too, but nothing is blocked: you can still run an impossible galaxy.',
-         action:'1. Drag Scale radius all the way to one end, then the other. 2. Watch the marker leave the shaded band on the monitor, and a warning appear on the 3D view.'},
+         action:'Drag Scale radius all the way to one end, then the other. Watch the marker leave the shaded band on the monitor, and a warning appear on the 3D view.'},
         {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['curvePlot:Watch the orange line'],gesture:'adjust',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 times the typical halo. The stars start on orbits that balance the typical halo, so a lighter or heavier one throws them off balance.',
@@ -3158,6 +3159,7 @@ window.GALAXIES = {
       if(sig===tutorialCheckSig)return;
       tutorialCheckSig=sig;
       if(!step.done&&Object.keys(step.checks).every(id=>tutorialLatched[id]))completeTutorialAction(step.id,step.doneText,!!step.fs);
+      renderTutorialTry();
       updateTutorialSpotlight();
     }
     // The control to point at now: the first part not yet done (null once every part is done).
@@ -3223,7 +3225,15 @@ window.GALAXIES = {
       }
       return step.action;
     }
-    // "First:" line for anything in the way, then the action; "1. … 2. …" actions become a numbered list.
+    // Which numbered part of the action the viewer is on: the first part not yet done (the last part once all are).
+    function tutorialPartIndex(step,count){
+      if(tutorialCompleted[step.id])return count-1;
+      if(step.checks){const i=Object.keys(step.checks).findIndex(id=>!tutorialLatched[id]);return i<0?count-1:Math.min(i,count-1);}
+      if(step.id==='haloShape'){const[start,min]=tutorialScaleSeen;return min<start||start<=Number(scaleSlider.min)?1:0;}
+      return 0;
+    }
+    // "First:" line for anything in the way, then the action; "1. … 2. …" actions show one part at a time,
+    // keeping its number, and the next part appears once that one is done.
     function renderTutorialTry(){
       const blocker=tutorialBlocker(),action=tutorialInstruction();
       tutorialTry.replaceChildren();
@@ -3231,8 +3241,9 @@ window.GALAXIES = {
       const head=document.createElement('strong');head.textContent=blocker?'Then: ':'Try it: ';tutorialTry.appendChild(head);
       const parts=action.split(/\s(?=\d\.\s)/);
       if(parts.length>1&&/^1\.\s/.test(parts[0])){
-        const list=document.createElement('ol');
-        parts.forEach(p=>{const li=document.createElement('li');li.textContent=p.replace(/^\d\.\s/,'');list.appendChild(li);});
+        const i=tutorialPartIndex(tutorialStep(),parts.length),list=document.createElement('ol'),li=document.createElement('li');
+        list.start=i+1;li.textContent=parts[i].replace(/^\d\.\s/,'');list.appendChild(li);
+        if(i<parts.length-1){const more=document.createElement('span');more.className='tutorial-more-parts';more.textContent=`Step ${i+1} of ${parts.length}: the next step appears when this one is done.`;tutorialTry.appendChild(list);tutorialTry.appendChild(more);return;}
         tutorialTry.appendChild(list);
       }else tutorialTry.appendChild(document.createTextNode(action));
     }
@@ -3617,6 +3628,7 @@ window.GALAXIES = {
         tutorialScaleSeen[1]=Math.min(tutorialScaleSeen[1],value);tutorialScaleSeen[2]=Math.max(tutorialScaleSeen[2],value);
         const down=tutorialScaleSeen[1]<start||start<=lo,up=tutorialScaleSeen[2]>start||start>=hi;
         if(down&&up)completeTutorialAction('haloShape','Both ways: the same mass, arranged differently.');
+        else if(down&&tutorialStep().id==='haloShape')renderTutorialTry();
         checkStabilityStep();
       }
       tutorialLastScale=value;
