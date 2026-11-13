@@ -620,7 +620,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-card p { margin:0 0 10px; color:#c3d0de; font-size:13px; line-height:1.5; }
     .tutorial-card .tutorial-try { position:sticky; bottom:0; margin:2px 0 0; padding:10px 12px; border-left:2px solid var(--cyan); border-radius:0 7px 7px 0; background:#15283a; box-shadow:0 -10px 14px -6px #0f1e2d; color:#c7f5fa; }
     /* The task stays pinned in view at the bottom of the card while the explanation above it scrolls. */
-    .tutorial-feedback { flex:none; display:flex; align-items:center; gap:10px; margin:9px 0 0; color:#a5e3c2; font-size:12px; animation:tutorial-pop .3s cubic-bezier(.2,.8,.2,1) both; }
+    .tutorial-feedback { flex:none; display:flex; align-items:center; gap:10px; margin:9px 0 0; color:#a5e3c2; font-size:12px; animation:tutorial-pop .7s cubic-bezier(.2,.8,.2,1) both; }
     #tutorialFeedbackText { flex:1; min-width:0; }
     .tutorial-auto { flex:none; display:inline-flex; align-items:center; gap:6px; padding:3px 4px 3px 10px; border:1px solid rgba(165,227,194,.35); border-radius:999px; background:rgba(165,227,194,.08); color:#a5e3c2; font-size:11px; font-weight:600; cursor:pointer; transition:background .15s ease, opacity .2s ease; }
     .tutorial-auto[hidden] { display:none; }
@@ -633,15 +633,15 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-clock .ring { stroke:#a5e3c2; stroke-linecap:round; stroke-dasharray:43.98; }
     .tutorial-clock b { position:absolute; inset:0; display:grid; place-items:center; font-size:10px; font-variant-numeric:tabular-nums; }
     /* Moving between cards: the old text slides out the way you are going, the new text follows in, line by line. */
-    .tutorial-card { transition:opacity .2s ease, transform .2s ease; }
-    .tutorial-content, .tutorial-feedback { transition:opacity .14s ease, transform .14s ease; }
+    .tutorial-card { transition:opacity .38s ease, transform .38s ease; }
+    .tutorial-content, .tutorial-feedback { transition:opacity .3s ease, transform .3s ease; }
     .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { opacity:0; transform:translateX(calc(var(--dir,1) * -12px)); }
-    .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry) { animation:tutorial-in .34s cubic-bezier(.2,.8,.2,1) both; }
-    .tutorial-card.enter #tutorialText { animation-delay:.04s; }
-    .tutorial-card.enter #tutorialTry { animation-delay:.08s; }
+    .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry) { animation:tutorial-in .55s cubic-bezier(.2,.8,.2,1) both; }
+    .tutorial-card.enter #tutorialText { animation-delay:.08s; }
+    .tutorial-card.enter #tutorialTry { animation-delay:.16s; }
     /* When the card swaps sides of the page it fades out and rises back in, rather than jumping across. */
     .tutorial-card.leave-side { opacity:0; transform:translateY(10px) scale(.98); }
-    .tutorial-card.enter-side { animation:tutorial-card-in .34s cubic-bezier(.2,.8,.2,1); }
+    .tutorial-card.enter-side { animation:tutorial-card-in .55s cubic-bezier(.2,.8,.2,1); }
     @keyframes tutorial-in { from { opacity:0; transform:translateX(calc(var(--dir,1) * 16px)); } }
     @keyframes tutorial-card-in { from { opacity:0; transform:translateY(10px) scale(.98); } }
     @keyframes tutorial-pop { from { opacity:0; transform:translateY(4px); } }
@@ -671,10 +671,15 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
+    /* A finished part's ring turns green and fades away instead of vanishing (visual only). */
+    .tutorial-also.is-leaving { animation:tutorial-ring-done .85s ease forwards; }
+    .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
+    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 45% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
-    .tutorial-spotlight.is-complete { opacity:0; }
+    /* When the task is done the highlight glows green, holds a moment, then fades slowly. */
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:none; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 6px rgba(165,227,194,.7); transition:opacity 1.3s ease .6s, border-color .3s ease, box-shadow .3s ease; }
     .is-complete .tutorial-pointer { animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
@@ -3597,16 +3602,25 @@ __GALAXIES_JS__
       return{left,top,right,bottom,width:right-left,height:bottom-top};
     }
     // Dashed rings on the other controls a card names (hidden while something else has to be fixed first).
-    const tutorialAlsoRings=[];
+    // One ring per control id, so a ring whose part is done can fade out where it is instead of vanishing.
+    const tutorialAlsoRings=new Map();
     function positionTutorialAlso(hideAll){
       const step=tutorialSteps[tutorialIndex];
       const aim=step&&!hideAll&&!tutorialCard.hidden?tutorialCurrentAim(step):null;
       // Rings go once their part is done, or once the whole card is done; the part being pointed at has the main ring.
       const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||tutorialCompleted[step.id]?[]:tutorialRingList(step).filter(r=>!tutorialLatched[r.id]&&!(aim&&aim.id===r.id));
-      while(tutorialAlsoRings.length<ids.length){const ring=document.createElement('div');ring.className='tutorial-also';ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.push(ring);}
-      tutorialAlsoRings.forEach((ring,i)=>{
-        const item=i<ids.length?ids[i]:null,el=item?document.getElementById(item.id):null;
-        if(item){const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;}
+      const keep=new Set(ids.map(item=>item.id));
+      tutorialAlsoRings.forEach((ring,id)=>{
+        if(keep.has(id))return;
+        // Ending the tour clears them at once; anything else fades them out gently.
+        if(tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
+        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},900);}
+      });
+      ids.forEach(item=>{
+        let ring=tutorialAlsoRings.get(item.id);
+        if(!ring){ring=document.createElement('div');ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.id,ring);}
+        const el=document.getElementById(item.id);
+        const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;
         if(ring.parentElement!==tutorialSpotlight.parentElement)tutorialSpotlight.parentElement.appendChild(ring);
         const r=el&&el.getClientRects().length?tutorialSpotRect(el):null;
         if(!r||!r.width||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth){ring.hidden=true;return;}
@@ -3747,7 +3761,7 @@ __GALAXIES_JS__
         tutorialIndex=index;showTutorialStep();
         void tutorialCard.offsetWidth;
         tutorialCard.classList.add(sideChange?'enter-side':'enter');
-      },sideChange?200:140);
+      },sideChange?380:300);
     }
     function endTutorial(){
       stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
