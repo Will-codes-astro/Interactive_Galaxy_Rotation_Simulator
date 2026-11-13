@@ -50,17 +50,18 @@ SPARC rotation curves.
 ## Size of change decides the routine
 
 - **Small** (wording, labels, colours, layout, tutorial text, README, a bug
-  in UI code): edit, regenerate, commit with a plain message. No Stage
-  number, no physics checks, no build-log entry unless Will asks. If a living
-  document quotes the exact text you changed, fix that one line.
-- **Medium** (a new feature or button, a real behaviour change): commit, run
-  physics checks only if the physics trigger below applies, and add a short
-  build-log entry.
-- **Big** (a new Stage Will names, a UI overhaul, new physics or a new
-  galaxy): run the full Stage routine.
+  in UI code): edit, regenerate, commit with a plain message. No physics
+  checks. Log it only if it's worth noting (see build log rule below). If a
+  living document quotes the exact text you changed, fix that one line.
+- **Medium** (a new feature or button, a real behaviour change, a bug fix
+  that matters): commit, run physics checks only if the physics trigger
+  below applies, and add a build-log bullet.
+- **Big** (a UI overhaul, new physics or a new galaxy): run the Big change
+  routine.
 
-Only call something a Stage when Will says so or it's clearly Big. Never
-number a tiny tweak as a Stage.
+**No "Stages".** Never number work as Stage N, in commit messages, Notion
+or anywhere else. Name a change by what it adds (e.g. "Smooth graph readout
+and phone layout").
 
 ## Physics checks: only when physics could break
 
@@ -94,12 +95,21 @@ star count 800 / cap 2400, generated files match, baseline.)
 ## Notion writing: short by default
 
 - **Build log = the "My Websites Creation" page** (id
-  416c4fda4ef4813fa741fda5b6f61f5b, under EPQ Main Hub). Append to the
-  bottom of Part 2, matching its style: a `## <date> — <title>` heading
-  (reuse today's heading if it exists), then 1–3 bullets saying what
-  changed, why if not obvious, and the commit ID in brackets. Use a callout
-  only for a mistake or an open decision. Big changes may add a little
-  more, still under ~150 words. Never create Diary pages.
+  416c4fda4ef4813fa741fda5b6f61f5b, under EPQ Main Hub). Do this
+  **every time something worth noting lands** (a new feature, a visible
+  change, a bug fix that matters, a physics change, a mistake), without
+  being asked. Skip pure tweaks (colour nudges, wording, repeated fine
+  tuning of one thing).
+  - One `## <D Mon> — <what was added>` heading per day, dated by the
+    commit date in git (`git log --date=short`), never the chat date. If
+    today's heading exists, add to it and widen its title if needed.
+  - Under it, bullets of the form `<b>Short name:</b> what it does, one
+    sentence (commit ID)`. Add why only if it isn't obvious, and a source
+    if the physics needs one. Group related commits into one bullet.
+  - Callouts only for a mistake or an open decision. No Stage numbers, no
+    file lists, no slider-by-slider detail.
+  - Keep each day short (aim for under ~150 words). Never create Diary
+    pages.
 - **Living documents** (Explain My Code flashcards, User Testing Kit): edit
   only the cards or tasks whose facts changed (physics, formulas, numbers,
   features, buttons, labels). Add a card or task for a new feature. Update
@@ -111,10 +121,10 @@ star count 800 / cap 2400, generated files match, baseline.)
 
 ## Routines (run when Will names them)
 
-### Stage routine (Big changes only)
+### Big change routine
 1. Physics checks if the physics trigger applies. Stop if any fail.
 2. Regenerate the site; update `README.md` if anything visible changed.
-3. Commit as "... (Stage N)".
+3. Commit with a message naming what was added.
 4. Short build-log entry (see Notion writing), then living documents and
    `project-status.md`.
 5. Check the AI declaration still covers the work.
@@ -136,8 +146,8 @@ source. List the problems.
 - Ask Will to confirm OneDrive has finished syncing.
 - List the proposed edits, then apply them directly (no tracked changes).
 
-### Stage screenshots (only when Will asks)
-Open the live site, capture the new feature, attach to that Stage's build-log
+### Screenshots (only when Will asks)
+Open the live site, capture the new feature, attach to that day's build-log
 entry.
 
 ## If something is unavailable
