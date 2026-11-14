@@ -4,10 +4,21 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 (the page's HTML, CSS and JavaScript are in `HTML_TEMPLATE`). The equations are
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
-Page order: The puzzle, Model setup, Simulation, Scorecard, Background, Method & sources
-(the top menu links to each).
+The site is one file (`index.html`) split into five pages: The puzzle,
+Simulator (Model setup and Simulation), Scorecard, Background, and Method &
+sources. The top menu shows one page at a time (`showPage`); each page ends with
+a "Next" button, the browser's Back button works, and a link such as
+`#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
+width (height 0, not `display:none`), so the 3D view and the rotation curve stay
+correctly sized. The stat tiles (test stars, timeline, mass-to-light, MOND best
+fit) sit at the top right of the Simulator page.
 
-The puzzle section opens the page, before any control. Four numbered steps
+The tutorial offer appears the first time the Simulator page opens, not over the
+opening story. Each tour step opens the page its control is on (the last step
+opens Background); if the visitor moves to another page mid-tour, the card asks
+them to go back and points at the top-menu entry.
+
+The puzzle page opens the site, before any control. Four numbered steps
 explain what a rotation curve is, what astronomers expected (with the Solar
 System as the comparison), what they measured, and the two possible answers.
 Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
@@ -199,15 +210,19 @@ Scorecard: a table scoring every preset galaxy under visible matter only, the
 starting NFW halo (Apply Observed Fit), MOND at the default a₀, and the MOND
 best fit, which also shows its fitted a₀ and disk M/L beside the standard
 values. Under each score it gives the root-mean-square gap in plain words
-("about 1.2 error bars off per point", √(χ²/N)). It is calculated in the page when it loads (`scoreGalaxy`), with the
+("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
+It is calculated in the page when it loads (`scoreGalaxy`), with the
 same functions as the fit badge, so the two always agree. "Show in simulator"
-loads that galaxy (leaving the sandbox if needed). The notes underneath state
+loads that galaxy (leaving the sandbox if needed). Five short cards underneath state
 what limits the comparison; they do not say which idea wins.
 
 Background has a third, full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with its source and a tag for the
-idea it points to. Method & sources ends with a Harvard reference list of every
+idea it points to. Two "Still open" cards follow: no confirmed dark matter
+particle (including the single LZ candidate event of September 2026, a 2.6σ
+preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds its
+equations under "Show the maths". Method & sources ends with a Harvard reference list of every
 source cited on the page, each linked by DOI (checked against Crossref on
 14 Nov 2026).
 
