@@ -21,3 +21,6 @@ _site/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# OneDrive conflict duplicates
+*-Wills_Laptop_V2.*
