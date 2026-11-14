@@ -663,7 +663,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
     @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
     body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
-    #top, #simulator, #results, #curvePanel, #theoryGuide, #method { scroll-margin-top:72px; }
+    #top, #puzzle, #simulator, #results, #curvePanel, #scorecard, #theoryGuide, #method { scroll-margin-top:72px; }
     .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
     .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:600; font-size:14px; letter-spacing:.01em; text-decoration:none; white-space:nowrap; }
     .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
@@ -773,15 +773,80 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
     @media (max-width:640px) { .topbar { padding:0 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
     .key summary::before { content:""; display:inline-block; width:4px; }
+    /* Small text: sizes and contrast raised for readability (visual only). */
+    :root { --muted:#96a5ba; }
+    .stat-label { font-size:10.5px; }
+    .sim-stage .control-help { font-size:12px; }
+    .schematic figcaption { font-size:12px; }
+    footer .export-btn { font-size:12px; }
+    /* The puzzle: the story before the controls. */
+    .puzzle, .scorecard { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
+    .puzzle { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:8px 36px; align-items:center; padding:22px 24px; }
+    .puzzle-steps { margin:0; padding:0; list-style:none; counter-reset:puzzle; }
+    .puzzle-steps li { position:relative; padding:0 0 14px 40px; counter-increment:puzzle; }
+    .puzzle-steps li:last-child { padding-bottom:0; }
+    .puzzle-steps li::before { content:counter(puzzle); position:absolute; left:0; top:0; width:26px; height:26px; border:1px solid var(--line-strong); border-radius:50%; color:var(--accent); font:500 12px/24px var(--f-mono); text-align:center; }
+    .puzzle-steps li:not(:last-child)::after { content:""; position:absolute; left:13px; top:32px; bottom:4px; width:1px; background:var(--line-strong); }
+    .puzzle-steps h3 { margin:0 0 3px; padding-top:2px; color:var(--ink); font:600 16px/1.3 var(--f-serif); }
+    .puzzle-steps p { margin:0; color:var(--ink-2); font-size:13.5px; line-height:1.6; }
+    .puzzle-steps b { color:var(--ink); font-weight:600; }
+    .puzzle-fig { margin:0; }
+    .puzzle-fig svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:13px var(--f-ui); }
+    .puzzle-fig figcaption { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; }
+    .puzzle-cta { grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:10px; padding-top:16px; border-top:1px solid var(--line); }
+    .puzzle-cta button { padding:9px 16px; font-size:13px; }
+    .puzzle-cta a, .refs a, .evidence-source a { color:var(--accent); text-underline-offset:3px; }
+    .puzzle-cta a { font-size:13px; }
+    @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } }
+    /* Fit badge: a plain-language verdict in front of the numbers. */
+    #chiBadge sub { line-height:0; font-size:.82em; }
+    #chiBadge b { margin-right:4px; font:600 11.5px var(--f-ui); letter-spacing:.01em; }
+    /* Scorecard: every preset galaxy scored under each model. */
+    .scorecard { padding:18px 22px 16px; }
+    .scorecard > p { max-width:88ch; margin:0 0 14px; color:var(--ink-2); font-size:13.5px; line-height:1.65; }
+    .score-scroll { overflow-x:auto; margin:0 -6px; padding:0 6px; }
+    .score-table { width:100%; min-width:640px; border-collapse:collapse; font-size:13px; }
+    .score-table th, .score-table td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    .score-table thead th { color:var(--ink); font-weight:600; vertical-align:bottom; }
+    .score-table small { display:block; margin-top:2px; color:var(--muted); font-size:11.5px; font-weight:400; line-height:1.4; }
+    .score-table tbody th { color:var(--ink); font-weight:600; white-space:nowrap; }
+    .score-table tbody tr:last-child th, .score-table tbody tr:last-child td { border-bottom:0; }
+    .score { display:inline-block; min-width:58px; padding:2px 9px; border:1px solid rgba(120,150,180,.3); border-radius:999px; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums; text-align:center; }
+    .score.good { border-color:rgba(95,208,224,.55); color:#8fe3ee; } .score.ok { border-color:rgba(255,174,92,.55); color:#ffc48a; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
+    .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
+    .score-notes { margin:14px 0 0; padding:14px 0 0 18px; border-top:1px solid var(--line); color:var(--ink-2); font-size:13px; line-height:1.6; }
+    .score-notes li { margin-bottom:6px; max-width:96ch; }
+    .score-notes b { color:var(--ink); font-weight:600; }
+    .scorecard sub, .scorecard sup, .key sub, .key sup { line-height:0; }
+    .score-notes-title { margin:16px 0 0; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .score-notes-title + .score-notes { margin-top:8px; padding-top:0; border-top:0; }
+    /* Wider evidence: a full-width box under the two theory boxes. */
+    .learn article.evidence { grid-column:1/-1; }
+    .evidence-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:6px 0 14px; }
+    .evidence-card { padding:12px 14px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); }
+    .evidence-card h4 { margin:6px 0 6px; color:var(--ink); font:600 14.5px/1.3 var(--f-serif); }
+    .learn .evidence-card p { margin:0 0 8px; font-size:13px; line-height:1.6; }
+    .learn .evidence-card p.evidence-source { margin:0; color:var(--muted); font-size:11.5px; }
+    .evidence-tag { display:inline-block; padding:2px 8px; border-radius:999px; font:500 10.5px var(--f-mono); letter-spacing:.06em; }
+    .evidence-tag.dm { border:1px solid rgba(179,154,232,.5); color:#c9b8f0; } .evidence-tag.mond { border:1px solid rgba(255,174,92,.5); color:#ffc48a; }
+    @media (max-width:1100px) { .evidence-grid { grid-template-columns:1fr 1fr; } } @media (max-width:560px) { .evidence-grid { grid-template-columns:1fr; } }
+    /* Reference list. */
+    .refs { margin:4px 0 18px; padding-top:16px; border-top:1px solid var(--line); }
+    .refs h3 { margin:0 0 8px; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .refs ul { margin:0; padding:0; list-style:none; columns:2; column-gap:32px; }
+    .refs li { margin:0 0 8px; padding-left:18px; text-indent:-18px; break-inside:avoid; color:var(--ink-2); font-size:12.5px; line-height:1.55; overflow-wrap:anywhere; }
+    .refs p { margin:8px 0 0; color:var(--muted); font-size:12px; }
+    @media (max-width:900px) { .refs ul { columns:1; } }
+    @media (max-width:640px) { .scorecard { padding:16px; } }
   </style>
 </head>
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#top"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
-    <div class="topnav"><a href="#simulator">Model Setup</a><a href="#results">Simulation</a><a href="#curvePanel">Rotation curve</a><a href="#theoryGuide">Theory</a><a href="#method">Method &amp; data</a></div>
+    <div class="topnav"><a href="#puzzle">The puzzle</a><a href="#simulator">Model setup</a><a href="#results">Simulation</a><a href="#scorecard">Scorecard</a><a href="#theoryGuide">Background</a><a href="#method">Method &amp; sources</a></div>
   </nav>
   <header id="top">
-    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Compare a dark matter halo (NFW) with modified gravity (MOND) against measured rotation curves from the SPARC survey (Lelli, McGaugh &amp; Schombert 2016).</p></div>
+    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Stars at the edges of galaxies orbit far faster than the matter we can see should allow. See the measurements for yourself, then test two explanations against them: an unseen halo of dark matter, or a change to gravity itself.</p></div>
     <div class="header-stats" aria-label="Simulation summary">
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
@@ -804,7 +869,21 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
   </header>
   <main>
-    <div class="section-head" id="simulator"><span class="kicker">01</span><h2>Model setup</h2><p>Choose a galaxy and a theory of gravity.</p></div>
+    <div class="section-head" id="puzzle"><span class="kicker">01</span><h2>The puzzle</h2><p>Why galaxies seem to hold far more matter than we can see.</p></div>
+    <section class="puzzle" aria-label="The missing mass problem">
+      <ol class="puzzle-steps">
+        <li><h3>A rotation curve is a speed chart</h3><p>Stars and gas circle the centre of their galaxy. Measure how fast they move at each distance from the centre, plot speed against distance, and you have a rotation curve.</p></li>
+        <li><h3>What astronomers expected</h3><p>Gravity weakens with distance. In the Solar System, where almost all the mass is in the Sun, Mercury orbits at 47 km/s and far-off Neptune at only 5 km/s (Williams 2024). Most of a galaxy’s visible matter, its stars and gas, also sits towards the middle, so its outermost stars and gas should be slow as well: the dashed line.</p></li>
+        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the outermost measured point of __DEFAULT_GALAXY_NAME__, gas moves at <b id="puzzleObs">–</b>, yet the visible matter accounts for only <b id="puzzleBar">–</b>. Holding that gas in orbit takes about <b id="puzzleRatio">–</b> times the pull that the visible matter supplies. This gap is the missing mass problem.</p></li>
+        <li><h3>Two possible answers</h3><p>Either the galaxy sits inside a huge cloud of unseen <b>dark matter</b>, or gravity itself works differently when it is very weak, an idea called <b>MOND</b>. Below you can test both against real measurements.</p></li>
+      </ol>
+      <figure class="puzzle-fig">
+        <div id="puzzleChart"></div>
+        <figcaption>Real measurements of __DEFAULT_GALAXY_NAME__ from the SPARC survey (Lelli, McGaugh &amp; Schombert 2016). The dashed line turns the galaxy’s starlight and gas into mass using standard mass-to-light ratios (see Method &amp; sources), then applies Newton’s gravity.</figcaption>
+      </figure>
+      <div class="puzzle-cta"><button type="button" class="tutorial-primary" id="puzzleTour">Take the guided tour</button><a href="#simulator">or go straight to the simulator ↓</a></div>
+    </section>
+    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy and a theory of gravity.</p></div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
       <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
         <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span>Preset Galaxies</span></label>
@@ -822,7 +901,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <span class="mond-note" id="mondNote" hidden>MOND active: no dark matter (M<sub>200</sub> = 0). Gravity is boosted below a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</span>
       <button type="button" class="tutorial-launch" id="tutorialLaunch">Tutorial</button>
     </section>
-    <div class="section-head" id="results"><span class="kicker">02</span><h2>Simulation</h2><p>Move the sliders and watch the star orbits and the rotation curve respond straight away.</p></div>
+    <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders and watch the star orbits and the rotation curve respond straight away.</p></div>
     <div class="sim-stage" id="simStage">
     <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
       <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2></div>
@@ -883,7 +962,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </section>
     </article>
       <article class="panel" id="curvePanel">
-        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points">χ² –</span></div>
+        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div>
         <div class="curve-wrap"><div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div></div>
         <p class="curve-hint">Tap the graph, or slide your finger along it, to read the speeds at each radius. Tap outside the graph to close.</p>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
@@ -896,10 +975,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         <details class="key">
           <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li data-preset-only><b>χ² badge:</b> <span class="g">teal</span> good fit, <span class="o">orange</span> fair, <span class="r">red</span> poor.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> teal = model is too slow, coral = model is too fast, no bar = perfect match.</li><li data-preset-only><b>Fit badge:</b> <span class="g">teal</span> close fit (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">orange</span> rough fit (2 to 10), <span class="r">red</span> poor fit (above 10). These cut-offs are this site’s own rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; they add in quadrature to the cyan baryonic curve.</li></ul>
             <div data-preset-only>
             <h3>Why isn't χ² exactly 0?</h3>
-            <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point (χ²ᵣ ≈ 1 is a good fit).</p>
+            <p>χ² adds up how far the model is from each measured point, in units of that point's uncertainty. A score of 0 would mean every point matched perfectly, which real data never allows: measurements carry noise, so even a correct model scatters around them by roughly one error bar per point.</p>
+            <h3>What is χ<sup>2</sup><sub>r</sub>?</h3>
+            <p>χ² grows with the number of measured points, so galaxies cannot be compared with it directly. χ<sup>2</sup><sub>r</sub> (reduced chi-squared) divides χ² by the number of measured points minus the number of values tuned to fit this galaxy. A model that misses each point by about one error bar scores about 1; missing by three error bars scores about 9.</p>
+            <p>Counting the tuned values keeps the comparison fair, because a model with more adjustable numbers can always be bent closer to the data. The halo has two (its mass and scale radius). MOND has none: its a<sub>0</sub> is meant to be the same for every galaxy. MOND best fit tunes two (a<sub>0</sub> and the disk mass-to-light ratio).</p>
             <p>Models also simplify reality. NFW assumes a smooth spherical halo, MOND uses a characteristic acceleration a<sub>0</sub>, and both rely on an estimated stellar mass for the visible matter. Their small mismatches add to the score, which is why neither theory reaches 0.</p>
             </div>
           </div>
@@ -907,7 +989,25 @@ HTML_TEMPLATE = r"""<!doctype html>
       </article>
     </section>
     </div>
-    <div class="section-head"><span class="kicker">03</span><h2>Background</h2><p>The two explanations this simulator tests.</p></div>
+    <div class="section-head" id="scorecard"><span class="kicker">04</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
+    <section class="scorecard" aria-label="Fit scores for every preset galaxy">
+      <p>Each number is a χ<sup>2</sup><sub>r</sub> score: the average squared gap between the model and the measured speeds, counted in error bars. A model that misses each point by about one error bar scores about 1, which is as close as the measurements allow. Missing by three error bars scores about 9. Lower is better. Under each score is the same result in plain terms: how many error bars the model is off by at a typical point.</p>
+      <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard table">
+        <table class="score-table">
+          <thead><tr><th scope="col">Galaxy</th><th scope="col">Visible matter only<small>Newton’s gravity, nothing added</small></th><th scope="col">Dark matter halo (NFW)<small>2 values tuned to this galaxy</small></th><th scope="col">MOND<small>nothing tuned to this galaxy</small></th><th scope="col">MOND best fit<small>2 values tuned to this galaxy</small></th></tr></thead>
+          <tbody id="scoreBody"><tr><td colspan="5">Calculating the scores…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="score-notes-title">Before drawing conclusions</p>
+      <ul class="score-notes">
+        <li><b>Tuned values.</b> The halo column uses this site’s starting halo for each galaxy (the Apply Observed Fit button), where the halo’s mass and scale radius were chosen to fit that galaxy. Plain MOND uses one a<sub>0</sub> for every galaxy and tunes nothing. χ<sup>2</sup><sub>r</sub> divides by the number of measured points minus the number of tuned values, so extra freedom is not rewarded for free.</li>
+        <li><b>MOND best fit is MOND’s best case.</b> It lets a<sub>0</sub> and the disk mass-to-light ratio change from galaxy to galaxy. MOND itself says a<sub>0</sub> is one universal constant (Milgrom 1983), so the fitted values shown in that column matter as much as the score.</li>
+        <li><b>The starting halo is not the best possible halo.</b> It was fitted with the mass-to-light ratios fixed at <span id="scoreMl">0.5 (disk) and 0.7 (bulge)</span> and kept inside the slider ranges. A fit that could also tune the mass-to-light ratio, as MOND best fit does, could only score the same or better.</li>
+        <li><b>The error bars matter.</b> The scores use SPARC’s quoted uncertainty on each speed. Uncertainty in a galaxy’s distance and tilt would shift its whole curve and is not part of these scores, so a high score alone does not rule a model out.</li>
+        <li><b>A small sample.</b> These are <span id="scoreCount">a few</span> of the 175 galaxies in SPARC (Lelli, McGaugh &amp; Schombert 2016), so the table shows how the comparison works rather than settling it.</li>
+      </ul>
+    </section>
+    <div class="section-head"><span class="kicker">05</span><h2>Background</h2><p>The two explanations this simulator tests, and the wider evidence.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <article class="nfw"><h3>What is a dark matter halo?</h3>
         <div class="learn-content">
@@ -957,8 +1057,20 @@ HTML_TEMPLATE = r"""<!doctype html>
         <p>Switch between the two models and compare each curve with the white measured points. One galaxy alone cannot settle which idea is right.</p>
         </div>
       </article>
+      <article class="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
+        <div class="learn-content">
+        <p class="tldr">Rotation curves are one clue among several. Each idea has to explain all of them, and each has places where it does well and places where it struggles.</p>
+        <div class="evidence-grid">
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p>In 1933 Fritz Zwicky measured the speeds of galaxies in the Coma cluster. They move so fast that the cluster should fly apart unless it holds far more mass than its visible galaxies. MOND shrinks this gap but does not close it: it still needs some unseen matter in clusters.</p><p class="evidence-source">Zwicky (1933); Famaey &amp; McGaugh (2012)</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p>Two clusters have passed through each other. Their hot gas, which holds most of the visible matter, was slowed in the collision, but the bending of light from galaxies behind them shows that most of the mass carried on with the galaxies. The gravity is not where most of the visible matter is.</p><p class="evidence-source">Clowe et al. (2006)</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p>The cosmic microwave background is light released when the universe was about 380,000 years old. The pattern of its slightly hotter and cooler patches is matched by a universe holding about five times as much dark matter as ordinary matter.</p><p class="evidence-source">Planck Collaboration (2020)</p></div>
+          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>A tight rule in galaxies</h4><p>Across 153 galaxies, the pull measured from rotation curves follows the pull expected from the visible matter alone along one tight relation. MOND predicts a rule like this. If dark matter is the answer, something must tie each halo closely to its visible matter.</p><p class="evidence-source">McGaugh, Lelli &amp; Schombert (2016)</p></div>
+        </div>
+        <p>Neither idea is finished. No dark matter particle has been detected directly despite decades of searching (Bertone &amp; Hooper 2018), and MOND has not matched clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012). Full references are listed under Method &amp; sources.</p>
+        </div>
+      </article>
     </section>
-    <div class="section-head" id="method"><span class="kicker">04</span><h2>Method &amp; data</h2><p>What the simulator calculates, and where the numbers come from.</p></div>
+    <div class="section-head" id="method"><span class="kicker">06</span><h2>Method &amp; sources</h2><p>What the simulator calculates, and where the numbers and ideas come from.</p></div>
     <footer>
       <dl class="method-grid">
         <div data-preset-only><dt>Data</dt><dd>Measured speeds V<sub>obs</sub> ± σ and the gas, disk and bulge speeds at each radius, from SPARC (Lelli, McGaugh &amp; Schombert 2016), read from the project’s table2.dat.</dd></div>
@@ -966,8 +1078,31 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div><dt>Dark matter</dt><dd>NFW halo (Navarro, Frenk &amp; White 1996), set by M<sub>200</sub> and r<sub>s</sub>. Model speed:<span class="eq"><math display="block"><msubsup><mi>V</mi><mi>model</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></math></span></dd></div>
         <div><dt>MOND</dt><dd>No halo (Milgrom 1983). a<sub>0</sub> = 1.2×10⁻¹⁰ m/s².<span class="eq"><math display="block"><mi>μ</mi><mo>(</mo><mfrac><mi>g</mi><msub><mi>a</mi><mn>0</mn></msub></mfrac><mo>)</mo><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>,</mo><mspace width="1em"/><mi>μ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mi>x</mi><msqrt><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></msqrt></mfrac></math></span></dd></div>
         <div><dt>Simulation</dt><dd>Massless test stars (800 for the presets) moved by Velocity-Verlet steps, 2 per Myr, over 1 Gyr.</dd></div>
-        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="1em"/><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mn>2</mn></mrow></mfrac></math></span>for N measured points.</dd></div>
+        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="1em"/><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span>for N measured points and k values tuned to the galaxy: 2 for the NFW halo (M<sub>200</sub>, r<sub>s</sub>), 0 for MOND, 2 for MOND best fit (a<sub>0</sub>, disk M/L).</dd></div>
       </dl>
+      <section class="refs" id="references" aria-labelledby="refsTitle">
+        <h3 id="refsTitle">References</h3>
+        <ul>
+          <li>Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href="https://doi.org/10.1103/RevModPhys.90.045002" target="_blank" rel="noopener">doi:10.1103/RevModPhys.90.045002</a></li>
+          <li>Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href="https://doi.org/10.1086/508162" target="_blank" rel="noopener">doi:10.1086/508162</a></li>
+          <li>Dutton, A.A. and Macciò, A.V. (2014) ‘Cold dark matter haloes in the Planck era: evolution of structural parameters for Einasto and NFW profiles’, <i>Monthly Notices of the Royal Astronomical Society</i>, 441(4), pp. 3359–3374. <a href="https://doi.org/10.1093/mnras/stu742" target="_blank" rel="noopener">doi:10.1093/mnras/stu742</a></li>
+          <li>Famaey, B. and McGaugh, S.S. (2012) ‘Modified Newtonian Dynamics (MOND): observational phenomenology and relativistic extensions’, <i>Living Reviews in Relativity</i>, 15, 10. <a href="https://doi.org/10.12942/lrr-2012-10" target="_blank" rel="noopener">doi:10.12942/lrr-2012-10</a></li>
+          <li>Freeman, K.C. (1970) ‘On the disks of spiral and S0 galaxies’, <i>The Astrophysical Journal</i>, 160, p. 811. <a href="https://doi.org/10.1086/150474" target="_blank" rel="noopener">doi:10.1086/150474</a></li>
+          <li>Graham, A.W. and Worley, C.C. (2008) ‘Inclination- and dust-corrected galaxy parameters: bulge-to-disc ratios and size–luminosity relations’, <i>Monthly Notices of the Royal Astronomical Society</i>, 388(4), pp. 1708–1728. <a href="https://doi.org/10.1111/j.1365-2966.2008.13506.x" target="_blank" rel="noopener">doi:10.1111/j.1365-2966.2008.13506.x</a></li>
+          <li>Hubble, E.P. (1926) ‘Extragalactic nebulae’, <i>The Astrophysical Journal</i>, 64, p. 321. <a href="https://doi.org/10.1086/143018" target="_blank" rel="noopener">doi:10.1086/143018</a></li>
+          <li>Lelli, F., McGaugh, S.S. and Schombert, J.M. (2016) ‘SPARC: mass models for 175 disk galaxies with Spitzer photometry and accurate rotation curves’, <i>The Astronomical Journal</i>, 152(6), 157. <a href="https://doi.org/10.3847/0004-6256/152/6/157" target="_blank" rel="noopener">doi:10.3847/0004-6256/152/6/157</a></li>
+          <li>McGaugh, S.S., Lelli, F. and Schombert, J.M. (2016) ‘Radial acceleration relation in rotationally supported galaxies’, <i>Physical Review Letters</i>, 117(20), 201101. <a href="https://doi.org/10.1103/PhysRevLett.117.201101" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.117.201101</a></li>
+          <li>McGaugh, S.S. and Schombert, J.M. (2014) ‘Color–mass-to-light-ratio relations for disk galaxies’, <i>The Astronomical Journal</i>, 148(5), 77. <a href="https://doi.org/10.1088/0004-6256/148/5/77" target="_blank" rel="noopener">doi:10.1088/0004-6256/148/5/77</a></li>
+          <li>Milgrom, M. (1983) ‘A modification of the Newtonian dynamics as a possible alternative to the hidden mass hypothesis’, <i>The Astrophysical Journal</i>, 270, p. 365. <a href="https://doi.org/10.1086/161130" target="_blank" rel="noopener">doi:10.1086/161130</a></li>
+          <li>Moster, B.P., Naab, T. and White, S.D.M. (2013) ‘Galactic star formation and accretion histories from matching galaxies to dark matter haloes’, <i>Monthly Notices of the Royal Astronomical Society</i>, 428(4), pp. 3121–3138. <a href="https://doi.org/10.1093/mnras/sts261" target="_blank" rel="noopener">doi:10.1093/mnras/sts261</a></li>
+          <li>Navarro, J.F., Frenk, C.S. and White, S.D.M. (1996) ‘The structure of cold dark matter halos’, <i>The Astrophysical Journal</i>, 462, p. 563. <a href="https://doi.org/10.1086/177173" target="_blank" rel="noopener">doi:10.1086/177173</a></li>
+          <li>Planck Collaboration (2020) ‘Planck 2018 results. VI. Cosmological parameters’, <i>Astronomy &amp; Astrophysics</i>, 641, A6. <a href="https://doi.org/10.1051/0004-6361/201833910" target="_blank" rel="noopener">doi:10.1051/0004-6361/201833910</a></li>
+          <li>Rubin, V.C., Ford, W.K. and Thonnard, N. (1980) ‘Rotational properties of 21 Sc galaxies with a large range of luminosities and radii, from NGC 4605 (R = 4 kpc) to UGC 2885 (R = 122 kpc)’, <i>The Astrophysical Journal</i>, 238, p. 471. <a href="https://doi.org/10.1086/158003" target="_blank" rel="noopener">doi:10.1086/158003</a></li>
+          <li>Williams, D.R. (2024) <i>Planetary fact sheet</i>. NASA Goddard Space Flight Center. <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener">nssdc.gsfc.nasa.gov/planetary/factsheet</a></li>
+          <li>Zwicky, F. (1933) ‘Die Rotverschiebung von extragalaktischen Nebeln’, <i>Helvetica Physica Acta</i>, 6, pp. 110–127. English translation (2009): ‘The redshift of extragalactic nebulae’, <i>General Relativity and Gravitation</i>, 41(1), pp. 207–224. <a href="https://doi.org/10.1007/s10714-008-0707-4" target="_blank" rel="noopener">doi:10.1007/s10714-008-0707-4</a></li>
+        </ul>
+        <p>Each link opens the published source in a new tab.</p>
+      </section>
       <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
     </footer>
   </main>
@@ -1269,16 +1404,21 @@ __GALAXIES_JS__
            galaxy, so the rest of the page reads radii / vObs / vBary without knowing which galaxy is active. */
         const mlState={disk:DATA.upsilon_disk,bulge:DATA.upsilon_bulge};
         let rotationRows=[],radii=[],vObs=[],obsV=[],obsErr=[],vBary=[];
-        const baryonsFor=(ud,ub)=>customActive&&customModel
-            ?rotationRows.map(p=>Math.sqrt(customModel.vSq(p.radius_kpc)))
-            :rotationRows.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
-        function loadGalaxyData(galaxy){
+        function sparcRowsOf(galaxy){
             const t=galaxy.rotation;
-            rotationRows=t.radius_kpc.map((radius,i)=>{
+            return t.radius_kpc.map((radius,i)=>{
                 const gas=t.v_gas_kms[i];
                 return{radius_kpc:radius,observed_kms:Math.abs(t.v_obs_kms[i]),error_kms:Math.abs(t.v_obs_err_kms[i]),
                     gas_kms:Math.abs(gas),gas_sq:gas*Math.abs(gas),disk_kms:Math.abs(t.v_disk_kms[i]),bulge_kms:Math.abs(t.v_bulge_kms[i])};
             });
+        }
+        // Visible-matter speed at each SPARC row for the given disk and bulge mass-to-light ratios (the gas term keeps its sign).
+        const sparcBaryons=(rows,ud,ub)=>rows.map(p=>Math.sqrt(Math.max(0,p.gas_sq+ud*p.disk_kms**2+ub*p.bulge_kms**2)));
+        const baryonsFor=(ud,ub)=>customActive&&customModel
+            ?rotationRows.map(p=>Math.sqrt(customModel.vSq(p.radius_kpc)))
+            :sparcBaryons(rotationRows,ud,ub);
+        function loadGalaxyData(galaxy){
+            rotationRows=sparcRowsOf(galaxy);
             radii=rotationRows.map(p=>p.radius_kpc);
             vObs=rotationRows.map(p=>p.observed_kms);
             obsV=vObs.slice();
@@ -2389,7 +2529,23 @@ __GALAXIES_JS__
     const initialHalo=haloCurve(DEFAULTS.massT,DEFAULTS.scaleRadius);
     const totalCurve=vBary.map((v,i)=>Math.hypot(v,initialHalo[i]));
     // χ² needs measured speeds, so the badge is hidden for the imaginary sandbox galaxy.
-    function updateChi(total){const b=document.getElementById('chiBadge');b.hidden=customActive;document.getElementById('tmChiRow').hidden=customActive;if(customActive)return;const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),dof=Math.max(1,obsV.length-2),red=chi/dof;b.textContent='χ² '+chi.toFixed(0)+' · χ²ᵣ '+red.toFixed(2);b.className=red<2?'good':red<10?'ok':'poor';const fc=document.getElementById('tm-chi');fc.textContent=red.toFixed(2);fc.className=b.className;}
+    // Reduced chi-squared divides by N - k, where k counts the values tuned to the galaxy: the halo's mass and scale
+    // radius (NFW), nothing (visible matter only, or MOND with its universal a0), or a0 and the disk M/L (MOND best fit).
+    const FITTED_VALUES={visible:0,nfw:2,mond:0,mondBest:2};
+    const reducedChi=(chi,pointCount,model)=>chi/Math.max(1,pointCount-FITTED_VALUES[model]);
+    const activeFitModel=()=>mondMode?(document.getElementById('mondFitToggle').checked?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
+    // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
+    const fitVerdict=red=>red<2?{cls:'good',word:'Close fit'}:red<10?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
+    function updateChi(total){
+      const b=document.getElementById('chiBadge');
+      b.hidden=customActive;document.getElementById('tmChiRow').hidden=customActive;
+      if(customActive)return;
+      const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,activeFitModel()),verdict=fitVerdict(red);
+      document.getElementById('chiVerdict').textContent=verdict.word;
+      document.getElementById('chiNumbers').innerHTML='χ² '+chi.toFixed(0)+' · χ²<sub>r</sub> '+red.toFixed(2);
+      b.className=verdict.cls;
+      const fc=document.getElementById('tm-chi');fc.textContent=red.toFixed(2);fc.className=verdict.cls;
+    }
     const residualsOf=total=>obsV.map((v,i)=>v-total[i]);
     const AXIS={gridcolor:'rgba(148,170,200,0.08)',gridwidth:1,zerolinecolor:'rgba(148,170,200,0.3)',linecolor:'rgba(148,170,200,0.32)',showline:true,mirror:false,tickcolor:'rgba(148,170,200,0.32)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#8e9db3',family:'JetBrains Mono,ui-monospace,Consolas,monospace'},title:{font:{size:12,color:'#b8c4d6'}}};
     // Residual bars are about half the mean spacing of the SPARC radii, so dense and sparse curves both read clearly.
@@ -2761,23 +2917,26 @@ __GALAXIES_JS__
     }
     const mondToggle=document.getElementById('mondToggle'),mondFitToggle=document.getElementById('mondFitToggle');
     // Grid search over a0 and the disk M/L (bulge M/L stays fixed) for the lowest chi-squared.
-    let mondBest=null;
-    function findMondBestFit(){
-      if(mondBest)return mondBest;
-      let best={chi:Infinity,disk:mlState.disk,a0:MOND_A0_DEFAULT};
+    // The result is kept per preset galaxy, so the scorecard and the MOND best fit switch share one search.
+    const mondBestFits={};
+    function mondBestFitOf(galaxy){
+      if(mondBestFits[galaxy.id])return mondBestFits[galaxy.id];
+      const rows=sparcRowsOf(galaxy);
+      let best={chi:Infinity,disk:DATA.upsilon_disk,a0:MOND_A0_DEFAULT};
       for(let ud=0.05;ud<=1.5001;ud+=0.01){
-        const vb=baryonsFor(ud,DATA.upsilon_bulge);
+        const vb=sparcBaryons(rows,ud,DATA.upsilon_bulge);
         for(let a0=0.3e-10;a0<=4e-10;a0+=0.01e-10){
           let chi=0;
-          for(let i=0;i<vb.length;i++){const d=(obsV[i]-mondVelocity(vb[i],radii[i],a0))/obsErr[i];chi+=d*d;}
+          for(let i=0;i<vb.length;i++){const d=(rows[i].observed_kms-mondVelocity(vb[i],rows[i].radius_kpc,a0))/rows[i].error_kms;chi+=d*d;}
           if(chi<best.chi)best={chi,disk:ud,a0};
         }
       }
-      return mondBest=best;
+      return mondBestFits[galaxy.id]=best;
     }
+    const formatA0=a0=>{const e=Math.floor(Math.log10(a0));return `${(a0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;};
     function applyBaryonState(){
       // A custom galaxy is built from masses, so mass-to-light ratios and the MOND best fit (which tunes them) do not apply.
-      const fit=mondMode&&!customActive&&mondFitToggle.checked,best=fit?findMondBestFit():null;
+      const fit=mondMode&&!customActive&&mondFitToggle.checked,best=fit?mondBestFitOf(activeGalaxy):null;
       mlState.disk=fit?best.disk:DATA.upsilon_disk;
       MOND_A0=fit?best.a0:MOND_A0_DEFAULT;
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
@@ -2788,8 +2947,7 @@ __GALAXIES_JS__
       document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
-      const e=Math.floor(Math.log10(MOND_A0));
-      document.getElementById('mondA0Text').textContent=`${(MOND_A0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;
+      document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
     }
     mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
     // "?" on the M/L tile: a mouse hover fades the explainer in and moving away fades it out
@@ -2914,7 +3072,6 @@ __GALAXIES_JS__
       customActive=false;customGridRmax=null;
       activeGalaxy=galaxy;
       DEFAULTS=haloDefaultsOf(galaxy);
-      mondBest=null; // a cached MOND fit belongs to the previous galaxy
       loadGalaxyData(galaxy);
       applyBaryonState();
       configureHaloSliders();
@@ -2988,7 +3145,7 @@ __GALAXIES_JS__
       updateHalo();clearTimeout(orbitModelTimer);
     }
     function activateCustom(){
-      customActive=true;haloFine=1;rsManual=false;mondBest=null;
+      customActive=true;haloFine=1;rsManual=false;
       applyModeLabels();
       simTime=0;window.simTime=0;syncTimelineUI(0);
       rebuildCustomGalaxy({replot:true});
@@ -3009,6 +3166,85 @@ __GALAXIES_JS__
       loadPreset(galaxy);
     }
     galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
+
+    /* ---------- Scorecard ----------
+       Every preset galaxy scored under each model with the page's own functions: visible matter only, the starting
+       NFW halo (Apply Observed Fit), MOND at the default a0, and the MOND best fit. The numbers match the fit badge. */
+    function scoreGalaxy(galaxy){
+      const rows=sparcRowsOf(galaxy),vBar=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
+      const chiOf=model=>rows.reduce((s,p,i)=>s+((p.observed_kms-model[i])/p.error_kms)**2,0);
+      const halo=nfwVelocityModel(galaxy.default_halo.m200_msun,galaxy.default_halo.scale_radius_kpc);
+      const best=mondBestFitOf(galaxy);
+      return{pointCount:rows.length,best,chi:{
+        visible:chiOf(vBar),
+        nfw:chiOf(rows.map((p,i)=>Math.hypot(vBar[i],halo(p.radius_kpc)))),
+        mond:chiOf(rows.map((p,i)=>mondVelocity(vBar[i],p.radius_kpc,MOND_A0_DEFAULT))),
+        mondBest:best.chi}};
+    }
+    function scoreRowHtml(galaxy){
+      const score=scoreGalaxy(galaxy);
+      const cell=(model,note='')=>{
+        const red=reducedChi(score.chi[model],score.pointCount,model),verdict=fitVerdict(red);
+        const miss=Math.sqrt(score.chi[model]/score.pointCount); // root-mean-square gap, in error bars
+        return `<td><span class="score ${verdict.cls}">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word}: about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off per point</small><small>χ² = ${score.chi[model].toFixed(0)}</small>${note}</td>`;
+      };
+      const tuned=`<small>a₀ = ${(score.best.a0/1e-10).toFixed(2)}×10⁻¹⁰ m/s² (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · disk M/L = ${score.best.disk.toFixed(2)} (standard ${DATA.upsilon_disk.toFixed(2)})</small>`;
+      return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfw')}${cell('mond')}${cell('mondBest',tuned)}</tr>`;
+    }
+    const scoreBody=document.getElementById('scoreBody');
+    // One galaxy per timer tick, so the MOND grid searches never hold up the page.
+    function renderScorecard(){
+      const galaxies=Object.values(GALAXIES),rows=[];
+      document.getElementById('scoreCount').textContent=String(galaxies.length);
+      document.getElementById('scoreMl').textContent=`${DATA.upsilon_disk} (disk) and ${DATA.upsilon_bulge} (bulge)`;
+      (function next(){
+        if(rows.length<galaxies.length){rows.push(scoreRowHtml(galaxies[rows.length]));setTimeout(next,0);return;}
+        scoreBody.innerHTML=rows.join('');
+      })();
+    }
+    setTimeout(renderScorecard,400);
+    scoreBody.addEventListener('click',e=>{
+      const button=e.target.closest('.score-show');
+      if(!button)return;
+      if(customActive)setGalaxyMode('preset');
+      galaxySelect.value=button.dataset.galaxy;
+      selectGalaxy(button.dataset.galaxy);
+      document.getElementById('results').scrollIntoView();
+    });
+
+    /* ---------- The puzzle figure ----------
+       The default galaxy's real SPARC speeds against the speed its visible matter predicts, drawn once as an SVG.
+       The colours match the rotation-curve plot; the shaded gap is a visual aid only. */
+    function drawPuzzleFigure(){
+      const galaxy=GALAXIES[DATA.default_galaxy_id],rows=sparcRowsOf(galaxy),vBar=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
+      const n=rows.length,outer=rows[n-1],W=400,H=250,LEFT=44,RIGHT=12,TOP=14,BOTTOM=38;
+      const rMax=outer.radius_kpc*1.04,vMax=Math.max(...rows.map(p=>p.observed_kms+p.error_kms))*1.14;
+      const x=r=>LEFT+(W-LEFT-RIGHT)*r/rMax,y=v=>H-BOTTOM-(H-TOP-BOTTOM)*v/vMax,f=value=>value.toFixed(1);
+      const tickStep=(max,target)=>{const raw=max/target,pow=10**Math.floor(Math.log10(raw));return [1,2,5,10].map(m=>m*pow).find(step=>step>=raw);};
+      const ticks=(max,target)=>{const step=tickStep(max,target),out=[];for(let t=0;t<=max;t+=step)out.push(t);return out;};
+      const axis='#96a5ba',white='#f4f7fb',cyan='#5fd0e0',gold='#e9c88a';
+      let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Rotation curve of ${galaxy.name}: measured speeds stay near ${Math.round(outer.observed_kms)} km/s out to ${Math.round(outer.radius_kpc)} kpc, while the speed expected from visible matter falls to ${Math.round(vBar[n-1])} km/s">`;
+      ticks(vMax,4).forEach(v=>{svg+=`<path d="M${LEFT} ${f(y(v))}H${W-RIGHT}" stroke="${axis}" stroke-opacity="${v?0.14:0.5}"/><text x="${LEFT-6}" y="${f(y(v)+4)}" text-anchor="end" fill="${axis}">${v}</text>`;});
+      ticks(rMax,5).forEach(r=>{svg+=`<path d="M${f(x(r))} ${H-BOTTOM}v4" stroke="${axis}" stroke-opacity=".5"/><text x="${f(x(r))}" y="${H-BOTTOM+17}" text-anchor="middle" fill="${axis}">${r}</text>`;});
+      svg+=`<text x="${(LEFT+W-RIGHT)/2}" y="${H-4}" text-anchor="middle" fill="${axis}">Distance from the centre (kpc)</text><text x="12" y="${(TOP+H-BOTTOM)/2}" text-anchor="middle" fill="${axis}" transform="rotate(-90 12 ${(TOP+H-BOTTOM)/2})">Orbital speed (km/s)</text>`;
+      // Shade the gap from the last radius where the visible matter still keeps up with the measured speed.
+      let from=0;
+      rows.forEach((p,i)=>{if(p.observed_kms<=vBar[i])from=Math.min(i+1,n-1);});
+      const top=rows.slice(from).map(p=>`${f(x(p.radius_kpc))},${f(y(p.observed_kms))}`),bottom=rows.slice(from).map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[from+i]))}`).reverse();
+      svg+=`<polygon points="${top.concat(bottom).join(' ')}" fill="${gold}" fill-opacity=".13"/>`;
+      svg+=`<polyline points="${rows.map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[i]))}`).join(' ')}" fill="none" stroke="${cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      rows.forEach(p=>{svg+=`<path d="M${f(x(p.radius_kpc))} ${f(y(p.observed_kms-p.error_kms))}V${f(y(p.observed_kms+p.error_kms))}" stroke="${white}" stroke-opacity=".55"/><circle cx="${f(x(p.radius_kpc))}" cy="${f(y(p.observed_kms))}" r="2.4" fill="${white}"/>`;});
+      const mid=rows[Math.max(from,Math.round(0.7*(n-1)))],midBar=vBar[rows.indexOf(mid)];
+      svg+=`<text x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
+      svg+=`<text x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
+      svg+=`<text x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
+      document.getElementById('puzzleChart').innerHTML=svg;
+      const ratio=(outer.observed_kms/vBar[n-1])**2;
+      document.getElementById('puzzleObs').textContent=`${Math.round(outer.observed_kms)} km/s`;
+      document.getElementById('puzzleBar').textContent=`${Math.round(vBar[n-1])} km/s`;
+      document.getElementById('puzzleRatio').textContent=ratio<3?ratio.toFixed(1):String(Math.round(ratio));
+    }
+    drawPuzzleFigure();
 
     const timeSlider=document.getElementById('timeSlider');
     function setPlaying(isPlaying){
@@ -3218,7 +3454,7 @@ __GALAXIES_JS__
          action:'Hover over any of the cards in the blue ring (or tap one on a touch screen) to read what it means.'},
         {id:'fit',nfw:true,target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:Watch χ² (lower is better)'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale},doneText:'Both sliders tried: compare χ² now with where it started.',
-         text:'χ² (chi-squared), in the yellow-ringed badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better. The residual bars under the graph show each gap.',
+         text:'χ² (chi-squared), in the yellow-ringed badge above the graph, scores the fit: it adds up the gaps between the orange line and the white points. Lower is better, and the badge sums it up in words: close, rough or poor fit. The residual bars under the graph show each gap.',
          action:'1. Drag Halo mass a little either way and watch χ² change. 2. Do the same with Scale radius. Can you get χ² lower than it started? Apply Observed Fit puts the starting fit back.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter at all. Instead, gravity is stronger than Newton’s law predicts where it is very weak, as in the outer galaxy. The halo sliders switch off.',
@@ -3903,6 +4139,7 @@ __GALAXIES_JS__
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
     document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
     tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
+    document.getElementById('puzzleTour').addEventListener('click',()=>tutorialLaunch.click());
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
     tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0)goTutorialStep(tutorialIndex-1,-1);});
     tutorialNext.addEventListener('click',()=>{

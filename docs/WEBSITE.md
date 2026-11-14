@@ -4,6 +4,18 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 (the page's HTML, CSS and JavaScript are in `HTML_TEMPLATE`). The equations are
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
+Page order: The puzzle, Model setup, Simulation, Scorecard, Background, Method & sources
+(the top menu links to each).
+
+The puzzle section opens the page, before any control. Four numbered steps
+explain what a rotation curve is, what astronomers expected (with the Solar
+System as the comparison), what they measured, and the two possible answers.
+Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
+speeds against the speed its visible matter predicts, with the gap between them
+shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
+the outermost point, are read from the data, not typed in. The shading is a
+visual aid only. "Take the guided tour" starts the tutorial.
+
 The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
 the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
@@ -175,6 +187,29 @@ The View controls start collapsed. The rotation-curve guide combines the
 colour key and fit explanation. Select it or a theory box to open it. Halo
 values reveal their explanations on hover or when selected with a mouse, touch,
 or keyboard.
+
+Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
+fit") sits in front of χ² and χ²ᵣ. The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
+are the site's own rule of thumb (`fitVerdict`), and the guide under the graph
+says so. χ²ᵣ divides by the measured points minus the values tuned to the galaxy
+(`FITTED_VALUES`: NFW halo 2, visible matter only 0, MOND 0, MOND best fit 2);
+see PHYSICS.md.
+
+Scorecard: a table scoring every preset galaxy under visible matter only, the
+starting NFW halo (Apply Observed Fit), MOND at the default a₀, and the MOND
+best fit, which also shows its fitted a₀ and disk M/L beside the standard
+values. Under each score it gives the root-mean-square gap in plain words
+("about 1.2 error bars off per point", √(χ²/N)). It is calculated in the page when it loads (`scoreGalaxy`), with the
+same functions as the fit badge, so the two always agree. "Show in simulator"
+loads that galaxy (leaving the sandbox if needed). The notes underneath state
+what limits the comparison; they do not say which idea wins.
+
+Background has a third, full-width box, "Beyond rotation curves: the wider
+evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
+and the radial acceleration relation, each with its source and a tag for the
+idea it points to. Method & sources ends with a Harvard reference list of every
+source cited on the page, each linked by DOI (checked against Crossref on
+14 Nov 2026).
 
 Rotation-curve readout: hovering over the graph (or, on a touch screen, tapping
 it or sliding a finger along it) shows a box with the speeds at the nearest

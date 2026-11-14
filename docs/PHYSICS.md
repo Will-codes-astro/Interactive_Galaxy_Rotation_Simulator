@@ -100,12 +100,22 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
 
 ## Goodness of fit
 
-χ² = Σᵢ [(V_obs,i − V_model,i) / σᵢ]²,  χ²_ν = χ² / (N − 2)
+χ² = Σᵢ [(V_obs,i − V_model,i) / σᵢ]²,  χ²_ν = χ² / (N − k)
+
+k is the number of values tuned to the galaxy (`FITTED_VALUES`, `reducedChi`,
+page JS): 2 for the NFW halo (M₂₀₀, r_s), 0 for visible matter only (halo mass
+slider at 0), 0 for MOND at the default a₀, and 2 for the MOND best fit (a₀ and
+Υ_disk). Will chose this rule on 14 Nov 2026 so that the two models are compared
+fairly; before that the page used N − 2 in every mode. A halo set by hand with
+the sliders still counts as k = 2.
 
 This is calculated only at measured SPARC radii and only for preset galaxies
-(`updateChi`, page JS). `analysis/baryonic_baseline.py` uses dof = N instead
-(there are no free parameters in a baryonic-only model). The two numbers are
-therefore not directly comparable.
+(`updateChi` for the fit badge, `scoreGalaxy` for the scorecard).
+`analysis/baryonic_baseline.py` also uses dof = N for its baryonic-only model.
+
+**Fit verdict**: the words "Close fit" (χ²_ν < 2), "Rough fit" (2–10) and "Poor
+fit" (> 10) come from `fitVerdict`. The cut-offs are a rule of thumb for this
+site, not a published standard, and the page says so.
 
 ## Test-star orbits (website)
 
@@ -147,9 +157,9 @@ plotting scripts and the Blender model, **not** by the website.
 
 These are documented here, not changed. Any change needs Will's decision.
 
-1. χ²_ν uses dof = N − 2 on the page (also in MOND and visible-only modes) but
-   dof = N in `baryonic_baseline.py`. The NFW starting fit uses a 1 km/s error
-   floor and the page χ² does not.
+1. The NFW starting fit uses a 1 km/s error floor and the page χ² does not.
+   The starting fit also keeps Υ fixed and stays inside the slider ranges, so
+   it is not the best possible NFW fit (the scorecard notes say this).
 2. The halo mass is truncated at r₂₀₀ (see NFW above).
 3. In MOND mode, the site's CSV export puts the MOND boost in the `V_nfw_halo`
    column.

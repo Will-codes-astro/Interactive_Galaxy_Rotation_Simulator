@@ -88,7 +88,7 @@ const exportApi = `
   activeHaloMassT: () => activeHaloMassT,
   setMond: on => { mondMode = on; },
   mondVelocity, nfwVelocityModel, baryonicVelocity,
-  modelCurves, starCountFor,
+  modelCurves, starCountFor, reducedChi,
   defaults: () => DEFAULTS, frameCount, MOND_A0,
   particles: () => particles,
   galaxy: () => activeGalaxy,
@@ -113,10 +113,11 @@ function run(massT, rs) {
 }
 const meanShift = (a, b) => a.reduce((s, p, i) => s + Math.hypot(p[0] - b[i][0], p[1] - b[i][1], p[2] - b[i][2]), 0) / a.length;
 const median = xs => { const s = [...xs].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
-function reducedChi(total) {
+// model names the page's fit model ('visible', 'nfw', 'mond'), which sets how many tuned values are subtracted from N.
+function reducedChi(total, model) {
   const { v, err } = P.obs();
   const chi = v.reduce((s, x, i) => s + ((x - total[i]) / err[i]) ** 2, 0);
-  return chi / Math.max(1, v.length - 2);
+  return P.reducedChi(chi, v.length, model);
 }
 
 /* ---------- Measurements ---------- */
@@ -155,8 +156,8 @@ out.negative_gas_points = negativeGasPoints;
 out.baryonic_worst_relative_mismatch = worstGasMismatch;
 
 // Goodness of fit.
-out.reduced_chi2_visible_only = reducedChi(P.modelCurves(0, d.scaleRadius).total);
-out.reduced_chi2_nfw_default = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total);
+out.reduced_chi2_visible_only = reducedChi(P.modelCurves(0, d.scaleRadius).total, 'visible');
+out.reduced_chi2_nfw_default = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total, 'nfw');
 
 // MOND.
 out.mond_a0 = P.MOND_A0;
@@ -164,7 +165,7 @@ P.setMond(true);
 const mondA = run(d.massT, d.scaleRadius), mondB = run(d.massT * 3, d.scaleRadius + 10);
 out.mond_halo_mass_used = mondA.haloMassT;
 out.mond_shift_when_halo_sliders_move = meanShift(mondA.final, mondB.final);
-out.reduced_chi2_mond = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total);
+out.reduced_chi2_mond = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total, 'mond');
 P.setMond(false);
 // Deep-MOND limit: g -> sqrt(gN * a0), so v^4 -> vN^2 * a0 * r.
 {
@@ -185,8 +186,8 @@ for (const id of ['NGC2403', 'NGC7331']) {
     P.selectGalaxy(id);
     const dd = P.defaults();
     out.presets[id] = {
-      reduced_chi2_visible_only: reducedChi(P.modelCurves(0, dd.scaleRadius).total),
-      reduced_chi2_nfw_default: reducedChi(P.modelCurves(dd.massT, dd.scaleRadius).total),
+      reduced_chi2_visible_only: reducedChi(P.modelCurves(0, dd.scaleRadius).total, 'visible'),
+      reduced_chi2_nfw_default: reducedChi(P.modelCurves(dd.massT, dd.scaleRadius).total, 'nfw'),
     };
   } catch (e) {
     out.presets[id] = { error: String(e) };
