@@ -41,6 +41,9 @@ HALO_SCALE_RANGE_KPC = (5.0, 60.0)  # the scale-radius slider's range
 FIT_GRID_POINTS = 5
 FIT_STARTS = 4
 FIT_TOLERANCE = 1e-4
+# Values each model tunes to a galaxy, before the galaxy settings a best fit also tunes (its fit record's
+# tuned_settings). k in chi2_r = chi2 / (N - k). The page's chi2_r and the Method text both come from this.
+MODEL_TUNED_VALUES = {"visible": 0, "nfw": 2, "mond": 0, "mondBest": 1}
 
 
 class GalaxyPreset(NamedTuple):
@@ -375,6 +378,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .fit-toggle input:focus-visible ~ .track { outline:2px solid var(--cyan); outline-offset:2px; }
     .fit-toggle input:checked ~ .fit-label { color:var(--ink); }
     .ml-pair { display:flex; gap:16px; }
+    .ml-source { display:block; margin-top:2px; color:var(--muted); font-size:10px; letter-spacing:.02em; }
     .ml-pair span { display:block; font-size:10px; font-weight:400; color:var(--muted); letter-spacing:.06em; }
     .ml-col { position:relative; }
     .stat.ml .stat-label { display:flex; align-items:center; justify-content:space-between; gap:8px; }
@@ -1018,7 +1022,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
-        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div></div>
+        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
         <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
           <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
           <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
@@ -1156,7 +1160,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </div>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
-        <li><b>Tuned values</b>The halo has two values fitted to each galaxy; plain MOND has none. χ<sup>2</sup><sub>r</sub> subtracts the tuned values from the number of points, so extra freedom is not free.</li>
+        <li><b>Tuned values</b>Visible matter only and plain MOND tune nothing. The halo adds 2 values (its mass and size) and MOND best fit adds 1 (a<sub>0</sub>). Both best fits also tune the galaxy’s M/L, distance and tilt, so in total the halo’s best fit tunes __K_NFW_FIT__ and MOND’s best fit __K_MOND_FIT__. χ<sup>2</sup><sub>r</sub> subtracts the tuned values from the number of points, so extra freedom is not free.</li>
         <li><b>Realistic limits</b>Both best fits may only use believable values: mass-to-light ratios that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s measurement errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A fit that stops at a limit is the honest result: that model would need something unrealistic to do better.</li>
         <li><b>MOND’s best case</b>MOND best fit lets a<sub>0</sub> vary between 0.96 and 1.44 × 10⁻¹⁰ m/s², the measured value and its uncertainty (McGaugh, Lelli &amp; Schombert 2016), although MOND says a<sub>0</sub> is universal (Milgrom 1983). Check the fitted values, not just the score.</li>
         <li><b>Error bars</b>Scores use SPARC’s uncertainty on each speed. Errors in a galaxy’s distance and tilt shift its whole curve, so the best fits allow for them; the other two columns use SPARC’s values.</li>
@@ -1242,11 +1246,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     <footer>
       <dl class="method-grid">
         <div data-preset-only><dt>Data</dt><dd>Measured speeds V<sub>obs</sub> ± σ and the gas, disk and bulge speeds at each radius, from SPARC (Lelli, McGaugh &amp; Schombert 2016), read from the project’s table2.dat.</dd></div>
-        <div><dt>Visible matter</dt><dd><span id="footerModel"><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></math></span>The numbers are the disk and bulge M/L ratios.</span><span id="footerCustom" hidden><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></math></span>From exponential disks and a Hernquist bulge.</span></dd></div>
+        <div><dt>Visible matter</dt><dd><span id="footerModel"><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></math></span>The numbers are the disk and bulge M/L ratios now in use: <b id="ftMlSource">standard SPARC values</b>. SPARC’s standard values are 0.50 and 0.70 (McGaugh &amp; Schombert 2014); the best fits may change them within realistic limits.</span><span id="footerCustom" hidden><span class="eq"><math display="block"><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></math></span>From exponential disks and a Hernquist bulge.</span></dd></div>
         <div><dt>Dark matter</dt><dd>NFW halo (Navarro, Frenk &amp; White 1996), set by M<sub>200</sub> and r<sub>s</sub>. Model speed:<span class="eq"><math display="block"><msubsup><mi>V</mi><mi>model</mi><mn>2</mn></msubsup><mo>=</mo><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></math></span></dd></div>
         <div><dt>MOND</dt><dd>No halo (Milgrom 1983). a<sub>0</sub> = 1.2×10⁻¹⁰ m/s².<span class="eq"><math display="block"><mi>μ</mi><mo>(</mo><mfrac><mi>g</mi><msub><mi>a</mi><mn>0</mn></msub></mfrac><mo>)</mo><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>,</mo><mspace width="1em"/><mi>μ</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mi>x</mi><msqrt><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></msqrt></mfrac></math></span></dd></div>
         <div><dt>Simulation</dt><dd>Massless test stars (800 for the presets) moved by Velocity-Verlet steps, 2 per Myr, over 1 Gyr.</dd></div>
-        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="1em"/><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span>for N measured points and k values tuned to the galaxy: 2 for the NFW halo (M<sub>200</sub>, r<sub>s</sub>), 0 for MOND, 2 for MOND best fit (a<sub>0</sub>, disk M/L).</dd></div>
+        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup><mo>,</mo><mspace width="1em"/><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span>for N measured points and k values tuned to the galaxy. Visible matter only and plain MOND use SPARC’s standard values, so k = 0. Each best fit also tunes the galaxy’s disk M/L (and bulge M/L if it has a bulge), its distance (within __FIT_LIMIT_SIGMA__× SPARC’s error) and its tilt (inclination, within __FIT_LIMIT_SIGMA__× SPARC’s error). So k = __K_NFW_FIT__ for the NFW best fit (M<sub>200</sub> and r<sub>s</sub> plus those) and __K_MOND_FIT__ for the MOND best fit (a<sub>0</sub> plus those). A halo set by hand with the sliders counts its 2 values.</dd></div>
       </dl>
       <section class="refs" id="references" aria-labelledby="refsTitle">
         <h3 id="refsTitle">References</h3>
@@ -2715,7 +2719,7 @@ __GALAXIES_JS__
     // Reduced chi-squared divides by N - k, where k counts the values tuned to the galaxy: the halo's mass and scale
     // radius (NFW) or a0 (MOND best fit), plus the galaxy settings a best fit tunes (disk M/L, bulge M/L where there is
     // a bulge, distance and tilt). Visible matter only and plain MOND use SPARC's standard values and tune nothing.
-    const MODEL_VALUES={visible:0,nfw:2,mond:0,mondBest:1};
+    const MODEL_VALUES=DATA.model_tuned_values; // MODEL_TUNED_VALUES in the generator
     const tunedCount=(model,fit)=>MODEL_VALUES[model]+(fit?fit.tuned_settings:0);
     const reducedChi=(chi,pointCount,k)=>chi/Math.max(1,pointCount-k);
     // The best fit in use: Apply Observed Fit (until Visible Matter Only) in NFW mode, or the MOND best fit switch.
@@ -3127,6 +3131,10 @@ __GALAXIES_JS__
       document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
+      const mlSource=fit?(mondMode?'MOND best fit':'NFW best fit'):'standard SPARC values';
+      document.getElementById('mlSource').textContent=mlSource;
+      document.getElementById('ftMlSource').textContent=mlSource;
+      mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). The best fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
       document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
     }
     mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
@@ -4458,6 +4466,15 @@ def join_names(names: list[str]) -> str:
     return ", ".join(names[:-1]) + " and " + names[-1]
 
 
+def tuned_count_text(galaxies: list[dict[str, Any]], model: str, fit_key: str) -> str:
+    """k for one best fit across the presets, e.g. '5 (6 for NGC 7331)'. Matches tunedCount (page JS)."""
+    counts = {g["name"]: MODEL_TUNED_VALUES[model] + g["best_fit"][fit_key]["tuned_settings"] for g in galaxies}
+    usual = max(set(counts.values()), key=list(counts.values()).count)
+    others = sorted({k for k in counts.values() if k != usual})
+    extra = "; ".join(f"{k} for {join_names([n for n, c in counts.items() if c == k])}" for k in others)
+    return f"{usual} ({extra})" if extra else str(usual)
+
+
 def main() -> None:
     if not SPARC_PATH.is_file():
         raise FileNotFoundError(f"Missing SPARC table: {SPARC_PATH}")
@@ -4471,6 +4488,7 @@ def main() -> None:
         "upsilon_bulge": UPSILON_BULGE,
         "default_galaxy_id": DEFAULT_PRESET.sparc_id,
         "stable_concentration": list(STABLE_CONCENTRATION),
+        "model_tuned_values": MODEL_TUNED_VALUES,
         "particle_model": {
             "base_count": BASE_STAR_COUNT,
             "min_count": MIN_STAR_COUNT,
@@ -4491,6 +4509,9 @@ def main() -> None:
         "__GALAXY_NAMES__", escape(join_names([preset.name for preset in GALAXY_PRESETS]))
     )
     html = html.replace("__FRAME_MAX__", "1000")
+    html = html.replace("__K_NFW_FIT__", escape(tuned_count_text(galaxies, "nfw", "nfw")))
+    html = html.replace("__K_MOND_FIT__", escape(tuned_count_text(galaxies, "mondBest", "mond")))
+    html = html.replace("__FIT_LIMIT_SIGMA__", f"{FIT_LIMIT_SIGMA:g}")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")

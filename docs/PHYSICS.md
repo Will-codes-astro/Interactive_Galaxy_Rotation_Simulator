@@ -142,8 +142,9 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
 
 χ² = Σᵢ [(V_obs,i − V_model,i) / σᵢ]²,  χ²_ν = χ² / (N − k)
 
-k is the number of values tuned to the galaxy (`tunedCount`, `reducedChi`,
-page JS): 2 for the NFW halo (M₂₀₀, r_s) or 1 for the MOND best fit (a₀), plus
+k is the number of values tuned to the galaxy (`MODEL_TUNED_VALUES` in the
+generator, read by `tunedCount` and `reducedChi` in page JS, and by
+`tuned_count_text` for the k values quoted on the page): 2 for the NFW halo (M₂₀₀, r_s) or 1 for the MOND best fit (a₀), plus
 the galaxy settings a best fit tunes (`tuned_settings`: Υ_disk, D, i, and
 Υ_bulge where there is a bulge). Visible matter only and MOND at the default a₀
 use SPARC's values, so k = 0. So the NFW best fit has k = 5 (6 with a bulge) and

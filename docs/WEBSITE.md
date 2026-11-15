@@ -208,8 +208,10 @@ the halo mass is first moved to zero; skipping the tutorial makes it available.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
 the scale radius and returns to SPARC's standard M/L, distance and tilt; Apply
 Observed Fit restores the best realistic NFW fit (halo, M/L, distance and tilt).
-The M/L tile shows the values in use, and the fit badge's tooltip names the
-fit's distance and tilt.
+The M/L tile shows the values in use and, under them, where they come from
+("standard SPARC values", "NFW best fit" or "MOND best fit"); the Method page's
+visible-matter formula shows the same numbers and label. The fit badge's tooltip
+names the fit's distance and tilt.
 The View controls start collapsed. The rotation-curve guide combines the
 colour key and fit explanation. Select it or a theory box to open it. Halo
 values reveal their explanations on hover or when selected with a mouse, touch,
@@ -220,7 +222,10 @@ fit") sits in front of χ² and χ²ᵣ. The cut-offs (χ²ᵣ below 2, 2 to 10,
 are the site's own rule of thumb (`fitVerdict`), and the guide under the graph
 says so. χ²ᵣ divides by the measured points minus the values tuned to the galaxy
 (`tunedCount`: the halo's 2 or a₀'s 1, plus the M/L, distance and tilt values a
-best fit tunes; visible matter only and plain MOND 0); see PHYSICS.md.
+best fit tunes; visible matter only and plain MOND 0); see PHYSICS.md. The k
+values quoted in the Method page and the Scorecard's "Tuned values" card are
+written by the generator (`tuned_count_text`) from the same numbers, so they
+cannot drift from the page's maths.
 
 Scorecard: a table scoring every preset galaxy under visible matter only, the
 best realistic NFW fit (Apply Observed Fit), MOND at the default a₀, and the
