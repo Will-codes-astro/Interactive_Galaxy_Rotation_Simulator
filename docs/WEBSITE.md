@@ -97,8 +97,9 @@ residual columns.
   halo sliders to the new typical halo.
   The Typical Halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
-- The header's Mass-to-light (M/L) tile is hidden in the sandbox, because
-  sandbox masses are set directly rather than converted from light.
+- The header's Mass-to-light (M/L) and Tilt tiles are hidden in the sandbox,
+  because sandbox masses are set directly rather than converted from light,
+  and a sandbox galaxy has no measured tilt.
 
 Hovering over the "?" on the M/L tile fades in a short explainer (tap or
 press it on touch screens and keyboards): what a mass-to-light ratio
@@ -108,6 +109,14 @@ the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 μm are standard averages
 measured for each galaxy, and that the Best realistic fits switch lets each
 model move them between about 0.6 and 1.6 times those values. It fades out when the pointer leaves, or on ×,
 Escape or a tap elsewhere.
+
+The Tilt tile beside it shows the inclination in use (SPARC's, or the best
+fit's with SPARC's in brackets) and has the same kind of "?" explainer: what
+inclination is, that telescopes only see line-of-sight motion so true speed =
+measured ÷ sin i, that near face-on galaxies are the most sensitive, and that
+Best realistic fits may move it within twice SPARC's error (Lelli, McGaugh &
+Schombert 2016; Li et al. 2018). Method has a matching "Tilt (inclination)"
+card with the s = sin i_SPARC / sin i factor and a worked example.
 
 Test stars:
 

@@ -417,6 +417,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     .ml-source { display:block; margin-top:2px; color:var(--muted); font-size:10px; letter-spacing:.02em; }
     .ml-pair span { display:block; font-size:10px; font-weight:400; color:var(--muted); letter-spacing:.06em; }
     .ml-col { position:relative; }
+    .ml-row { display:flex; gap:8px; }
+    .ml-row .stat.ml { flex:1 1 auto; }
     .stat.ml .stat-label { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .ml-info { padding:0 6px; border:1px solid rgba(242,200,121,0.45); border-radius:999px; background:transparent; color:var(--gold); font:600 10px/1.5 "Segoe UI",sans-serif; letter-spacing:0; text-transform:none; cursor:pointer; }
     .ml-info:hover, .ml-info[aria-expanded="true"] { background:rgba(242,200,121,0.16); }
@@ -1087,7 +1089,10 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
+        <div class="ml-row">
         <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
+        <div class="stat ml" id="tiltStat" title="The galaxy’s tilt (inclination) in use"><div class="stat-label"><span>Tilt</span><button type="button" class="ml-info" id="tiltInfoBtn" aria-expanded="false" aria-controls="tiltExplainer" title="What is the tilt?">?</button></div><div class="stat-value"><b id="tiltValue">–</b></div><small class="ml-source" id="tiltSource">standard SPARC value</small></div>
+        </div>
         <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
           <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
           <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
@@ -1099,6 +1104,18 @@ HTML_TEMPLATE = r"""<!doctype html>
           <p>SPARC’s standard values (in 3.6 μm infrared light) are <b>0.5 for the disk</b> and <b>0.7 for the older bulge</b>. They are averages, so every real galaxy differs a little. A higher M/L lifts the visible-matter curve and leaves less for dark matter to explain.</p>
           <p>The <b>Best realistic fits</b> switch lets each model scale them by 0.6 to 1.6 times, the range stellar models allow; the line under the tile says which values are in use. The Custom Sandbox sets masses directly, so needs no M/L.</p>
           <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
+        </div>
+        <div class="ml-explainer" id="tiltExplainer" role="dialog" aria-labelledby="tiltExplainerTitle" aria-hidden="true">
+          <button type="button" class="ml-close" id="tiltExplainerClose" aria-label="Close">×</button>
+          <h3 id="tiltExplainerTitle">What is the tilt?</h3>
+          <p>We see every galaxy at an angle. The <b>tilt</b> (or <b>inclination</b>, i) is that angle: 0° is face-on, 90° is edge-on.</p>
+          <ul>
+            <li><b>Telescopes only see motion towards or away from us</b> (the Doppler shift), not sideways.</li>
+            <li><b>So a tilted disk looks slower than it really spins.</b> True speed = measured speed ÷ sin i.</li>
+          </ul>
+          <p>SPARC estimates each galaxy’s tilt and has already corrected its speeds for it, but the estimate has an error of a few degrees. Nearly face-on galaxies are the most sensitive: there a small change in tilt changes every speed a lot.</p>
+          <p>The <b>Best realistic fits</b> switch lets each model change the tilt within twice SPARC’s error; the line under the tile says which value is in use.</p>
+          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; Li et al. (2018).</p>
         </div>
         <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
       </div>
@@ -1312,6 +1329,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <footer>
       <dl class="method-grid">
         <div data-preset-only><dt>Data</dt><dd><p>SPARC (Lelli, McGaugh &amp; Schombert 2016) gives, at each radius r of each galaxy:</p><ul><li><b>V<sub>obs</sub> ± σ</b>: the measured orbital speed and its uncertainty (error bar).</li><li><b>V<sub>gas</sub>, V<sub>disk</sub>, V<sub>bulge</sub></b>: the speed the gas, the stellar disk or the bulge would give on its own, worked out from infrared images of the stars and radio maps of the hydrogen gas.</li></ul><p>Read from the project’s copy of SPARC’s table2.dat.</p></dd></div>
+        <div data-preset-only><dt>Tilt (inclination)</dt><dd><p>We see each disk at a tilt i: 0° face-on, 90° edge-on. A telescope only measures motion along our line of sight (the Doppler shift), so it sees just part of each star’s orbital speed:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>obs</mi></msub><mo>=</mo><mfrac><msub><mi>V</mi><mi>line of sight</mi></msub><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>In words:</b> divide the speed we see by sin i to get the true speed. SPARC has already done this using its own tilt, i<sub>SPARC</sub>, which has an error of a few degrees.</p><p><b>If the true tilt is different</b>, every point moves by the same factor (Li et al. 2018, eq. 5):</p><span class="eq"><math display="block"><mi>s</mi><mo>=</mo><mfrac><mrow><mi>sin</mi><msub><mi>i</mi><mi>SPARC</mi></msub></mrow><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>Example:</b> SPARC says 60° but the truth is 55°: s = 0.866 / 0.819 ≈ 1.06, so the real speeds are 6% higher. At 30° instead of 25°, s ≈ 1.18: nearly face-on galaxies are far more sensitive.</p><p><b>On the page,</b> Best realistic fits may change i within __FIT_LIMIT_SIGMA__× SPARC’s error (at most 90°). The points stay where SPARC put them and the model is divided by s instead, which gives the same χ². Tilt and distance can partly make up for each other, so the fitted tilt is less certain than the score.</p></dd></div>
         <div><dt>Visible matter</dt><dd><div id="footerModel"><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed a star would orbit at if only the visible matter pulled on it.</p><p><b>Why add squares?</b> For a circular orbit, the pull g = V²/r, so V² = gr. Pulls from different masses add, so V² values add; then take the square root.</p><p><b>The numbers</b> are mass-to-light ratios (now <b id="ftMlSource">standard SPARC values</b>; standard 0.50 and 0.70, McGaugh &amp; Schombert 2014). SPARC gives V<sub>disk</sub> and V<sub>bulge</sub> for a ratio of 1, and V² is proportional to mass, so scaling the mass scales V².</p><p><b>Why V<sub>gas</sub>|V<sub>gas</sub>|?</b> Much of a galaxy’s gas lies in a ring further out. Inside the ring, more gas is outside you than inside, so its overall pull points outwards and SPARC lists V<sub>gas</sub> as negative. V<sub>gas</sub>|V<sub>gas</sub>| keeps that minus sign (squaring would lose it), so the gas then lowers the total.</p></div><div id="footerCustom" hidden><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed from your sandbox galaxy’s visible matter alone, added as squares for the same reason as in a real galaxy (V² = gr, and pulls add).</p><p>Each speed comes from the masses you set: an exponential disk (density fading steadily outwards) for the stars and the gas, and a Hernquist bulge (a standard ball-shaped profile).</p></div></dd></div>
         <div><dt>Dark matter (NFW halo)</dt><dd><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the model’s speed is visible matter plus the halo, added as squares like the parts above.</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>halo</mi></msub><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt><mo>,</mo><mspace width="1em"/><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>200</mn></msub><mfrac><mrow><mi>f</mi><mo>(</mo><mi>r</mi><mo>/</mo><msub><mi>r</mi><mi>s</mi></msub><mo>)</mo></mrow><mrow><mi>f</mi><mo>(</mo><mi>c</mi><mo>)</mo></mrow></mfrac></math></span><span class="eq"><math display="block"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>x</mi><mo>)</mo><mo>−</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>+</mo><mi>x</mi></mrow></mfrac><mo>,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mfrac><msub><mi>r</mi><mn>200</mn></msub><msub><mi>r</mi><mi>s</mi></msub></mfrac></math></span><p><b>The halo’s speed</b> is the A-level orbit speed V = √(GM/r). For a round cloud, only the mass inside the orbit pulls overall (Newton’s shell theorem), so M<sub>halo</sub>(r) is the dark matter inside radius r.</p><p><b>f</b> describes how that mass builds up with radius in an NFW halo (Navarro, Frenk &amp; White 1996); dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>. <b>r<sub>200</sub></b> is the halo’s conventional edge, where its average density falls to 200 times the Universe’s critical density; the model adds no mass beyond it. <b>r<sub>s</sub></b> (the scale radius slider) sets how concentrated the halo is.</p></dd></div>
         <div><dt>MOND</dt><dd><p>No halo (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p><p><b>1. Newton’s pull</b> from the visible matter:</p><span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span><p><b>2. MOND’s boost.</b> Multiply by a boost factor:</p><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>×</mo><msqrt><mfrac><mrow><mn>1</mn><mo>+</mo><msqrt><mn>1</mn><mo>+</mo><msup><mrow><mo>(</mo><mn>2</mn><msub><mi>a</mi><mn>0</mn></msub><mo>/</mo><msub><mi>g</mi><mi>N</mi></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></mrow><mn>2</mn></mfrac></msqrt></math></span><p>When g<sub>N</sub> is much bigger than a<sub>0</sub>, the bracket is about 1, so g = g<sub>N</sub>: plain Newton. When g<sub>N</sub> is much smaller, it grows and gives g ≈ √(g<sub>N</sub>a<sub>0</sub>), the stronger pull that flattens the curve. This is MOND’s standard interpolating function, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012), rearranged for g.</p><p><b>3. Back to a speed</b>, since g = V²/r:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></dd></div>
@@ -1330,6 +1348,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           <li>Graham, A.W. and Worley, C.C. (2008) ‘Inclination- and dust-corrected galaxy parameters: bulge-to-disc ratios and size–luminosity relations’, <i>Monthly Notices of the Royal Astronomical Society</i>, 388(4), pp. 1708–1728. <a href="https://doi.org/10.1111/j.1365-2966.2008.13506.x" target="_blank" rel="noopener">doi:10.1111/j.1365-2966.2008.13506.x</a></li>
           <li>Hubble, E.P. (1926) ‘Extragalactic nebulae’, <i>The Astrophysical Journal</i>, 64, p. 321. <a href="https://doi.org/10.1086/143018" target="_blank" rel="noopener">doi:10.1086/143018</a></li>
           <li>Lelli, F., McGaugh, S.S. and Schombert, J.M. (2016) ‘SPARC: mass models for 175 disk galaxies with Spitzer photometry and accurate rotation curves’, <i>The Astronomical Journal</i>, 152(6), 157. <a href="https://doi.org/10.3847/0004-6256/152/6/157" target="_blank" rel="noopener">doi:10.3847/0004-6256/152/6/157</a></li>
+          <li>Li, P., Lelli, F., McGaugh, S. and Schombert, J. (2018) ‘Fitting the radial acceleration relation to individual SPARC galaxies’, <i>Astronomy &amp; Astrophysics</i>, 615, A3. <a href="https://doi.org/10.1051/0004-6361/201732547" target="_blank" rel="noopener">doi:10.1051/0004-6361/201732547</a></li>
           <li>LZ Collaboration (Akerib, D.S. et al.) (2026) ‘Search for dark matter particle interactions in an extended nuclear recoil energy window with the LUX-ZEPLIN (LZ) experiment’. Preprint, not yet peer reviewed. <a href="https://arxiv.org/abs/2609.02823" target="_blank" rel="noopener">arXiv:2609.02823</a></li>
           <li>McGaugh, S.S., Lelli, F. and Schombert, J.M. (2016) ‘Radial acceleration relation in rotationally supported galaxies’, <i>Physical Review Letters</i>, 117(20), 201101. <a href="https://doi.org/10.1103/PhysRevLett.117.201101" target="_blank" rel="noopener">doi:10.1103/PhysRevLett.117.201101</a></li>
           <li>McGaugh, S.S. and Schombert, J.M. (2014) ‘Color–mass-to-light-ratio relations for disk galaxies’, <i>The Astronomical Journal</i>, 148(5), 77. <a href="https://doi.org/10.1088/0004-6256/148/5/77" target="_blank" rel="noopener">doi:10.1088/0004-6256/148/5/77</a></li>
@@ -3232,6 +3251,7 @@ __GALAXIES_JS__
       document.getElementById('bestFitWrap').hidden=customActive;
       const mlStat=document.getElementById('mlStat');
       mlStat.classList.toggle('off',customActive); // hidden in the sandbox, which sets stellar masses directly
+      document.getElementById('tiltStat').classList.toggle('off',customActive); // a sandbox galaxy has no measured tilt
       document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
@@ -3241,6 +3261,11 @@ __GALAXIES_JS__
       document.getElementById('ftMlSource').textContent=mlSource;
       mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). Best realistic fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
       document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
+      if(!customActive){
+        const sparcTilt=activeGalaxy.catalogue.inclination_deg,tilt=fit?fit.inclination_deg:sparcTilt;
+        document.getElementById('tiltValue').textContent=`${tilt.toFixed(0)}°`;
+        document.getElementById('tiltSource').textContent=fit&&bestFits?`${mlSource} (SPARC ${sparcTilt.toFixed(0)}°)`:'standard SPARC value';
+      }
     }
     bestFitToggle.addEventListener('change',()=>{
       bestFits=bestFitToggle.checked;
@@ -3253,37 +3278,41 @@ __GALAXIES_JS__
       applyBaryonState();updateHalo();
     });
     applyBaryonState();updateHalo(); // the page opens with the preset's halo fit at SPARC's standard values
-    // "?" on the M/L tile: a mouse hover fades the explainer in and moving away fades it out
+    // "?" on the M/L and tilt tiles: a mouse hover fades the explainer in and moving away fades it out
     // (a short grace period lets the pointer travel into the box). Touch and keyboard users tap/press
     // the button instead, and close it with ×, Escape or a tap elsewhere.
-    const mlInfoBtn=document.getElementById('mlInfoBtn'),mlExplainer=document.getElementById('mlExplainer');
-    let mlHover=false,mlPinned=false,mlCloseTimer=null,mlLastPointer='';
-    const mlIsOpen=()=>mlExplainer.classList.contains('open');
-    const renderMlExplainer=()=>{
-      const open=mlHover||mlPinned;
-      if(open&&!mlIsOpen()){
-        // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
-        mlExplainer.style.left='';mlExplainer.style.right='';
-        if(mlExplainer.getBoundingClientRect().left<16){mlExplainer.style.left='0';mlExplainer.style.right='auto';}
-      }
-      mlExplainer.classList.toggle('open',open);
-      mlExplainer.setAttribute('aria-hidden',String(!open));
-      mlInfoBtn.setAttribute('aria-expanded',String(open));
-    };
-    const closeMlExplainer=()=>{mlHover=false;mlPinned=false;clearTimeout(mlCloseTimer);renderMlExplainer();};
-    [mlInfoBtn,mlExplainer].forEach(el=>{
-      el.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(mlCloseTimer);mlHover=true;renderMlExplainer();});
-      el.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;clearTimeout(mlCloseTimer);mlCloseTimer=setTimeout(()=>{mlHover=false;renderMlExplainer();},150);});
-    });
-    mlInfoBtn.addEventListener('pointerdown',e=>{mlLastPointer=e.pointerType;});
-    mlInfoBtn.addEventListener('click',e=>{
-      e.stopPropagation();
-      if(mlLastPointer==='mouse'){mlLastPointer='';return;}  // mouse users already see it on hover
-      mlLastPointer='';mlPinned=!mlPinned;renderMlExplainer();
-    });
-    document.getElementById('mlExplainerClose').addEventListener('click',()=>{closeMlExplainer();mlInfoBtn.focus();});
-    document.addEventListener('click',e=>{if(mlIsOpen()&&!mlExplainer.contains(e.target)&&e.target!==mlInfoBtn)closeMlExplainer();});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mlIsOpen()){closeMlExplainer();mlInfoBtn.focus();}});
+    function setupExplainer(btnId,boxId,closeId){
+      const btn=document.getElementById(btnId),box=document.getElementById(boxId);
+      let hover=false,pinned=false,closeTimer=null,lastPointer='';
+      const isOpen=()=>box.classList.contains('open');
+      const render=()=>{
+        const open=hover||pinned;
+        if(open&&!isOpen()){
+          // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
+          box.style.left='';box.style.right='';
+          if(box.getBoundingClientRect().left<16){box.style.left='0';box.style.right='auto';}
+        }
+        box.classList.toggle('open',open);
+        box.setAttribute('aria-hidden',String(!open));
+        btn.setAttribute('aria-expanded',String(open));
+      };
+      const close=()=>{hover=false;pinned=false;clearTimeout(closeTimer);render();};
+      [btn,box].forEach(el=>{
+        el.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(closeTimer);hover=true;render();});
+        el.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;clearTimeout(closeTimer);closeTimer=setTimeout(()=>{hover=false;render();},150);});
+      });
+      btn.addEventListener('pointerdown',e=>{lastPointer=e.pointerType;});
+      btn.addEventListener('click',e=>{
+        e.stopPropagation();
+        if(lastPointer==='mouse'){lastPointer='';return;}  // mouse users already see it on hover
+        lastPointer='';pinned=!pinned;render();
+      });
+      document.getElementById(closeId).addEventListener('click',()=>{close();btn.focus();});
+      document.addEventListener('click',e=>{if(isOpen()&&!box.contains(e.target)&&e.target!==btn)close();});
+      document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isOpen()){close();btn.focus();}});
+    }
+    setupExplainer('mlInfoBtn','mlExplainer','mlExplainerClose');
+    setupExplainer('tiltInfoBtn','tiltExplainer','tiltExplainerClose');
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
       document.getElementById('optNfw').classList.toggle('active',!mondMode);
@@ -4242,7 +4271,7 @@ __GALAXIES_JS__
         const unit=el.closest('label')||el;
         if(tutorialCard.contains(unit))return;
         // The tour's own launch button sits inside the gravity model bar, so it is locked even when that bar is not.
-        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
+        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
         if(unit.inert!==locked)unit.inert=locked;
         unit.classList.toggle('tutorial-locked',locked);
       }));
