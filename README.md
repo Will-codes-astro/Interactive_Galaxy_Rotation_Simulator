@@ -8,7 +8,7 @@ from the **SPARC** survey (Lelli, McGaugh & Schombert 2016), mainly NGC 3198.
 - **Live site:** <https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/>
 - **Main features:** rotation curve with observed SPARC speeds and gas, disk and
   bulge components; NFW halo sliders; MOND mode and best fit; χ² fit score;
-  800 test stars integrated live in 3D; NGC 3198, NGC 2403 and NGC 7331 presets;
+  800 test stars integrated live in 3D; NGC 3198, NGC 2403, NGC 7331 and UGC 128 presets;
   a custom sandbox galaxy; guided tutorials; CSV export.
 - **Offline analysis:** a baryonic-only baseline fit and orbit simulation for
   NGC 3198 (Python), plus a Blender 3D model.

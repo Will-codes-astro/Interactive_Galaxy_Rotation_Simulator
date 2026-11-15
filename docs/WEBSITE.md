@@ -38,7 +38,9 @@ set the star population described under "Test stars" below.
 
 The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
-speed contributions. The generator creates it from `data/sparc/table2.dat`; do not edit it
+speed contributions. There are four: three spirals (NGC 3198, NGC 2403,
+NGC 7331) and one low-surface-brightness galaxy (UGC 128), each shown in the
+galaxy picker and the scorecard. The generator creates it from `data/sparc/table2.dat`; do not edit it
 by hand. The generator also inlines the same code into `index.html`, so the
 published page stays a single file and the Pages workflow needs no change. To
 offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in

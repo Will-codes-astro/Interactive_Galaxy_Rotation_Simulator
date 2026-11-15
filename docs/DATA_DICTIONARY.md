@@ -46,7 +46,9 @@ Each row is one radius of one galaxy.
 | SBbulge | `sb_bulge` | L☉/pc² | Bulge surface brightness (not used) |
 
 **Galaxies used:** NGC 3198 (43 radii, 6 with small negative V_gas),
-NGC 2403 (73 radii) and NGC 7331 (36 radii, 7 with negative V_gas). The site's
+NGC 2403 (73 radii), NGC 7331 (36 radii, 7 with negative V_gas) and UGC 128
+(SPARC id `UGC00128`; 22 radii from 1.25 to 53.75 kpc, no negative V_gas, no
+bulge, assumed distance 64.5 Mpc), the one low-surface-brightness galaxy. The site's
 presets are listed in `GALAXY_PRESETS` in `generate_interactive_html.py`.
 
 **If the file is ever lost:** restore it with `git checkout -- data/sparc/table2.dat`.

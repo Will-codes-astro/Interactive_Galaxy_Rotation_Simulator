@@ -36,6 +36,7 @@ GALAXY_PRESETS = (
     GalaxyPreset("NGC3198", "NGC 3198", "Classic late-type spiral benchmark"),
     GalaxyPreset("NGC2403", "NGC 2403", "Gas-rich late-type spiral"),
     GalaxyPreset("NGC7331", "NGC 7331", "Massive early-type spiral with a prominent bulge"),
+    GalaxyPreset("UGC00128", "UGC 128", "Faint, spread-out, gas-rich galaxy (low surface brightness)"),
 )
 DEFAULT_PRESET = GALAXY_PRESETS[0]
 ROTATION_COLUMNS = (

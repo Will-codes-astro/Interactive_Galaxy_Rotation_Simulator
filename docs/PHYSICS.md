@@ -170,3 +170,9 @@ These are documented here, not changed. Any change needs Will's decision.
    Python, page JS, two analysis scripts and Blender. The website is the
    reference version. If you change one, change all of them, or record the
    difference here.
+7. UGC 128 (added 15 Nov 2026, Will's choice from a shortlist): its MOND best
+   fit stops at the top of the search range (Υ_disk = 1.5), so a wider search
+   could fit better. Plain MOND at the default a₀ scores χ²_ν ≈ 115 here with
+   SPARC's distance (64.5 Mpc) and Υ_disk = 0.5 held fixed; the site does not
+   vary distance or inclination, which published MOND fits often do. The
+   description "low surface brightness" still needs a source cited on the page.

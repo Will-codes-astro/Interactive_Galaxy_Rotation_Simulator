@@ -181,7 +181,7 @@ out.star_count_for_huge_galaxy = P.starCountFor(1e15, 1e10);
 
 // Other presets (best-effort: switching galaxy goes through page UI code).
 out.presets = {};
-for (const id of ['NGC2403', 'NGC7331']) {
+for (const id of ['NGC2403', 'NGC7331', 'UGC00128']) {
   try {
     P.selectGalaxy(id);
     const dd = P.defaults();

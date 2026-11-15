@@ -17,6 +17,10 @@
     "NGC7331": {
       "reduced_chi2_visible_only": 241.6015659825833,
       "reduced_chi2_nfw_default": 10.532443388707275
+    },
+    "UGC00128": {
+      "reduced_chi2_visible_only": 6130.545888764023,
+      "reduced_chi2_nfw_default": 3.226436293128134
     }
   }
 }
