@@ -878,9 +878,9 @@
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
         <dl class="halo-metrics" id="haloMetrics">
-          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>Where the halo's average density falls to 200 times the Universe's average (critical) density. A convention, not a sharp edge.</span></span></dd></div>
-          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
-          <div class="halo-metric"><dt><button type="button" aria-expanded="false" aria-controls="haloConcentrationHelp">Concentration, c<span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloConcentration">—</span></button></dt><dd id="haloConcentrationHelp"><span><span>Halo radius ÷ scale radius. Higher c means the dark matter is packed more towards the centre.</span></span></dd></div>
+          <div class="halo-metric" id="haloRadiusCard"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>Where the halo's average density falls to 200 times the Universe's average (critical) density. A convention, not a sharp edge.</span></span></dd></div>
+          <div class="halo-metric" id="haloScaleCard"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
+          <div class="halo-metric" id="haloConcentrationCard"><dt><button type="button" aria-expanded="false" aria-controls="haloConcentrationHelp">Concentration, c<span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloConcentration">—</span></button></dt><dd id="haloConcentrationHelp"><span><span>Halo radius ÷ scale radius. Higher c means the dark matter is packed more towards the centre.</span></span></dd></div>
         </dl>
         <p class="halo-empty" id="haloEmpty" hidden></p>
       </section>
@@ -3691,9 +3691,10 @@ window.GALAXIES = {
         {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['scaleValue:Scale radius','curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
          text:'The scale radius sets how tightly the halo is packed. Its total mass stays the same.',
          action:'1. Drag Scale radius left: the left of the orange line rises. 2. Drag it right: that part drops.'},
-        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloMetrics',gesture:'click',tag:'Hover over a card',title:'Read the halo’s numbers',
+        {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloRadiusCard',gesture:'click',tag:'1 · Open',also:['haloScaleCard:2 · Open','haloConcentrationCard:3 · Open'],title:'Read the halo’s numbers',
+         checks:{haloRadiusCard:()=>tutorialFlags.haloRadiusCard,haloScaleCard:()=>tutorialFlags.haloScaleCard,haloConcentrationCard:()=>tutorialFlags.haloConcentrationCard},doneText:'All three read: these numbers follow the halo sliders.',
          text:'These cards describe your halo. r₂₀₀ marks its outer edge. Concentration c (r₂₀₀ ÷ scale radius) says how tightly packed it is.',
-         action:'Hover over (or tap) any card in the blue box.'},
+         action:'1. Hover over (or tap) Halo radius. 2. Now Scale radius. 3. Now Concentration.'},
         {id:'fit',nfw:true,target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)','massValue:Halo mass','scaleValue:Scale radius'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale},doneText:'Both sliders tried: compare χ² now with where it started.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
@@ -4392,7 +4393,7 @@ window.GALAXIES = {
       tutorialLastScale=value;
     });
     document.querySelectorAll('#haloMetrics .halo-metric').forEach(metric=>{
-      ['pointerenter','click'].forEach(type=>metric.addEventListener(type,()=>completeTutorialAction('haloNumbers','Card opened: these numbers follow the halo sliders.')));
+      ['pointerenter','click','focusin'].forEach(type=>metric.addEventListener(type,()=>{tutorialFlags[metric.id]=true;}));
     });
     visibleMatterOnly.addEventListener('click',()=>{
       if(!mondMode)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
