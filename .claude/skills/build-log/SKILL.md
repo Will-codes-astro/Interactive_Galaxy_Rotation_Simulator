@@ -40,8 +40,10 @@ work in progress, open decisions, and the date last updated. Update it only
 after a Big change, a decision or a deadline change. Keep the history in the
 dated entries, not here.
 
-The "Project context" section below it (report state, bibliography, AI
-declaration, notes for Claude, open to-dos) replaced project-status.md. When
+"Part 3: Project context", at the end of the page (report state,
+bibliography, AI declaration, notes for Claude, open to-dos), replaced
+project-status.md. Keep the page order: status callout, Part 1 (before the
+website), Part 2 (dated build log, oldest first), Part 3. When
 one of its facts changes, edit that line, and remove to-dos once done.
 
 ## Screenshots (only when Will asks)
