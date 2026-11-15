@@ -66,7 +66,20 @@ Parameters: M₂₀₀ (M☉), the mass inside r₂₀₀, and the scale radius 
 
 Implemented in: `_nfw_shape`, `_nfw_velocity` (generator) and `nfwVelocityModel` (page JS).
 
-## Best realistic fits ("Apply Observed Fit", "MOND best fit")
+## Standard values and best realistic fits (the "Best realistic fits" switch)
+
+Will's choice (15 Nov 2026, later the same day): every model uses the same
+settings. With the switch **off** (the default), visible matter only, the NFW
+halo and MOND all use SPARC's standard Υ_disk = 0.50, Υ_bulge = 0.70, distance
+and inclination, so the visible-matter curve is identical in every mode. The
+halo fit then tunes only M₂₀₀ and r_s (`best_fit.nfw_standard`, from `fit_nfw`
+with `_standard_settings`, still within the concentration limit below), and
+MOND tunes nothing. With the switch **on**, the NFW and MOND best fits below
+also tune Υ, D and i within the same limits (and a₀ for MOND). This replaced
+a set-up where NFW opened at its best fit but MOND at its plain prediction,
+which compared NFW's best case with MOND's untuned one.
+
+### Best realistic fits
 
 Will's choice (15 Nov 2026): each best fit is the lowest χ² a model can reach
 using only physically realistic values. It replaces the old starting fit (fixed
@@ -103,11 +116,12 @@ site uses hard limits.
   and Υ, D and i are then refitted with the halo fixed, so the page shows the
   fit exactly. The physics checks confirm that the page's χ² matches the
   generator's (`chi2` in `galaxies.js`).
-- **On the page.** Apply Observed Fit (and loading a preset) applies the NFW
-  fit's halo, Υ, D and i; they stay while the halo sliders move, until Visible
-  Matter Only returns to SPARC's standard values. The MOND best fit switch
-  applies the MOND fit. Plain MOND and visible matter only always use SPARC's
-  values.
+- **On the page.** Apply Observed Fit (and loading a preset) applies the halo
+  fit for the switch's state (`nfwFitOf`): the standard-values halo, or the NFW
+  best fit's halo, Υ, D and i. They stay while the halo sliders move, until
+  Visible Matter Only returns to SPARC's standard values. Turning the switch on
+  in MOND mode applies the MOND best fit. Visible matter only always uses
+  SPARC's values.
 - **At a limit.** A fitted value within `LIMIT_TOLERANCE` (0.1 %) of its range
   from a limit is recorded in the fit's `at_limit` (`_limits_hit`), and the
   Scorecard marks it "at limit". The NFW halo is checked after snapping, which
@@ -138,7 +152,7 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
 - No halo is used in MOND mode (M₂₀₀ = 0).
 - The limits are checked by the physics checks: g → g_N when g_N ≫ a₀, and
   V⁴ → G M a₀ when g_N ≪ a₀.
-- **MOND best fit**: `fit_mond` (generator), within the realistic limits above.
+- **MOND best fit** (Best realistic fits on): `fit_mond` (generator), within the realistic limits above.
 - Implemented in `mondVelocity`, `mondModelVelocity` and `extraVelocityModel`
   (page JS), and `_mond_velocity` (generator, used only by the fit).
 
@@ -151,7 +165,7 @@ generator, read by `tunedCount` and `reducedChi` in page JS, and by
 `tuned_count_text` for the k values quoted on the page): 2 for the NFW halo (M₂₀₀, r_s) or 1 for the MOND best fit (a₀), plus
 the galaxy settings a best fit tunes (`tuned_settings`: Υ_disk, D, i, and
 Υ_bulge where there is a bulge). Visible matter only and MOND at the default a₀
-use SPARC's values, so k = 0. So the NFW best fit has k = 5 (6 with a bulge) and
+use SPARC's values, so k = 0, and the standard-values halo fit k = 2. So the NFW best fit has k = 5 (6 with a bulge) and
 the MOND best fit k = 4 (5). Will chose this rule on 14 Nov 2026 so that the two
 models are compared fairly; before that the page used N − 2 in every mode. A
 halo set by hand with the sliders still counts its 2, plus the fit's settings

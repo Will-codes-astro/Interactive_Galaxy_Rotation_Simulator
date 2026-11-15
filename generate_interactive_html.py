@@ -236,13 +236,20 @@ def _settings_record(settings: list[float], bounds) -> dict[str, Any]:
     }
 
 
-def fit_nfw(rotation: dict[str, list[float]], info: GalaxyInfo) -> dict[str, Any]:
-    """Best NFW halo with realistic settings: the Apply Observed Fit button and the scorecard's halo column.
+def _standard_settings(info: GalaxyInfo) -> list[tuple[float, float]]:
+    """SPARC's standard values held fixed (no range): disk and bulge M/L, distance and inclination."""
+    return [(v, v) for v in (UPSILON_DISK, UPSILON_BULGE, info.dist_mpc, info.inc_deg)]
 
-    Fitted: log M200, the concentration's offset from the typical value, and the galaxy's settings. The halo is
-    then snapped to the sliders' resolution and the settings refitted, so the page shows the result exactly.
+
+def fit_nfw(rotation: dict[str, list[float]], info: GalaxyInfo, settings_bounds=None) -> dict[str, Any]:
+    """Best NFW halo: Apply Observed Fit and the scorecard's halo columns.
+
+    Fitted: log M200, the concentration's offset from the typical value, and the galaxy's settings within
+    settings_bounds (realistic limits by default; _standard_settings fixes them at SPARC's values, so only the halo
+    is tuned). The halo is then snapped to the sliders' resolution and the settings refitted, so the page shows the
+    result exactly.
     """
-    settings_bounds = _realistic_settings(rotation, info)
+    settings_bounds = settings_bounds or _realistic_settings(rotation, info)
     log_c_limit = FIT_LIMIT_SIGMA * HALO_CONCENTRATION_SCATTER_DEX
 
     def halo_model(m200_msun: float, scale_radius_kpc: float):
@@ -281,7 +288,7 @@ def fit_nfw(rotation: dict[str, list[float]], info: GalaxyInfo) -> dict[str, Any
 
 
 def fit_mond(rotation: dict[str, list[float]], info: GalaxyInfo) -> dict[str, Any]:
-    """Best MOND fit with realistic settings and a0 within its measured uncertainty: the MOND best fit switch."""
+    """Best MOND fit with realistic settings and a0 within its measured uncertainty: the Best realistic fits switch."""
     settings_bounds = _realistic_settings(rotation, info)
 
     def cost(p: list[float]) -> float:
@@ -311,7 +318,11 @@ def build_galaxy_record(preset: GalaxyPreset, galaxy_info: dict[str, GalaxyInfo]
             "inclination_deg": info.inc_deg,
             "inclination_err_deg": info.e_inc_deg,
         },
-        "best_fit": {"nfw": fit_nfw(galaxy["rotation"], info), "mond": fit_mond(galaxy["rotation"], info)},
+        "best_fit": {
+            "nfw_standard": fit_nfw(galaxy["rotation"], info, _standard_settings(info)),
+            "nfw": fit_nfw(galaxy["rotation"], info),
+            "mond": fit_mond(galaxy["rotation"], info),
+        },
         "rotation": galaxy["rotation"],
     }
 
@@ -326,9 +337,10 @@ GALAXIES_JS_HEADER = """/*
  *
  * Radii are in kpc and velocities in km/s. v_gas_kms keeps SPARC's sign (the gas term can be
  * negative). catalogue holds SPARC Table 1's distance and inclination with their errors.
- * best_fit holds the generator's NFW and MOND fits, each searched only over physically realistic
- * values (mass-to-light ratios, distance, inclination, and the halo concentration or a0): see
- * fit_nfw and fit_mond. These are model results, not measurements.
+ * best_fit holds the generator's fits. nfw_standard tunes only the halo, with SPARC's standard
+ * mass-to-light ratios, distance and inclination (the page's default). nfw and mond also tune those
+ * settings, searched only over physically realistic values (and the halo concentration or a0): the
+ * Best realistic fits switch. See fit_nfw and fit_mond. These are model results, not measurements.
  */
 """
 
@@ -392,13 +404,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stat-value small { font-size:12px; font-weight:400; color:var(--muted); margin-left:3px; }
     .stat.ml .stat-value { color:var(--gold); }
     .ml-col { display:flex; flex-direction:column; align-items:stretch; gap:6px; }
-    .fit-toggle { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 10px; border:1px solid rgba(255,174,92,0.28); border-radius:8px; background:rgba(255,174,92,0.05); font-size:11px; color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap; }
+    .fit-toggle { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 10px; border:1px solid rgba(138,180,248,0.28); border-radius:8px; background:rgba(138,180,248,0.05); font-size:11px; color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap; }
     .fit-toggle[hidden] { display:none; }
     .fit-toggle input { position:absolute; opacity:0; width:0; height:0; }
     .fit-toggle .track { position:relative; width:30px; height:16px; border-radius:999px; background:#16222f; border:1px solid rgba(120,150,180,0.4); transition:background .2s,border-color .2s; flex:none; }
     .fit-toggle .track::after { content:""; position:absolute; top:2px; left:2px; width:10px; height:10px; border-radius:50%; background:#dbe7f4; transition:transform .2s; }
-    .fit-toggle input:checked ~ .track { background:rgba(255,174,92,0.25); border-color:rgba(255,174,92,0.7); }
-    .fit-toggle input:checked ~ .track::after { transform:translateX(14px); background:#ffae5c; }
+    .fit-toggle input:checked ~ .track { background:rgba(138,180,248,0.25); border-color:rgba(138,180,248,0.7); }
+    .fit-toggle input:checked ~ .track::after { transform:translateX(14px); background:#8ab4f8; }
     .fit-toggle input:focus-visible ~ .track { outline:2px solid var(--cyan); outline-offset:2px; }
     .fit-toggle input:checked ~ .fit-label { color:var(--ink); }
     .ml-pair { display:flex; gap:16px; }
@@ -958,6 +970,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .score-table { width:100%; min-width:640px; border-collapse:collapse; font-size:13px; }
     .score-table th, .score-table td { padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
     .score-table thead th { color:var(--ink); font-weight:600; vertical-align:bottom; }
+    .score-table thead th.score-group { color:var(--accent); border-bottom:1px solid var(--line-strong); }
     .score-table small { display:block; margin-top:2px; color:var(--muted); font-size:11.5px; font-weight:400; line-height:1.4; }
     .score-table tbody th { color:var(--ink); font-weight:600; white-space:nowrap; }
     .score-table tbody tr:last-child th, .score-table tbody tr:last-child td { border-bottom:0; }
@@ -1084,10 +1097,10 @@ HTML_TEMPLATE = r"""<!doctype html>
             <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
           </ul>
           <p>SPARC’s standard values (in 3.6 μm infrared light) are <b>0.5 for the disk</b> and <b>0.7 for the older bulge</b>. They are averages, so every real galaxy differs a little. A higher M/L lifts the visible-matter curve and leaves less for dark matter to explain.</p>
-          <p>The best fits may scale them by 0.6 to 1.6 times, the range stellar models allow; the line under the tile says which values are in use. The Custom Sandbox sets masses directly, so needs no M/L.</p>
+          <p>The <b>Best realistic fits</b> switch lets each model scale them by 0.6 to 1.6 times, the range stellar models allow; the line under the tile says which values are in use. The Custom Sandbox sets masses directly, so needs no M/L.</p>
           <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
         </div>
-        <label class="fit-toggle" id="mondFitWrap" hidden title="The lowest χ² MOND can reach with realistic values: a₀, the mass-to-light ratios, distance and tilt, each kept within its measured range (MOND mode only)"><span class="fit-label">MOND best fit</span><input type="checkbox" id="mondFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
+        <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
       </div>
     </div>
     </div>
@@ -1169,7 +1182,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </section>
     </article>
       <article class="panel" id="curvePanel">
-        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><div class="chi-wrap"><small id="chiFit" class="chi-fit" title="Compare like with like: the NFW best fit with the MOND best fit (both tune the galaxy’s M/L, distance and tilt), or visible matter only with plain MOND (nothing tuned)."></small><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div></div>
+        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><div class="chi-wrap"><small id="chiFit" class="chi-fit" title="Every model uses the same settings: SPARC’s standard values, or, with Best realistic fits on, values each model tunes within the same limits."></small><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div></div>
         <div class="curve-wrap"><div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div></div>
         <p class="curve-hint">Tap the graph, or slide your finger along it, to read the speeds at each radius. Tap outside the graph to close.</p>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
@@ -1189,7 +1202,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             <h3>Why not 0?</h3>
             <p>Measurements are noisy, so even a correct model misses by about one error bar. Both models also simplify real galaxies (a smooth round halo, an estimated star mass).</p>
             <h3>Why count tuned values?</h3>
-            <p>More adjustable numbers can always bend a model closer to the data. Plain MOND tunes none: a<sub>0</sub> should be the same everywhere. The best fits tune 4 to 6: the galaxy’s M/L, distance and tilt, plus the halo’s mass and size or MOND’s a<sub>0</sub>.</p>
+            <p>More adjustable numbers can always bend a model closer to the data. With standard values, the halo tunes 2 (its mass and size) and MOND none: a<sub>0</sub> should be the same everywhere. Best realistic fits also tune the galaxy’s M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total.</p>
             </div>
           </div>
         </details>
@@ -1205,13 +1218,13 @@ HTML_TEMPLATE = r"""<!doctype html>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
       <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard table">
         <table class="score-table">
-          <thead><tr><th scope="col">Galaxy</th><th scope="col">Visible matter only<small>Newton’s gravity, nothing added</small></th><th scope="col">Dark matter halo (NFW)<small>best realistic fit</small></th><th scope="col">MOND<small>nothing tuned to this galaxy</small></th><th scope="col">MOND best fit<small>best realistic fit</small></th></tr></thead>
-          <tbody id="scoreBody"><tr><td colspan="5">Calculating the scores…</td></tr></tbody>
+          <thead><tr><th scope="col" rowspan="2">Galaxy</th><th scope="colgroup" colspan="3" class="score-group">Standard values<small>SPARC’s M/L, distance and tilt for every model</small></th><th scope="colgroup" colspan="2" class="score-group">Best realistic fits<small>each model also tunes M/L, distance and tilt</small></th></tr><tr><th scope="col">Visible matter only<small>Newton’s gravity, nothing added</small></th><th scope="col">Dark matter halo (NFW)<small>halo mass and size tuned</small></th><th scope="col">MOND<small>nothing tuned</small></th><th scope="col">Dark matter halo (NFW)</th><th scope="col">MOND<small>a₀ also tuned</small></th></tr></thead>
+          <tbody id="scoreBody"><tr><td colspan="6">Calculating the scores…</td></tr></tbody>
         </table>
       </div>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
-        <li><b>Tuned values</b>Visible matter only and plain MOND tune nothing. The halo’s best fit tunes __K_NFW_FIT__ (its mass and size, plus the galaxy’s M/L, distance and tilt); MOND’s tunes __K_MOND_FIT__ (a<sub>0</sub> plus the same). χ<sup>2</sup><sub>r</sub> accounts for this, so extra freedom is not free.</li>
+        <li><b>Same rules for every model</b>With standard values, all three use SPARC’s M/L, distance and tilt, so the visible matter is identical and only the explanation differs: the halo tunes 2 values (mass and size), MOND none. Best realistic fits give both models the same extra freedom: the halo tunes __K_NFW_FIT__, MOND __K_MOND_FIT__ (a<sub>0</sub>, M/L, distance and tilt). χ<sup>2</sup><sub>r</sub> accounts for this, so extra freedom is not free.</li>
         <li><b>Realistic limits</b>Best fits use only believable values: M/L that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> means that model needs something unrealistic to do better.</li>
         <li><b>MOND’s best case</b>a<sub>0</sub> may vary from 0.96 to 1.44 × 10⁻¹⁰ m/s², its measured range (McGaugh, Lelli &amp; Schombert 2016), though MOND says it should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
         <li><b>Error bars</b>Scores use SPARC’s error on each speed. Distance and tilt errors shift a whole curve, so the best fits allow for them.</li>
@@ -1303,7 +1316,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div><dt>Dark matter (NFW halo)</dt><dd><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the model’s speed is visible matter plus the halo, added as squares like the parts above.</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>halo</mi></msub><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt><mo>,</mo><mspace width="1em"/><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>200</mn></msub><mfrac><mrow><mi>f</mi><mo>(</mo><mi>r</mi><mo>/</mo><msub><mi>r</mi><mi>s</mi></msub><mo>)</mo></mrow><mrow><mi>f</mi><mo>(</mo><mi>c</mi><mo>)</mo></mrow></mfrac></math></span><span class="eq"><math display="block"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>x</mi><mo>)</mo><mo>−</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>+</mo><mi>x</mi></mrow></mfrac><mo>,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mfrac><msub><mi>r</mi><mn>200</mn></msub><msub><mi>r</mi><mi>s</mi></msub></mfrac></math></span><p><b>The halo’s speed</b> is the A-level orbit speed V = √(GM/r). For a round cloud, only the mass inside the orbit pulls overall (Newton’s shell theorem), so M<sub>halo</sub>(r) is the dark matter inside radius r.</p><p><b>f</b> describes how that mass builds up with radius in an NFW halo (Navarro, Frenk &amp; White 1996); dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>. <b>r<sub>200</sub></b> is the halo’s conventional edge, where its average density falls to 200 times the Universe’s critical density; the model adds no mass beyond it. <b>r<sub>s</sub></b> (the scale radius slider) sets how concentrated the halo is.</p></dd></div>
         <div><dt>MOND</dt><dd><p>No halo (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p><p><b>1. Newton’s pull</b> from the visible matter:</p><span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span><p><b>2. MOND’s boost.</b> Multiply by a boost factor:</p><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>×</mo><msqrt><mfrac><mrow><mn>1</mn><mo>+</mo><msqrt><mn>1</mn><mo>+</mo><msup><mrow><mo>(</mo><mn>2</mn><msub><mi>a</mi><mn>0</mn></msub><mo>/</mo><msub><mi>g</mi><mi>N</mi></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></mrow><mn>2</mn></mfrac></msqrt></math></span><p>When g<sub>N</sub> is much bigger than a<sub>0</sub>, the bracket is about 1, so g = g<sub>N</sub>: plain Newton. When g<sub>N</sub> is much smaller, it grows and gives g ≈ √(g<sub>N</sub>a<sub>0</sub>), the stronger pull that flattens the curve. This is MOND’s standard interpolating function, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012), rearranged for g.</p><p><b>3. Back to a speed</b>, since g = V²/r:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></dd></div>
         <div><dt>Simulation</dt><dd><p>The 3D view follows massless <b>test stars</b> (800 for the presets): they feel the model’s gravity but do not pull on each other, so each moves on its own. Disk stars start on circular orbits, bulge stars with random motions. Each star’s acceleration is a = V<sub>model</sub>(r)²/r, towards the centre.</p><p>An orbit cannot be solved in one go, so the computer moves each star in small time steps, Δt = 0.5 Myr, 2000 times over 1 Gyr. Each step uses the <b>Velocity-Verlet method</b>:</p><span class="eq"><math display="block"><msub><mi>x</mi><mi>new</mi></msub><mo>=</mo><mi>x</mi><mo>+</mo><mi>v</mi><mi>Δ</mi><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>a</mi><msup><mrow><mi>Δ</mi><mi>t</mi></mrow><mn>2</mn></msup></math></span><p>This is SUVAT’s s = ut + ½at². Next, it finds the new acceleration a<sub>new</sub> at the new position, then updates the velocity with the <i>average</i> of the old and new accelerations:</p><span class="eq"><math display="block"><msub><mi>v</mi><mi>new</mi></msub><mo>=</mo><mi>v</mi><mo>+</mo><mfrac><mrow><mi>a</mi><mo>+</mo><msub><mi>a</mi><mi>new</mi></msub></mrow><mn>2</mn></mfrac><mi>Δ</mi><mi>t</mi></math></span><p><b>Why this method?</b> Using only the old acceleration would make each step slightly too big or small, and the error would build up, slowly spiralling stars in or out. Averaging stops this energy drift, so any star that leaves does so because of the physics, not rounding.</p></dd></div>
-        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math></span><p><b>In words:</b> for each measured point, find how far the model misses, divide by that point’s error bar σ, square it, then add them all up. Squaring makes misses above and below both count, and big misses count much more.</p><span class="eq"><math display="block"><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span><p><b>N</b> is the number of points and <b>k</b> the number of values tuned to fit this galaxy, so χ<sup>2</sup><sub>r</sub> is roughly the squared miss per point. About 1 means misses the size of the error bars.</p><p>k = 0 for visible matter only and plain MOND. The best fits tune disk M/L (and bulge M/L), plus distance and tilt within __FIT_LIMIT_SIGMA__× SPARC’s errors, plus M<sub>200</sub> and r<sub>s</sub> (NFW, k = __K_NFW_FIT__) or a<sub>0</sub> (MOND, k = __K_MOND_FIT__). A halo set by hand with the sliders counts 2.</p></dd></div>
+        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math></span><p><b>In words:</b> for each measured point, find how far the model misses, divide by that point’s error bar σ, square it, then add them all up. Squaring makes misses above and below both count, and big misses count much more.</p><span class="eq"><math display="block"><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span><p><b>N</b> is the number of points and <b>k</b> the number of values tuned to fit this galaxy, so χ<sup>2</sup><sub>r</sub> is roughly the squared miss per point. About 1 means misses the size of the error bars.</p><p>With standard values: k = 0 for visible matter only and MOND, and k = 2 for the halo (M<sub>200</sub> and r<sub>s</sub>, also when set by hand). Best realistic fits also tune disk M/L (and bulge M/L), plus distance and tilt within __FIT_LIMIT_SIGMA__× SPARC’s errors: k = __K_NFW_FIT__ for NFW and __K_MOND_FIT__ for MOND (which adds a<sub>0</sub>).</p></dd></div>
       </dl>
       <section class="refs" id="references" aria-labelledby="refsTitle">
         <h3 id="refsTitle">References</h3>
@@ -1419,7 +1432,11 @@ __GALAXIES_JS__
     });
     const DATA = __DATA_JSON__;
     // GALAXIES (the inlined galaxies.js above) holds one SPARC rotation curve per preset galaxy.
-    const haloDefaultsOf = galaxy => ({massT: galaxy.best_fit.nfw.m200_msun / 1e12, scaleRadius: galaxy.best_fit.nfw.scale_radius_kpc});
+    // Best realistic fits switch: off, every model uses SPARC's standard values (the halo fit tunes only the halo);
+    // on, the NFW and MOND best fits also tune M/L, distance and tilt within the same realistic limits.
+    let bestFits = false;
+    const nfwFitOf = galaxy => galaxy.best_fit[bestFits ? 'nfw' : 'nfw_standard'];
+    const haloDefaultsOf = galaxy => ({massT: nfwFitOf(galaxy).m200_msun / 1e12, scaleRadius: nfwFitOf(galaxy).scale_radius_kpc});
     let activeGalaxy = GALAXIES[DATA.default_galaxy_id];
     let DEFAULTS = haloDefaultsOf(activeGalaxy);
     let customActive = false; // true while the Custom Sandbox, not a SPARC preset, drives the physics
@@ -2798,14 +2815,15 @@ __GALAXIES_JS__
     const MODEL_VALUES=DATA.model_tuned_values; // MODEL_TUNED_VALUES in the generator
     const tunedCount=(model,fit)=>MODEL_VALUES[model]+(fit?fit.tuned_settings:0);
     const reducedChi=(chi,pointCount,k)=>chi/Math.max(1,pointCount-k);
-    // The best fit in use: Apply Observed Fit (until Visible Matter Only) in NFW mode, or the MOND best fit switch.
+    // The fit in use: the halo fit (Apply Observed Fit, until Visible Matter Only) in NFW mode, or the MOND best fit
+    // when Best realistic fits is on. Which halo fit depends on the switch (nfwFitOf).
     let nfwFitApplied=true;
     function activeFit(){
       if(customActive)return null;
-      if(mondMode)return document.getElementById('mondFitToggle').checked?activeGalaxy.best_fit.mond:null;
-      return nfwFitApplied?activeGalaxy.best_fit.nfw:null;
+      if(mondMode)return bestFits?activeGalaxy.best_fit.mond:null;
+      return nfwFitApplied?nfwFitOf(activeGalaxy):null;
     }
-    const activeFitModel=()=>mondMode?(document.getElementById('mondFitToggle').checked?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
+    const activeFitModel=()=>mondMode?(bestFits?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
     // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
     const fitVerdict=red=>red<2?{cls:'good',word:'Close fit'}:red<10?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
     // Names the model and fit the badge is scoring, so like-for-like pairs are easy to spot.
@@ -2815,7 +2833,7 @@ __GALAXIES_JS__
       if(model==='mondBest')return 'MOND best fit';
       const fit=activeFit(),massT=Number(document.getElementById('massSlider').value),rs=Number(document.getElementById('scaleSlider').value);
       const isFit=fit&&Math.abs(massT-fit.m200_msun/1e12)<1e-6&&Math.abs(rs-fit.scale_radius_kpc)<1e-6;
-      return isFit?'NFW best fit':fit?'Your halo + fit’s M/L, distance, tilt':'Your halo';
+      return isFit?(bestFits?'NFW best fit':'NFW halo fit'):fit&&bestFits?'Your halo + fit’s M/L, distance, tilt':'Your halo';
     }
     function updateChi(total){
       const b=document.getElementById('chiBadge');
@@ -3191,8 +3209,8 @@ __GALAXIES_JS__
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       const res=residualsOf(total);updateChi(total);
       const fit=activeFit();
-      document.getElementById('chiBadge').title=(mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of baryons + NFW halo to the SPARC points')
-        +(fit?`, using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)`:'');
+      document.getElementById('chiBadge').title=(mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of visible matter + NFW halo to the SPARC points')
+        +(fit&&bestFits?`, using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)`:'');
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
       const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)');
@@ -3200,7 +3218,7 @@ __GALAXIES_JS__
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
-    const mondToggle=document.getElementById('mondToggle'),mondFitToggle=document.getElementById('mondFitToggle');
+    const mondToggle=document.getElementById('mondToggle'),bestFitToggle=document.getElementById('bestFitToggle');
     const formatA0=a0=>{const e=Math.floor(Math.log10(a0));return `${(a0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;};
     function applyBaryonState(){
       // The best fit in use sets the M/L ratios, a0, distance and tilt; otherwise SPARC's standard values apply.
@@ -3211,21 +3229,30 @@ __GALAXIES_JS__
       MOND_A0=fit&&mondMode?fit.a0_ms2:MOND_A0_DEFAULT;
       fitFrame=frameOf(activeGalaxy,fit);
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
-      document.getElementById('mondFitWrap').hidden=!mondMode||customActive;
+      document.getElementById('bestFitWrap').hidden=customActive;
       const mlStat=document.getElementById('mlStat');
       mlStat.classList.toggle('off',customActive); // hidden in the sandbox, which sets stellar masses directly
       document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
       document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
-      const mlSource=fit?(mondMode?'MOND best fit':'NFW best fit'):'standard SPARC values';
+      const mlSource=fit&&bestFits?(mondMode?'MOND best fit':'NFW best fit'):'standard SPARC values';
       document.getElementById('mlSource').textContent=mlSource;
       document.getElementById('ftMlSource').textContent=mlSource;
-      mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). The best fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
+      mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). Best realistic fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
       document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
     }
-    mondFitToggle.addEventListener('change',()=>{applyBaryonState();updateHalo();});
-    applyBaryonState();updateHalo(); // the page opens with the preset's NFW best fit applied
+    bestFitToggle.addEventListener('change',()=>{
+      bestFits=bestFitToggle.checked;
+      DEFAULTS=haloDefaultsOf(activeGalaxy);
+      if(!customActive){ // the halo sliders follow the new fit unless the halo was set to zero (Visible Matter Only)
+        const m=massSlider.value,rs=scaleSlider.value;
+        configureHaloSliders();
+        if(!nfwFitApplied){massSlider.value=m;scaleSlider.value=rs;}
+      }
+      applyBaryonState();updateHalo();
+    });
+    applyBaryonState();updateHalo(); // the page opens with the preset's halo fit at SPARC's standard values
     // "?" on the M/L tile: a mouse hover fades the explainer in and moving away fades it out
     // (a short grace period lets the pointer travel into the box). Touch and keyboard users tap/press
     // the button instead, and close it with ×, Escape or a tap elsewhere.
@@ -3259,7 +3286,6 @@ __GALAXIES_JS__
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mlIsOpen()){closeMlExplainer();mlInfoBtn.focus();}});
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
-      if(!mondMode)mondFitToggle.checked=false;
       document.getElementById('optNfw').classList.toggle('active',!mondMode);
       document.getElementById('optMond').classList.toggle('active',mondMode);
       document.getElementById('mondNote').hidden=!mondMode;
@@ -3446,19 +3472,21 @@ __GALAXIES_JS__
     galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
 
     /* ---------- Scorecard ----------
-       Every preset galaxy scored under each model with the page's own functions: visible matter only and plain MOND
-       (SPARC's standard values, nothing tuned), and the NFW and MOND best fits (realistic limits, from the generator's
-       fit_nfw and fit_mond). The numbers match the fit badge. */
+       Every preset galaxy scored under each model with the page's own functions. Standard values: visible matter only,
+       the halo fit (halo only tuned) and plain MOND. Best realistic fits: the NFW and MOND best fits (realistic limits,
+       from the generator's fit_nfw and fit_mond). The numbers match the fit badge. */
     function scoreGalaxy(galaxy){
       const rows=sparcRowsOf(galaxy),vBar=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
       const chiOf=model=>rows.reduce((s,p,i)=>s+((p.observed_kms-model[i])/p.error_kms)**2,0);
-      const{nfw,mond}=galaxy.best_fit,nfwFrame=frameOf(galaxy,nfw),mondFrame=frameOf(galaxy,mond);
+      const{nfw_standard:std,nfw,mond}=galaxy.best_fit,nfwFrame=frameOf(galaxy,nfw),mondFrame=frameOf(galaxy,mond);
+      const haloStd=nfwVelocityModel(std.m200_msun,std.scale_radius_kpc);
       const vBarNfw=sparcBaryons(rows,nfw.upsilon_disk,nfw.upsilon_bulge,nfwFrame),vBarMond=sparcBaryons(rows,mond.upsilon_disk,mond.upsilon_bulge,mondFrame);
       const halo=nfwVelocityModel(nfw.m200_msun,nfw.scale_radius_kpc,nfwFrame);
       return{pointCount:rows.length,
-        k:{visible:0,nfw:tunedCount('nfw',nfw),mond:0,mondBest:tunedCount('mondBest',mond)},
+        k:{visible:0,nfwStd:tunedCount('nfw',std),mond:0,nfw:tunedCount('nfw',nfw),mondBest:tunedCount('mondBest',mond)},
         chi:{
         visible:chiOf(vBar),
+        nfwStd:chiOf(rows.map((p,i)=>Math.hypot(vBar[i],haloStd(p.radius_kpc)))),
         nfw:chiOf(rows.map((p,i)=>Math.hypot(vBarNfw[i],halo(p.radius_kpc)))),
         mond:chiOf(rows.map((p,i)=>mondVelocity(vBar[i],p.radius_kpc,MOND_A0_DEFAULT))),
         mondBest:chiOf(rows.map((p,i)=>mondModelVelocity(vBarMond[i],p.radius_kpc,mond.a0_ms2,mondFrame)))}};
@@ -3473,17 +3501,19 @@ __GALAXIES_JS__
       const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}${limitMark(fit,'upsilon_bulge')}`:'';
       return `M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
     }
-    const SCORE_COLUMNS={visible:'Visible matter only',nfw:'Dark matter halo (NFW), best realistic fit',mond:'MOND, nothing tuned',mondBest:'MOND best fit (realistic limits)'};
+    const SCORE_COLUMNS={visible:'Visible matter only',nfwStd:'Dark matter halo (NFW), standard values',mond:'MOND, standard values',nfw:'NFW, best realistic fit',mondBest:'MOND, best realistic fit'};
     function scoreRowHtml(galaxy){
-      const score=scoreGalaxy(galaxy),{nfw,mond}=galaxy.best_fit;
+      const score=scoreGalaxy(galaxy),{nfw_standard:std,nfw,mond}=galaxy.best_fit;
+      const haloText=fit=>`M<sub>200</sub> ${(fit.m200_msun/1e12).toFixed(2)}×10¹² M☉${limitMark(fit,'m200_msun')} · concentration ${fit.concentration.toFixed(1)}${limitMark(fit,'concentration')}${limitMark(fit,'scale_radius_kpc')}`;
+      const stdTuned=`<small>${score.k.nfwStd} tuned: ${haloText(std)}</small>`;
       const cell=(model,note='')=>{ // data-label names the column on phones, where the table stacks
         const red=reducedChi(score.chi[model],score.pointCount,score.k[model]),verdict=fitVerdict(red);
         const miss=Math.sqrt(score.chi[model]/score.pointCount); // root-mean-square gap, in error bars
         return `<td data-label="${SCORE_COLUMNS[model]}"><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
       };
-      const nfwTuned=`<small>${score.k.nfw} tuned: M<sub>200</sub> ${(nfw.m200_msun/1e12).toFixed(2)}×10¹² M☉${limitMark(nfw,'m200_msun')} · concentration ${nfw.concentration.toFixed(1)}${limitMark(nfw,'concentration')}${limitMark(nfw,'scale_radius_kpc')} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
+      const nfwTuned=`<small>${score.k.nfw} tuned: ${haloText(nfw)} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
       const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
-      return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfw',nfwTuned)}${cell('mond')}${cell('mondBest',mondTuned)}</tr>`;
+      return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>`;
     }
     const scoreBody=document.getElementById('scoreBody');
     function renderScorecard(){
@@ -3785,9 +3815,9 @@ __GALAXIES_JS__
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter at all. Instead, gravity is stronger than Newton’s law predicts where it is very weak, as in the outer galaxy. The halo sliders switch off.',
          action:'Click MOND on the gravity switch (blue ring), then compare its χ² with the halo’s.'},
-        {id:'mondFit',mond:true,mode:'preset',target:'mondFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ² drop'],title:'Give MOND its best shot',
-         text:'MOND best fit adjusts a₀, the mass-to-light ratio (only an estimate), and the galaxy’s distance and tilt, within realistic limits, for the lowest χ².',
-         action:'Turn on MOND best fit (blue ring, top right) and watch χ² drop.'},
+        {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ² drop'],title:'Give both their best shot',
+         text:'Nobody knows a galaxy’s exact mass-to-light ratio, distance or tilt. Best realistic fits lets both models tune them within the same realistic limits (plus a₀ for MOND). The cyan line may move: the stars’ assumed mass has changed.',
+         action:'Turn on Best realistic fits (blue ring, top right) and watch MOND’s χ² drop. The halo’s fit improves too when you switch back.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
         {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],title:'Now watch it happen',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
@@ -3822,7 +3852,7 @@ __GALAXIES_JS__
          text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo.',
          action:'Open the Galaxy menu (blue ring) and choose another galaxy. Is the same gap there between the white points and the cyan line?'},
         {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
-         text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. The values here are standard averages, so they are an assumption.',
+         text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. SPARC’s standard values are averages, so they are an assumption; Best realistic fits lets each model adjust them.',
          action:'Hover over or tap the ? (blue ring) beside Mass-to-light to read more.'},
         {id:'finish',target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
          text:'A close fit here does not prove either idea. Both models simplify a real galaxy, the measurements have uncertainties, and the mass of the stars is an estimate. One galaxy alone cannot settle which explanation is correct.',
@@ -4503,8 +4533,8 @@ __GALAXIES_JS__
       if(mondMode)completeTutorialAction('mond','MOND selected: no halo, modified gravity instead.');
       tutorialRecheck();
     });
-    mondFitToggle.addEventListener('change',()=>{
-      if(mondFitToggle.checked)completeTutorialAction('mondFit','Best fit on: a₀, the mass-to-light ratio, distance and tilt have been re-tuned within realistic limits.');
+    bestFitToggle.addEventListener('change',()=>{
+      if(bestFitToggle.checked)completeTutorialAction('bestFit','Best fits on: each model has re-tuned the mass-to-light ratio, distance and tilt (and MOND its a₀) within realistic limits.');
     });
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
     // "I've been here before" is remembered in this browser, so the offer does not return on later visits.
@@ -4617,10 +4647,11 @@ def main() -> None:
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")
     print(f"Embedded {len(galaxies)} SPARC galaxies")
     for galaxy in galaxies:
-        nfw, mond = galaxy["best_fit"]["nfw"], galaxy["best_fit"]["mond"]
+        std, nfw, mond = (galaxy["best_fit"][key] for key in ("nfw_standard", "nfw", "mond"))
         print(
             f"  {galaxy['name']}: {len(galaxy['rotation']['radius_kpc'])} points; "
-            f"NFW M200={nfw['m200_msun']:.3g} Msun, rs={nfw['scale_radius_kpc']:.1f} kpc, chi2={nfw['chi2']:.1f}; "
+            f"NFW standard M200={std['m200_msun']:.3g} Msun, rs={std['scale_radius_kpc']:.1f} kpc, chi2={std['chi2']:.1f}; "
+            f"NFW best M200={nfw['m200_msun']:.3g} Msun, rs={nfw['scale_radius_kpc']:.1f} kpc, chi2={nfw['chi2']:.1f}; "
             f"MOND a0={mond['a0_ms2']:.3g}, chi2={mond['chi2']:.1f}"
         )
 

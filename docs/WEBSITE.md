@@ -105,8 +105,8 @@ press it on touch screens and keyboards): what a mass-to-light ratio
 is, why young stellar populations have low M/L and old ones high M/L, and that
 the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 μm are standard averages
 (Lelli, McGaugh & Schombert 2016; McGaugh & Schombert 2014), not values
-measured for each galaxy, and that the best fits may move them between about
-0.6 and 1.6 times those values. It fades out when the pointer leaves, or on ×,
+measured for each galaxy, and that the Best realistic fits switch lets each
+model move them between about 0.6 and 1.6 times those values. It fades out when the pointer leaves, or on ×,
 Escape or a tap elsewhere.
 
 Test stars:
@@ -211,9 +211,15 @@ edited (sliders and switches let go of focus after a mouse or touch drag, so
 the arrows return to the tour). Outside the tour, in fullscreen only, the arrows
 step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
+Best realistic fits switch (header, beside the M/L tile; presets only): off by
+default, so every model uses SPARC's standard M/L, distance and tilt and the
+cyan visible-matter curve is the same in NFW and MOND mode. On, the NFW and
+MOND best fits each tune those within the same realistic limits (MOND also
+a₀); see PHYSICS.md. It replaced the MOND-only "MOND best fit" switch.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
 the scale radius and returns to SPARC's standard M/L, distance and tilt; Apply
-Observed Fit restores the best realistic NFW fit (halo, M/L, distance and tilt).
+Observed Fit restores the halo fit for the switch's state (halo only, or the
+NFW best fit's halo, M/L, distance and tilt).
 The M/L tile shows the values in use and, under them, where they come from
 ("standard SPARC values", "NFW best fit" or "MOND best fit"); the Method page's
 visible-matter formula shows the same numbers and label. The fit badge's tooltip
@@ -225,11 +231,12 @@ or keyboard.
 
 Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
 fit") sits in front of χ² and χ²ᵣ. Beside the badge a grey label names what is being
-scored and how many values were tuned (`fitLabel`): "NFW best fit · 5 tuned",
+scored and how many values were tuned (`fitLabel`): "NFW halo fit · 2 tuned",
+"NFW best fit · 5 tuned",
 "Your halo" (sliders moved, with or without the fit's M/L, distance and tilt),
 "Visible matter only", "Plain MOND · 0 tuned" or "MOND best fit · 4 tuned". Its
-tooltip names the like-for-like pairs (the two best fits; visible matter only
-and plain MOND). The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
+tooltip says every model uses the same settings (standard, or each model's
+best realistic fit). The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
 are the site's own rule of thumb (`fitVerdict`), and the guide under the graph
 says so. χ²ᵣ divides by the measured points minus the values tuned to the galaxy
 (`tunedCount`: the halo's 2 or a₀'s 1, plus the M/L, distance and tilt values a
@@ -238,9 +245,10 @@ values quoted in the Method page and the Scorecard's "Tuned values" card are
 written by the generator (`tuned_count_text`) from the same numbers, so they
 cannot drift from the page's maths.
 
-Scorecard: a table scoring every preset galaxy under visible matter only, the
-best realistic NFW fit (Apply Observed Fit), MOND at the default a₀, and the
-MOND best fit. Both best-fit cells list how many values were tuned and what they
+Scorecard: a table scoring every preset galaxy in two column groups.
+"Standard values": visible matter only, the NFW halo fit (halo only) and MOND
+at the default a₀. "Best realistic fits": the NFW and MOND best fits. The halo
+and best-fit cells list how many values were tuned and what they
 are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). A value that stopped at a realistic limit carries a small "at limit" tag whose tooltip says which limit. Under each score it gives the root-mean-square gap in plain words
 ("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
 On phones (640 px or narrower) the table becomes one stacked card per galaxy,

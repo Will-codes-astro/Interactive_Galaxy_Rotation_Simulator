@@ -124,7 +124,7 @@ function reducedChi(total, model) {
 // Chi-squared of the generator's best fits, recomputed by the page (scorecard) next to the generator's own value.
 const fitMismatch = galaxy => {
   const score = P.scoreGalaxy(galaxy), fits = galaxy.best_fit;
-  return Math.max(Math.abs(score.chi.nfw / fits.nfw.chi2 - 1), Math.abs(score.chi.mondBest / fits.mond.chi2 - 1));
+  return Math.max(Math.abs(score.chi.nfwStd / fits.nfw_standard.chi2 - 1), Math.abs(score.chi.nfw / fits.nfw.chi2 - 1), Math.abs(score.chi.mondBest / fits.mond.chi2 - 1));
 };
 
 /* ---------- Measurements ---------- */
@@ -135,7 +135,7 @@ out.galaxy = P.galaxy().id;
 out.star_count = starCount;
 out.default_halo = { massT: d.massT, scaleRadius: d.scaleRadius };
 
-// The page opens with the NFW best fit applied; Visible Matter Only returns to SPARC's standard values.
+// The page opens with the halo fit at SPARC's standard values (Best realistic fits off); Visible Matter Only removes the halo.
 const withHalo = run(d.massT, d.scaleRadius);
 P.setFitApplied(false);
 const noHalo = run(0, d.scaleRadius);

@@ -1,28 +1,28 @@
 {
   "star_count": 800,
   "default_halo": {
-    "massT": 0.37,
-    "scaleRadius": 11.5
+    "massT": 0.46,
+    "scaleRadius": 16.5
   },
   "escaped_with_halo": 0,
   "escaped_visible_only": 142,
   "reduced_chi2_visible_only": 759.0540285683601,
-  "reduced_chi2_nfw_default": 1.4655338864459508,
+  "reduced_chi2_nfw_default": 1.4001792238417374,
   "reduced_chi2_mond": 21.304792866398063,
   "presets": {
     "NGC2403": {
       "reduced_chi2_visible_only": 4374.210085525969,
-      "reduced_chi2_nfw_default": 9.34355136475557,
+      "reduced_chi2_nfw_default": 10.06116510403655,
       "best_fit_chi2_relative_mismatch": 8.165913272240033e-07
     },
     "NGC7331": {
       "reduced_chi2_visible_only": 241.6015659825833,
-      "reduced_chi2_nfw_default": 0.7227857132945079,
+      "reduced_chi2_nfw_default": 9.182958122977755,
       "best_fit_chi2_relative_mismatch": 2.6352388287520512e-05
     },
     "UGC00128": {
       "reduced_chi2_visible_only": 6130.545888764023,
-      "reduced_chi2_nfw_default": 3.541277547408826,
+      "reduced_chi2_nfw_default": 3.226436293128134,
       "best_fit_chi2_relative_mismatch": 8.303764970940541e-05
     }
   }

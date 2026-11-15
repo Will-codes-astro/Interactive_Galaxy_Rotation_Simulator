@@ -8,9 +8,10 @@
  *
  * Radii are in kpc and velocities in km/s. v_gas_kms keeps SPARC's sign (the gas term can be
  * negative). catalogue holds SPARC Table 1's distance and inclination with their errors.
- * best_fit holds the generator's NFW and MOND fits, each searched only over physically realistic
- * values (mass-to-light ratios, distance, inclination, and the halo concentration or a0): see
- * fit_nfw and fit_mond. These are model results, not measurements.
+ * best_fit holds the generator's fits. nfw_standard tunes only the halo, with SPARC's standard
+ * mass-to-light ratios, distance and inclination (the page's default). nfw and mond also tune those
+ * settings, searched only over physically realistic values (and the halo concentration or a0): the
+ * Best realistic fits switch. See fit_nfw and fit_mond. These are model results, not measurements.
  */
 window.GALAXIES = {
   "NGC3198": {
@@ -19,6 +20,7 @@ window.GALAXIES = {
     summary: "Classic late-type spiral benchmark",
     catalogue: {"distance_mpc": 13.8, "distance_err_mpc": 1.4, "inclination_deg": 73.0, "inclination_err_deg": 3.0},
     best_fit: {
+      nfw_standard: {"m200_msun": 460000000000.0, "scale_radius_kpc": 16.5, "concentration": 9.651, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 13.8, "inclination_deg": 73.0, "tuned_settings": 0, "at_limit": {}, "chi2": 57.407},
       nfw: {"m200_msun": 370000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.877, "upsilon_disk": 0.5222, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 78.11, "tuned_settings": 3, "at_limit": {"distance_mpc": "low"}, "chi2": 55.69},
       mond: {"a0_ms2": 9.6e-11, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 12.575, "inclination_deg": 76.37, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high"}, "chi2": 158.725},
     },
@@ -37,6 +39,7 @@ window.GALAXIES = {
     summary: "Gas-rich late-type spiral",
     catalogue: {"distance_mpc": 3.16, "distance_err_mpc": 0.16, "inclination_deg": 63.0, "inclination_err_deg": 3.0},
     best_fit: {
+      nfw_standard: {"m200_msun": 280000000000.0, "scale_radius_kpc": 11.0, "concentration": 12.268, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 3.16, "inclination_deg": 63.0, "tuned_settings": 0, "at_limit": {}, "chi2": 714.343},
       nfw: {"m200_msun": 280000000000.0, "scale_radius_kpc": 8.5, "concentration": 15.877, "upsilon_disk": 0.4262, "upsilon_bulge": 0.7, "distance_mpc": 3.093, "inclination_deg": 57.0, "tuned_settings": 3, "at_limit": {"concentration": "high", "inclination_deg": "low"}, "chi2": 635.361},
       mond: {"a0_ms2": 1.44e-10, "upsilon_disk": 0.6909, "upsilon_bulge": 0.7, "distance_mpc": 3.361, "inclination_deg": 62.72, "tuned_settings": 3, "at_limit": {"a0_ms2": "high"}, "chi2": 864.718},
     },
@@ -55,6 +58,7 @@ window.GALAXIES = {
     summary: "Massive early-type spiral with a prominent bulge",
     catalogue: {"distance_mpc": 14.7, "distance_err_mpc": 1.5, "inclination_deg": 75.0, "inclination_err_deg": 2.0},
     best_fit: {
+      nfw_standard: {"m200_msun": 2740000000000.0, "scale_radius_kpc": 60.0, "concentration": 4.811, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 14.7, "inclination_deg": 75.0, "tuned_settings": 0, "at_limit": {"scale_radius_kpc": "high"}, "chi2": 312.221},
       nfw: {"m200_msun": 2440000000000.0, "scale_radius_kpc": 32.5, "concentration": 8.545, "upsilon_disk": 0.4905, "upsilon_bulge": 0.4417, "distance_mpc": 11.7, "inclination_deg": 71.0, "tuned_settings": 4, "at_limit": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "low"}, "chi2": 21.683},
       mond: {"a0_ms2": 1.44e-10, "upsilon_disk": 0.3946, "upsilon_bulge": 0.4417, "distance_mpc": 15.61, "inclination_deg": 77.76, "tuned_settings": 4, "at_limit": {"a0_ms2": "high", "upsilon_bulge": "low"}, "chi2": 37.228},
     },
@@ -73,6 +77,7 @@ window.GALAXIES = {
     summary: "Low-surface-brightness galaxy: faint, spread-out and gas-rich (de Blok & McGaugh 1996)",
     catalogue: {"distance_mpc": 64.5, "distance_err_mpc": 9.7, "inclination_deg": 57.0, "inclination_err_deg": 10.0},
     best_fit: {
+      nfw_standard: {"m200_msun": 360000000000.0, "scale_radius_kpc": 17.0, "concentration": 8.632, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 64.5, "inclination_deg": 57.0, "tuned_settings": 0, "at_limit": {}, "chi2": 64.529},
       nfw: {"m200_msun": 320000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.269, "upsilon_disk": 0.3155, "upsilon_bulge": 0.7, "distance_mpc": 45.1, "inclination_deg": 56.47, "tuned_settings": 3, "at_limit": {"upsilon_disk": "low", "distance_mpc": "low"}, "chi2": 60.202},
       mond: {"a0_ms2": 9.6e-11, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 49.732, "inclination_deg": 76.99, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high", "inclination_deg": "high"}, "chi2": 1264.151},
     },
