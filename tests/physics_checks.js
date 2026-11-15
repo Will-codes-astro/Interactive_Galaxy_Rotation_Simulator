@@ -73,7 +73,8 @@ for (const n of ['THREE', 'Plotly', 'navigator', 'localStorage', 'sessionStorage
   'history', 'Blob', 'URL', 'screen', 'devicePixelRatio', 'innerWidth', 'innerHeight',
   'addEventListener', 'removeEventListener', 'CustomEvent', 'Event', 'KeyboardEvent', 'PointerEvent',
   'Image', 'Option', 'Audio', 'HTMLElement', 'Element', 'Node', 'CSS', 'AbortController',
-  'FileReader', 'TextEncoder', 'fetch', 'alert', 'confirm', 'prompt', 'queueMicrotask', 'structuredClone']) {
+  'FileReader', 'TextEncoder', 'fetch', 'alert', 'confirm', 'prompt', 'queueMicrotask', 'structuredClone',
+  'WebGLRenderingContext']) {
   ctx[n] = stub(n);
 }
 ctx.document = documentStub;

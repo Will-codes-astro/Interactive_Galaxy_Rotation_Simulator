@@ -10,7 +10,10 @@ sources. The top menu shows one page at a time (`showPage`); each page ends with
 a "Next" button, the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
-correctly sized. On phones (640 px or narrower) the menu uses short labels
+correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
+WebGL is off, a red note at the top says which, and the page shows The puzzle,
+Background and Method as one long scroll; the Simulator and Scorecard, which need
+the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
 ("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, MOND best
 fit) sit at the top right of the Simulator page.
 

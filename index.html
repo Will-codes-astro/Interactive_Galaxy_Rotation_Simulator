@@ -636,6 +636,9 @@
     @media (max-width:640px) { .scorecard { padding:16px; } }
     /* Pages: one .page shows at a time. A hidden page keeps its width (height 0, not display:none) so its plots stay sized. */
     .page:not(.active) { height:0; overflow:hidden; visibility:hidden; }
+    .load-failed { margin:16px 0; padding:14px 16px; border:1px solid rgba(255,138,128,.6); border-radius:10px; background:rgba(255,138,128,.08); color:var(--ink); line-height:1.5; }
+    body.sim-unavailable .page:not(.active) { height:auto; overflow:visible; visibility:visible; }
+    body.sim-unavailable :is(.page[data-page="simulator"], .page[data-page="scorecard"], .page-next, .topnav a[href="#simulator"], .topnav a[href="#scorecard"]) { display:none; }
     .topnav a[aria-current="page"] { color:var(--ink); background:rgba(138,180,248,.16); }
     .page header { max-width:none; margin:0; padding:36px 0 4px; display:block; }
     .page > .section-head:first-child, .sim-head > .section-head { margin-top:20px; padding-top:8px; border-top:0; }
@@ -1072,6 +1075,29 @@ window.GALAXIES = {
 
   </script>
   <script>
+    /* Runs before the simulator. If a library did not load (a network that blocks CDNs, or no internet) or the
+       browser has WebGL turned off, say so plainly, show every page as one long scroll so the text still reads,
+       and stop: the simulator below needs all of them. */
+    (()=>{
+      const canvas=document.createElement('canvas');
+      let webgl=false;
+      try{webgl=!!(window.WebGLRenderingContext&&(canvas.getContext('webgl2')||canvas.getContext('webgl')));}catch(err){}
+      const missing=[];
+      if(typeof Plotly==='undefined')missing.push('Plotly (graphs)');
+      if(typeof THREE==='undefined'||!THREE.EffectComposer||!THREE.UnrealBloomPass)missing.push('Three.js (3D view)');
+      if(!missing.length&&webgl)return;
+      window.SIM_UNAVAILABLE=missing.length?`could not load ${missing.join(' and ')}`:'WebGL is turned off in this browser';
+      const note=document.createElement('div');
+      note.className='load-failed';note.setAttribute('role','alert');
+      note.innerHTML=`<b>The interactive simulator could not start:</b> ${window.SIM_UNAVAILABLE}. `+(missing.length
+        ?'These load from the internet, so a school or work network may be blocking them. Try another network, or reload.'
+        :'Try another browser, or turn on hardware acceleration in this one.')+' The explanations below still work.';
+      document.body.classList.add('sim-unavailable');
+      document.querySelector('main').prepend(note);
+    })();
+  </script>
+  <script>
+    if(window.SIM_UNAVAILABLE)throw new Error('Simulator not started: '+window.SIM_UNAVAILABLE); // see the check above
     document.querySelectorAll('details').forEach(details=>{
       const summary=details.querySelector('summary');
       const content=summary.nextElementSibling;
