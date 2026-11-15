@@ -15,7 +15,9 @@ correctly sized. On phones (640 px or narrower) the menu uses short labels
 fit) sit at the top right of the Simulator page.
 
 The tutorial offer appears the first time the Simulator page opens, not over the
-opening story. Each tour step opens the page its control is on (the last step
+opening story. "I've been here before" is remembered in the
+browser (`localStorage`, read and written inside try/catch), so the offer does
+not return on later visits; if storage is blocked it shows once per visit. Each tour step opens the page its control is on (the last step
 opens Background); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 

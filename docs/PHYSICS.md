@@ -130,7 +130,7 @@ site uses hard limits.
 
 ## MOND (Milgrom 1983)
 
-μ(g/a₀) g = g_N, with the "simple-standard" interpolating function
+μ(g/a₀) g = g_N, with the "standard" interpolating function
 μ(x) = x/√(1 + x²) (Famaey & McGaugh 2012). Solved exactly for g:
 
 g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI), and V_MOND = √(g r)
@@ -226,7 +226,14 @@ These are documented here, not changed. Any change needs Will's decision.
    scores χ²_ν ≈ 70, with Υ_disk, a₀ and the tilt all at their limits: within
    realistic values MOND cannot match this galaxy here. The NFW fit scores
    χ²_ν ≈ 3.5, with its distance at the lower limit (45 Mpc). Plain MOND
-   scores χ²_ν ≈ 115. "Low surface brightness" is cited on the page to de Blok
+   scores χ²_ν ≈ 115. Checked independently on 15 Nov 2026 (a separate script reading
+   table2.dat directly, with SciPy's bounded optimiser): the same χ² for plain
+   MOND (2530) and the MOND best fit (1264), so this is not a code error. The
+   cause is the curve's shape: MOND is too slow between 6 and 21 kpc and about
+   6 % too fast beyond 26 kpc, and SPARC's errors there are only 0.55 to 1 km/s,
+   so each of those points adds about 25 to 480 to χ². Raising M/L lifts the inner curve but
+   also the outer one, so the fit lowers a₀ to compensate and both stop at
+   their limits. NGC 2403's plain MOND χ²_ν ≈ 338 was checked the same way. "Low surface brightness" is cited on the page to de Blok
    & McGaugh (1996), who use 60 Mpc for it.
 8. Several best fits sit at a limit (on 15 Nov 2026: the MOND a₀ for all four
    presets, 16 values in all across NFW and MOND, listed in each fit's

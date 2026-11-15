@@ -138,7 +138,7 @@ def _r200_kpc(m200_msun: float) -> float:
 
 
 def _mond_velocity(v_bar_kms: float, radius_kpc: float, a0_ms2: float) -> float:
-    """MOND speed with the simple interpolating function, solved exactly. Same as mondVelocity (page JS)."""
+    """MOND speed with the standard interpolating function mu(x) = x / sqrt(1 + x^2), solved exactly. Same as mondVelocity (page JS)."""
     r_m, v_ms = radius_kpc * M_PER_KPC, v_bar_kms * 1000.0
     if r_m <= 0.0 or v_ms <= 0.0:
         return 0.0
@@ -4463,7 +4463,14 @@ __GALAXIES_JS__
       if(mondFitToggle.checked)completeTutorialAction('mondFit','Best fit on: a₀, the mass-to-light ratio, distance and tilt have been re-tuned within realistic limits.');
     });
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
-    document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
+    // "I've been here before" is remembered in this browser, so the offer does not return on later visits.
+    // Storage can be blocked (private windows, school settings): then the offer simply shows once per visit.
+    const WELCOME_SKIPPED_KEY='galaxySim.welcomeSkipped';
+    const welcomeSkipped=()=>{try{return localStorage.getItem(WELCOME_SKIPPED_KEY)==='1';}catch(err){return false;}};
+    document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>{
+      try{localStorage.setItem(WELCOME_SKIPPED_KEY,'1');}catch(err){}
+      tutorialWelcome.close();
+    });
     tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
     document.getElementById('puzzleTour').addEventListener('click',()=>{if(galaxyMode==='custom')setGalaxyMode('preset');startTutorial('main',true);});
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
@@ -4496,7 +4503,7 @@ __GALAXIES_JS__
       }
     });
     // The tour is offered the first time the Simulator page opens, not over the opening story.
-    let tourOffered=false;
+    let tourOffered=welcomeSkipped();
     document.addEventListener('pagechange',e=>{
       tutorialRecheck();
       if(e.detail.page==='simulator'&&!tourOffered&&tutorialCard.hidden){tourOffered=true;tutorialWelcome.showModal();}
