@@ -633,11 +633,12 @@
     @media (max-width:1100px) { .evidence-grid { grid-template-columns:1fr 1fr; } } @media (max-width:560px) { .evidence-grid { grid-template-columns:1fr; } }
     /* Reference list. */
     .refs { margin:4px 0 18px; padding-top:16px; border-top:1px solid var(--line); }
-    .refs h3 { margin:0 0 8px; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
-    .refs ul { margin:0; padding:0; list-style:none; columns:2; column-gap:32px; }
-    .refs li { margin:0 0 8px; padding-left:18px; text-indent:-18px; break-inside:avoid; color:var(--ink-2); font-size:12.5px; line-height:1.55; overflow-wrap:anywhere; }
+    .refs h3 { margin:0 0 14px; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .refs ul { margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .refs li { margin:0; padding:12px 14px; border:1px solid var(--line); border-left:2px solid var(--line-strong); border-radius:var(--r); background:rgba(0,0,0,.16); color:var(--ink-2); font-size:12.5px; line-height:1.6; overflow-wrap:anywhere; }
+    .refs li a { display:inline-block; margin-top:6px; font:500 11px var(--f-mono); }
     .refs p { margin:8px 0 0; color:var(--muted); font-size:12px; }
-    @media (max-width:900px) { .refs ul { columns:1; } }
+    @media (max-width:900px) { .refs ul { grid-template-columns:1fr; } }
     @media (max-width:640px) { .scorecard { padding:16px; } }
     /* Pages: one .page shows at a time. A hidden page keeps its width (height 0, not display:none) so its plots stay sized. */
     .page:not(.active) { height:0; overflow:hidden; visibility:hidden; }
