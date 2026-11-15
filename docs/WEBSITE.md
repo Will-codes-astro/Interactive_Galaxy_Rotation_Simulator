@@ -60,8 +60,8 @@ type with its family and arms (`HUBBLE_TYPES`), whether there is a central bulge
 flat rotation speed (also in km/h), how far out it was measured and how many
 speeds, and a stars-vs-gas bar (stars ≈ 0.5 × L[3.6], gas = 1.33 × M_HI, the
 helium factor SPARC uses). The stellar figure is a rough estimate (it ignores the
-bulge's higher M/L). The tutorial's "Try another galaxy" step rings the menu and
-puts a yellow watch ring on the card.
+bulge's higher M/L). The tutorial's "Try another galaxy" step boxes the menu in blue and
+puts a yellow watch box on the card.
 
 The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
@@ -216,9 +216,16 @@ already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
 highlighted control, and comes back only when the step points somewhere new.
-When a task is done the highlight turns green with one small ripple, the card
+Each card has one or two short sentences of explanation and an
+"Instructions:" line asking for one action; a card with several actions
+("1. … 2. …") shows one part at a time ("Part 1 of 2"), and each new part fades
+in. Controls to use get a blue box; the numbers or graph to watch while doing
+it (halo mass, scale radius, χ², M/L, tilt, the Ejected count) get yellow dashed
+boxes. A step finished by dragging a slider only counts as done once the slider
+is let go. When a task is done the highlight turns green with one small ripple, the card
 border tints green briefly, and the done message starts with a short word of
-praise. On screens wider than 700 px every card shows all its text without
+praise; a 10 s countdown (paused while a control is held, restarted by more
+input) then fades to the next card. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
 phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tutorial covers
