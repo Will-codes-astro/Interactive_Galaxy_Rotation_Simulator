@@ -19,6 +19,10 @@ fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
 the controls that change them. On wide screens the galaxy profile card splits into
 two columns (who the galaxy is | its numbers) to keep the figures nearer the top.
+The NFW/MOND switch ("Gravity model", `#modelBar`) is the first control in
+the slider bar (Will's choice), so on screens at least 961 × 700 px, where that bar
+sticks to the top, the theory can be flipped while watching the figures and χ².
+Its hint reads "Flip to MOND…" in NFW mode and gives a₀ in MOND mode.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
@@ -39,7 +43,7 @@ then, straight on, the sandbox tutorial ("Part 1 of 2", "Part 2 of 2"). "Open
 the simulator" instead brings up the welcome offer, whose "Start simulator
 tutorial" runs the simulator tutorial alone.
 
-The Galaxy menu above the gravity model switch chooses which SPARC galaxy
+The Galaxy menu (Model setup) chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
 the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
 restarts the orbit clock and re-integrates the star orbits. The selected

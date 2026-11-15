@@ -613,7 +613,11 @@ HTML_TEMPLATE = r"""<!doctype html>
     .fs-sliders input[type=range] { width:100%; height:16px; margin:0; }
     #orbitPlot .fs-sliders.mond-hidden { display:none; }
     .control[hidden] { display:none; }
-    @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto repeat(2,minmax(0,1fr)); } }
+    .gravity-label { display:block; margin-bottom:9px; color:var(--ink-2); font-size:12.5px; font-weight:500; }
+    .gravity-control .switch { display:flex; justify-content:flex-start; margin:0; gap:9px; font-size:13px; }
+    .gravity-control .control-help { max-width:300px; }
+    @media (max-width:960px) { .gravity-control { grid-column:1/-1; } }
     .fs-time { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
     .fs-play { flex:none; width:28px; height:28px; min-height:0; padding:0; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; line-height:1; }
     .fs-time output { margin-left:auto; }
@@ -872,7 +876,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .control output, .fs-sliders output { font-family:var(--f-mono); font-size:12px; color:var(--ink); }
     .control-help { font-size:12px; line-height:1.5; }
     /* Layout: the halo sliders sit directly above the plots they change and stay pinned while you scroll the plots (layout choice only). */
-    .sim-stage .controls { grid-template-columns:minmax(0,1.35fr) repeat(3,minmax(0,1fr)); gap:14px 26px; padding:14px 20px; margin-bottom:14px; }
+    .sim-stage .controls { grid-template-columns:auto minmax(0,1.35fr) repeat(3,minmax(0,1fr)); gap:14px 26px; padding:14px 20px; margin-bottom:14px; }
     .sim-stage .control-help { font-size:11.5px; line-height:1.45; min-height:0; margin-top:4px; }
     @media (min-width:961px) and (min-height:700px) {
       .sim-stage .controls { position:sticky; top:56px; z-index:150; background:linear-gradient(180deg,var(--panel-2),var(--panel)); }
@@ -1126,7 +1130,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
     <div class="page" data-page="simulator">
     <div class="sim-head">
-    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy and a theory of gravity.</p></div>
+    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy to model.</p></div>
     <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
@@ -1161,11 +1165,6 @@ HTML_TEMPLATE = r"""<!doctype html>
           </div>
         </div>
       </div>
-    </section>
-    <section class="model-bar" id="modelBar" aria-label="Gravity model">
-      <span class="model-label">Gravity model</span>
-      <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
-      <span class="mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</span>
     </section>
     <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
     <div class="stats-row">
@@ -1245,7 +1244,8 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="sandbox-footer"><p id="sandboxNote">Changing the galaxy resets the halo to its typical size. This galaxy is imaginary, so there are no measured speeds to compare with.</p><button type="button" id="sandboxReset" title="Return the anatomy sliders to an NGC 3198-like galaxy">Reset anatomy</button></div>
     </section>
     <div id="controlsAnchor" aria-hidden="true"></div>
-    <section class="controls" aria-label="Dark matter controls">
+    <section class="controls" aria-label="Model controls">
+    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label><p class="control-help" id="nfwNote">Flip to MOND, a change to gravity with no dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</p></div>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
@@ -3386,6 +3386,7 @@ __GALAXIES_JS__
       document.getElementById('optNfw').classList.toggle('active',!mondMode);
       document.getElementById('optMond').classList.toggle('active',mondMode);
       document.getElementById('mondNote').hidden=!mondMode;
+      document.getElementById('nfwNote').hidden=mondMode;
       applyBaryonState();
       // MOND has no halo, so its sliders are hidden rather than greyed out.
       ['massControl','scaleControl'].forEach(id=>{document.getElementById(id).hidden=mondMode;});
