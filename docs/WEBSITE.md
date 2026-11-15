@@ -256,8 +256,10 @@ evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with its source and a tag for the
 idea it points to. Two "Still open" cards follow: no confirmed dark matter
 particle (including the single LZ candidate event of September 2026, a 2.6σ
-preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds its
-equations under "Show the maths". Method & sources ends with a Harvard reference list of every
+preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds a
+three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
+v⁴ = GMa₀) under "Show the maths"; the full interpolating formula appears
+only in Method. Method & sources ends with a Harvard reference list of every
 source cited on the page, each linked by DOI (checked against Crossref on
 14 Nov 2026).
 
