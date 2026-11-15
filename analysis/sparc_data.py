@@ -1,4 +1,5 @@
-"""Read-only access to the SPARC mass-model table (Lelli, McGaugh & Schombert 2016).
+"""Read-only access to the SPARC tables (Lelli, McGaugh & Schombert 2016): the mass models
+(table2.dat) and the galaxy sample (table1.mrt, for distances and inclinations).
 
 Every script that needs SPARC data goes through this module, so the raw file is
 checked the same way everywhere. It never writes, downloads or replaces the file.
@@ -32,6 +33,17 @@ VALID_RANGES = {
     "v_bulge_kms": (0.0, 390.0),
 }
 EXPECTED_GALAXIES = 175
+
+# SPARC Table 1 (galaxy sample): distances and inclinations with their errors.
+TABLE1_PATH = ROOT / "data" / "sparc" / "table1.mrt"
+# SHA-256 with line endings normalised to LF. Recorded 2026-11-15 from the copy downloaded that day
+# from astroweb.case.edu/SPARC/SPARC_Lelli2016c.mrt (server date 28 Mar 2016).
+TABLE1_SHA256 = "5aa0501f6b0d881fa579030e315e7b5b6ef561a5bd3a07472f9929c7e5728243"
+# Positions of the fields used, counting whitespace-separated fields (Galaxy T D e_D f_D Inc e_Inc ...).
+# The data lines are offset from the file's own byte-by-byte description, so they are split on spaces;
+# no field used here contains a space.
+TABLE1_FIELDS = {"name": 0, "dist_mpc": 2, "e_dist_mpc": 3, "inc_deg": 5, "e_inc_deg": 6}
+TABLE1_FIELD_COUNT = 19
 
 
 class SparcRow(NamedTuple):
@@ -90,6 +102,46 @@ def load_table(path: Path = SPARC_PATH, check_hash: bool = True) -> list[SparcRo
     if len(galaxies) != EXPECTED_GALAXIES:
         raise ValueError(f"{path}: expected {EXPECTED_GALAXIES} galaxies, found {len(galaxies)}")
     return rows
+
+
+class GalaxyInfo(NamedTuple):
+    """One galaxy's distance and inclination with their published errors (SPARC Table 1)."""
+
+    name: str
+    dist_mpc: float  # assumed distance, Mpc (the same value as table2's Dist)
+    e_dist_mpc: float  # mean error on the distance, Mpc
+    inc_deg: float  # disk inclination, degrees (90 = edge-on)
+    e_inc_deg: float  # mean error on the inclination, degrees
+
+
+def load_galaxy_info(path: Path = TABLE1_PATH) -> dict[str, GalaxyInfo]:
+    """Parse SPARC Table 1 (machine-readable text), keyed by galaxy name. Raises ValueError on any problem."""
+    if not path.is_file():
+        raise FileNotFoundError(f"SPARC Table 1 missing: {path}. See docs/DATA_DICTIONARY.md.")
+    if path.resolve() == TABLE1_PATH.resolve() and file_sha256(path) != TABLE1_SHA256:
+        raise ValueError(f"{path} has changed. Raw SPARC data must not be edited; restore it with git.")
+    lines = path.read_text(encoding="ascii").splitlines()
+    # The byte-by-byte description ends with the last dashed line; one galaxy per line follows.
+    last_rule = max(n for n, line in enumerate(lines) if line.startswith("-" * 20))
+    info = {}
+    for line_number, line in enumerate(lines[last_rule + 1:], last_rule + 2):
+        if not line.strip():
+            continue
+        parts = line.split()
+        if len(parts) != TABLE1_FIELD_COUNT:
+            raise ValueError(f"{path}:{line_number}: expected {TABLE1_FIELD_COUNT} fields, found {len(parts)}")
+        try:
+            name = parts[TABLE1_FIELDS["name"]]
+            values = [float(parts[TABLE1_FIELDS[field]]) for field in GalaxyInfo._fields[1:]]
+        except ValueError as error:
+            raise ValueError(f"{path}:{line_number}: {error}") from None
+        row = GalaxyInfo(name, *values)
+        if not (row.dist_mpc > 0 and row.e_dist_mpc >= 0 and 0 < row.inc_deg <= 90 and row.e_inc_deg >= 0):
+            raise ValueError(f"{path}:{line_number}: distance or inclination out of range: {row}")
+        info[name.upper()] = row
+    if len(info) != EXPECTED_GALAXIES:
+        raise ValueError(f"{path}: expected {EXPECTED_GALAXIES} galaxies, found {len(info)}")
+    return info
 
 
 def galaxy_rows(name: str, path: Path = SPARC_PATH) -> list[SparcRow]:

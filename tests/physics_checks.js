@@ -86,9 +86,10 @@ const exportApi = `
   integrate: (m, rs) => integrateTrajectories(m, rs),
   escapedCount: () => sortedEscapeTimes.length,
   activeHaloMassT: () => activeHaloMassT,
-  setMond: on => { mondMode = on; },
+  setMond: on => { mondMode = on; applyBaryonState(); },
+  setFitApplied: on => { nfwFitApplied = on; applyBaryonState(); },
   mondVelocity, nfwVelocityModel, baryonicVelocity,
-  modelCurves, starCountFor, reducedChi,
+  modelCurves, starCountFor, reducedChi, tunedCount, activeFit, scoreGalaxy,
   defaults: () => DEFAULTS, frameCount, MOND_A0,
   particles: () => particles,
   galaxy: () => activeGalaxy,
@@ -113,12 +114,17 @@ function run(massT, rs) {
 }
 const meanShift = (a, b) => a.reduce((s, p, i) => s + Math.hypot(p[0] - b[i][0], p[1] - b[i][1], p[2] - b[i][2]), 0) / a.length;
 const median = xs => { const s = [...xs].sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
-// model names the page's fit model ('visible', 'nfw', 'mond'), which sets how many tuned values are subtracted from N.
+// model names the page's fit model ('visible', 'nfw', 'mond'); with the best fit in use it sets k in N - k.
 function reducedChi(total, model) {
   const { v, err } = P.obs();
   const chi = v.reduce((s, x, i) => s + ((x - total[i]) / err[i]) ** 2, 0);
-  return P.reducedChi(chi, v.length, model);
+  return P.reducedChi(chi, v.length, P.tunedCount(model, P.activeFit()));
 }
+// Chi-squared of the generator's best fits, recomputed by the page (scorecard) next to the generator's own value.
+const fitMismatch = galaxy => {
+  const score = P.scoreGalaxy(galaxy), fits = galaxy.best_fit;
+  return Math.max(Math.abs(score.chi.nfw / fits.nfw.chi2 - 1), Math.abs(score.chi.mondBest / fits.mond.chi2 - 1));
+};
 
 /* ---------- Measurements ---------- */
 const out = {};
@@ -128,8 +134,11 @@ out.galaxy = P.galaxy().id;
 out.star_count = starCount;
 out.default_halo = { massT: d.massT, scaleRadius: d.scaleRadius };
 
+// The page opens with the NFW best fit applied; Visible Matter Only returns to SPARC's standard values.
 const withHalo = run(d.massT, d.scaleRadius);
+P.setFitApplied(false);
 const noHalo = run(0, d.scaleRadius);
+P.setFitApplied(true);
 const heavyHalo = run(d.massT * 3, d.scaleRadius);
 const otherRs = run(d.massT, d.scaleRadius === 40 ? 20 : 40);
 out.escaped_with_halo = withHalo.escaped;
@@ -143,7 +152,8 @@ const ps = P.particles();
 out.median_abs_z_kpc = median(ps.map(p => Math.abs(p.position[2])));
 out.median_R_kpc = median(ps.map(p => Math.hypot(p.position[0], p.position[1])));
 
-// Visible matter on the page vs. SPARC with the gas sign kept.
+// Visible matter on the page vs. SPARC with the gas sign kept (SPARC's standard values, as after Visible Matter Only).
+P.setFitApplied(false);
 const g = P.galaxy().rotation, ups = P.upsilon();
 let worstGasMismatch = 0, negativeGasPoints = 0;
 g.radius_kpc.forEach((r, i) => {
@@ -157,7 +167,9 @@ out.baryonic_worst_relative_mismatch = worstGasMismatch;
 
 // Goodness of fit.
 out.reduced_chi2_visible_only = reducedChi(P.modelCurves(0, d.scaleRadius).total, 'visible');
+P.setFitApplied(true);
 out.reduced_chi2_nfw_default = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total, 'nfw');
+out.best_fit_chi2_relative_mismatch = fitMismatch(P.galaxy());
 
 // MOND.
 out.mond_a0 = P.MOND_A0;
@@ -185,9 +197,12 @@ for (const id of ['NGC2403', 'NGC7331', 'UGC00128']) {
   try {
     P.selectGalaxy(id);
     const dd = P.defaults();
+    const nfw = reducedChi(P.modelCurves(dd.massT, dd.scaleRadius).total, 'nfw');
+    P.setFitApplied(false);
     out.presets[id] = {
       reduced_chi2_visible_only: reducedChi(P.modelCurves(0, dd.scaleRadius).total, 'visible'),
-      reduced_chi2_nfw_default: reducedChi(P.modelCurves(dd.massT, dd.scaleRadius).total, 'nfw'),
+      reduced_chi2_nfw_default: nfw,
+      best_fit_chi2_relative_mismatch: fitMismatch(P.galaxy()),
     };
   } catch (e) {
     out.presets[id] = { error: String(e) };

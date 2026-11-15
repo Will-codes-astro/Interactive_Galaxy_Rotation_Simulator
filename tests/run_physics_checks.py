@@ -135,6 +135,11 @@ def javascript_checks() -> dict | None:
           "NGC 3198 chi-squared makes sense",
           f"reduced chi2: visible only {m['reduced_chi2_visible_only']:.0f}, "
           f"NFW default {m['reduced_chi2_nfw_default']:.2f}, MOND {m['reduced_chi2_mond']:.2f}")
+    worst_fit = max([m["best_fit_chi2_relative_mismatch"]]
+                    + [p.get("best_fit_chi2_relative_mismatch", 1.0) for p in m["presets"].values()])
+    check(worst_fit < 1e-3, "Best fits agree (generator vs page)",
+          f"the page's chi-squared for every NFW and MOND best fit matches the generator's "
+          f"(worst difference {100 * worst_fit:.4f}%)")
     check(m["mond_a0"] == 1.2e-10 and m["mond_halo_mass_used"] == 0
           and m["mond_shift_when_halo_sliders_move"] == 0,
           "MOND mode uses no dark matter",

@@ -27,6 +27,7 @@ from the **SPARC** survey (Lelli, McGaugh & Schombert 2016), mainly NGC 3198.
 
 ```
 data/sparc/table2.dat          raw SPARC data (read-only, checksum-checked)
+data/sparc/table1.mrt          raw SPARC galaxy table: distances, inclinations (read-only)
 analysis/                      offline Python
   sparc_data.py                  the only SPARC loader: validates, never writes
   baryonic_baseline.py           baryonic-only curve + χ²  -> results/, plots/
@@ -80,10 +81,11 @@ python generate_qr.py
 
 ## Data
 
-All code reads the one SPARC table, `data/sparc/table2.dat`, through
-`analysis/sparc_data.py`. That loader checks the file's checksum, header and
-value ranges before any calculation runs, and it never downloads or overwrites
-the file. Provenance and column definitions are in
+All code reads the SPARC tables, `data/sparc/table2.dat` (mass models) and
+`data/sparc/table1.mrt` (distances and inclinations), through
+`analysis/sparc_data.py`. That loader checks each file's checksum and layout and
+the value ranges before any calculation runs, and it never downloads or
+overwrites the files. Provenance and column definitions are in
 [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md). To add a SPARC galaxy to
 the site, add a `GalaxyPreset` to `GALAXY_PRESETS` in the generator and run it again.
 

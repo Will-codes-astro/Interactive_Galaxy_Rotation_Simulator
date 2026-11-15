@@ -43,7 +43,7 @@ The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
 speed contributions. There are four: three spirals (NGC 3198, NGC 2403,
 NGC 7331) and one low-surface-brightness galaxy (UGC 128), each shown in the
-galaxy picker and the scorecard. The generator creates it from `data/sparc/table2.dat`; do not edit it
+galaxy picker and the scorecard. The generator creates it from `data/sparc/table2.dat` and `table1.mrt`; do not edit it
 by hand. The generator also inlines the same code into `index.html`, so the
 published page stays a single file and the Pages workflow needs no change. To
 offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
@@ -99,7 +99,8 @@ press it on touch screens and keyboards): what a mass-to-light ratio
 is, why young stellar populations have low M/L and old ones high M/L, and that
 the presets' 0.5 (disk) and 0.7 (bulge) at 3.6 μm are standard averages
 (Lelli, McGaugh & Schombert 2016; McGaugh & Schombert 2014), not values
-measured for each galaxy. It fades out when the pointer leaves, or on ×,
+measured for each galaxy, and that the best fits may move them between about
+0.6 and 1.6 times those values. It fades out when the pointer leaves, or on ×,
 Escape or a tap elsewhere.
 
 Test stars:
@@ -205,7 +206,10 @@ the arrows return to the tour). Outside the tour, in fullscreen only, the arrows
 step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
-the scale radius; Apply Observed Fit restores the starting halo settings.
+the scale radius and returns to SPARC's standard M/L, distance and tilt; Apply
+Observed Fit restores the best realistic NFW fit (halo, M/L, distance and tilt).
+The M/L tile shows the values in use, and the fit badge's tooltip names the
+fit's distance and tilt.
 The View controls start collapsed. The rotation-curve guide combines the
 colour key and fit explanation. Select it or a theory box to open it. Halo
 values reveal their explanations on hover or when selected with a mouse, touch,
@@ -215,17 +219,18 @@ Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
 fit") sits in front of χ² and χ²ᵣ. The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
 are the site's own rule of thumb (`fitVerdict`), and the guide under the graph
 says so. χ²ᵣ divides by the measured points minus the values tuned to the galaxy
-(`FITTED_VALUES`: NFW halo 2, visible matter only 0, MOND 0, MOND best fit 2);
-see PHYSICS.md.
+(`tunedCount`: the halo's 2 or a₀'s 1, plus the M/L, distance and tilt values a
+best fit tunes; visible matter only and plain MOND 0); see PHYSICS.md.
 
 Scorecard: a table scoring every preset galaxy under visible matter only, the
-starting NFW halo (Apply Observed Fit), MOND at the default a₀, and the MOND
-best fit, which also shows its fitted a₀ and disk M/L beside the standard
-values. Under each score it gives the root-mean-square gap in plain words
+best realistic NFW fit (Apply Observed Fit), MOND at the default a₀, and the
+MOND best fit. Both best-fit cells list how many values were tuned and what they
+are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). Under each score it gives the root-mean-square gap in plain words
 ("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
 It is calculated in the page when it loads (`scoreGalaxy`), with the
 same functions as the fit badge, so the two always agree. "Show in simulator"
-loads that galaxy (leaving the sandbox if needed). Five short cards underneath state
+loads that galaxy (leaving the sandbox if needed). Five short cards underneath (including
+"Realistic limits", which names the sources of the fit limits) state
 what limits the comparison; they do not say which idea wins.
 
 Background has a third, full-width box, "Beyond rotation curves: the wider

@@ -44,7 +44,7 @@ V_bar² = V_gas·|V_gas| + Υ_disk·V_disk² + Υ_bulge·V_bulge²
 - **Keep the sign of V_gas.** A negative SPARC V_gas is real: at small radii the
   gas pulls outwards. Never use V_gas². The physics checks scan all Python for this.
 - If the sum is negative, V_bar is set to 0 (`max(0, …)`).
-- Implemented in: `fit_galaxy_halo` (generator); `baryonsFor` / `applyBaryonState`
+- Implemented in: `_chi_squared` (generator); `sparcBaryons` / `baryonsFor` / `applyBaryonState`
   (page JS); `analyse_galaxy` (`analysis/baryonic_baseline.py`);
   `simulate_baryonic_orbits.py`; `_load_sparc_profile` (Blender).
 - Between SPARC radii the page interpolates linearly (`baryonicVelocity`).
@@ -66,10 +66,50 @@ Parameters: M₂₀₀ (M☉), the mass inside r₂₀₀, and the scale radius 
 
 Implemented in: `_nfw_shape`, `_nfw_velocity` (generator) and `nfwVelocityModel` (page JS).
 
-**Starting fit ("Apply Observed Fit")**: `fit_default_halo` does a grid search
-over M₂₀₀ from 10¹¹ to 2×10¹² M☉ and r_s from 5 to 60 kpc. It minimises
-χ² = Σ[(V_obs − V_model)/max(σ, 1 km/s)]², then snaps the result to the slider
-steps (10¹⁰ M☉ and 0.5 kpc).
+## Best realistic fits ("Apply Observed Fit", "MOND best fit")
+
+Will's choice (15 Nov 2026): each best fit is the lowest χ² a model can reach
+using only physically realistic values. It replaces the old starting fit (fixed
+Υ, a 1 km/s error floor) and the page's MOND grid search (Υ_disk up to 1.5,
+a₀ from 0.3 to 4 × 10⁻¹⁰). Every limit is `FIT_LIMIT_SIGMA` = 2 times the
+published uncertainty either side of the typical value:
+
+| Value | Limits | Source |
+|---|---|---|
+| Υ_disk | 0.5 × 10^(±0.2): 0.32 to 0.79 | 0.5 at 3.6 μm (McGaugh & Schombert 2014); 0.1 dex scatter, the prior width in Li et al. (2018, §2) |
+| Υ_bulge (only galaxies with a bulge) | 0.7 × 10^(±0.2): 0.44 to 1.11 | as above |
+| Distance D | D_SPARC ± 2 e_D | SPARC Table 1 (`table1.mrt`) |
+| Inclination i | i_SPARC ± 2 e_i, at most 90° | SPARC Table 1 |
+| NFW concentration c = r₂₀₀/r_s | c(M₂₀₀) × 10^(±0.22) | Dutton & Macciò (2014), eq. 8, intrinsic scatter 0.11 dex (§4.1) |
+| NFW M₂₀₀ | 10¹⁰ to 10¹³ M☉, with r_s inside the slider's 5 to 60 kpc | search range only |
+| MOND a₀ | 0.96 to 1.44 × 10⁻¹⁰ m/s² | 1.20 ± 0.24 (systematic) (McGaugh, Lelli & Schombert 2016). This is ±1 systematic uncertainty, not ±2σ: the value Will approved |
+
+This follows Li et al. (2018), who fit each SPARC galaxy within "a realistic
+region of the parameter space", except that they use Gaussian priors where this
+site uses hard limits.
+
+- **Distance and tilt.** A distance D scales every radius by f = D/D_SPARC and
+  every squared visible-matter speed by f (mass ∝ D², radius ∝ D). An
+  inclination i scales the measured speeds and their errors by
+  s = sin i_SPARC / sin i (Li et al. 2018, eq. 5). Dividing the model by s
+  instead gives the same χ², so the page leaves SPARC's points where they are
+  and draws the model as V_model(r·f)/s (`frameOf`, `fitFrame`, `mondModelVelocity`).
+- **Search** (`_minimise_in_box`): a grid of 5 values per parameter, then a
+  pattern search from the 4 best grid points. On 15 Nov 2026 this matched a
+  25⁴ brute-force grid for the MOND fits of UGC 128, NGC 3198 and NGC 2403 to
+  within 0.1 in χ². D and i are partly degenerate, so their fitted values are
+  less certain than the χ².
+- **Snapping.** The NFW halo is snapped to the slider steps (10¹⁰ M☉, 0.5 kpc)
+  and Υ, D and i are then refitted with the halo fixed, so the page shows the
+  fit exactly. The physics checks confirm that the page's χ² matches the
+  generator's (`chi2` in `galaxies.js`).
+- **On the page.** Apply Observed Fit (and loading a preset) applies the NFW
+  fit's halo, Υ, D and i; they stay while the halo sliders move, until Visible
+  Matter Only returns to SPARC's standard values. The MOND best fit switch
+  applies the MOND fit. Plain MOND and visible matter only always use SPARC's
+  values.
+- Implemented in: `fit_nfw`, `fit_mond`, `_realistic_settings`, `_chi_squared`
+  (generator); `activeFit`, `applyBaryonState`, `scoreGalaxy` (page JS).
 
 **Halo stability band**: in the sandbox, a warning shows when c is outside 3–25
 (`STABLE_CONCENTRATION`). This range is a rule of thumb, not a published cut.
@@ -94,20 +134,23 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
 - No halo is used in MOND mode (M₂₀₀ = 0).
 - The limits are checked by the physics checks: g → g_N when g_N ≫ a₀, and
   V⁴ → G M a₀ when g_N ≪ a₀.
-- **MOND best fit**: `findMondBestFit` grid-searches Υ_disk from 0.05 to 1.5
-  and a₀ from 0.3 to 4 × 10⁻¹⁰ m/s², with Υ_bulge fixed, minimising χ².
-- Implemented in `mondVelocity` and `extraVelocityModel` (page JS).
+- **MOND best fit**: `fit_mond` (generator), within the realistic limits above.
+- Implemented in `mondVelocity`, `mondModelVelocity` and `extraVelocityModel`
+  (page JS), and `_mond_velocity` (generator, used only by the fit).
 
 ## Goodness of fit
 
 χ² = Σᵢ [(V_obs,i − V_model,i) / σᵢ]²,  χ²_ν = χ² / (N − k)
 
-k is the number of values tuned to the galaxy (`FITTED_VALUES`, `reducedChi`,
-page JS): 2 for the NFW halo (M₂₀₀, r_s), 0 for visible matter only (halo mass
-slider at 0), 0 for MOND at the default a₀, and 2 for the MOND best fit (a₀ and
-Υ_disk). Will chose this rule on 14 Nov 2026 so that the two models are compared
-fairly; before that the page used N − 2 in every mode. A halo set by hand with
-the sliders still counts as k = 2.
+k is the number of values tuned to the galaxy (`tunedCount`, `reducedChi`,
+page JS): 2 for the NFW halo (M₂₀₀, r_s) or 1 for the MOND best fit (a₀), plus
+the galaxy settings a best fit tunes (`tuned_settings`: Υ_disk, D, i, and
+Υ_bulge where there is a bulge). Visible matter only and MOND at the default a₀
+use SPARC's values, so k = 0. So the NFW best fit has k = 5 (6 with a bulge) and
+the MOND best fit k = 4 (5). Will chose this rule on 14 Nov 2026 so that the two
+models are compared fairly; before that the page used N − 2 in every mode. A
+halo set by hand with the sliders still counts its 2, plus the fit's settings
+while they are applied.
 
 This is calculated only at measured SPARC radii and only for preset galaxies
 (`updateChi` for the fit badge, `scoreGalaxy` for the scorecard).
@@ -157,9 +200,9 @@ plotting scripts and the Blender model, **not** by the website.
 
 These are documented here, not changed. Any change needs Will's decision.
 
-1. The NFW starting fit uses a 1 km/s error floor and the page χ² does not.
-   The starting fit also keeps Υ fixed and stays inside the slider ranges, so
-   it is not the best possible NFW fit (the scorecard notes say this).
+1. Resolved 15 Nov 2026: the NFW fit no longer uses a 1 km/s error floor or
+   fixed Υ (see Best realistic fits). It still stays inside the scale-radius
+   slider's range.
 2. The halo mass is truncated at r₂₀₀ (see NFW above).
 3. In MOND mode, the site's CSV export puts the MOND boost in the `V_nfw_halo`
    column.
@@ -170,10 +213,18 @@ These are documented here, not changed. Any change needs Will's decision.
    Python, page JS, two analysis scripts and Blender. The website is the
    reference version. If you change one, change all of them, or record the
    difference here.
-7. UGC 128 (added 15 Nov 2026, Will's choice from a shortlist): its MOND best
-   fit stops at the top of the search range (Υ_disk = 1.5), so a wider search
-   could fit better. Plain MOND at the default a₀ scores χ²_ν ≈ 115 here with
-   SPARC's distance (64.5 Mpc) and Υ_disk = 0.5 held fixed; the site does not
-   vary distance or inclination, which published MOND fits often do. "Low
-   surface brightness" is cited on the page to de Blok & McGaugh (1996), who
-   use 60 Mpc for it.
+7. UGC 128 (added 15 Nov 2026, Will's choice from a shortlist). Resolved the
+   same day: the old MOND best fit stopped at the top of its search range
+   (Υ_disk = 1.5), with distance fixed. An unlimited search reaches χ²_ν ≈ 5.6,
+   but only with Υ_disk = 2.7 and a₀ = 0.38 × 10⁻¹⁰, which are not realistic.
+   The realistic MOND fit (above) varies distance and tilt too, and still
+   scores χ²_ν ≈ 70, with Υ_disk, a₀ and the tilt all at their limits: within
+   realistic values MOND cannot match this galaxy here. The NFW fit scores
+   χ²_ν ≈ 3.5, with its distance at the lower limit (45 Mpc). Plain MOND
+   scores χ²_ν ≈ 115. "Low surface brightness" is cited on the page to de Blok
+   & McGaugh (1996), who use 60 Mpc for it.
+8. Several best fits sit at a limit (for example the MOND a₀ for all four
+   presets, and NGC 3198's NFW distance at 11.0 Mpc). The limits are hard
+   edges; Li et al. (2018) use Gaussian priors, which would let a value move
+   further at a cost in χ². A different FIT_LIMIT_SIGMA would change the
+   scores, so it is Will's decision.
