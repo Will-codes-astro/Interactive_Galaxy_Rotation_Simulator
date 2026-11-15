@@ -224,7 +224,12 @@ values reveal their explanations on hover or when selected with a mouse, touch,
 or keyboard.
 
 Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
-fit") sits in front of χ² and χ²ᵣ. The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
+fit") sits in front of χ² and χ²ᵣ. Beside the badge a grey label names what is being
+scored and how many values were tuned (`fitLabel`): "NFW best fit · 5 tuned",
+"Your halo" (sliders moved, with or without the fit's M/L, distance and tilt),
+"Visible matter only", "Plain MOND · 0 tuned" or "MOND best fit · 4 tuned". Its
+tooltip names the like-for-like pairs (the two best fits; visible matter only
+and plain MOND). The cut-offs (χ²ᵣ below 2, 2 to 10, above 10)
 are the site's own rule of thumb (`fitVerdict`), and the guide under the graph
 says so. χ²ᵣ divides by the measured points minus the values tuned to the galaxy
 (`tunedCount`: the halo's 2 or a₀'s 1, plus the M/L, distance and tilt values a

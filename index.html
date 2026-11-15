@@ -584,6 +584,8 @@
     @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } }
     /* Fit badge: a plain-language verdict in front of the numbers. */
     #chiBadge sub { line-height:0; font-size:.82em; }
+    .chi-wrap { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:4px 8px; }
+    .chi-fit { color:var(--muted); font-size:11.5px; cursor:help; }
     #chiBadge b { margin-right:4px; font:600 11.5px var(--f-ui); letter-spacing:.01em; }
     /* Scorecard: every preset galaxy scored under each model. */
     .scorecard { padding:18px 22px 16px; }
@@ -803,7 +805,7 @@
       </section>
     </article>
       <article class="panel" id="curvePanel">
-        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div>
+        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><div class="chi-wrap"><small id="chiFit" class="chi-fit" title="Compare like with like: the NFW best fit with the MOND best fit (both tune the galaxy’s M/L, distance and tilt), or visible matter only with plain MOND (nothing tuned)."></small><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div></div>
         <div class="curve-wrap"><div id="curvePlot" class="plot" role="img" aria-label="NGC 3198 observed, baryonic, and fitted rotation curves"></div></div>
         <p class="curve-hint">Tap the graph, or slide your finger along it, to read the speeds at each radius. Tap outside the graph to close.</p>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
@@ -2528,11 +2530,22 @@ window.GALAXIES = {
     const activeFitModel=()=>mondMode?(document.getElementById('mondFitToggle').checked?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
     // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
     const fitVerdict=red=>red<2?{cls:'good',word:'Close fit'}:red<10?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
+    // Names the model and fit the badge is scoring, so like-for-like pairs are easy to spot.
+    function fitLabel(model){
+      if(model==='visible')return 'Visible matter only';
+      if(model==='mond')return 'Plain MOND';
+      if(model==='mondBest')return 'MOND best fit';
+      const fit=activeFit(),massT=Number(document.getElementById('massSlider').value),rs=Number(document.getElementById('scaleSlider').value);
+      const isFit=fit&&Math.abs(massT-fit.m200_msun/1e12)<1e-6&&Math.abs(rs-fit.scale_radius_kpc)<1e-6;
+      return isFit?'NFW best fit':fit?'Your halo + fit’s M/L, distance, tilt':'Your halo';
+    }
     function updateChi(total){
       const b=document.getElementById('chiBadge');
-      b.hidden=customActive;document.getElementById('tmChiRow').hidden=customActive;
+      b.hidden=customActive;document.getElementById('chiFit').hidden=customActive;document.getElementById('tmChiRow').hidden=customActive;
       if(customActive)return;
-      const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,tunedCount(activeFitModel(),activeFit())),verdict=fitVerdict(red);
+      const model=activeFitModel(),k=tunedCount(model,activeFit());
+      const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,k),verdict=fitVerdict(red);
+      document.getElementById('chiFit').textContent=`${fitLabel(model)} · ${k} tuned`;
       document.getElementById('chiVerdict').textContent=verdict.word;
       document.getElementById('chiNumbers').innerHTML='χ² '+chi.toFixed(0)+' · χ²<sub>r</sub> '+red.toFixed(2);
       b.className=verdict.cls;
