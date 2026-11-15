@@ -17,10 +17,10 @@ the libraries, are hidden. On phones (640 px or narrower) the menu uses short la
 ("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, MOND best
 fit) sit at the top right of the Simulator page.
 
-The tutorial offer appears the first time the Simulator page opens, not over the
-opening story. "I've been here before" is remembered in the
-browser (`localStorage`, read and written inside try/catch), so the offer does
-not return on later visits; if storage is blocked it shows once per visit. Each tour step opens the page its control is on (the last step
+The tutorial offer appears the first time the Simulator page opens in each page
+load, not over the opening story. "I've been here before" closes it for the rest
+of that page load; a refresh or a new tab offers it again (Will's choice:
+nothing is stored between visits). Each tour step opens the page its control is on (the last step
 opens Background); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 

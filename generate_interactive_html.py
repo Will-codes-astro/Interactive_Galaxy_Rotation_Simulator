@@ -4687,14 +4687,7 @@ __GALAXIES_JS__
       if(bestFitToggle.checked)completeTutorialAction('bestFit','Best fits on: each model has re-tuned the mass-to-light ratio, distance and tilt (and MOND its a₀) within realistic limits.');
     });
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
-    // "I've been here before" is remembered in this browser, so the offer does not return on later visits.
-    // Storage can be blocked (private windows, school settings): then the offer simply shows once per visit.
-    const WELCOME_SKIPPED_KEY='galaxySim.welcomeSkipped';
-    const welcomeSkipped=()=>{try{return localStorage.getItem(WELCOME_SKIPPED_KEY)==='1';}catch(err){return false;}};
-    document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>{
-      try{localStorage.setItem(WELCOME_SKIPPED_KEY,'1');}catch(err){}
-      tutorialWelcome.close();
-    });
+    document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
     tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
     document.getElementById('puzzleTour').addEventListener('click',()=>{if(galaxyMode==='custom')setGalaxyMode('preset');startTutorial('main',true);});
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
@@ -4726,8 +4719,9 @@ __GALAXIES_JS__
         onSliderInput(simTime+dir*ARROW_TIME_STEP_MYR);
       }
     });
-    // The tour is offered the first time the Simulator page opens, not over the opening story.
-    let tourOffered=welcomeSkipped();
+    // The tour is offered the first time the Simulator page opens in each page load (a refresh or new tab offers it
+    // again; Will's choice), not over the opening story. Nothing is stored between visits.
+    let tourOffered=false;
     document.addEventListener('pagechange',e=>{
       tutorialRecheck();
       if(e.detail.page==='simulator'&&!tourOffered&&tutorialCard.hidden){tourOffered=true;tutorialWelcome.showModal();}
