@@ -36,7 +36,7 @@ then, straight on, the sandbox tutorial ("Part 1 of 2", "Part 2 of 2"). "Open
 the simulator" instead brings up the welcome offer, whose "Start simulator
 tutorial" runs the simulator tutorial alone.
 
-The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
+The Galaxy menu above the gravity model switch chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
 the baryonic curve, resets the halo sliders to that galaxy's observed NFW fit,
 restarts the orbit clock and re-integrates the star orbits. The selected
@@ -44,6 +44,17 @@ gravity model (NFW or MOND) is kept. The 3D stars follow the selected galaxy
 too: a rough disk scale length, outer radius, bulge and visible mass are
 estimated from its SPARC mass-model speeds (`anatomyFromRotation`), and these
 set the star population described under "Test stars" below.
+
+The Galaxy menu is a custom listbox (`galaxyMenuBtn`, `galaxyMenuList`; arrow
+keys, Home/End, Enter/Space, Escape), so each option shows its Hubble type badge
+and the preset's one-line `summary`. Under it, the galaxy profile card
+(`renderGalaxyProfile`) shows SPARC Table 1's values in plain words: the Hubble
+type with its family and shape (`HUBBLE_TYPES`), distance (also in light-years),
+flat rotation speed (also in km/h), how far out it was measured and how many
+speeds, and a stars-vs-gas bar (stars ≈ 0.5 × L[3.6], gas = 1.33 × M_HI, the
+helium factor SPARC uses). The stellar figure is a rough estimate (it ignores the
+bulge's higher M/L). The tutorial's "Try another galaxy" step rings the menu and
+puts a yellow watch ring on the card.
 
 The preset galaxies live in `galaxies.js`, a lookup keyed by SPARC id that
 holds each galaxy's radii, observed speeds, error bars and gas, disk and bulge
@@ -57,7 +68,7 @@ offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
 `data/sparc/table2.dat`) and run the generator again. It reads that galaxy's rows, fits
 its starting NFW halo and rewrites both files.
 
-The Preset Galaxies / Custom Sandbox switch beside the Galaxy dropdown opens
+The Preset Galaxies / Custom Sandbox switch beside the Galaxy menu opens
 a builder with six anatomy sliders: stellar disk mass, disk scale length,
 truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
 radius is disabled while the bulge mass is zero. A "What you have built" card
@@ -75,7 +86,7 @@ badge (also over the 3D view) whenever c falls outside 3–25
 In the sandbox the anatomy sliders drive the rotation curve, the halo and the
 3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the generator's
 page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
-Galaxy dropdown, the observed SPARC points, the residual bars and the χ² badge
+Galaxy menu and profile card, the observed SPARC points, the residual bars and the χ² badge
 are hidden, and the curves are drawn on an even grid of 60 radii out to
 1.25 × the truncation radius. Its CSV export leaves out the observed and
 residual columns.

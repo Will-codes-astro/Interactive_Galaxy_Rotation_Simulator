@@ -17,8 +17,8 @@ window.GALAXIES = {
   "NGC3198": {
     id: "NGC3198",
     name: "NGC 3198",
-    summary: "Classic late-type spiral benchmark",
-    catalogue: {"distance_mpc": 13.8, "distance_err_mpc": 1.4, "inclination_deg": 73.0, "inclination_err_deg": 3.0},
+    summary: "The classic test case: a calm spiral measured far beyond its stars",
+    catalogue: {"distance_mpc": 13.8, "distance_err_mpc": 1.4, "inclination_deg": 73.0, "inclination_err_deg": 3.0, "hubble_type": 5, "luminosity_36_1e9_lsun": 38.279, "hi_mass_1e9_msun": 10.869, "v_flat_kms": 150.1},
     best_fit: {
       nfw_standard: {"m200_msun": 460000000000.0, "scale_radius_kpc": 16.5, "concentration": 9.651, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 13.8, "inclination_deg": 73.0, "tuned_settings": 0, "at_limit": {}, "chi2": 57.407},
       nfw: {"m200_msun": 370000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.877, "upsilon_disk": 0.5222, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 78.11, "tuned_settings": 3, "at_limit": {"distance_mpc": "low"}, "chi2": 55.69},
@@ -36,8 +36,8 @@ window.GALAXIES = {
   "NGC2403": {
     id: "NGC2403",
     name: "NGC 2403",
-    summary: "Gas-rich late-type spiral",
-    catalogue: {"distance_mpc": 3.16, "distance_err_mpc": 0.16, "inclination_deg": 63.0, "inclination_err_deg": 3.0},
+    summary: "A nearby, gas-rich spiral, measured in fine detail",
+    catalogue: {"distance_mpc": 3.16, "distance_err_mpc": 0.16, "inclination_deg": 63.0, "inclination_err_deg": 3.0, "hubble_type": 6, "luminosity_36_1e9_lsun": 10.041, "hi_mass_1e9_msun": 3.199, "v_flat_kms": 131.2},
     best_fit: {
       nfw_standard: {"m200_msun": 280000000000.0, "scale_radius_kpc": 11.0, "concentration": 12.268, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 3.16, "inclination_deg": 63.0, "tuned_settings": 0, "at_limit": {}, "chi2": 714.343},
       nfw: {"m200_msun": 280000000000.0, "scale_radius_kpc": 8.5, "concentration": 15.877, "upsilon_disk": 0.4262, "upsilon_bulge": 0.7, "distance_mpc": 3.093, "inclination_deg": 57.0, "tuned_settings": 3, "at_limit": {"concentration": "high", "inclination_deg": "low"}, "chi2": 635.361},
@@ -55,8 +55,8 @@ window.GALAXIES = {
   "NGC7331": {
     id: "NGC7331",
     name: "NGC 7331",
-    summary: "Massive early-type spiral with a prominent bulge",
-    catalogue: {"distance_mpc": 14.7, "distance_err_mpc": 1.5, "inclination_deg": 75.0, "inclination_err_deg": 2.0},
+    summary: "A big, bright spiral with a large central bulge",
+    catalogue: {"distance_mpc": 14.7, "distance_err_mpc": 1.5, "inclination_deg": 75.0, "inclination_err_deg": 2.0, "hubble_type": 3, "luminosity_36_1e9_lsun": 250.631, "hi_mass_1e9_msun": 11.067, "v_flat_kms": 239.0},
     best_fit: {
       nfw_standard: {"m200_msun": 2740000000000.0, "scale_radius_kpc": 60.0, "concentration": 4.811, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 14.7, "inclination_deg": 75.0, "tuned_settings": 0, "at_limit": {"scale_radius_kpc": "high"}, "chi2": 312.221},
       nfw: {"m200_msun": 2440000000000.0, "scale_radius_kpc": 32.5, "concentration": 8.545, "upsilon_disk": 0.4905, "upsilon_bulge": 0.4417, "distance_mpc": 11.7, "inclination_deg": 71.0, "tuned_settings": 4, "at_limit": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "low"}, "chi2": 21.683},
@@ -74,8 +74,8 @@ window.GALAXIES = {
   "UGC00128": {
     id: "UGC00128",
     name: "UGC 128",
-    summary: "Low-surface-brightness galaxy: faint, spread-out and gas-rich (de Blok & McGaugh 1996)",
-    catalogue: {"distance_mpc": 64.5, "distance_err_mpc": 9.7, "inclination_deg": 57.0, "inclination_err_deg": 10.0},
+    summary: "A faint, spread-out low-surface-brightness galaxy (de Blok & McGaugh 1996)",
+    catalogue: {"distance_mpc": 64.5, "distance_err_mpc": 9.7, "inclination_deg": 57.0, "inclination_err_deg": 10.0, "hubble_type": 8, "luminosity_36_1e9_lsun": 12.02, "hi_mass_1e9_msun": 7.431, "v_flat_kms": 129.3},
     best_fit: {
       nfw_standard: {"m200_msun": 360000000000.0, "scale_radius_kpc": 17.0, "concentration": 8.632, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 64.5, "inclination_deg": 57.0, "tuned_settings": 0, "at_limit": {}, "chi2": 64.529},
       nfw: {"m200_msun": 320000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.269, "upsilon_disk": 0.3155, "upsilon_bulge": 0.7, "distance_mpc": 45.1, "inclination_deg": 56.47, "tuned_settings": 3, "at_limit": {"upsilon_disk": "low", "distance_mpc": "low"}, "chi2": 60.202},

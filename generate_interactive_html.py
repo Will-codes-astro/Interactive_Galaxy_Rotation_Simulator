@@ -65,10 +65,10 @@ class GalaxyPreset(NamedTuple):
 # The first preset is selected when the page opens. To offer another SPARC galaxy,
 # add a preset here and run this script again.
 GALAXY_PRESETS = (
-    GalaxyPreset("NGC3198", "NGC 3198", "Classic late-type spiral benchmark"),
-    GalaxyPreset("NGC2403", "NGC 2403", "Gas-rich late-type spiral"),
-    GalaxyPreset("NGC7331", "NGC 7331", "Massive early-type spiral with a prominent bulge"),
-    GalaxyPreset("UGC00128", "UGC 128", "Low-surface-brightness galaxy: faint, spread-out and gas-rich (de Blok & McGaugh 1996)"),
+    GalaxyPreset("NGC3198", "NGC 3198", "The classic test case: a calm spiral measured far beyond its stars"),
+    GalaxyPreset("NGC2403", "NGC 2403", "A nearby, gas-rich spiral, measured in fine detail"),
+    GalaxyPreset("NGC7331", "NGC 7331", "A big, bright spiral with a large central bulge"),
+    GalaxyPreset("UGC00128", "UGC 128", "A faint, spread-out low-surface-brightness galaxy (de Blok & McGaugh 1996)"),
 )
 DEFAULT_PRESET = GALAXY_PRESETS[0]
 ROTATION_COLUMNS = (
@@ -322,6 +322,10 @@ def build_galaxy_record(preset: GalaxyPreset, galaxy_info: dict[str, GalaxyInfo]
             "distance_err_mpc": info.e_dist_mpc,
             "inclination_deg": info.inc_deg,
             "inclination_err_deg": info.e_inc_deg,
+            "hubble_type": int(info.hubble_type),
+            "luminosity_36_1e9_lsun": info.lum_36_1e9_lsun,
+            "hi_mass_1e9_msun": info.hi_mass_1e9_msun,
+            "v_flat_kms": info.v_flat_kms,
         },
         "best_fit": {
             "nfw_standard": fit_nfw(galaxy["rotation"], info, _standard_settings(info)),
@@ -464,11 +468,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     .control.disabled { opacity:.35; pointer-events:none; }
     .control.disabled input, .control.disabled button { cursor:not-allowed; }
     .mond-note { color:#ffc48a; font-size:12px; }
-    .galaxy-bar select { min-width:150px; padding:6px 32px 6px 12px; font:inherit; font-size:13px; color:var(--ink); background-color:#102130; background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 17px) 55%,calc(100% - 12px) 55%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; border:1px solid #294255; border-radius:4px; -webkit-appearance:none; appearance:none; cursor:pointer; }
-    .galaxy-bar select:hover { border-color:var(--cyan); }
-    .galaxy-bar select:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
-    .galaxy-bar option { background:#0a111b; color:var(--ink); }
-    .galaxy-summary { color:var(--muted); font-size:12px; }
     .preset-picker { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
     .preset-picker[hidden], .sandbox[hidden], .stability-chip[hidden] { display:none; }
     .source-toggle { display:inline-grid; grid-template-columns:1fr 1fr; padding:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
@@ -889,9 +888,39 @@ HTML_TEMPLATE = r"""<!doctype html>
     button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     #applyObservedFit, .tutorial-primary { background:rgba(138,180,248,.16); border-color:rgba(138,180,248,.6); color:#eef4ff; }
     #applyObservedFit:hover, .tutorial-primary:hover { background:rgba(138,180,248,.26); }
-    .galaxy-bar select { padding:7px 34px 7px 12px; border:1px solid var(--line-strong); border-radius:8px; background-color:var(--panel-2); font:500 13px var(--f-ui); }
-    .galaxy-summary { color:var(--ink-2); font-size:12.5px; }
     .source-toggle span { padding:6px 16px; font-weight:500; }
+    .preset-picker { flex:1 1 420px; min-width:0; gap:12px 14px; }
+    .galaxy-menu { position:relative; }
+    .galaxy-menu-btn { display:flex; align-items:center; gap:10px; min-width:200px; padding:6px 36px 6px 7px; background-color:var(--panel-2); background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 19px) 52%,calc(100% - 14px) 52%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; font:600 14px var(--f-ui); text-align:left; }
+    .galaxy-menu-btn[aria-expanded="true"] { border-color:var(--accent); }
+    .gm-code { display:inline-grid; place-items:center; flex:none; min-width:36px; height:24px; padding:0 6px; border:1px solid rgba(233,200,138,.42); border-radius:6px; background:rgba(233,200,138,.08); color:var(--gold); font:600 11.5px var(--f-mono); }
+    .galaxy-menu-list { position:absolute; top:calc(100% + 6px); left:0; z-index:60; width:min(400px,calc(100vw - 32px)); margin:0; padding:6px; list-style:none; border:1px solid var(--line-strong); border-radius:var(--r); background:var(--panel-2); box-shadow:0 18px 44px rgba(0,0,0,.55); }
+    .galaxy-menu-list[hidden] { display:none; }
+    .galaxy-menu-list:focus { outline:none; }
+    .galaxy-menu-list li { display:flex; align-items:flex-start; gap:11px; padding:9px 10px; border-radius:8px; cursor:pointer; }
+    .galaxy-menu-list li.active { background:rgba(138,180,248,.12); }
+    .galaxy-menu-list li[aria-selected="true"] .gm-text b::after { content:" ✓"; color:var(--accent); }
+    .gm-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .gm-text b { color:var(--ink); font:600 13.5px var(--f-ui); }
+    .gm-text small { color:var(--muted); font-size:12px; line-height:1.4; }
+    .galaxy-profile { flex:1 1 100%; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 18px; padding:14px 18px 13px; border:1px solid rgba(233,200,138,.26); border-left:3px solid var(--gold); border-radius:var(--r); background:linear-gradient(160deg,rgba(233,200,138,.075),rgba(233,200,138,.01)); }
+    .gp-badge { display:grid; place-items:center; width:66px; height:66px; margin-top:2px; border:1px solid rgba(233,200,138,.38); border-radius:50%; background:radial-gradient(circle,rgba(233,200,138,.3) 0,rgba(233,200,138,.06) 55%,transparent 72%); color:var(--gold); font:600 20px var(--f-serif); }
+    .galaxy-profile h3 { margin:2px 0 3px; color:var(--ink); font:600 18px/1.25 var(--f-serif); }
+    .gp-summary { margin:0 0 11px; color:var(--ink-2); font-size:13px; line-height:1.45; }
+    .gp-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px 16px; margin:0 0 12px; }
+    .gp-stats dt { color:var(--muted); font:500 10px var(--f-mono); letter-spacing:.12em; text-transform:uppercase; }
+    .gp-stats dd { margin:3px 0 0; }
+    .gp-stats b { display:block; color:var(--ink); font:500 17px/1.2 var(--f-mono); }
+    .gp-stats small { color:var(--muted); font-size:11.5px; }
+    .gp-mass-head { display:flex; justify-content:space-between; flex-wrap:wrap; gap:3px 14px; margin-bottom:6px; color:var(--ink-2); font-size:12px; }
+    .gp-mass-head b { color:var(--ink); font-family:var(--f-mono); font-weight:500; }
+    .gp-dot { display:inline-block; width:8px; height:8px; margin-right:5px; border-radius:50%; }
+    .gp-dot.stars { background:var(--gold); } .gp-dot.gas { background:rgba(138,180,248,.75); }
+    .gp-bar { display:flex; height:8px; overflow:hidden; border-radius:999px; background:rgba(138,180,248,.75); }
+    .gp-bar span { background:var(--gold); transition:flex-basis .45s ease; }
+    .gp-note { margin:8px 0 0; color:var(--muted); font-size:10.5px; line-height:1.4; }
+    @media (prefers-reduced-motion:reduce) { .gp-bar span { transition:none; } }
+    @media (max-width:560px) { .galaxy-profile { grid-template-columns:1fr; } .gp-badge { width:48px; height:48px; font-size:16px; } .gp-stats { grid-template-columns:1fr 1fr; } }
     .switch .opt { font-size:13px; }
     .track-input { border-color:var(--line-strong); background:rgba(0,0,0,.25); font-family:var(--f-mono); }
     .sandbox-group h3 { font:500 10.5px var(--f-mono); letter-spacing:.14em; color:var(--accent); }
@@ -1132,9 +1161,27 @@ HTML_TEMPLATE = r"""<!doctype html>
         <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span>Custom Sandbox</span></label>
       </div>
       <div class="preset-picker" id="presetPicker">
-        <label class="model-label" id="galaxyLabel" for="galaxySelect">Galaxy</label>
-        <select id="galaxySelect" autocomplete="off" aria-describedby="galaxySummary" title="Choose which SPARC galaxy to model"></select>
-        <span class="galaxy-summary" id="galaxySummary" role="status" aria-live="polite"></span>
+        <span class="model-label" id="galaxyLabel">Galaxy</span>
+        <div class="galaxy-menu" id="galaxyMenu">
+          <button type="button" class="galaxy-menu-btn" id="galaxyMenuBtn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="galaxyLabel galaxyMenuBtn" title="Choose which SPARC galaxy to model"><span class="gm-code" id="galaxyMenuCode"></span><span id="galaxyMenuName"></span></button>
+          <ul class="galaxy-menu-list" id="galaxyMenuList" role="listbox" aria-labelledby="galaxyLabel" tabindex="-1" hidden></ul>
+        </div>
+        <div class="galaxy-profile" id="galaxyProfile" aria-live="polite">
+          <div class="gp-badge" aria-hidden="true"><span id="gpCode"></span></div>
+          <div>
+            <p class="galaxy-type-kicker" id="gpFamily"></p>
+            <h3 id="gpShape"></h3>
+            <p class="gp-summary" id="gpSummary"></p>
+            <dl class="gp-stats">
+              <div><dt>Distance</dt><dd><b id="gpDistance"></b><small id="gpDistanceLy"></small></dd></div>
+              <div><dt>Flat rotation speed</dt><dd><b id="gpSpeed"></b><small id="gpSpeedKmh"></small></dd></div>
+              <div><dt>Measured out to</dt><dd><b id="gpExtent"></b><small id="gpPoints"></small></dd></div>
+            </dl>
+            <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars ≈ <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
+            <div class="gp-bar" role="img" id="gpBar"><span id="gpStarsBar"></span></div>
+            <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium.</p>
+          </div>
+        </div>
       </div>
     </section>
     <section class="model-bar" id="modelBar" aria-label="Gravity model">
@@ -3380,16 +3427,90 @@ __GALAXIES_JS__
        rotation-curve plot, chi-squared and orbits are all rebuilt from that galaxy's galaxies.js entry.
        The Custom Sandbox hides the dropdown: its imaginary galaxy has no measurements to compare with, and the
        anatomy sliders drive every output through PhysicsEngine. */
-    const galaxySelect=document.getElementById('galaxySelect'),galaxySummary=document.getElementById('galaxySummary');
-    Object.values(GALAXIES).forEach(galaxy=>galaxySelect.add(new Option(galaxy.name,galaxy.id)));
+    // SPARC Table 1's Hubble type codes (its note 1), each with the family and a plain description of the shape.
+    const HUBBLE_TYPES=[['S0','Lenticular','A disk with no spiral arms'],['Sa','Spiral','Tightly wound arms and a big bulge'],
+      ['Sab','Spiral','Fairly tight arms and a big bulge'],['Sb','Spiral','Medium arms and a clear bulge'],
+      ['Sbc','Spiral','Fairly open arms and a modest bulge'],['Sc','Spiral','Loose arms and a small bulge'],
+      ['Scd','Spiral','Very loose arms and a tiny bulge'],['Sd','Spiral','Loose, patchy arms and almost no bulge'],
+      ['Sdm','Late-type spiral','Faint, patchy arms and no bulge'],['Sm','Magellanic spiral','Barely-there arms'],
+      ['Im','Irregular','No clear shape'],['BCD','Blue compact dwarf','Small, bright and forming stars']];
+    const LIGHT_YEARS_PER_MPC=3.2616e6;
+    const GAS_PER_HI=1.33; // SPARC counts helium by scaling the hydrogen mass (Lelli, McGaugh & Schombert 2016)
+    const hubbleOf=galaxy=>HUBBLE_TYPES[galaxy.catalogue.hubble_type];
+    /* Galaxy menu: a button and a listbox, so each option can carry its type badge and a one-line description.
+       Arrow keys, Home/End, Enter/Space and Escape work as in a native menu. */
+    const galaxyMenu=document.getElementById('galaxyMenu'),galaxyMenuBtn=document.getElementById('galaxyMenuBtn'),
+      galaxyMenuList=document.getElementById('galaxyMenuList');
+    const galaxyOptions=Object.values(GALAXIES).map(galaxy=>{
+      const li=document.createElement('li'),code=document.createElement('span'),text=document.createElement('span'),
+        name=document.createElement('b'),blurb=document.createElement('small');
+      li.id=`galaxyOption-${galaxy.id}`;li.setAttribute('role','option');li.dataset.galaxy=galaxy.id;
+      code.className='gm-code';code.textContent=hubbleOf(galaxy)[0];
+      text.className='gm-text';name.textContent=galaxy.name;blurb.textContent=galaxy.summary;
+      text.append(name,blurb);li.append(code,text);galaxyMenuList.append(li);
+      return li;
+    });
+    let galaxyMenuActive=0;
+    function setGalaxyMenuActive(index){
+      galaxyMenuActive=(index+galaxyOptions.length)%galaxyOptions.length;
+      galaxyOptions.forEach((li,i)=>li.classList.toggle('active',i===galaxyMenuActive));
+      galaxyMenuList.setAttribute('aria-activedescendant',galaxyOptions[galaxyMenuActive].id);
+    }
+    function openGalaxyMenu(){
+      galaxyMenuList.hidden=false;galaxyMenuBtn.setAttribute('aria-expanded','true');
+      // Below the button by default; nudged left if that would run off a narrow screen.
+      galaxyMenuList.style.left='';
+      const overflow=galaxyMenuList.getBoundingClientRect().right-(document.documentElement.clientWidth-16);
+      if(overflow>0)galaxyMenuList.style.left=`${-overflow}px`;
+      setGalaxyMenuActive(galaxyOptions.findIndex(li=>li.dataset.galaxy===activeGalaxy.id));
+      galaxyMenuList.focus();
+    }
+    function closeGalaxyMenu(returnFocus){
+      if(galaxyMenuList.hidden)return;
+      galaxyMenuList.hidden=true;galaxyMenuBtn.setAttribute('aria-expanded','false');
+      if(returnFocus)galaxyMenuBtn.focus();
+    }
+    function pickGalaxy(id){
+      closeGalaxyMenu(true);
+      if(id===activeGalaxy.id)return;
+      selectGalaxy(id);
+      completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo. Its profile is under the menu.');
+    }
+    galaxyMenuBtn.addEventListener('click',()=>{if(galaxyMenuList.hidden)openGalaxyMenu();else closeGalaxyMenu(true);});
+    galaxyMenuBtn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();openGalaxyMenu();}});
+    galaxyMenuList.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();setGalaxyMenuActive(galaxyMenuActive+(e.key==='ArrowDown'?1:-1));}
+      else if(e.key==='Home'||e.key==='End'){e.preventDefault();setGalaxyMenuActive(e.key==='Home'?0:-1);}
+      else if(e.key==='Enter'||e.key===' '){e.preventDefault();pickGalaxy(galaxyOptions[galaxyMenuActive].dataset.galaxy);}
+      else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeGalaxyMenu(true);}
+      else if(e.key==='Tab')closeGalaxyMenu(false);
+    });
+    galaxyMenuList.addEventListener('click',e=>{const li=e.target.closest('[role=option]');if(li)pickGalaxy(li.dataset.galaxy);});
+    galaxyMenuList.addEventListener('pointermove',e=>{const li=e.target.closest('[role=option]');if(li)setGalaxyMenuActive(galaxyOptions.indexOf(li));});
+    document.addEventListener('click',e=>{if(!galaxyMenu.contains(e.target))closeGalaxyMenu(false);});
+    // Profile card: SPARC Table 1's catalogue values, with everyday units beside them.
+    function renderGalaxyProfile(galaxy){
+      const c=galaxy.catalogue,[code,family,shape]=hubbleOf(galaxy),radii=galaxy.rotation.radius_kpc;
+      const stars=DATA.upsilon_disk*c.luminosity_36_1e9_lsun,gas=GAS_PER_HI*c.hi_mass_1e9_msun;
+      const billions=v=>v>=10?v.toFixed(0):v.toFixed(1),set=(id,text)=>{document.getElementById(id).textContent=text;};
+      set('gpCode',code);set('gpFamily',`${family} · Hubble type ${code}`);set('gpShape',shape);set('gpSummary',galaxy.summary);
+      set('gpDistance',`${c.distance_mpc} Mpc`);set('gpDistanceLy',`${Math.round(c.distance_mpc*LIGHT_YEARS_PER_MPC/1e6)} million light-years`);
+      set('gpSpeed',`${c.v_flat_kms.toFixed(0)} km/s`);set('gpSpeedKmh',`${(Math.round(c.v_flat_kms*3.6)*1000).toLocaleString('en-GB')} km/h`);
+      set('gpExtent',`${radii[radii.length-1].toFixed(0)} kpc`);set('gpPoints',`${radii.length} measured speeds`);
+      set('gpStars',billions(stars));set('gpGas',billions(gas));
+      document.getElementById('gpStarsBar').style.flexBasis=`${(100*stars/(stars+gas)).toFixed(1)}%`;
+      document.getElementById('gpBar').setAttribute('aria-label',`Stars ${Math.round(100*stars/(stars+gas))}% and gas ${Math.round(100*gas/(stars+gas))}% of the visible mass`);
+    }
     function applyGalaxyLabels(galaxy){
       document.querySelectorAll('[data-galaxy-name]').forEach(el=>{el.textContent=galaxy.name;});
-      galaxySummary.textContent=`${galaxy.summary} · ${galaxy.rotation.radius_kpc.length} measured speeds (SPARC)`;
+      document.getElementById('galaxyMenuCode').textContent=hubbleOf(galaxy)[0];
+      document.getElementById('galaxyMenuName').textContent=galaxy.name;
+      galaxyOptions.forEach(li=>li.setAttribute('aria-selected',String(li.dataset.galaxy===galaxy.id)));
+      renderGalaxyProfile(galaxy);
       orbitPlot.setAttribute('aria-label',`Interactive three-dimensional ${galaxyMode==='custom'?'custom galaxy':galaxy.name} star trajectories`);
       document.getElementById('curvePlot').setAttribute('aria-label',galaxyMode==='custom'?'Custom galaxy baryonic, halo and model rotation curves':`${galaxy.name} observed, baryonic, and fitted rotation curves`);
       document.getElementById('viewReset').title=`Return to the default ${galaxyMode==='custom'?'custom galaxy':galaxy.name} view`;
     }
-    galaxySelect.value=activeGalaxy.id;
     applyGalaxyLabels(activeGalaxy);
     // Wording that differs between a preset galaxy and the sandbox.
     function applyModeLabels(){
@@ -3506,7 +3627,6 @@ __GALAXIES_JS__
       if(!galaxy||galaxy===activeGalaxy||customActive)return;
       loadPreset(galaxy);
     }
-    galaxySelect.addEventListener('change',()=>selectGalaxy(galaxySelect.value));
 
     /* ---------- Scorecard ----------
        Every preset galaxy scored under each model with the page's own functions. Standard values: visible matter only,
@@ -3563,7 +3683,6 @@ __GALAXIES_JS__
       const button=e.target.closest('.score-show');
       if(!button)return;
       if(customActive)setGalaxyMode('preset');
-      galaxySelect.value=button.dataset.galaxy;
       selectGalaxy(button.dataset.galaxy);
       showPage('simulator',{scroll:false});
       document.getElementById('results').scrollIntoView({behavior:'instant'});
@@ -3885,8 +4004,8 @@ __GALAXIES_JS__
          checks:{fsRestart:()=>tutorialFlags.restartHalo,viewFullHalo:()=>tutorialFlags.fullHalo},doneText:'Zoomed out: the whole visible galaxy is that bright speck.',
          text:'With the halo back, the same stars stay put. Zoomed right out, the bright speck in the middle is the whole visible galaxy, and the sphere is the halo’s edge, r₂₀₀. Real halos have no sharp edge; the sphere just marks it.',
          action:'1. Press Restart and watch the stars stay put. 2. Press Full halo to zoom right out.'},
-        {id:'galaxies',mode:'preset',target:'galaxySelect',gesture:'click',tag:'Choose a galaxy',title:'Try another galaxy',
-         text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo.',
+        {id:'galaxies',mode:'preset',target:'galaxyMenu',gesture:'click',tag:'Choose a galaxy',watch:['galaxyProfile:Its profile'],title:'Try another galaxy',
+         text:'The Galaxy menu loads other real galaxies from the SPARC survey, each with its own measured speeds and starting halo. The card under it (yellow ring) shows what kind of galaxy it is: its shape, distance, speed and how its visible mass splits between stars and gas.',
          action:'Open the Galaxy menu (blue ring) and choose another galaxy. Is the same gap there between the white points and the cyan line?'},
         {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other and sets how high the cyan line sits. SPARC’s standard values are averages, so they are an assumption; Best realistic fits lets each model adjust them.',
@@ -4548,9 +4667,6 @@ __GALAXIES_JS__
     fullHaloBtn.addEventListener('click',()=>{tutorialFlags.fullHalo=true;});
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{tutorialFlags[Number(massSlider.value)===0?'restart0':'restartHalo']=true;onSliderInput(0);setPlaying(true);});
-    galaxySelect.addEventListener('change',()=>{
-      completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo.');
-    });
     ['pointerenter','focus','click'].forEach(type=>{
       document.getElementById('mlInfoBtn').addEventListener(type,()=>completeTutorialAction('ml','Explainer opened.'));
     });

@@ -64,8 +64,12 @@ presets are listed in `GALAXY_PRESETS` in `generate_interactive_html.py`.
 
 Fields used (`GalaxyInfo`): `dist_mpc` (D, Mpc; the same as table2's Dist, which
 the generator checks), `e_dist_mpc` (e_D, mean error), `inc_deg` (Inc, degrees)
-and `e_inc_deg` (e_Inc). The other columns (luminosity, sizes, HI mass, V_flat,
-quality flag, references) are not used. For the presets: NGC 3198 13.8 ± 1.4 Mpc,
+and `e_inc_deg` (e_Inc), used by the fits; and, for the galaxy profile card only,
+`hubble_type` (T, 0 = S0 … 11 = BCD, Table 1 note 1), `lum_36_1e9_lsun`
+(L[3.6], 10⁹ L☉), `hi_mass_1e9_msun` (MHI,
+10⁹ M☉) and `v_flat_kms` (Vflat, km/s). These reach the page as `catalogue`
+fields in `galaxies.js`. The other columns (surface brightnesses, Reff, Rdisk, RHI,
+errors on L and Vflat, quality flag, references) are not used. For the presets: NGC 3198 13.8 ± 1.4 Mpc,
 73 ± 3°; NGC 2403 3.16 ± 0.16 Mpc, 63 ± 3°; NGC 7331 14.7 ± 1.5 Mpc, 75 ± 2°;
 UGC 128 64.5 ± 9.7 Mpc, 57 ± 10°.
 

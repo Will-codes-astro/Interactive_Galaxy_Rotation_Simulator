@@ -42,7 +42,8 @@ TABLE1_SHA256 = "5aa0501f6b0d881fa579030e315e7b5b6ef561a5bd3a07472f9929c7e572824
 # Positions of the fields used, counting whitespace-separated fields (Galaxy T D e_D f_D Inc e_Inc ...).
 # The data lines are offset from the file's own byte-by-byte description, so they are split on spaces;
 # no field used here contains a space.
-TABLE1_FIELDS = {"name": 0, "dist_mpc": 2, "e_dist_mpc": 3, "inc_deg": 5, "e_inc_deg": 6}
+TABLE1_FIELDS = {"name": 0, "dist_mpc": 2, "e_dist_mpc": 3, "inc_deg": 5, "e_inc_deg": 6, "hubble_type": 1,
+                 "lum_36_1e9_lsun": 7, "hi_mass_1e9_msun": 13, "v_flat_kms": 15}
 TABLE1_FIELD_COUNT = 19
 
 
@@ -105,13 +106,17 @@ def load_table(path: Path = SPARC_PATH, check_hash: bool = True) -> list[SparcRo
 
 
 class GalaxyInfo(NamedTuple):
-    """One galaxy's distance and inclination with their published errors (SPARC Table 1)."""
+    """One galaxy's distance and inclination with their published errors, and its catalogue properties (SPARC Table 1)."""
 
     name: str
     dist_mpc: float  # assumed distance, Mpc (the same value as table2's Dist)
     e_dist_mpc: float  # mean error on the distance, Mpc
     inc_deg: float  # disk inclination, degrees (90 = edge-on)
     e_inc_deg: float  # mean error on the inclination, degrees
+    hubble_type: float  # T: 0 = S0, 1 = Sa ... 5 = Sc ... 10 = Im, 11 = BCD (Table 1 note 1; a whole number)
+    lum_36_1e9_lsun: float  # L[3.6]: total luminosity at 3.6 um, 10^9 Lsun
+    hi_mass_1e9_msun: float  # MHI: total atomic hydrogen mass, 10^9 Msun
+    v_flat_kms: float  # Vflat: asymptotically flat rotation speed, km/s (0 where SPARC gives none)
 
 
 def load_galaxy_info(path: Path = TABLE1_PATH) -> dict[str, GalaxyInfo]:
@@ -138,6 +143,8 @@ def load_galaxy_info(path: Path = TABLE1_PATH) -> dict[str, GalaxyInfo]:
         row = GalaxyInfo(name, *values)
         if not (row.dist_mpc > 0 and row.e_dist_mpc >= 0 and 0 < row.inc_deg <= 90 and row.e_inc_deg >= 0):
             raise ValueError(f"{path}:{line_number}: distance or inclination out of range: {row}")
+        if not (row.hubble_type in range(12) and row.lum_36_1e9_lsun >= 0 and row.hi_mass_1e9_msun >= 0):
+            raise ValueError(f"{path}:{line_number}: Hubble type, luminosity or HI mass out of range: {row}")
         info[name.upper()] = row
     if len(info) != EXPECTED_GALAXIES:
         raise ValueError(f"{path}: expected {EXPECTED_GALAXIES} galaxies, found {len(info)}")
