@@ -2840,12 +2840,13 @@ __GALAXIES_JS__
     const tunedCount=(model,fit)=>MODEL_VALUES[model]+(fit?fit.tuned_settings:0);
     const reducedChi=(chi,pointCount,k)=>chi/Math.max(1,pointCount-k);
     // The fit in use: the halo fit (Apply Observed Fit, until Visible Matter Only) in NFW mode, or the MOND best fit
-    // when Best realistic fits is on. Which halo fit depends on the switch (nfwFitOf).
-    let nfwFitApplied=true;
+    // when Best realistic fits is on. Which halo fit depends on the switch (nfwFitOf). With the halo mass at zero
+    // the model is visible matter only, so SPARC's standard values apply however the slider got there.
+    let nfwFitApplied=true,appliedFit=null; // appliedFit: the fit applyBaryonState last applied
     function activeFit(){
       if(customActive)return null;
       if(mondMode)return bestFits?activeGalaxy.best_fit.mond:null;
-      return nfwFitApplied?nfwFitOf(activeGalaxy):null;
+      return nfwFitApplied&&Number(document.getElementById('massSlider').value)>0?nfwFitOf(activeGalaxy):null;
     }
     const activeFitModel=()=>mondMode?(bestFits?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
     // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
@@ -3224,6 +3225,7 @@ __GALAXIES_JS__
     setGalaxyMode(galaxyModeRadios.find(radio=>radio.checked).value);
 
     function updateHalo(){
+      if(activeFit()!==appliedFit)applyBaryonState(); // the halo slider reached or left zero
       syncFsSliders();
       updateStability();
       clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
@@ -3248,6 +3250,7 @@ __GALAXIES_JS__
       // The best fit in use sets the M/L ratios, a0, distance and tilt; otherwise SPARC's standard values apply.
       // A custom galaxy is built from masses, so none of these apply to it (activeFit is null).
       const fit=activeFit();
+      appliedFit=fit;
       mlState.disk=fit?fit.upsilon_disk:DATA.upsilon_disk;
       mlState.bulge=fit?fit.upsilon_bulge:DATA.upsilon_bulge;
       MOND_A0=fit&&mondMode?fit.a0_ms2:MOND_A0_DEFAULT;

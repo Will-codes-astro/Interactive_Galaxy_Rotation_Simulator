@@ -226,7 +226,9 @@ cyan visible-matter curve is the same in NFW and MOND mode. On, the NFW and
 MOND best fits each tune those within the same realistic limits (MOND also
 a₀); see PHYSICS.md. It replaced the MOND-only "MOND best fit" switch.
 In NFW mode, Visible Matter Only sets the halo mass to zero without changing
-the scale radius and returns to SPARC's standard M/L, distance and tilt; Apply
+the scale radius and returns to SPARC's standard M/L, distance and tilt.
+Dragging the halo mass to zero does the same, and dragging it back up
+restores the fit's M/L, distance and tilt until Visible Matter Only is pressed; Apply
 Observed Fit restores the halo fit for the switch's state (halo only, or the
 NFW best fit's halo, M/L, distance and tilt).
 The M/L tile shows the values in use and, under them, where they come from
