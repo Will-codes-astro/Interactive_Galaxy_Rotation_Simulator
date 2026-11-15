@@ -40,6 +40,10 @@ work in progress, open decisions, and the date last updated. Update it only
 after a Big change, a decision or a deadline change. Keep the history in the
 dated entries, not here.
 
+The "Project context" section below it (report state, bibliography, AI
+declaration, notes for Claude, open to-dos) replaced project-status.md. When
+one of its facts changes, edit that line, and remove to-dos once done.
+
 ## Screenshots (only when Will asks)
 
 Open the live site, capture the new feature, attach it to that day's
