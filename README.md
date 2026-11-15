@@ -94,4 +94,5 @@ the site, add a `GalaxyPreset` to `GALAXY_PRESETS` in the generator and run it a
 Pushing to `main` runs `.github/workflows/deploy-pages.yml`, which publishes
 only `index.html`, `epq_qr_code.png` and `epq_qr_code.svg` from the repository
 root. Those files must stay in the root. The page loads Plotly and Three.js
-from CDNs.
+from CDNs; if one is blocked or WebGL is off, it shows a note saying so and
+keeps the text pages readable (see `docs/WEBSITE.md`).
