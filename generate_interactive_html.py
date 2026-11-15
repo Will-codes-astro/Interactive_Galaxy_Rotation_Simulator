@@ -440,6 +440,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stats-row:has(.ml-explainer.open) { position:relative; z-index:160; }
     .stats-row { margin-bottom:14px; }
     .stats-row .header-stats { justify-content:flex-start; flex-wrap:wrap; }
+    .stats-row .fit-toggle { align-self:center; padding:9px 14px; font-size:12px; }
+    .sim-head .tutorial-launch { justify-self:end; }
+    @media (max-width:900px) { .sim-head .tutorial-launch { justify-self:start; } }
     .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
     @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
@@ -924,6 +927,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .gp-bar span { background:var(--gold); transition:flex-basis .45s ease; }
     .gp-note { margin:8px 0 0; color:var(--muted); font-size:10.5px; line-height:1.4; }
     @media (prefers-reduced-motion:reduce) { .gp-bar span { transition:none; } }
+    @media (min-width:1000px) { .gp-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); gap:0 30px; align-items:start; } .gp-summary { margin-bottom:0; } }
     @media (max-width:560px) { .galaxy-profile { grid-template-columns:1fr; } .gp-badge { width:48px; height:48px; font-size:16px; } .gp-stats { grid-template-columns:1fr 1fr; } }
     .switch .opt { font-size:13px; }
     .track-input { border-color:var(--line-strong); background:rgba(0,0,0,.25); font-family:var(--f-mono); }
@@ -1123,6 +1127,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="page" data-page="simulator">
     <div class="sim-head">
     <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy and a theory of gravity.</p></div>
+    <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
       <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
@@ -1137,10 +1142,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         </div>
         <div class="galaxy-profile" id="galaxyProfile" aria-live="polite">
           <div class="gp-badge" aria-hidden="true"><span id="gpCode"></span></div>
-          <div>
+          <div class="gp-body">
+            <div>
             <p class="galaxy-type-kicker" id="gpFamily"></p>
             <h3 id="gpShape"></h3>
             <p class="gp-summary" id="gpSummary"></p>
+            </div>
+            <div>
             <dl class="gp-stats">
               <div><dt>Distance</dt><dd><b id="gpDistance"></b><small id="gpDistanceLy"></small></dd></div>
               <div><dt>Flat rotation speed</dt><dd><b id="gpSpeed"></b><small id="gpSpeedKmh"></small></dd></div>
@@ -1149,6 +1157,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars ≈ <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
             <div class="gp-bar" role="img" id="gpBar"><span id="gpStarsBar"></span></div>
             <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium. Bulge: whether SPARC’s mass model includes one.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1157,7 +1166,6 @@ HTML_TEMPLATE = r"""<!doctype html>
       <span class="model-label">Gravity model</span>
       <label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label>
       <span class="mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</span>
-      <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </section>
     <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
     <div class="stats-row">
@@ -1193,8 +1201,8 @@ HTML_TEMPLATE = r"""<!doctype html>
           <p>The <b>Best realistic fits</b> switch lets each model change the tilt within twice SPARC’s error; the line under the tile says which value is in use.</p>
           <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; Li et al. (2018).</p>
         </div>
-        <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
       </div>
+        <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
     </div>
     </div>
     <div class="sim-stage" id="simStage">
@@ -4401,7 +4409,7 @@ __GALAXIES_JS__
       tutorialLockScopes.forEach(scope=>scope.querySelectorAll(TUTORIAL_LOCKABLE).forEach(el=>{
         const unit=el.closest('label')||el;
         if(tutorialCard.contains(unit))return;
-        // The tour's own launch button sits inside the gravity model bar, so it is locked even when that bar is not.
+        // The tour's own launch button (beside the Model setup heading) is always locked while a tour runs.
         const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
         if(unit.inert!==locked)unit.inert=locked;
         unit.classList.toggle('tutorial-locked',locked);

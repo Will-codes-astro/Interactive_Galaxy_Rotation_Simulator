@@ -16,7 +16,9 @@ Background and Method as one long scroll; the Simulator and Scorecard, which nee
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
 ("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
-(Will's choice), so the values in use stay next to the controls that change them.
+(Will's choice), all in one row on wide screens, so the values in use stay next to
+the controls that change them. On wide screens the galaxy profile card splits into
+two columns (who the galaxy is | its numbers) to keep the figures nearer the top.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
@@ -187,7 +189,7 @@ Restart buttons). It only reads the computed orbits.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Simulator tutorial button beside the
-gravity model switch. The tours do not reset or change simulator settings.
+Model setup heading. The tours do not reset or change simulator settings.
 While a card is open, every simulator control it does not name is locked
 (inert and dimmed), and so are the top menu and the 3D camera's drag and zoom;
 when something is in the way, only the control that fixes it is free. Playback
