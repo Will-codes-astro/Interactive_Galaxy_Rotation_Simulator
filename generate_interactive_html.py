@@ -1181,7 +1181,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             </dl>
             <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars ≈ <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
             <div class="gp-bar" role="img" id="gpBar"><span id="gpStarsBar"></span></div>
-            <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium.</p>
+            <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium. Bulge: whether SPARC’s mass model includes one.</p>
           </div>
         </div>
       </div>
@@ -3425,11 +3425,13 @@ __GALAXIES_JS__
        The Custom Sandbox hides the dropdown: its imaginary galaxy has no measurements to compare with, and the
        anatomy sliders drive every output through PhysicsEngine. */
     // SPARC Table 1's Hubble type codes (its note 1), each with the family and a plain description of the shape.
-    const HUBBLE_TYPES=[['S0','Lenticular','A disk with no spiral arms'],['Sa','Spiral','Tightly wound arms and a big bulge'],
-      ['Sab','Spiral','Fairly tight arms and a big bulge'],['Sb','Spiral','Medium arms and a clear bulge'],
-      ['Sbc','Spiral','Fairly open arms and a modest bulge'],['Sc','Spiral','Loose arms and a small bulge'],
-      ['Scd','Spiral','Very loose arms and a tiny bulge'],['Sd','Spiral','Loose, patchy arms and almost no bulge'],
-      ['Sdm','Late-type spiral','Faint, patchy arms and no bulge'],['Sm','Magellanic spiral','Barely-there arms'],
+    // SPARC Table 1's Hubble type codes (its note 1), each with the family and how its arms look. Whether there is a
+    // bulge comes from the galaxy's own SPARC mass model (any non-zero V_bulge), not from the type, so the card never
+    // claims a bulge the model leaves out (NGC 3198 is type Sc but SPARC fits it with no bulge).
+    const HUBBLE_TYPES=[['S0','Lenticular','No spiral arms'],['Sa','Spiral','Tightly wound arms'],
+      ['Sab','Spiral','Fairly tight arms'],['Sb','Spiral','Medium arms'],['Sbc','Spiral','Fairly open arms'],
+      ['Sc','Spiral','Loose arms'],['Scd','Spiral','Very loose arms'],['Sd','Spiral','Loose, patchy arms'],
+      ['Sdm','Late-type spiral','Faint, patchy arms'],['Sm','Magellanic spiral','Barely-there arms'],
       ['Im','Irregular','No clear shape'],['BCD','Blue compact dwarf','Small, bright and forming stars']];
     const LIGHT_YEARS_PER_MPC=3.2616e6;
     const GAS_PER_HI=1.33; // SPARC counts helium by scaling the hydrogen mass (Lelli, McGaugh & Schombert 2016)
@@ -3487,7 +3489,8 @@ __GALAXIES_JS__
     document.addEventListener('click',e=>{if(!galaxyMenu.contains(e.target))closeGalaxyMenu(false);});
     // Profile card: SPARC Table 1's catalogue values, with everyday units beside them.
     function renderGalaxyProfile(galaxy){
-      const c=galaxy.catalogue,[code,family,shape]=hubbleOf(galaxy),radii=galaxy.rotation.radius_kpc;
+      const c=galaxy.catalogue,[code,family,arms]=hubbleOf(galaxy),radii=galaxy.rotation.radius_kpc;
+      const shape=`${arms}, ${galaxy.rotation.v_bulge_kms.some(v=>v!==0)?'with a central bulge':'no central bulge'}`;
       const stars=DATA.upsilon_disk*c.luminosity_36_1e9_lsun,gas=GAS_PER_HI*c.hi_mass_1e9_msun;
       const billions=v=>v>=10?v.toFixed(0):v.toFixed(1),set=(id,text)=>{document.getElementById(id).textContent=text;};
       set('gpCode',code);set('gpFamily',`${family} · Hubble type ${code}`);set('gpShape',shape);set('gpSummary',galaxy.summary);

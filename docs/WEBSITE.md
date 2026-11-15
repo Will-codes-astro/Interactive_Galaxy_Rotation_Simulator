@@ -49,7 +49,7 @@ The Galaxy menu is a custom listbox (`galaxyMenuBtn`, `galaxyMenuList`; arrow
 keys, Home/End, Enter/Space, Escape), so each option shows its Hubble type badge
 and the preset's one-line `summary`. Under it, the galaxy profile card
 (`renderGalaxyProfile`) shows SPARC Table 1's values in plain words: the Hubble
-type with its family and shape (`HUBBLE_TYPES`), distance (also in light-years),
+type with its family and arms (`HUBBLE_TYPES`), whether there is a central bulge (from SPARC's mass model: any non-zero V_bulge, so NGC 3198 shows none although Sc galaxies often have a small one), distance (also in light-years),
 flat rotation speed (also in km/h), how far out it was measured and how many
 speeds, and a stars-vs-gas bar (stars ≈ 0.5 × L[3.6], gas = 1.33 × M_HI, the
 helium factor SPARC uses). The stellar figure is a rough estimate (it ignores the
