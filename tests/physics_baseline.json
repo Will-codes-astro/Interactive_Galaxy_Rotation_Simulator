@@ -13,7 +13,7 @@
     "NGC2403": {
       "reduced_chi2_visible_only": 4374.210085525969,
       "reduced_chi2_nfw_default": 10.06116510403655,
-      "best_fit_chi2_relative_mismatch": 8.165913272240033e-07
+      "best_fit_chi2_relative_mismatch": 7.756273656678303e-07
     },
     "NGC7331": {
       "reduced_chi2_visible_only": 241.6015659825833,
@@ -23,7 +23,7 @@
     "UGC00128": {
       "reduced_chi2_visible_only": 6130.545888764023,
       "reduced_chi2_nfw_default": 3.226436293128134,
-      "best_fit_chi2_relative_mismatch": 8.303764970940541e-05
+      "best_fit_chi2_relative_mismatch": 8.527139174741016e-05
     }
   }
 }

@@ -28,12 +28,16 @@ M_PER_KPC = 3.08567758e19
 # - disk and bulge M/L: stellar-population models predict 0.5 and 0.7 at 3.6 um with about 0.1 dex scatter
 #   (McGaugh & Schombert 2014; the prior width used by Li et al. 2018);
 # - distance and inclination: SPARC Table 1's own errors (Lelli, McGaugh & Schombert 2016);
-# - NFW concentration: the Dutton & Maccio (2014) relation, whose scatter is 0.11 dex.
-# MOND's a0 stays within the measured 1.20 +/- 0.24 (systematic) x 10^-10 m/s^2 (McGaugh, Lelli & Schombert 2016).
+# - NFW concentration: the Dutton & Maccio (2014) relation, whose scatter is 0.11 dex;
+# - MOND a0: the measured 1.20 +/- 0.24 (systematic) x 10^-10 m/s^2 (McGaugh, Lelli & Schombert 2016), with the
+#   systematic error treated as 1 sigma (Will's choice, 15 Nov 2026: the same rule as the halo concentration).
 FIT_LIMIT_SIGMA = 2.0
 UPSILON_SCATTER_DEX = 0.1
 HALO_CONCENTRATION_SCATTER_DEX = 0.11
-MOND_A0_RANGE_MS2 = (0.96e-10, 1.44e-10)
+MOND_A0_MEASURED_MS2 = 1.20e-10
+MOND_A0_SYSTEMATIC_MS2 = 0.24e-10
+MOND_A0_RANGE_MS2 = (MOND_A0_MEASURED_MS2 - FIT_LIMIT_SIGMA * MOND_A0_SYSTEMATIC_MS2,
+                     MOND_A0_MEASURED_MS2 + FIT_LIMIT_SIGMA * MOND_A0_SYSTEMATIC_MS2)
 HALO_MASS_RANGE_MSUN = (1e10, 1e13)
 HALO_SCALE_RANGE_KPC = (5.0, 60.0)  # the scale-radius slider's range
 # Fit search: a grid of FIT_GRID_POINTS per value, then a pattern search from the best FIT_STARTS grid points,
@@ -1243,7 +1247,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <ul class="score-notes">
         <li><b>Same rules for every model</b>With standard values, all three use SPARC’s M/L, distance and tilt, so the visible matter is identical and only the explanation differs: the halo tunes 2 values (mass and size), MOND none. Best realistic fits give both models the same extra freedom: the halo tunes __K_NFW_FIT__, MOND __K_MOND_FIT__ (a<sub>0</sub>, M/L, distance and tilt). χ<sup>2</sup><sub>r</sub> accounts for this, so extra freedom is not free.</li>
         <li><b>Realistic limits</b>Best fits use only believable values: M/L that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> means that model needs something unrealistic to do better.</li>
-        <li><b>MOND’s best case</b>a<sub>0</sub> may vary from 0.96 to 1.44 × 10⁻¹⁰ m/s², its measured range (McGaugh, Lelli &amp; Schombert 2016), though MOND says it should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
+        <li><b>MOND’s best case</b>a<sub>0</sub> may vary from __A0_MIN__ to __A0_MAX__ × 10⁻¹⁰ m/s², within __FIT_LIMIT_SIGMA__× its measured error, like every other limit (McGaugh, Lelli &amp; Schombert 2016), though MOND says it should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
         <li><b>Error bars</b>Scores use SPARC’s error on each speed. Distance and tilt errors shift a whole curve, so the best fits allow for them.</li>
         <li><b>Small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to settle it.</li>
       </ul>
@@ -4671,6 +4675,8 @@ def main() -> None:
     html = html.replace("__K_NFW_FIT__", escape(tuned_count_text(galaxies, "nfw", "nfw")))
     html = html.replace("__K_MOND_FIT__", escape(tuned_count_text(galaxies, "mondBest", "mond")))
     html = html.replace("__FIT_LIMIT_SIGMA__", f"{FIT_LIMIT_SIGMA:g}")
+    html = html.replace("__A0_MIN__", f"{MOND_A0_RANGE_MS2[0] / 1e-10:.2f}")
+    html = html.replace("__A0_MAX__", f"{MOND_A0_RANGE_MS2[1] / 1e-10:.2f}")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")

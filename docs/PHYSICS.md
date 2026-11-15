@@ -95,7 +95,7 @@ published uncertainty either side of the typical value:
 | Inclination i | i_SPARC ± 2 e_i, at most 90° | SPARC Table 1 |
 | NFW concentration c = r₂₀₀/r_s | c(M₂₀₀) × 10^(±0.22) | Dutton & Macciò (2014), eq. 8, intrinsic scatter 0.11 dex (§4.1) |
 | NFW M₂₀₀ | 10¹⁰ to 10¹³ M☉, with r_s inside the slider's 5 to 60 kpc | search range only |
-| MOND a₀ | 0.96 to 1.44 × 10⁻¹⁰ m/s² | 1.20 ± 0.24 (systematic) (McGaugh, Lelli & Schombert 2016). This is ±1 systematic uncertainty, not ±2σ: the value Will approved |
+| MOND a₀ | 1.20 ± 2 × 0.24: 0.72 to 1.68 × 10⁻¹⁰ m/s² | 1.20 ± 0.24 (systematic) (McGaugh, Lelli & Schombert 2016), the systematic error treated as 1σ (`MOND_A0_SYSTEMATIC_MS2`). Will's choice (15 Nov 2026): ±2σ like every other limit, replacing ±1 × 0.24 (0.96 to 1.44) |
 
 This follows Li et al. (2018), who fit each SPARC galaxy within "a realistic
 region of the parameter space", except that they use Gaussian priors where this
@@ -237,7 +237,8 @@ These are documented here, not changed. Any change needs Will's decision.
    (Υ_disk = 1.5), with distance fixed. An unlimited search reaches χ²_ν ≈ 5.6,
    but only with Υ_disk = 2.7 and a₀ = 0.38 × 10⁻¹⁰, which are not realistic.
    The realistic MOND fit (above) varies distance and tilt too, and still
-   scores χ²_ν ≈ 70, with Υ_disk, a₀ and the tilt all at their limits: within
+   scores χ²_ν ≈ 70 (≈ 69 since a₀'s limit widened to ±2σ), with Υ_disk and a₀
+   at their limits (and the tilt too, before the widening): within
    realistic values MOND cannot match this galaxy here. The NFW fit scores
    χ²_ν ≈ 3.5, with its distance at the lower limit (45 Mpc). Plain MOND
    scores χ²_ν ≈ 115. Checked independently on 15 Nov 2026 (a separate script reading
@@ -249,9 +250,15 @@ These are documented here, not changed. Any change needs Will's decision.
    also the outer one, so the fit lowers a₀ to compensate and both stop at
    their limits. NGC 2403's plain MOND χ²_ν ≈ 338 was checked the same way. "Low surface brightness" is cited on the page to de Blok
    & McGaugh (1996), who use 60 Mpc for it.
-8. Several best fits sit at a limit (on 15 Nov 2026: the MOND a₀ for all four
-   presets, 16 values in all across NFW and MOND, listed in each fit's
-   `at_limit` and marked on the Scorecard). The limits are hard
+8. Several best fits sit at a limit (listed in each fit's `at_limit` and
+   marked on the Scorecard). With a₀ at ±2σ (15 Nov 2026) the MOND a₀ is
+   still at a limit for three of the four presets (NGC 2403 and NGC 7331 at
+   the top, UGC 128 at the bottom); NGC 3198's is not (0.73). MOND best-fit
+   χ²_ν moved: NGC 3198 4.07 → 3.38, NGC 2403 12.5 → 11.8, NGC 7331 1.20 →
+   1.11, UGC 128 70.2 → 68.8. Caveat: most of the ±0.24 comes from the
+   uncertainty in stellar M/L, which the best fits already vary on their own,
+   so ±2 × 0.24 may count that uncertainty twice (Claude's reading; check §3
+   of McGaugh, Lelli & Schombert 2016). The limits are hard
    edges; Li et al. (2018) use Gaussian priors, which would let a value move
    further at a cost in χ². A different FIT_LIMIT_SIGMA would change the
    scores, so it is Will's decision.
