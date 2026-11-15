@@ -3965,6 +3965,7 @@ __GALAXIES_JS__
        is locked (see tutorialAllowed). A guided tour from the puzzle page runs the main tour, then the sandbox tour. */
     // Leave (~0.45 s) plus the staggered enter animation (~0.85 s): the card's scrollbar stays hidden for this long.
     const TUTORIAL_SWITCH_MS=1350;let tutorialScrollTimer=0;
+    const TUTORIAL_RING_MIN_RADIUS_PX=8;  // softest corner any highlight ring gets
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
         {id:'puzzle',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
@@ -4326,7 +4327,7 @@ __GALAXIES_JS__
       tutorialSpotlight.style.top=(rect.top-pad)+'px';
       tutorialSpotlight.style.width=(rect.width+2*pad)+'px';
       tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
-      tutorialSpotlight.style.borderRadius=(Math.min(radius,rect.height/2)+pad)+'px';
+      tutorialSpotlight.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,rect.height/2)+pad)+'px';
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
       const tag=document.getElementById('tutorialTag'),label=blocker?'':tutorialTagNumber(aim.label);
       if(tag.textContent!==label)tag.textContent=label;
@@ -4346,8 +4347,10 @@ __GALAXIES_JS__
     }
     // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
     // highlight grows to cover a box that expands out of it.
+    // A slider's <output> stretches to fill its label row, so measure the number text itself.
     function tutorialSpotRect(target){
-      const r=target.getBoundingClientRect();
+      let r=target.getBoundingClientRect();
+      if(target.tagName==='OUTPUT'&&target.textContent.trim()){const range=document.createRange();range.selectNodeContents(target);r=range.getBoundingClientRect();}
       let left=r.left,top=r.top,right=r.right,bottom=r.bottom;
       const openers=[...target.querySelectorAll('[aria-expanded="true"][aria-controls]')];
       if(target.matches('[aria-expanded="true"][aria-controls]'))openers.push(target);
@@ -4387,7 +4390,7 @@ __GALAXIES_JS__
         ring.hidden=false;
         ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
         ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
-        ring.style.borderRadius=(Math.min(radius,r.height/2)+pad)+'px';
+        ring.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,r.height/2)+pad)+'px';
       });
     }
     // A step's extra rings: also = other controls to use (blue), watch = things to watch (yellow).
