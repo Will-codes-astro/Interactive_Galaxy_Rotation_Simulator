@@ -437,7 +437,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
     .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
     /* While the explainer is open, lift its section above the sticky slider bar (z-index 150) so the bar can't cover it. */
-    .sim-head:has(.ml-explainer.open) { position:relative; z-index:160; }
+    .stats-row:has(.ml-explainer.open) { position:relative; z-index:160; }
+    .stats-row { margin-bottom:14px; }
+    .stats-row .header-stats { justify-content:flex-start; flex-wrap:wrap; }
     .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
     @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
@@ -1121,41 +1123,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="page" data-page="simulator">
     <div class="sim-head">
     <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy and a theory of gravity.</p></div>
-    <div class="header-stats" aria-label="Simulation summary">
-      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
-      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
-      <div class="ml-col">
-        <div class="ml-row">
-        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
-        <div class="stat ml" id="tiltStat" title="The galaxy’s tilt (inclination) in use"><div class="stat-label"><span>Tilt</span><button type="button" class="ml-info" id="tiltInfoBtn" aria-expanded="false" aria-controls="tiltExplainer" title="What is the tilt?">?</button></div><div class="stat-value"><b id="tiltValue">–</b></div><small class="ml-source" id="tiltSource">standard SPARC value</small></div>
-        </div>
-        <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
-          <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
-          <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
-          <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L, or Υ) converts one into the other: Suns' worth of mass per Sun's worth of light.</p>
-          <ul>
-            <li><b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass.</li>
-            <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
-          </ul>
-          <p>SPARC’s standard values (in 3.6 μm infrared light) are <b>0.5 for the disk</b> and <b>0.7 for the older bulge</b>. They are averages, so every real galaxy differs a little. A higher M/L lifts the visible-matter curve and leaves less for dark matter to explain.</p>
-          <p>The <b>Best realistic fits</b> switch lets each model scale them by 0.6 to 1.6 times, the range stellar models allow; the line under the tile says which values are in use. The Custom Sandbox sets masses directly, so needs no M/L.</p>
-          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
-        </div>
-        <div class="ml-explainer" id="tiltExplainer" role="dialog" aria-labelledby="tiltExplainerTitle" aria-hidden="true">
-          <button type="button" class="ml-close" id="tiltExplainerClose" aria-label="Close">×</button>
-          <h3 id="tiltExplainerTitle">What is the tilt?</h3>
-          <p>We see every galaxy at an angle. The <b>tilt</b> (or <b>inclination</b>, i) is that angle: 0° is face-on, 90° is edge-on.</p>
-          <ul>
-            <li><b>Telescopes only see motion towards or away from us</b> (the Doppler shift), not sideways.</li>
-            <li><b>So a tilted disk looks slower than it really spins.</b> True speed = measured speed ÷ sin i.</li>
-          </ul>
-          <p>SPARC estimates each galaxy’s tilt and has already corrected its speeds for it, but the estimate has an error of a few degrees. Nearly face-on galaxies are the most sensitive: there a small change in tilt changes every speed a lot.</p>
-          <p>The <b>Best realistic fits</b> switch lets each model change the tilt within twice SPARC’s error; the line under the tile says which value is in use.</p>
-          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; Li et al. (2018).</p>
-        </div>
-        <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
-      </div>
-    </div>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
       <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
@@ -1193,6 +1160,43 @@ HTML_TEMPLATE = r"""<!doctype html>
       <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </section>
     <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
+    <div class="stats-row">
+    <div class="header-stats" aria-label="Simulation summary">
+      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
+      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
+      <div class="ml-col">
+        <div class="ml-row">
+        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
+        <div class="stat ml" id="tiltStat" title="The galaxy’s tilt (inclination) in use"><div class="stat-label"><span>Tilt</span><button type="button" class="ml-info" id="tiltInfoBtn" aria-expanded="false" aria-controls="tiltExplainer" title="What is the tilt?">?</button></div><div class="stat-value"><b id="tiltValue">–</b></div><small class="ml-source" id="tiltSource">standard SPARC value</small></div>
+        </div>
+        <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
+          <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
+          <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
+          <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L, or Υ) converts one into the other: Suns' worth of mass per Sun's worth of light.</p>
+          <ul>
+            <li><b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass.</li>
+            <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
+          </ul>
+          <p>SPARC’s standard values (in 3.6 μm infrared light) are <b>0.5 for the disk</b> and <b>0.7 for the older bulge</b>. They are averages, so every real galaxy differs a little. A higher M/L lifts the visible-matter curve and leaves less for dark matter to explain.</p>
+          <p>The <b>Best realistic fits</b> switch lets each model scale them by 0.6 to 1.6 times, the range stellar models allow; the line under the tile says which values are in use. The Custom Sandbox sets masses directly, so needs no M/L.</p>
+          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
+        </div>
+        <div class="ml-explainer" id="tiltExplainer" role="dialog" aria-labelledby="tiltExplainerTitle" aria-hidden="true">
+          <button type="button" class="ml-close" id="tiltExplainerClose" aria-label="Close">×</button>
+          <h3 id="tiltExplainerTitle">What is the tilt?</h3>
+          <p>We see every galaxy at an angle. The <b>tilt</b> (or <b>inclination</b>, i) is that angle: 0° is face-on, 90° is edge-on.</p>
+          <ul>
+            <li><b>Telescopes only see motion towards or away from us</b> (the Doppler shift), not sideways.</li>
+            <li><b>So a tilted disk looks slower than it really spins.</b> True speed = measured speed ÷ sin i.</li>
+          </ul>
+          <p>SPARC estimates each galaxy’s tilt and has already corrected its speeds for it, but the estimate has an error of a few degrees. Nearly face-on galaxies are the most sensitive: there a small change in tilt changes every speed a lot.</p>
+          <p>The <b>Best realistic fits</b> switch lets each model change the tilt within twice SPARC’s error; the line under the tile says which value is in use.</p>
+          <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; Li et al. (2018).</p>
+        </div>
+        <label class="fit-toggle" id="bestFitWrap" title="Off: every model uses SPARC’s standard M/L, distance and tilt. On: the halo and MOND each tune them within the same realistic limits (and MOND its a₀) for their lowest χ²."><span class="fit-label">Best realistic fits</span><input type="checkbox" id="bestFitToggle" autocomplete="off"><span class="track" aria-hidden="true"></span></label>
+      </div>
+    </div>
+    </div>
     <div class="sim-stage" id="simStage">
     <section class="sandbox" id="sandboxPanel" aria-labelledby="sandboxTitle" hidden>
       <div class="sandbox-head"><h2 id="sandboxTitle">Custom galaxy builder</h2></div>

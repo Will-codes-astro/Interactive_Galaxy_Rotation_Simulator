@@ -14,8 +14,9 @@ correctly sized. If Plotly or Three.js fails to load (for example a network that
 WebGL is off, a red note at the top says which, and the page shows The puzzle,
 Background and Method as one long scroll; the Simulator and Scorecard, which need
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
-("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, MOND best
-fit) sit at the top right of the Simulator page.
+("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
+fits switch sit just under the Simulation heading, directly above the sliders
+(Will's choice), so the values in use stay next to the controls that change them.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
