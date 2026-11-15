@@ -10,7 +10,8 @@ sources. The top menu shows one page at a time (`showPage`); each page ends with
 a "Next" button, the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
-correctly sized. The stat tiles (test stars, timeline, mass-to-light, MOND best
+correctly sized. On phones (640 px or narrower) the menu uses short labels
+("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, MOND best
 fit) sit at the top right of the Simulator page.
 
 The tutorial offer appears the first time the Simulator page opens, not over the
@@ -232,6 +233,8 @@ best realistic NFW fit (Apply Observed Fit), MOND at the default a₀, and the
 MOND best fit. Both best-fit cells list how many values were tuned and what they
 are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). Under each score it gives the root-mean-square gap in plain words
 ("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
+On phones (640 px or narrower) the table becomes one stacked card per galaxy,
+with each score labelled by its column, so nothing is off-screen.
 It is calculated in the page when it loads (`scoreGalaxy`), with the
 same functions as the fit badge, so the two always agree. "Show in simulator"
 loads that galaxy (leaving the sandbox if needed). Five short cards underneath (including

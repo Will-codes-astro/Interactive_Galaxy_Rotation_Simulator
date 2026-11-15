@@ -783,6 +783,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
     .topnav { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
     .topnav a { padding:6px 11px; border-radius:7px; color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; white-space:nowrap; transition:color .15s,background .15s; }
+    .topnav .nav-short { display:none; }
+    /* Phones: short labels, and the menu wraps onto a second row rather than running off the screen. */
+    @media (max-width:640px) {
+      .topbar { height:auto; min-height:56px; }
+      .topnav { flex-wrap:wrap; justify-content:flex-end; row-gap:2px; overflow:visible; }
+      .topnav .nav-long { display:none; } .topnav .nav-short { display:inline; }
+    }
     .topnav a:hover, .topnav a:focus-visible { color:var(--ink); background:rgba(255,255,255,.05); outline:none; }
     a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
@@ -885,7 +892,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stat-q::after { background:var(--panel-2); border-color:var(--line-strong); }
     .telemetry { font-family:var(--f-mono); }
     @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
-    @media (max-width:640px) { .topbar { padding:0 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
+    @media (max-width:640px) { .topbar { padding:6px 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
     .key summary::before { content:""; display:inline-block; width:4px; }
     /* Small text: sizes and contrast raised for readability (visual only). */
     :root { --muted:#96a5ba; }
@@ -925,6 +932,17 @@ HTML_TEMPLATE = r"""<!doctype html>
     .score-table small { display:block; margin-top:2px; color:var(--muted); font-size:11.5px; font-weight:400; line-height:1.4; }
     .score-table tbody th { color:var(--ink); font-weight:600; white-space:nowrap; }
     .score-table tbody tr:last-child th, .score-table tbody tr:last-child td { border-bottom:0; }
+    /* Phones: one stacked card per galaxy, each score labelled with its column, so nothing is off-screen. */
+    @media (max-width:640px) {
+      .score-table { min-width:0; }
+      .score-table thead { display:none; }
+      .score-table tbody, .score-table tr, .score-table tbody th, .score-table td { display:block; }
+      .score-table tr { margin-bottom:14px; border:1px solid var(--line); border-radius:10px; }
+      .score-table tbody tr:last-child th, .score-table tbody tr:last-child td { border-bottom:1px solid var(--line); }
+      .score-table tr > :last-child, .score-table tbody tr:last-child td:last-child { border-bottom:0; }
+      .score-table tbody th { white-space:normal; background:rgba(138,180,248,.06); }
+      .score-table td[data-label]::before { content:attr(data-label); display:block; margin-bottom:4px; color:var(--ink); font-size:12px; font-weight:600; }
+    }
     .score { display:inline-block; min-width:58px; padding:2px 9px; border:1px solid rgba(120,150,180,.3); border-radius:999px; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums; text-align:center; }
     .score.good { border-color:rgba(95,208,224,.55); color:#8fe3ee; } .score.ok { border-color:rgba(255,174,92,.55); color:#ffc48a; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
     .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
@@ -988,7 +1006,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
-    <div class="topnav"><a href="#puzzle" aria-current="page">The puzzle</a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background">Background</a><a href="#method">Method &amp; sources</a></div>
+    <div class="topnav"><a href="#puzzle" aria-current="page"><span class="nav-long">The puzzle</span><span class="nav-short">Puzzle</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background">Background</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
   </nav>
   <main>
     <div class="page active" data-page="puzzle">
@@ -3381,12 +3399,13 @@ __GALAXIES_JS__
       const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}`:'';
       return `M/L ${fit.upsilon_disk.toFixed(2)}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}° (SPARC ${c.inclination_deg.toFixed(0)}°)`;
     }
+    const SCORE_COLUMNS={visible:'Visible matter only',nfw:'Dark matter halo (NFW), best realistic fit',mond:'MOND, nothing tuned',mondBest:'MOND best fit (realistic limits)'};
     function scoreRowHtml(galaxy){
       const score=scoreGalaxy(galaxy),{nfw,mond}=galaxy.best_fit;
-      const cell=(model,note='')=>{
+      const cell=(model,note='')=>{ // data-label names the column on phones, where the table stacks
         const red=reducedChi(score.chi[model],score.pointCount,score.k[model]),verdict=fitVerdict(red);
         const miss=Math.sqrt(score.chi[model]/score.pointCount); // root-mean-square gap, in error bars
-        return `<td><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
+        return `<td data-label="${SCORE_COLUMNS[model]}"><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
       };
       const nfwTuned=`<small>${score.k.nfw} tuned: M<sub>200</sub> ${(nfw.m200_msun/1e12).toFixed(2)}×10¹² M☉ · concentration ${nfw.concentration.toFixed(1)} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
       const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰ (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
