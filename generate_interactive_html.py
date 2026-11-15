@@ -1119,7 +1119,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <ol class="puzzle-steps">
         <li><h3>A rotation curve is a speed chart</h3><p>Stars and gas circle the centre of their galaxy. Plot how fast they move against how far out they are, and you have a rotation curve.</p></li>
         <li><h3>What astronomers expected</h3><p>Gravity weakens with distance: Mercury orbits the Sun at 47 km/s, distant Neptune at only 5 km/s (Williams 2024). Most of a galaxy’s visible matter sits near its centre, so its outer stars and gas should be slow too: the dashed line.</p></li>
-        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the edge of __DEFAULT_GALAXY_NAME__, gas moves at <b id="puzzleObs">–</b>, but the gravity of its visible matter accounts for only <b id="puzzleBar">–</b>. Holding it in orbit takes about <b id="puzzleRatio">–</b> times the pull the visible matter supplies.</p></li>
+        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the edge of __DEFAULT_GALAXY_NAME__, gas orbits at <b id="puzzleObs">–</b>. The gravity of the stars and gas we can see could only hold it in orbit at about <b id="puzzleBar">–</b>: any faster and it should fly away. To keep it circling that fast takes about <b id="puzzleRatio">–</b> times as much pull as the visible matter supplies.</p></li>
         <li><h3>Two possible answers</h3>
           <div class="answers">
             <div class="answer dm"><b>Dark matter</b><span>The galaxy sits inside a huge cloud of unseen mass.</span></div>
@@ -1164,7 +1164,7 @@ HTML_TEMPLATE = r"""<!doctype html>
               <div><dt>Flat rotation speed</dt><dd><b id="gpSpeed"></b><small id="gpSpeedKmh"></small></dd></div>
               <div><dt>Measured out to</dt><dd><b id="gpExtent"></b><small id="gpPoints"></small></dd></div>
             </dl>
-            <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars ≈ <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
+            <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
             <div class="gp-bar" role="img" id="gpBar"><span id="gpStarsBar"></span></div>
             <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium. Bulge: whether SPARC’s mass model includes one.</p>
             </div>
