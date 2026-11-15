@@ -25,7 +25,10 @@ Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
 speeds against the speed its visible matter predicts, with the gap between them
 shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
-visual aid only. "Take the guided tour" starts the tutorial.
+visual aid only. "Take the full guided tour" runs the simulator tutorial and
+then, straight on, the sandbox tutorial ("Part 1 of 2", "Part 2 of 2"). "Open
+the simulator" instead brings up the welcome offer, whose "Start simulator
+tutorial" runs the simulator tutorial alone.
 
 The Galaxy dropdown above the gravity model switch chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds
@@ -155,8 +158,14 @@ distance (also in the fullscreen corner panel, beside the round Play and
 Restart buttons). It only reads the computed orbits.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
-skip it at any point and restart it using the Tutorial button beside the
+skip it at any point and restart it using the Simulator tutorial button beside the
 gravity model switch. The tours do not reset or change simulator settings.
+While a card is open, every simulator control it does not name is locked
+(inert and dimmed), and so are the top menu and the 3D camera's drag and zoom;
+when something is in the way, only the control that fixes it is free. Playback
+speed, the info (?) buttons and the halo-card explainers stay free. Ending or
+skipping the tour unlocks everything. Instructions with several actions show
+one numbered action at a time.
 The main tutorial's 18 steps start from the puzzle in the rotation curve
 (measured speeds stay above the visible-matter prediction), then remove and
 restore the halo, change its shape, read the halo cards (r200, scale radius,
@@ -165,10 +174,10 @@ switch. A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
 watch two ringed stars race (live lap counts and speeds show differential
 rotation on a flat rotation curve), turn edge-on to see a ringed star bob
-through the thin disk, remove the halo and follow the first star to cross a
-red ejection-line ring, then restore the halo and zoom out to the full halo.
+through the thin disk, switch on the ejection line, remove the halo and follow
+the first star to cross it, then restore the halo and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer and the theory
-guide. The rings, labels and ejection ring are tutorial aids drawn from the
+guide. The rings and labels are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
@@ -178,14 +187,15 @@ border tints green briefly, and the done message starts with a short word of
 praise. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
-phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tour covers
+phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tutorial covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
 halo stability monitor (what it reads, then pushing a halo out of range), the
 halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
-orbits, then the first star lost without dark matter). It starts from the
-Sandbox tour button on the tutorial's last step (which opens the Custom
-Sandbox), or from the Tutorial button, which reads "Sandbox tour" while the
-sandbox is open. If a step needs a different mode (NFW or MOND, a halo above
+orbits, then the first star lost without dark matter). It follows on from the simulator
+tutorial in the full guided tour, or starts from the Sandbox tutorial button on
+the simulator tutorial's last step (which opens the Custom Sandbox), or from the
+Simulator tutorial button, which reads "Sandbox tutorial" while the sandbox is
+open. If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
