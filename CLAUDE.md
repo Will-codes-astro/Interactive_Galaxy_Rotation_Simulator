@@ -220,3 +220,11 @@ fails, report it plainly and don't commit.
 - **`big-change`**: the routine for Big changes.
 - **`report-checks`**: report–code check, citation check, and the Word
   safety check, which is required before any edit to the report.
+- **"What I've learned from the site"** (Notion page id
+  `419c4fda4ef481249cd7ecb4f3ff255b`, under EPQ Main Hub): when work turns up
+  a high-value finding or evaluation point for the report (a surprising
+  result, a model verdict that depends on assumptions, a limitation of the
+  method), add a dated section without being asked: the numbers, what lies
+  behind them, points Will could make, and caveats. Notes and evidence only,
+  never report prose; mark anything that is Claude's interpretation rather
+  than a published finding.
