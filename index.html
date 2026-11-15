@@ -224,7 +224,9 @@
     .fs-sliders label { display:flex; justify-content:space-between; gap:8px; color:var(--muted); }
     .fs-sliders output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .fs-sliders input[type=range] { width:100%; height:16px; margin:0; }
-    .fs-sliders.disabled :is(label,input) { opacity:.35; pointer-events:none; }
+    #orbitPlot .fs-sliders.mond-hidden { display:none; }
+    .control[hidden] { display:none; }
+    @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     .fs-time { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
     .fs-play { flex:none; width:28px; height:28px; min-height:0; padding:0; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:12px; line-height:1; }
     .fs-time output { margin-left:auto; }
@@ -2809,8 +2811,7 @@ window.GALAXIES = {
       fsMass.value=massSlider.value;fsScale.value=scaleSlider.value;
       document.getElementById('fsMassValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('fsScaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
-      fsSliders.classList.toggle('disabled',mondMode);
-      fsMass.disabled=fsScale.disabled=mondMode;
+      fsSliders.classList.toggle('mond-hidden',mondMode); // no halo in MOND, so no halo sliders
     }
     [[fsMass,massSlider],[fsScale,scaleSlider]].forEach(([mini,main])=>{
       mini.addEventListener('input',()=>{main.value=mini.value;main.dispatchEvent(new Event('input'));});
@@ -3085,12 +3086,8 @@ window.GALAXIES = {
       document.getElementById('optMond').classList.toggle('active',mondMode);
       document.getElementById('mondNote').hidden=!mondMode;
       applyBaryonState();
-      ['massControl','scaleControl'].forEach(id=>{
-        const c=document.getElementById(id);
-        c.classList.toggle('disabled',mondMode);
-        c.setAttribute('aria-disabled',String(mondMode));
-        c.querySelectorAll('input,button').forEach(el=>{el.disabled=mondMode;});
-      });
+      // MOND has no halo, so its sliders are hidden rather than greyed out.
+      ['massControl','scaleControl'].forEach(id=>{document.getElementById(id).hidden=mondMode;});
       updateHalo();
     });
     function queueSliderUpdate(){

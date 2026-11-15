@@ -231,6 +231,9 @@ edited (sliders and switches let go of focus after a mouse or touch drag, so
 the arrows return to the tour). Outside the tour, in fullscreen only, the arrows
 step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
+In MOND mode the halo mass and scale radius sliders (and their fullscreen
+copies) are hidden, not greyed out, since MOND has no halo; on wide screens the
+remaining time and Track a star controls share the bar in two columns.
 Best realistic fits switch (header, beside the M/L tile; presets only): off by
 default, so every model uses SPARC's standard M/L, distance and tilt and the
 cyan visible-matter curve is the same in NFW and MOND mode. On, the NFW and
