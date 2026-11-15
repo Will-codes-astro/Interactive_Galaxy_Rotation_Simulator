@@ -255,10 +255,19 @@ These are documented here, not changed. Any change needs Will's decision.
    still at a limit for three of the four presets (NGC 2403 and NGC 7331 at
    the top, UGC 128 at the bottom); NGC 3198's is not (0.73). MOND best-fit
    χ²_ν moved: NGC 3198 4.07 → 3.38, NGC 2403 12.5 → 11.8, NGC 7331 1.20 →
-   1.11, UGC 128 70.2 → 68.8. Caveat: most of the ±0.24 comes from the
-   uncertainty in stellar M/L, which the best fits already vary on their own,
-   so ±2 × 0.24 may count that uncertainty twice (Claude's reading; check §3
-   of McGaugh, Lelli & Schombert 2016). The limits are hard
+   1.11, UGC 128 70.2 → 68.8.
+   **Double counting (checked 15 Nov 2026, Will to decide).** McGaugh, Lelli &
+   Schombert (2016, §III, after eq. 4) give g† = 1.20 ± 0.02 (random) ± 0.24
+   (systematic) and say the systematic "represents the 20% normalization
+   uncertainty in Υ⋆". Li et al. (2018, §5) note that "changes in g† can be
+   compensated for by changes in the mass-to-light ratio", fix g† = 1.20 in
+   their main fits, and when they let it vary per galaxy use a prior of
+   1.20 ± 0.02. The best fits already vary Υ, so the ±0.24 counts the M/L
+   uncertainty a second time. MOND best-fit χ² for the alternatives (run
+   15 Nov 2026, not adopted): a₀ = 1.20 ± 2 × 0.02 gives 198.8, 920.8, 40.4,
+   1277.1 (NGC 3198, NGC 2403, NGC 7331, UGC 128); a₀ fixed at 1.20 gives
+   207.0, 934.0, 41.6, 1279.2. The current ±2 × 0.24 gives 131.7, 813.7,
+   34.5, 1239.3. The limits are hard
    edges; Li et al. (2018) use Gaussian priors, which would let a value move
    further at a cost in χ². A different FIT_LIMIT_SIGMA would change the
    scores, so it is Will's decision.
