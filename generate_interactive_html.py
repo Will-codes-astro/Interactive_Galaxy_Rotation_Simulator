@@ -1200,7 +1200,19 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
     <div class="stats-row">
     <div class="header-stats" aria-label="Simulation summary">
-      <div class="stat"><div class="stat-label">Test stars<span class="stat-q" tabindex="0" role="img" aria-label="The stars in the 3D view feel the model’s gravity but do not pull on each other (test particles), so each one shows how that gravity moves a star." data-tip="The stars in the 3D view feel the model’s gravity but do not pull on each other (test particles), so each one shows how that gravity moves a star.">?</span></div><div class="stat-value"><span id="starCountStat">800</span></div></div>
+      <div class="ml-col">
+        <div class="stat ml" id="starsStat"><div class="stat-label"><span>Test stars</span><button type="button" class="ml-info" id="starsInfoBtn" aria-expanded="false" aria-controls="starsExplainer" title="What are test stars?">?</button></div><div class="stat-value"><span id="starCountStat">800</span></div></div>
+        <div class="ml-explainer" id="starsExplainer" role="dialog" aria-labelledby="starsExplainerTitle" aria-hidden="true">
+          <button type="button" class="ml-close" id="starsExplainerClose" aria-label="Close">×</button>
+          <h3 id="starsExplainerTitle">What are test stars?</h3>
+          <p>The dots in the 3D view are <b>test stars</b>: they feel the model’s gravity but do not pull on each other, so each one shows how that gravity alone moves a star.</p>
+          <ul>
+            <li><b>They start on balanced orbits</b>, set by the starting galaxy’s gravity (for a real galaxy, its measured speeds).</li>
+            <li><b>Change the gravity and they respond.</b> Too little pull and they drift outwards; beyond 1.5 × the galaxy’s edge they count as ejected.</li>
+          </ul>
+          <p>The number is a display choice, not a real count: 800 for NGC 3198, scaled with each galaxy’s visible mass (200 to 2400). A real galaxy has billions of stars.</p>
+        </div>
+      </div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
         <div class="ml-row">
@@ -3425,6 +3437,7 @@ __GALAXIES_JS__
     }
     setupExplainer('mlInfoBtn','mlExplainer','mlExplainerClose');
     setupExplainer('tiltInfoBtn','tiltExplainer','tiltExplainerClose');
+    setupExplainer('starsInfoBtn','starsExplainer','starsExplainerClose');
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
       document.getElementById('optNfw').classList.toggle('active',!mondMode);
@@ -4526,7 +4539,7 @@ __GALAXIES_JS__
         const unit=el.closest('label')||el;
         if(tutorialCard.contains(unit))return;
         // The tour's own launch button (beside the Model setup heading) is always locked while a tour runs.
-        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
+        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer,#starsExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
         if(unit.inert!==locked)unit.inert=locked;
         unit.classList.toggle('tutorial-locked',locked);
       }));

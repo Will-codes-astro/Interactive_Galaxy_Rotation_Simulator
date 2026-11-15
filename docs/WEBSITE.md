@@ -139,8 +139,10 @@ card with the s = sin i_SPARC / sin i factor and a worked example.
 
 Test stars:
 
-- The Test stars tile's "?" says they are test particles: they feel the
-  model's gravity but do not pull on each other.
+- The Test stars tile's "?" opens the same kind of hover explainer as the M/L
+  and Tilt tiles: they are test particles (they feel the model's gravity but do
+  not pull on each other), start on balanced orbits, can be ejected, and their
+  number is a display choice.
 - The default preset (NGC 3198) and the default sandbox galaxy are the
   800-star template. Other galaxies scale it by
   (visible mass / template mass)^0.5, limited to 200–2400 stars
