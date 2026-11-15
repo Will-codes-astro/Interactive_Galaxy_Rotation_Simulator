@@ -345,7 +345,9 @@
     .tutorial-card.on-left { left:16px; right:auto; }
     .tutorial-card[hidden] { display:none; }
     .tutorial-top { display:flex; flex:none; align-items:center; justify-content:space-between; gap:12px; }
-    .tutorial-content { min-height:0; overflow-y:auto; overscroll-behavior:contain; }
+    .tutorial-content { min-height:0; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; }
+    /* Hide the scrollbar while a step slides in or out, so it doesn't flash on Next. */
+    .tutorial-card.is-switching .tutorial-content { overflow-y:hidden; }
     .tutorial-skip { border:0; padding:4px; background:transparent; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; }
     .tutorial-skip:hover, .tutorial-skip:focus-visible { color:var(--ink); }
     .tutorial-progress-track { flex:none; height:3px; margin:10px 0 4px; background:rgba(138,180,248,.13); border-radius:4px; }
@@ -725,14 +727,14 @@
   <main>
     <div class="page active" data-page="puzzle">
     <header id="top">
-    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Stars at the edges of galaxies orbit far faster than the matter we can see should allow. Test two explanations against real measurements: an unseen halo of dark matter, or a change to gravity itself.</p></div>
+    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Far from a galaxy’s centre, stars and gas orbit much faster than the gravity of everything we can see could explain. Test two explanations against real measurements: an unseen halo of dark matter, or a change to how gravity works.</p></div>
     </header>
     <div class="section-head" id="puzzle"><span class="kicker">01</span><h2>The puzzle</h2><p>Why galaxies seem to hold far more matter than we can see.</p></div>
     <section class="puzzle" aria-label="The missing mass problem">
       <ol class="puzzle-steps">
         <li><h3>A rotation curve is a speed chart</h3><p>Stars and gas circle the centre of their galaxy. Plot how fast they move against how far out they are, and you have a rotation curve.</p></li>
         <li><h3>What astronomers expected</h3><p>Gravity weakens with distance: Mercury orbits the Sun at 47 km/s, distant Neptune at only 5 km/s (Williams 2024). Most of a galaxy’s visible matter sits near its centre, so its outer stars and gas should be slow too: the dashed line.</p></li>
-        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the edge of NGC 3198, gas moves at <b id="puzzleObs">–</b>, but the visible matter explains only <b id="puzzleBar">–</b>. Holding it in orbit takes about <b id="puzzleRatio">–</b> times the pull the visible matter supplies.</p></li>
+        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the edge of NGC 3198, gas moves at <b id="puzzleObs">–</b>, but the gravity of its visible matter accounts for only <b id="puzzleBar">–</b>. Holding it in orbit takes about <b id="puzzleRatio">–</b> times the pull the visible matter supplies.</p></li>
         <li><h3>Two possible answers</h3>
           <div class="answers">
             <div class="answer dm"><b>Dark matter</b><span>The galaxy sits inside a huge cloud of unseen mass.</span></div>
@@ -3672,10 +3674,12 @@ window.GALAXIES = {
        not in that state, the card says how to get there and the pointer moves to the control that does it.
        The tours never change the simulator's settings themselves. While a card is open, every control it does not name
        is locked (see tutorialAllowed). A guided tour from the puzzle page runs the main tour, then the sandbox tour. */
+    // Leave (~0.45 s) plus the staggered enter animation (~0.85 s): the card's scrollbar stays hidden for this long.
+    const TUTORIAL_SWITCH_MS=1350;let tutorialScrollTimer=0;
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
         {id:'puzzle',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
-         text:'Each white point is a measured orbit speed. The cyan line is the speed the visible stars and gas alone would give.',
+         text:'Each white point is a measured orbit speed. The cyan line is how fast they would move if only the stars and gas we can see were pulling on them.',
          action:'Move your mouse (or tap) along the right half of the graph. Do the white points stay above the cyan line?'},
         {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',allow:['visibleMatterOnly'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Take the dark matter away',
          text:'That gap is the puzzle. The orange line is the model: visible matter plus a dark matter halo.',
@@ -3687,17 +3691,17 @@ window.GALAXIES = {
          text:'The scale radius sets how tightly the halo is packed. Its total mass stays the same.',
          action:'1. Drag Scale radius left: the left of the orange line rises. 2. Drag it right: that part drops.'},
         {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloMetrics',gesture:'click',tag:'Hover over a card',title:'Read the halo’s numbers',
-         text:'These cards describe your halo. r₂₀₀ is its edge; concentration c = r₂₀₀ ÷ scale radius.',
+         text:'These cards describe your halo. r₂₀₀ marks its outer edge. Concentration c (r₂₀₀ ÷ scale radius) says how tightly packed it is.',
          action:'Hover over (or tap) any card in the blue box.'},
         {id:'fit',nfw:true,target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)','massValue:Halo mass','scaleValue:Scale radius'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale},doneText:'Both sliders tried: compare χ² now with where it started.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
          action:'1. Drag Halo mass a little and watch χ². 2. Drag Scale radius and watch χ². Can you beat where it started?'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
-         text:'MOND has no dark matter. Instead, gravity gets stronger than Newton predicts where it is very weak.',
+         text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says.',
          action:'Click the switch in the blue box to choose MOND. Compare χ² in the yellow box.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],title:'Give both their best shot',
-         text:'Nobody knows a galaxy’s exact mass-to-light ratio, distance or tilt. This switch lets each model adjust them within realistic limits.',
+         text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
         {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],title:'Now watch it happen',
@@ -3722,7 +3726,7 @@ window.GALAXIES = {
          checks:{viewEdgeOn:()=>Math.abs(controls.goal.phi-Math.PI/2)<0.2,fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap.'},
         {id:'fsEscape',fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
          checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['fsMassValue:Halo mass','escape-counter:Ejected count'],title:'Pull the halo away',
-         text:'The red circle is 1.5 × the galaxy’s visible edge. Without a halo, the outer stars move too fast to be held.',
+         text:'A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to hold them.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Gone: visible matter alone cannot hold the outer stars.'},
         {id:'fsFullHalo',fs:true,nfw:true,halo:true,viewPanel:true,target:'fsRestart',gesture:'click',tag:'1 · Restart',also:['viewFullHalo:2 · Full halo'],title:'Put the halo back, and step back',
@@ -4257,7 +4261,8 @@ window.GALAXIES = {
       const sideChange=!tutorialIsFullscreen()&&(innerWidth>960&&!tutorialSteps[index].cardRight)!==tutorialCard.classList.contains('on-left');
       tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
       tutorialCard.style.setProperty('--dir',dir);
-      tutorialCard.classList.add(sideChange?'leave-side':'leave');
+      tutorialCard.classList.add(sideChange?'leave-side':'leave','is-switching');
+      clearTimeout(tutorialScrollTimer);tutorialScrollTimer=setTimeout(()=>tutorialCard.classList.remove('is-switching'),TUTORIAL_SWITCH_MS);
       tutorialSwitchTimer=setTimeout(()=>{
         tutorialCard.classList.remove('leave','leave-side');
         tutorialIndex=index;showTutorialStep();
