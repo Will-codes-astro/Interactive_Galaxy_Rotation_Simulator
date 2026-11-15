@@ -409,6 +409,9 @@
     .tutorial-try li { margin:2px 0; }
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
+    .tutorial-choices { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .tutorial-choices button { min-height:34px; padding:6px 12px; border-radius:999px; font-size:12px; }
+    .tutorial-try .tutorial-prediction { display:block; margin-bottom:4px; color:var(--muted); font-size:11px; }
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
     /* A finished part's ring turns green and fades away instead of vanishing (visual only). */
     .tutorial-also.is-leaving { animation:tutorial-ring-done 1.2s ease forwards; }
@@ -2628,6 +2631,7 @@ window.GALAXIES = {
     const CLOSE_FIT_RED_CHI=2,ROUGH_FIT_RED_CHI=10;
     const fitVerdict=red=>red<CLOSE_FIT_RED_CHI?{cls:'good',word:'Close fit'}:red<ROUGH_FIT_RED_CHI?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
     let shownRedChi=Infinity;  // the reduced χ² on the fit badge now (the tutorial's fitting goal reads it)
+    let shownModelKms=null;    // the model speeds behind it, one per measured point
     // Names the model and fit the badge is scoring, so like-for-like pairs are easy to spot.
     function fitLabel(model){
       if(model==='visible')return 'Visible matter only';
@@ -2643,7 +2647,7 @@ window.GALAXIES = {
       if(customActive)return;
       const model=activeFitModel(),k=tunedCount(model,activeFit());
       const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,k),verdict=fitVerdict(red);
-      shownRedChi=red;
+      shownRedChi=red;shownModelKms=total;
       document.getElementById('chiFit').textContent=`${fitLabel(model)} · ${k} tuned`;
       document.getElementById('chiVerdict').textContent=verdict.word;
       document.getElementById('chiNumbers').innerHTML='χ² '+chi.toFixed(0)+' · χ²<sub>r</sub> '+red.toFixed(2);
@@ -3682,15 +3686,18 @@ window.GALAXIES = {
     const TUTORIAL_RING_MIN_RADIUS_PX=8;  // softest corner any highlight ring gets
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
-        {id:'puzzle',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
+        {id:'puzzle',mode:'preset',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
+         checks:{scanNear:()=>tutorialFlags.scan0,scanMid:()=>tutorialFlags.scan1,scanFar:()=>tutorialFlags.scan2},
+         doneText:'Spotted: all the way out, the white points stay well above the cyan line. Press Next to find out why.',
          text:'Each white point is a measured orbit speed. The cyan line is how fast they would move if only the stars and gas we can see were pulling on them.',
-         action:'Move your mouse (or tap) along the right half of the graph. Do the white points stay above the cyan line?'},
+         action:'Slowly move your mouse (or slide your finger) across the whole right half of the graph, from the middle to the far edge, reading the speeds as you go. Do the white points stay above the cyan line?'},
         {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',allow:['visibleMatterOnly'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Take the dark matter away',
          text:'That gap is the puzzle. The orange line is the model: visible matter plus a dark matter halo.',
          action:'Drag Halo mass (blue box) all the way left, to 0. Left lowers it.'},
-        {id:'addHalo',nfw:true,target:'massSlider',gesture:'increase',watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Add the halo back',
+        {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',gesture:'increase',watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Add the halo back',
+         checks:{massSlider:()=>Number(massSlider.value)>0&&tutorialOuterReached()},doneText:'Gap closed: enough dark matter lifts the orange line up to the measured speeds.',
          text:'A halo is a huge cloud of unseen matter. Its gravity makes the stars orbit faster.',
-         action:'Drag Halo mass to the right. Right raises it: watch the orange line climb.'},
+         action:'Drag Halo mass to the right until the orange line climbs up to the white points on the right of the graph.'},
         {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['scaleValue:Scale radius','curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
          text:'The scale radius sets how tightly the halo is packed. Its total mass stays the same.',
          action:'1. Drag Scale radius left: the left of the orange line rises. 2. Drag it right: that part drops.'},
@@ -3722,10 +3729,12 @@ window.GALAXIES = {
          text:'Face-on, you look straight down on the disk. Each line is one star’s path: near-perfect circles.',
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: a galaxy in balance.'},
-        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'Play',checks:{fsPlay:()=>playing},title:'The inner star laps the outer one',
-         text:'The two ringed stars move at similar speeds, but the outer one has much further to go, so it falls behind.',
-         action:'Watch the lap counts on the two ringed stars (press ▶ Play if they are still).',
-         done:()=>tutorialPlayedMyr>=400,doneText:'Similar speeds, very different lap counts.'},
+        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'Play',checks:{fsPlay:()=>tutorialFlags.prediction!=null&&playing},title:'Which star laps more?',
+         predict:{question:'Predict first: over the next 400 million years, which ringed star will finish more laps?',options:['Inner star','Outer star','About the same'],answer:0},
+         text:'The two ringed stars move at similar speeds, but the outer one is about four times further out.',
+         action:'Press ▶ Play and watch the lap counts on the two ringed stars.',
+         done:()=>tutorialFlags.prediction!=null&&tutorialPlayedMyr>=400,
+         doneText:()=>tutorialFlags.prediction===0?'You called it: at similar speeds, the inner star’s much shorter lap means it laps far more often.':'The inner star wins: at similar speeds, its much shorter lap means it laps far more often.'},
         {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',tag:'1 · Edge-on',also:['fsPlay:2 · Keep playing'],gesture:'click',title:'Turn it on its side',
          text:'Edge-on, the disk is a thin line. The ringed star bobs above and below it once a lap.',
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
@@ -3848,7 +3857,7 @@ window.GALAXIES = {
       tutorialWatchLast=simTime;
       const step=tutorialStep();
       // Watch steps never count down: the viewer keeps watching and presses Next when ready.
-      if(step.done&&!tutorialCompleted[step.id]&&!tutorialBlocker()&&step.done(prev))completeTutorialAction(step.id,step.doneText,true);
+      if(step.done&&!tutorialCompleted[step.id]&&!tutorialBlocker()&&step.done(prev))completeTutorialAction(step.id,typeof step.doneText==='function'?step.doneText():step.doneText,true,!!step.predict&&tutorialFlags.prediction!==step.predict.answer);
     }
     // What has to change on the page before this step's own action can be done (null when nothing is in the way).
     function tutorialBlocker(){
@@ -3897,8 +3906,18 @@ window.GALAXIES = {
       tutorialGoalCache={galaxy:activeGalaxy,goal:Math.max(CLOSE_FIT_RED_CHI,fitRed*TUTORIAL_FIT_SLACK)};
       return tutorialGoalCache.goal;
     }
+    // Add the halo back is done once the model reaches TUTORIAL_REACH_FRACTION of the measured speeds,
+    // averaged over the outer third of the points (where the gap is).
+    const TUTORIAL_REACH_FRACTION=0.9;
+    function tutorialOuterReached(){
+      if(!shownModelKms)return false;
+      let model=0,measured=0;
+      for(let i=Math.floor(obsV.length*2/3);i<obsV.length;i++){model+=shownModelKms[i];measured+=obsV[i];}
+      return model>=TUTORIAL_REACH_FRACTION*measured;
+    }
     function tutorialInstruction(){
       const step=tutorialStep();
+      if(step.id==='puzzle'&&!tutorialCompleted.puzzle){const n=[0,1,2].filter(i=>tutorialFlags['scan'+i]).length;if(n)return step.action+` (${n} of 3 stretches covered)`;}
       if(step.id==='fit'&&tutorialChiGoal()>CLOSE_FIT_RED_CHI){
         const goal=tutorialChiGoal().toFixed(1);
         return step.action.replace('the yellow box no longer reads Close fit',`χ²ᵣ (the second number in the yellow box) rises above ${goal}`)
@@ -3924,6 +3943,12 @@ window.GALAXIES = {
       const blocker=tutorialBlocker(),action=tutorialInstruction();
       tutorialTry.replaceChildren();
       if(blocker){const first=document.createElement('strong');first.className='tutorial-first';first.textContent='First: '+blocker.say.replace(/\s+first\b/gi,'').trim();tutorialTry.appendChild(first);}
+      const step=tutorialStep();
+      if(step.predict&&!blocker){
+        const pick=tutorialFlags.prediction;
+        if(pick==null){tutorialTry.append(tutorialPredictionPrompt(step.predict));return;}
+        const note=document.createElement('span');note.className='tutorial-prediction';note.textContent='Your prediction: '+step.predict.options[pick];tutorialTry.appendChild(note);
+      }
       const head=document.createElement('strong');head.textContent=blocker?'Then: ':'Instructions: ';tutorialTry.appendChild(head);
       const parts=action.split(/\s(?=\d\.\s)/);
       if(parts.length>1&&/^1\.\s/.test(parts[0])){
@@ -3936,6 +3961,14 @@ window.GALAXIES = {
         if(i<parts.length-1){const more=document.createElement('span');more.className='tutorial-more-parts';more.textContent=`Part ${i+1} of ${parts.length}: the next part appears when this one is done.`;tutorialTry.appendChild(list);tutorialTry.appendChild(more);return;}
         tutorialTry.appendChild(list);
       }else tutorialTry.appendChild(document.createTextNode(action));
+    }
+    // A predict-first question: the step's controls stay locked (and the race paused) until it is answered.
+    function tutorialPredictionPrompt(predict){
+      const box=document.createElement('div'),q=document.createElement('strong'),row=document.createElement('div');
+      q.textContent=predict.question;row.className='tutorial-choices';
+      predict.options.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.textContent=label;
+        b.addEventListener('click',()=>{tutorialFlags.prediction=i;tutorialPlayedMyr=0;tutorialWatchLast=simTime;refreshTutorialGuidance();});row.appendChild(b);});
+      box.append(q,row);return box;
     }
     function refreshTutorialGuidance(){
       if(tutorialCard.hidden)return;
@@ -4008,11 +4041,12 @@ window.GALAXIES = {
     }
     // Done while a slider is still held: wait until it is let go, so the viewer can keep dragging and watching.
     let tutorialPending=null;
-    function completeTutorialAction(id,message,noAuto){
+    // plain: no praise word in front (a missed prediction).
+    function completeTutorialAction(id,message,noAuto,plain){
       if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
-      if(tutorialHolding){tutorialPending=[id,message,noAuto];return;}
+      if(tutorialHolding){tutorialPending=[id,message,noAuto,plain];return;}
       tutorialPending=null;
-      tutorialCompleted[id]=TUTORIAL_PRAISE[tutorialIndex%TUTORIAL_PRAISE.length]+' '+message;
+      tutorialCompleted[id]=plain?message:TUTORIAL_PRAISE[tutorialIndex%TUTORIAL_PRAISE.length]+' '+message;
       tutorialFeedback.hidden=false;
       showTutorialFeedback(tutorialCompleted[id]);
       tutorialCard.classList.remove('is-celebrating');void tutorialCard.offsetWidth;tutorialCard.classList.add('is-celebrating');
@@ -4147,6 +4181,7 @@ window.GALAXIES = {
     function tutorialAllowed(){
       if(tutorialCard.hidden)return null;
       const step=tutorialStep(),blocker=tutorialBlocker();
+      if(!blocker&&step.predict&&tutorialFlags.prediction==null)return[];
       const ids=blocker?[]:[step.target,...tutorialRingList(step).filter(r=>!r.watch).map(r=>r.id),...(step.allow||[])];
       return[...(blocker?[blocker.target]:[]),...ids.map(id=>document.getElementById(id))].filter(Boolean).map(el=>el.closest('label')||el);
     }
@@ -4216,6 +4251,7 @@ window.GALAXIES = {
       // The ejection steps pull the camera back far enough to frame the ring, so the escaping star stays in view.
       if(step.ring&&tutorialIsFullscreen())controls.flyTo({phi:0.35,radius:ejectionRadius*4,target:[0,0,0],rate:2.4});
       tutorialPlayedMyr=0;tutorialWatchLast=simTime;
+      if(step.predict&&playing)setPlaying(false);
       syncTutorialFullscreen();
       if(tutorialBack.disabled&&backHadFocus)tutorialNext.focus({preventScroll:true});
       if(!tutorialIsFullscreen()){
@@ -4315,11 +4351,12 @@ window.GALAXIES = {
       const r=tutorialAimTarget.getBoundingClientRect(),x=e.clientX,y=e.clientY;
       if(x<r.left-6||x>r.right+6||y<r.top-6||y>r.bottom+6)return;
       tutorialSpotlight.classList.add('is-reached');
-      // Spot the puzzle is done once the user has looked at the right-hand half of the graph, where the gap is.
-      if(tutorialStep().id==='puzzle'&&x>r.left+r.width*.5)completeTutorialAction('puzzle','Spotted: out on the right, the white points stay well above the cyan line. Press Next to find out why.');
+      // Spot the puzzle needs all three stretches of the graph's right half (where the gap is) to be visited.
+      if(tutorialStep().id==='puzzle'&&x>r.left+r.width*.5)tutorialFlags['scan'+Math.min(2,Math.floor((x-r.left-r.width*.5)/(r.width/6)))]=true;
       completeTutorialAction('sbMonitor','Found it. Next, push the marker out of the band.');
     }
     window.addEventListener('pointermove',tutorialPointerReach,{capture:true,passive:true});
+    window.addEventListener('pointerdown',tutorialPointerReach,{capture:true,passive:true});
     window.addEventListener('pointerdown',tutorialPointerReach,{capture:true,passive:true});
     // Capture also catches scrolling inside panels, not just the page.
     window.addEventListener('scroll',updateTutorialSpotlight,{capture:true,passive:true});
@@ -4389,7 +4426,6 @@ window.GALAXIES = {
           visibleMatterOnly.classList.add('tutorial-reveal');
         }
         if(value===0)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
-        if(value>tutorialLastMass)completeTutorialAction('addHalo','Halo mass increased: more mass means stronger gravity and faster orbits.');
         checkStabilityStep();
       }
       tutorialLastMass=value;
