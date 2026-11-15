@@ -80,7 +80,7 @@ that the numbers match.
 
 | File | Contents |
 |---|---|
-| `galaxies.js` | `window.GALAXIES`: for each preset, `radius_kpc`, `v_obs_kms`, `v_obs_err_kms`, `v_gas_kms` (signed), `v_disk_kms`, `v_bulge_kms` (copied from SPARC; Vobs, e_Vobs, Vdisk and Vbulge are taken as absolute values) plus `catalogue` (Table 1's distance and inclination with their errors) and `best_fit.nfw` / `best_fit.mond` (**model**: the best realistic fits, with their Υ, distance, inclination, halo or a₀, `tuned_settings` and `chi2`; see PHYSICS.md) |
+| `galaxies.js` | `window.GALAXIES`: for each preset, `radius_kpc`, `v_obs_kms`, `v_obs_err_kms`, `v_gas_kms` (signed), `v_disk_kms`, `v_bulge_kms` (copied from SPARC; Vobs, e_Vobs, Vdisk and Vbulge are taken as absolute values) plus `catalogue` (Table 1's distance and inclination with their errors) and `best_fit.nfw` / `best_fit.mond` (**model**: the best realistic fits, with their Υ, distance, inclination, halo or a₀, `tuned_settings`, `at_limit` (which fitted values stopped at a realistic limit, `low` or `high`) and `chi2`; see PHYSICS.md) |
 | `index.html` | The whole site, with the `galaxies.js` code and settings inlined. This is the only file deployed, together with the QR images |
 
 **Site CSV export** (the download button; file `<galaxy>_rotation_curve_model.csv`).

@@ -41,6 +41,9 @@ HALO_SCALE_RANGE_KPC = (5.0, 60.0)  # the scale-radius slider's range
 FIT_GRID_POINTS = 5
 FIT_STARTS = 4
 FIT_TOLERANCE = 1e-4
+# A fitted value within LIMIT_TOLERANCE of its range from a limit is recorded as "at the limit" (the Scorecard marks it).
+LIMIT_TOLERANCE = 1e-3
+SETTING_NAMES = ("upsilon_disk", "upsilon_bulge", "distance_mpc", "inclination_deg")
 # Values each model tunes to a galaxy, before the galaxy settings a best fit also tunes (its fit record's
 # tuned_settings). k in chi2_r = chi2 / (N - k). The page's chi2_r and the Method text both come from this.
 MODEL_TUNED_VALUES = {"visible": 0, "nfw": 2, "mond": 0, "mondBest": 1}
@@ -206,6 +209,20 @@ def _chi_squared(rotation: dict[str, list[float]], info: GalaxyInfo, settings: l
     return total
 
 
+def _limits_hit(names, values, bounds) -> dict[str, str]:
+    """Which fitted values stopped at a limit: {name: "low" or "high"}. Fixed values (no range) are skipped."""
+    hits = {}
+    for name, x, (lo, hi) in zip(names, values, bounds):
+        if hi <= lo:
+            continue
+        tolerance = LIMIT_TOLERANCE * (hi - lo)
+        if x <= lo + tolerance:
+            hits[name] = "low"
+        elif x >= hi - tolerance:
+            hits[name] = "high"
+    return hits
+
+
 def _settings_record(settings: list[float], bounds) -> dict[str, Any]:
     disk_ml, bulge_ml, distance_mpc, inclination_deg = settings
     return {
@@ -215,6 +232,7 @@ def _settings_record(settings: list[float], bounds) -> dict[str, Any]:
         "inclination_deg": round(inclination_deg, 2),
         # Values tuned to the galaxy (a fixed bulge M/L is not tuned), counted in N - k.
         "tuned_settings": sum(hi > lo for lo, hi in bounds),
+        "at_limit": _limits_hit(SETTING_NAMES, settings, bounds),
     }
 
 
@@ -248,11 +266,16 @@ def fit_nfw(rotation: dict[str, list[float]], info: GalaxyInfo) -> dict[str, Any
         lambda p: _chi_squared(rotation, info, p, halo_model(m200, rs)),
         best[2:], _chi_squared(rotation, info, best[2:], halo_model(m200, rs)), settings_bounds, [(hi - lo) / 8.0 for lo, hi in settings_bounds],
     )
+    record = _settings_record(settings, settings_bounds)
+    # The halo is checked as shown, after snapping (which can move it slightly past a limit).
+    halo_values = [math.log10(m200), math.log10(_r200_kpc(m200) / rs / _halo_concentration(m200)), rs]
+    halo_bounds = [bounds[0], bounds[1], HALO_SCALE_RANGE_KPC]
+    record["at_limit"] = {**_limits_hit(("m200_msun", "concentration", "scale_radius_kpc"), halo_values, halo_bounds), **record["at_limit"]}
     return {
         "m200_msun": m200,
         "scale_radius_kpc": rs,
         "concentration": round(_r200_kpc(m200) / rs, 3),
-        **_settings_record(settings, settings_bounds),
+        **record,
         "chi2": round(chi, 3),
     }
 
@@ -268,6 +291,7 @@ def fit_mond(rotation: dict[str, list[float]], info: GalaxyInfo) -> dict[str, An
     bounds = [tuple(a / 1e-10 for a in MOND_A0_RANGE_MS2), *settings_bounds]
     chi, best = _minimise_in_box(cost, bounds)
     record = _settings_record(best[1:], settings_bounds)
+    record["at_limit"] = {**_limits_hit(("a0_ms2",), best[:1], bounds[:1]), **record["at_limit"]}
     return {"a0_ms2": round(best[0], 4) * 1e-10, **record, "chi2": round(chi, 3)}
 
 
@@ -945,6 +969,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     }
     .score { display:inline-block; min-width:58px; padding:2px 9px; border:1px solid rgba(120,150,180,.3); border-radius:999px; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums; text-align:center; }
     .score.good { border-color:rgba(95,208,224,.55); color:#8fe3ee; } .score.ok { border-color:rgba(255,174,92,.55); color:#ffc48a; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
+    .at-limit { padding:0 4px; border:1px solid rgba(255,174,92,.5); border-radius:4px; color:#ffc48a; font-size:10.5px; text-decoration:none; cursor:help; white-space:nowrap; }
     .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
     .score-notes { margin:14px 0 0; padding:14px 0 0 18px; border-top:1px solid var(--line); color:var(--ink-2); font-size:13px; line-height:1.6; }
     .score-notes li { margin-bottom:6px; max-width:96ch; }
@@ -1179,7 +1204,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
         <li><b>Tuned values</b>Visible matter only and plain MOND tune nothing. The halo adds 2 values (its mass and size) and MOND best fit adds 1 (a<sub>0</sub>). Both best fits also tune the galaxy’s M/L, distance and tilt, so in total the halo’s best fit tunes __K_NFW_FIT__ and MOND’s best fit __K_MOND_FIT__. χ<sup>2</sup><sub>r</sub> subtracts the tuned values from the number of points, so extra freedom is not free.</li>
-        <li><b>Realistic limits</b>Both best fits may only use believable values: mass-to-light ratios that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s measurement errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A fit that stops at a limit is the honest result: that model would need something unrealistic to do better.</li>
+        <li><b>Realistic limits</b>Both best fits may only use believable values: mass-to-light ratios that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s measurement errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A fit that stops at a limit (marked <span class="at-limit">at limit</span>) is the honest result: that model would need something unrealistic to do better.</li>
         <li><b>MOND’s best case</b>MOND best fit lets a<sub>0</sub> vary between 0.96 and 1.44 × 10⁻¹⁰ m/s², the measured value and its uncertainty (McGaugh, Lelli &amp; Schombert 2016), although MOND says a<sub>0</sub> is universal (Milgrom 1983). Check the fitted values, not just the score.</li>
         <li><b>Error bars</b>Scores use SPARC’s uncertainty on each speed. Errors in a galaxy’s distance and tilt shift its whole curve, so the best fits allow for them; the other two columns use SPARC’s values.</li>
         <li><b>Small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to settle it.</li>
@@ -3395,9 +3420,14 @@ __GALAXIES_JS__
         mondBest:chiOf(rows.map((p,i)=>mondModelVelocity(vBarMond[i],p.radius_kpc,mond.a0_ms2,mondFrame)))}};
     }
     // The galaxy settings a best fit chose, beside SPARC's own values.
+    // A fitted value that stopped at one of its realistic limits (fit.at_limit, recorded by the generator).
+    function limitMark(fit,key){
+      const side=fit.at_limit&&fit.at_limit[key];
+      return side?` <abbr class="at-limit" title="At its ${side==='low'?'lower':'upper'} realistic limit: a closer fit would need a value outside the realistic range">at limit</abbr>`:'';
+    }
     function fitSettingsHtml(galaxy,fit){
-      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}`:'';
-      return `M/L ${fit.upsilon_disk.toFixed(2)}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}° (SPARC ${c.inclination_deg.toFixed(0)}°)`;
+      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}${limitMark(fit,'upsilon_bulge')}`:'';
+      return `M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
     }
     const SCORE_COLUMNS={visible:'Visible matter only',nfw:'Dark matter halo (NFW), best realistic fit',mond:'MOND, nothing tuned',mondBest:'MOND best fit (realistic limits)'};
     function scoreRowHtml(galaxy){
@@ -3407,8 +3437,8 @@ __GALAXIES_JS__
         const miss=Math.sqrt(score.chi[model]/score.pointCount); // root-mean-square gap, in error bars
         return `<td data-label="${SCORE_COLUMNS[model]}"><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
       };
-      const nfwTuned=`<small>${score.k.nfw} tuned: M<sub>200</sub> ${(nfw.m200_msun/1e12).toFixed(2)}×10¹² M☉ · concentration ${nfw.concentration.toFixed(1)} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
-      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰ (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
+      const nfwTuned=`<small>${score.k.nfw} tuned: M<sub>200</sub> ${(nfw.m200_msun/1e12).toFixed(2)}×10¹² M☉${limitMark(nfw,'m200_msun')} · concentration ${nfw.concentration.toFixed(1)}${limitMark(nfw,'concentration')}${limitMark(nfw,'scale_radius_kpc')} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
+      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
       return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfw',nfwTuned)}${cell('mond')}${cell('mondBest',mondTuned)}</tr>`;
     }
     const scoreBody=document.getElementById('scoreBody');

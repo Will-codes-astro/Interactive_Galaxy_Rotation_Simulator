@@ -108,6 +108,10 @@ site uses hard limits.
   Matter Only returns to SPARC's standard values. The MOND best fit switch
   applies the MOND fit. Plain MOND and visible matter only always use SPARC's
   values.
+- **At a limit.** A fitted value within `LIMIT_TOLERANCE` (0.1 %) of its range
+  from a limit is recorded in the fit's `at_limit` (`_limits_hit`), and the
+  Scorecard marks it "at limit". The NFW halo is checked after snapping, which
+  can move it a little past a limit (NGC 2403's concentration is 0.004 dex over).
 - Implemented in: `fit_nfw`, `fit_mond`, `_realistic_settings`, `_chi_squared`
   (generator); `activeFit`, `applyBaryonState`, `scoreGalaxy` (page JS).
 
@@ -224,8 +228,9 @@ These are documented here, not changed. Any change needs Will's decision.
    χ²_ν ≈ 3.5, with its distance at the lower limit (45 Mpc). Plain MOND
    scores χ²_ν ≈ 115. "Low surface brightness" is cited on the page to de Blok
    & McGaugh (1996), who use 60 Mpc for it.
-8. Several best fits sit at a limit (for example the MOND a₀ for all four
-   presets, and NGC 3198's NFW distance at 11.0 Mpc). The limits are hard
+8. Several best fits sit at a limit (on 15 Nov 2026: the MOND a₀ for all four
+   presets, 16 values in all across NFW and MOND, listed in each fit's
+   `at_limit` and marked on the Scorecard). The limits are hard
    edges; Li et al. (2018) use Gaussian priors, which would let a value move
    further at a cost in χ². A different FIT_LIMIT_SIGMA would change the
    scores, so it is Will's decision.

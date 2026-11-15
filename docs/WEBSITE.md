@@ -231,7 +231,7 @@ cannot drift from the page's maths.
 Scorecard: a table scoring every preset galaxy under visible matter only, the
 best realistic NFW fit (Apply Observed Fit), MOND at the default a₀, and the
 MOND best fit. Both best-fit cells list how many values were tuned and what they
-are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). Under each score it gives the root-mean-square gap in plain words
+are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). A value that stopped at a realistic limit carries a small "at limit" tag whose tooltip says which limit. Under each score it gives the root-mean-square gap in plain words
 ("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
 On phones (640 px or narrower) the table becomes one stacked card per galaxy,
 with each score labelled by its column, so nothing is off-screen.
