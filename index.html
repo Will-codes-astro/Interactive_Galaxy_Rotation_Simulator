@@ -870,7 +870,7 @@
       <ul class="score-notes">
         <li><b>Same rules for every model</b>With standard values, all three use SPARC’s M/L, distance and tilt, so the visible matter is identical and only the explanation differs: the halo tunes 2 values (mass and size), MOND none. Best realistic fits give both models the same extra freedom: the halo tunes 5 (6 for NGC 7331), MOND 4 (5 for NGC 7331) (a<sub>0</sub>, M/L, distance and tilt). χ<sup>2</sup><sub>r</sub> accounts for this, so extra freedom is not free.</li>
         <li><b>Realistic limits</b>Best fits use only believable values: M/L that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> means that model needs something unrealistic to do better.</li>
-        <li><b>MOND’s best case</b>a<sub>0</sub> may vary from 0.72 to 1.68 × 10⁻¹⁰ m/s², within 2× its measured error, like every other limit (McGaugh, Lelli &amp; Schombert 2016), though MOND says it should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
+        <li><b>MOND’s best case</b>a<sub>0</sub> may vary from 1.16 to 1.24 × 10⁻¹⁰ m/s², within 2× its measured error, like every other limit (McGaugh, Lelli &amp; Schombert 2016). Their larger ±0.24 uncertainty comes from the stars’ M/L, which the fits already vary, so it is not counted twice. MOND says a<sub>0</sub> should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
         <li><b>Error bars</b>Scores use SPARC’s error on each speed. Distance and tilt errors shift a whole curve, so the best fits allow for them.</li>
         <li><b>Small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to settle it.</li>
       </ul>
@@ -1035,7 +1035,7 @@ window.GALAXIES = {
     best_fit: {
       nfw_standard: {"m200_msun": 460000000000.0, "scale_radius_kpc": 16.5, "concentration": 9.651, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 13.8, "inclination_deg": 73.0, "tuned_settings": 0, "at_limit": {}, "chi2": 57.407},
       nfw: {"m200_msun": 370000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.877, "upsilon_disk": 0.5222, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 78.11, "tuned_settings": 3, "at_limit": {"distance_mpc": "low"}, "chi2": 55.69},
-      mond: {"a0_ms2": 7.304000000000001e-11, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 13.739, "inclination_deg": 78.25, "tuned_settings": 3, "at_limit": {"upsilon_disk": "high"}, "chi2": 131.698},
+      mond: {"a0_ms2": 1.16e-10, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 11.438, "inclination_deg": 78.79, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high"}, "chi2": 198.785},
     },
     rotation: {
       radius_kpc: [0.32, 0.64, 0.96, 1.28, 1.61, 1.93, 2.24, 2.57, 2.89, 3.21, 3.54, 3.85, 4.17, 4.5, 4.82, 5.15, 5.46, 5.78, 6.1, 6.43, 6.74, 7.06, 8.04, 9.04, 10.04, 11.04, 12.05, 14.05, 16.07, 18.13, 20.05, 22.12, 24.03, 26.1, 28.16, 30.08, 32.14, 34.06, 36.12, 38.19, 40.1, 42.17, 44.08],
@@ -1054,7 +1054,7 @@ window.GALAXIES = {
     best_fit: {
       nfw_standard: {"m200_msun": 280000000000.0, "scale_radius_kpc": 11.0, "concentration": 12.268, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 3.16, "inclination_deg": 63.0, "tuned_settings": 0, "at_limit": {}, "chi2": 714.343},
       nfw: {"m200_msun": 280000000000.0, "scale_radius_kpc": 8.5, "concentration": 15.877, "upsilon_disk": 0.4262, "upsilon_bulge": 0.7, "distance_mpc": 3.093, "inclination_deg": 57.0, "tuned_settings": 3, "at_limit": {"concentration": "high", "inclination_deg": "low"}, "chi2": 635.361},
-      mond: {"a0_ms2": 1.68e-10, "upsilon_disk": 0.7305, "upsilon_bulge": 0.7, "distance_mpc": 3.068, "inclination_deg": 62.65, "tuned_settings": 3, "at_limit": {"a0_ms2": "high"}, "chi2": 813.69},
+      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.6536, "upsilon_bulge": 0.7, "distance_mpc": 3.464, "inclination_deg": 66.28, "tuned_settings": 3, "at_limit": {"a0_ms2": "high"}, "chi2": 920.805},
     },
     rotation: {
       radius_kpc: [0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.86, 0.96, 1.06, 1.16, 1.27, 1.36, 1.47, 1.57, 1.67, 1.77, 1.87, 1.97, 2.08, 2.18, 2.28, 2.37, 2.47, 2.57, 2.68, 2.78, 2.88, 2.98, 3.08, 3.19, 3.29, 3.39, 3.49, 3.59, 3.69, 3.79, 3.9, 3.99, 4.47, 4.97, 5.47, 5.96, 6.46, 6.96, 7.45, 7.95, 8.45, 8.94, 9.44, 9.94, 10.43, 10.93, 11.43, 11.92, 12.42, 12.92, 13.42, 13.91, 14.41, 14.91, 15.4, 15.9, 16.4, 16.89, 17.39, 17.89, 18.38, 18.88, 19.38, 19.87, 20.37, 20.87],
@@ -1073,7 +1073,7 @@ window.GALAXIES = {
     best_fit: {
       nfw_standard: {"m200_msun": 2740000000000.0, "scale_radius_kpc": 60.0, "concentration": 4.811, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 14.7, "inclination_deg": 75.0, "tuned_settings": 0, "at_limit": {"scale_radius_kpc": "high"}, "chi2": 312.221},
       nfw: {"m200_msun": 2440000000000.0, "scale_radius_kpc": 32.5, "concentration": 8.545, "upsilon_disk": 0.4905, "upsilon_bulge": 0.4417, "distance_mpc": 11.7, "inclination_deg": 71.0, "tuned_settings": 4, "at_limit": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "low"}, "chi2": 21.683},
-      mond: {"a0_ms2": 1.68e-10, "upsilon_disk": 0.4502, "upsilon_bulge": 0.4417, "distance_mpc": 13.799, "inclination_deg": 77.05, "tuned_settings": 4, "at_limit": {"a0_ms2": "high", "upsilon_bulge": "low"}, "chi2": 34.506},
+      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.3478, "upsilon_bulge": 0.4417, "distance_mpc": 17.511, "inclination_deg": 78.85, "tuned_settings": 4, "at_limit": {"a0_ms2": "high", "upsilon_bulge": "low"}, "chi2": 40.43},
     },
     rotation: {
       radius_kpc: [2.67, 3.21, 3.74, 4.27, 4.81, 5.35, 5.88, 6.41, 7.48, 8.55, 9.62, 10.66, 11.74, 12.83, 13.91, 15.0, 16.08, 17.07, 18.15, 19.24, 20.32, 21.41, 22.49, 23.48, 24.57, 25.65, 26.74, 27.82, 28.91, 29.89, 30.98, 32.06, 33.15, 34.23, 35.32, 36.31],
@@ -1092,7 +1092,7 @@ window.GALAXIES = {
     best_fit: {
       nfw_standard: {"m200_msun": 360000000000.0, "scale_radius_kpc": 17.0, "concentration": 8.632, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 64.5, "inclination_deg": 57.0, "tuned_settings": 0, "at_limit": {}, "chi2": 64.529},
       nfw: {"m200_msun": 320000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.269, "upsilon_disk": 0.3155, "upsilon_bulge": 0.7, "distance_mpc": 45.1, "inclination_deg": 56.47, "tuned_settings": 3, "at_limit": {"upsilon_disk": "low", "distance_mpc": "low"}, "chi2": 60.202},
-      mond: {"a0_ms2": 7.2e-11, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 64.23, "inclination_deg": 66.84, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high"}, "chi2": 1239.263},
+      mond: {"a0_ms2": 1.16e-10, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 45.332, "inclination_deg": 77.0, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high", "inclination_deg": "high"}, "chi2": 1277.143},
     },
     rotation: {
       radius_kpc: [1.25, 3.75, 6.25, 8.76, 11.25, 13.74, 16.22, 18.71, 21.3, 23.79, 26.28, 28.77, 31.25, 33.74, 36.23, 38.82, 41.31, 43.8, 46.28, 48.77, 51.26, 53.75],
