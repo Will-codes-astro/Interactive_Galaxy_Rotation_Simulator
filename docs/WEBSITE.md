@@ -202,8 +202,11 @@ skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
 The main tutorial's 18 steps start from the puzzle in the rotation curve
 (measured speeds stay above the visible-matter prediction), then remove and
-restore the halo, change its shape, read the halo cards (r200, scale radius,
-concentration), score the fit with χ², and compare MOND and its best-fit
+restore the halo, change its shape, open all three halo cards (r200, scale
+radius, concentration), then fit the halo by hand: break the fit with Halo
+mass, then tune both sliders until the badge reads Close fit (Apply Observed
+Fit stays locked). For a galaxy whose published halo fit is not Close, the goal
+is χ²ᵣ within 1.25 × that fit's value. Then it compares MOND and its best-fit
 switch. A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
 watch two ringed stars race (live lap counts and speeds show differential

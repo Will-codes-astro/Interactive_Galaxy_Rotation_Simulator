@@ -2914,7 +2914,9 @@ __GALAXIES_JS__
     }
     const activeFitModel=()=>mondMode?(bestFits?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
     // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
-    const fitVerdict=red=>red<2?{cls:'good',word:'Close fit'}:red<10?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
+    const CLOSE_FIT_RED_CHI=2,ROUGH_FIT_RED_CHI=10;
+    const fitVerdict=red=>red<CLOSE_FIT_RED_CHI?{cls:'good',word:'Close fit'}:red<ROUGH_FIT_RED_CHI?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
+    let shownRedChi=Infinity;  // the reduced χ² on the fit badge now (the tutorial's fitting goal reads it)
     // Names the model and fit the badge is scoring, so like-for-like pairs are easy to spot.
     function fitLabel(model){
       if(model==='visible')return 'Visible matter only';
@@ -2930,6 +2932,7 @@ __GALAXIES_JS__
       if(customActive)return;
       const model=activeFitModel(),k=tunedCount(model,activeFit());
       const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,k),verdict=fitVerdict(red);
+      shownRedChi=red;
       document.getElementById('chiFit').textContent=`${fitLabel(model)} · ${k} tuned`;
       document.getElementById('chiVerdict').textContent=verdict.word;
       document.getElementById('chiNumbers').innerHTML='χ² '+chi.toFixed(0)+' · χ²<sub>r</sub> '+red.toFixed(2);
@@ -3984,10 +3987,11 @@ __GALAXIES_JS__
          checks:{haloRadiusCard:()=>tutorialFlags.haloRadiusCard,haloScaleCard:()=>tutorialFlags.haloScaleCard,haloConcentrationCard:()=>tutorialFlags.haloConcentrationCard},doneText:'All three read: these numbers follow the halo sliders.',
          text:'These cards describe your halo. r₂₀₀ marks its outer edge. Concentration c (r₂₀₀ ÷ scale radius) says how tightly packed it is.',
          action:'1. Hover over (or tap) Halo radius. 2. Now Scale radius. 3. Now Concentration.'},
-        {id:'fit',nfw:true,target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)','massValue:Halo mass','scaleValue:Scale radius'],title:'Score your fit',
-         checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale},doneText:'Both sliders tried: compare χ² now with where it started.',
+        {id:'fit',nfw:true,mode:'preset',target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)','massValue:Halo mass','scaleValue:Scale radius'],title:'Score your fit',
+         checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass&&shownRedChi>=tutorialChiGoal(),scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale,
+           chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
-         action:'1. Drag Halo mass a little and watch χ². 2. Drag Scale radius and watch χ². Can you beat where it started?'},
+         action:'1. Drag Halo mass away from where it is until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Now fine-tune both sliders until the yellow box reads Close fit. No shortcuts: Apply Observed Fit is locked, so this is all you.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says.',
          action:'Click the switch in the blue box to choose MOND. Compare χ² in the yellow box.'},
@@ -4172,8 +4176,23 @@ __GALAXIES_JS__
       if(step.viewPanel&&viewPanel.classList.contains('collapsed'))return{target:viewToggle,gesture:'click',say:'Open View first. '};
       return null;
     }
+    // The fitting goal: a Close fit, or for a galaxy whose published halo fit can't reach one, within
+    // TUTORIAL_FIT_SLACK of that fit's reduced χ², so the goal is always reachable with the two sliders.
+    const TUTORIAL_FIT_SLACK=1.25;
+    let tutorialGoalCache=null;
+    function tutorialChiGoal(){
+      if(tutorialGoalCache&&tutorialGoalCache.galaxy===activeGalaxy)return tutorialGoalCache.goal;
+      const score=scoreGalaxy(activeGalaxy),fitRed=reducedChi(score.chi.nfwStd,score.pointCount,score.k.nfwStd);
+      tutorialGoalCache={galaxy:activeGalaxy,goal:Math.max(CLOSE_FIT_RED_CHI,fitRed*TUTORIAL_FIT_SLACK)};
+      return tutorialGoalCache.goal;
+    }
     function tutorialInstruction(){
       const step=tutorialStep();
+      if(step.id==='fit'&&tutorialChiGoal()>CLOSE_FIT_RED_CHI){
+        const goal=tutorialChiGoal().toFixed(1);
+        return step.action.replace('the yellow box no longer reads Close fit',`χ²ᵣ (the second number in the yellow box) rises above ${goal}`)
+          .replace('the yellow box reads Close fit',`χ²ᵣ drops below ${goal}, close to the best the published fit manages for this galaxy`);
+      }
       if(step.id==='removeHalo'){
         if(tutorialShortcutUnlocked)return 'Compare the orange line with the white points on the right. (The new Visible Matter Only button is a shortcut back to 0.)';
         if(Number(massSlider.value)===0)return 'Halo mass is already 0: drag it right, then back to 0.';
