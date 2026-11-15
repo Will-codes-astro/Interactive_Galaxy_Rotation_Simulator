@@ -413,6 +413,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     [data-preset-only][hidden], .stability[hidden] { display:none !important; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
     .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
+    /* While the explainer is open, lift its section above the sticky slider bar (z-index 150) so the bar can't cover it. */
+    .sim-head:has(.ml-explainer.open) { position:relative; z-index:160; }
     .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
     @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
@@ -1079,8 +1081,8 @@ HTML_TEMPLATE = r"""<!doctype html>
             <li><b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass.</li>
             <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
           </ul>
-          <p>The presets use <b>0.5 for the disk</b> and <b>0.7 for the bulge</b>, which is older (both measured in 3.6 μm infrared light). These are standard average values, not measured for each galaxy, and every real galaxy is a little different. Changing them raises or lowers the visible-matter curve, which changes how much dark matter is needed.</p>
-          <p>The best fits (Apply Observed Fit and MOND best fit) may move them to between about 0.6 and 1.6 times these values: the range stellar models allow, and no further.</p>
+          <p>SPARC’s standard values are <b>0.5 for the disk</b> and <b>0.7 for the bulge</b>, which is older (both measured in 3.6 μm infrared light). Visible matter only and plain MOND use these. They are averages, not measured for each galaxy, and every real galaxy is a little different. Changing them raises or lowers the visible-matter curve, which changes how much dark matter is needed.</p>
+          <p>The best fits (Apply Observed Fit and MOND best fit) may move them to between about 0.6 and 1.6 times these values: the range stellar models allow, and no further. So the numbers on the tile can differ from 0.5 and 0.7; the line under them says which values are in use.</p>
           <p>The Custom Sandbox sets the masses directly, so it does not need an M/L ratio.</p>
           <p class="ml-source">Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014).</p>
         </div>
