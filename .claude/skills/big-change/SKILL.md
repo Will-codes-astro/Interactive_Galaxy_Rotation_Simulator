@@ -12,7 +12,7 @@ description: Routine to finish a Big change on the EPQ site (UI overhaul, new ph
    `docs/DATA_DICTIONARY.md` if physics or data changed.
 3. Commit with a message naming what was added.
 4. Run the `build-log` skill: build-log entry, living documents (including
-   their "Last checked against" line) and `project-status.md`.
+   their "Last checked against" line) and the "Where things stand" status.
 5. Check Will's Project Q AI declaration still covers the work.
 6. Ask Will before pushing. Browser checks are fine; screenshots only if
    Will asks.

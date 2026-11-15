@@ -1,6 +1,6 @@
 ---
 name: build-log
-description: Write to Will's Notion after a change lands - the "My Websites Creation" build log, the living documents (Explain My Code, User Testing Kit) and project-status.md. Use whenever a new feature, visible change, meaningful bug fix, physics change or mistake is committed, or Will asks for screenshots.
+description: Write to Will's Notion after a change lands - the "My Websites Creation" build log, the living documents (Explain My Code, User Testing Kit) and the "Where things stand" status at the top of the build log. Use whenever a new feature, visible change, meaningful bug fix, physics change or mistake is committed, or Will asks for screenshots.
 ---
 
 # Build log and living documents
@@ -31,11 +31,14 @@ If a card quotes text you changed, fix that one line. Update the "Last
 checked against" commit/date line only after a Big change. Plain wording
 Will can say himself.
 
-## project-status.md (claude.ai Project "EPQ Work")
+## "Where things stand" (top of My Websites Creation)
 
-Update only after a Big change, a decision or a deadline change. If the
-Projects tool isn't available, list the needed changes in one short block at
-the end of your reply.
+My Websites Creation is the main source of context for any model working on
+the EPQ. Its "Where things stand" callout, at the top under the intro
+callout, says in at most ~10 lines: next deadline, current state of the site,
+work in progress, open decisions, and the date last updated. Update it only
+after a Big change, a decision or a deadline change. Keep the history in the
+dated entries, not here.
 
 ## Screenshots (only when Will asks)
 
