@@ -174,5 +174,6 @@ These are documented here, not changed. Any change needs Will's decision.
    fit stops at the top of the search range (Υ_disk = 1.5), so a wider search
    could fit better. Plain MOND at the default a₀ scores χ²_ν ≈ 115 here with
    SPARC's distance (64.5 Mpc) and Υ_disk = 0.5 held fixed; the site does not
-   vary distance or inclination, which published MOND fits often do. The
-   description "low surface brightness" still needs a source cited on the page.
+   vary distance or inclination, which published MOND fits often do. "Low
+   surface brightness" is cited on the page to de Blok & McGaugh (1996), who
+   use 60 Mpc for it.

@@ -36,7 +36,7 @@ GALAXY_PRESETS = (
     GalaxyPreset("NGC3198", "NGC 3198", "Classic late-type spiral benchmark"),
     GalaxyPreset("NGC2403", "NGC 2403", "Gas-rich late-type spiral"),
     GalaxyPreset("NGC7331", "NGC 7331", "Massive early-type spiral with a prominent bulge"),
-    GalaxyPreset("UGC00128", "UGC 128", "Faint, spread-out, gas-rich galaxy (low surface brightness)"),
+    GalaxyPreset("UGC00128", "UGC 128", "Low-surface-brightness galaxy: faint, spread-out and gas-rich (de Blok & McGaugh 1996)"),
 )
 DEFAULT_PRESET = GALAXY_PRESETS[0]
 ROTATION_COLUMNS = (
@@ -1143,6 +1143,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <ul>
           <li>Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href="https://doi.org/10.1103/RevModPhys.90.045002" target="_blank" rel="noopener">doi:10.1103/RevModPhys.90.045002</a></li>
           <li>Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href="https://doi.org/10.1086/508162" target="_blank" rel="noopener">doi:10.1086/508162</a></li>
+          <li>de Blok, W.J.G. and McGaugh, S.S. (1996) ‘Does low surface brightness mean low density?’, <i>The Astrophysical Journal</i>, 469(2), pp. L89–L92. <a href="https://doi.org/10.1086/310266" target="_blank" rel="noopener">doi:10.1086/310266</a></li>
           <li>Dutton, A.A. and Macciò, A.V. (2014) ‘Cold dark matter haloes in the Planck era: evolution of structural parameters for Einasto and NFW profiles’, <i>Monthly Notices of the Royal Astronomical Society</i>, 441(4), pp. 3359–3374. <a href="https://doi.org/10.1093/mnras/stu742" target="_blank" rel="noopener">doi:10.1093/mnras/stu742</a></li>
           <li>Famaey, B. and McGaugh, S.S. (2012) ‘Modified Newtonian Dynamics (MOND): observational phenomenology and relativistic extensions’, <i>Living Reviews in Relativity</i>, 15, 10. <a href="https://doi.org/10.12942/lrr-2012-10" target="_blank" rel="noopener">doi:10.12942/lrr-2012-10</a></li>
           <li>Freeman, K.C. (1970) ‘On the disks of spiral and S0 galaxies’, <i>The Astrophysical Journal</i>, 160, p. 811. <a href="https://doi.org/10.1086/150474" target="_blank" rel="noopener">doi:10.1086/150474</a></li>

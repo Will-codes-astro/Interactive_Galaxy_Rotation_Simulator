@@ -68,7 +68,7 @@ window.GALAXIES = {
   "UGC00128": {
     id: "UGC00128",
     name: "UGC 128",
-    summary: "Faint, spread-out, gas-rich galaxy (low surface brightness)",
+    summary: "Low-surface-brightness galaxy: faint, spread-out and gas-rich (de Blok & McGaugh 1996)",
     distance_mpc: 64.5,
     default_halo: {
       m200_msun: 360000000000.0,
