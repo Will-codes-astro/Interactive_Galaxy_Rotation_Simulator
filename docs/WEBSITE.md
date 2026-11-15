@@ -14,7 +14,8 @@ correctly sized. If Plotly or Three.js fails to load (for example a network that
 WebGL is off, a red note at the top says which, and the page shows The puzzle,
 Background and Method as one long scroll; the Simulator and Scorecard, which need
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
-("Puzzle", "Method") and wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
+("Puzzle", "Method") in one row (below 420 px the logo is hidden to make room); on
+narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
 the controls that change them. On wide screens the galaxy profile card splits into
@@ -138,6 +139,8 @@ card with the s = sin i_SPARC / sin i factor and a worked example.
 
 Test stars:
 
+- The Test stars tile's "?" says they are test particles: they feel the
+  model's gravity but do not pull on each other.
 - The default preset (NGC 3198) and the default sandbox galaxy are the
   800-star template. Other galaxies scale it by
   (visible mass / template mass)^0.5, limited to 200–2400 stars
@@ -185,6 +188,13 @@ The halo, time and tracking sliders sit in one bar directly above the 3D
 view and rotation curve. On a large enough screen the bar stays pinned under
 the top menu while you scroll the plots, so every slider change is visible at
 once, and the tutorial scrolls so the bar and the plots are both on screen.
+In that bar a long readout (e.g. the orbit time) drops under its label rather than
+running into the next column, and between 961 and 1280 px Play shows its icon only.
+On phones (640 px or narrower) the order is 3D view, rotation curve, sliders, and
+the rotation curve stays pinned under the menu while the sliders scroll beneath it,
+so a slider's effect is visible while dragging (layout choice only). It is unpinned
+while a tutorial runs, since the tutorial card needs the room. The curve's legend
+uses shorter names there ("Observed", "Visible matter") so two fit on each row.
 
 Next to the orbit timeline, "Track a star" takes a star number and rings that
 star in the 3D view with its laps round the centre since 0 Myr, speed and
@@ -275,7 +285,9 @@ values reveal their explanations on hover or when selected with a mouse, touch,
 or keyboard.
 
 Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
-fit") sits in front of χ² and χ²ᵣ. Beside the badge a grey label names what is being
+fit") sits in front of χ²ᵣ; χ² itself, the point count and the values tuned are in
+the number's tooltip. The grey label beside it ends with the same plain-words gap
+as the Scorecard ("about 1.2 error bars off", √(χ²/N)). Beside the badge a grey label names what is being
 scored and how many values were tuned (`fitLabel`): "NFW halo fit · 2 tuned",
 "NFW best fit · 5 tuned",
 "Your halo" (sliders moved, with or without the fit's M/L, distance and tilt),
@@ -290,7 +302,11 @@ values quoted in the Method page and the Scorecard's "Tuned values" card are
 written by the generator (`tuned_count_text`) from the same numbers, so they
 cannot drift from the page's maths.
 
-Scorecard: a table scoring every preset galaxy in two column groups.
+Scorecard: first an "At a glance" table, one row per galaxy, giving the verdict
+word for visible matter only and, for NFW and MOND, standard values → best
+realistic fit (a † marks a best fit that needed a value at a realistic limit; the
+galaxy name opens it in the simulator). Under it, "Full scores, error bars and tuned
+values" (closed by default) opens the full table, scoring every preset galaxy in two column groups.
 "Standard values": visible matter only, the NFW halo fit (halo only) and MOND
 at the default a₀. "Best realistic fits": the NFW and MOND best fits. The halo
 and best-fit cells list how many values were tuned and what they

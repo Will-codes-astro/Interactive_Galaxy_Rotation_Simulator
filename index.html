@@ -469,6 +469,7 @@
       .topnav { flex-wrap:wrap; justify-content:flex-end; row-gap:2px; overflow:visible; }
       .topnav .nav-long { display:none; } .topnav .nav-short { display:inline; }
     }
+    @media (max-width:420px) { .topbar .brand { display:none; } .topbar { justify-content:center; } }
     .topnav a:hover, .topnav a:focus-visible { color:var(--ink); background:rgba(255,255,255,.05); outline:none; }
     a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
@@ -502,6 +503,20 @@
     /* Layout: the halo sliders sit directly above the plots they change and stay pinned while you scroll the plots (layout choice only). */
     .sim-stage .controls { grid-template-columns:auto minmax(0,1.35fr) repeat(3,minmax(0,1fr)); gap:14px 26px; padding:14px 20px; margin-bottom:14px; }
     .sim-stage .control-help { font-size:11.5px; line-height:1.45; min-height:0; margin-top:4px; }
+    .sim-stage .control label { flex-wrap:wrap; row-gap:2px; } .sim-stage .control label > span { flex:1 0 auto; }
+    @media (min-width:961px) and (max-width:1280px) { .sim-stage .play-btn .play-text { display:none; } .sim-stage .play-btn { width:44px; padding:0; } } /* room for the time slider in narrow columns */
+    /* Phones: 3D view, then the rotation curve pinned under the menu, then the sliders, so a slider's effect on the
+       curve stays in view while dragging (layout choice only). Unpinned during the tutorial, whose card needs the room. */
+    @media (max-width:640px) {
+      .sim-stage { display:flex; flex-direction:column; gap:14px; }
+      .sim-stage .panel-grid { display:contents; }
+      .sim-stage .panel-grid > .panel:first-child { order:1; }
+      .sim-stage > .sandbox, #controlsAnchor { order:3; }
+      .sim-stage > .controls { order:4; margin-bottom:0; }
+      #curvePanel { order:2; position:sticky; top:56px; z-index:40; max-height:calc(100dvh - 56px - 180px); overflow-y:auto; overscroll-behavior:contain; box-shadow:0 12px 24px rgba(0,0,0,.6); }
+      #curvePlot.plot { height:34dvh; min-height:220px; }
+      body.tutorial-active #curvePanel { position:relative; max-height:none; overflow:hidden; }
+    }
     @media (min-width:961px) and (min-height:700px) {
       .sim-stage .controls { position:sticky; top:56px; z-index:150; background:linear-gradient(180deg,var(--panel-2),var(--panel)); }
       .sim-stage .plot { height:clamp(420px, calc(100vh - 56px - var(--ctrl-h,190px) - 84px), 700px); min-height:0; }
@@ -603,7 +618,7 @@
     .stat-q::after { background:var(--panel-2); border-color:var(--line-strong); }
     .telemetry { font-family:var(--f-mono); }
     @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
-    @media (max-width:640px) { .topbar { padding:6px 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 8px; font-size:12.5px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
+    @media (max-width:640px) { .topbar { padding:6px 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 6px; font-size:12px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
     .key summary::before { content:""; display:inline-block; width:4px; }
     /* Small text: sizes and contrast raised for readability (visual only). */
     :root { --muted:#96a5ba; }
@@ -661,6 +676,16 @@
     .score.good { border-color:rgba(95,208,224,.55); color:#8fe3ee; } .score.ok { border-color:rgba(255,174,92,.55); color:#ffc48a; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
     .at-limit { padding:0 4px; border:1px solid rgba(255,174,92,.5); border-radius:4px; color:#ffc48a; font-size:10.5px; text-decoration:none; cursor:help; white-space:nowrap; }
     .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
+    .glance-table td, .glance-table th { vertical-align:middle; }
+    .glance-name { margin:0; font-weight:600; color:var(--ink); }
+    .glance-pair { display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+    .glance-pair sup { color:#ffc48a; cursor:help; }
+    .glance-arrow { color:var(--muted); }
+    .glance-table .score { min-width:54px; }
+    .glance-note { margin:6px 0 0; color:var(--muted); font-size:12px; } .glance-note sup { color:#ffc48a; }
+    .score-details { margin-top:16px; }
+    .score-details > summary { cursor:pointer; color:var(--accent); font-size:13px; font-weight:500; padding:6px 0; }
+    .score-details[open] > summary { margin-bottom:10px; }
     .score-notes { margin:14px 0 0; padding:14px 0 0 18px; border-top:1px solid var(--line); color:var(--ink-2); font-size:13px; line-height:1.6; }
     .score-notes li { margin-bottom:6px; max-width:96ch; }
     .score-notes b { color:var(--ink); font-weight:600; }
@@ -793,7 +818,7 @@
     <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
     <div class="stats-row">
     <div class="header-stats" aria-label="Simulation summary">
-      <div class="stat"><div class="stat-label">Test stars</div><div class="stat-value"><span id="starCountStat">800</span><small>massless</small></div></div>
+      <div class="stat"><div class="stat-label">Test stars<span class="stat-q" tabindex="0" role="img" aria-label="The stars in the 3D view feel the model’s gravity but do not pull on each other (test particles), so each one shows how that gravity moves a star." data-tip="The stars in the 3D view feel the model’s gravity but do not pull on each other (test particles), so each one shows how that gravity moves a star.">?</span></div><div class="stat-value"><span id="starCountStat">800</span></div></div>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
         <div class="ml-row">
@@ -921,14 +946,25 @@
     <div class="page" data-page="scorecard">
     <div class="section-head" id="scorecard"><span class="kicker">04</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
-      <p>Each number is a χ<sup>2</sup><sub>r</sub> score: the model’s typical miss, in error bars, squared. Lower is better; about 1 is as close as the measurements allow.</p>
+      <p>Each fit is scored with χ<sup>2</sup><sub>r</sub>: the model’s typical miss, in error bars, squared. Lower is better; about 1 is as close as the measurements allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
+      <p class="score-notes-title">At a glance</p>
+      <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard summary">
+        <table class="score-table glance-table">
+          <thead><tr><th scope="col">Galaxy</th><th scope="col">Visible matter only<small>Newton’s gravity, nothing added</small></th><th scope="col">Dark matter halo (NFW)<small>standard values → best realistic fit</small></th><th scope="col">MOND<small>standard values → best realistic fit</small></th></tr></thead>
+          <tbody id="glanceBody"><tr><td colspan="4">Calculating the scores…</td></tr></tbody>
+        </table>
+      </div>
+      <p class="glance-note"><sup>†</sup> The best fit needed at least one value at its realistic limit (see the full scores).</p>
+      <details class="score-details">
+      <summary>Full scores, error bars and tuned values</summary>
       <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard table">
         <table class="score-table">
           <thead><tr><th scope="col" rowspan="2">Galaxy</th><th scope="colgroup" colspan="3" class="score-group">Standard values<small>SPARC’s M/L, distance and tilt for every model</small></th><th scope="colgroup" colspan="2" class="score-group">Best realistic fits<small>each model also tunes M/L, distance and tilt</small></th></tr><tr><th scope="col">Visible matter only<small>Newton’s gravity, nothing added</small></th><th scope="col">Dark matter halo (NFW)<small>halo mass and size tuned</small></th><th scope="col">MOND<small>nothing tuned</small></th><th scope="col">Dark matter halo (NFW)</th><th scope="col">MOND<small>a₀ also tuned</small></th></tr></thead>
           <tbody id="scoreBody"><tr><td colspan="6">Calculating the scores…</td></tr></tbody>
         </table>
       </div>
+      </details>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
         <li><b>Same rules for every model</b>With standard values, all three use SPARC’s M/L, distance and tilt, so the visible matter is identical and only the explanation differs: the halo tunes 2 values (mass and size), MOND none. Best realistic fits give both models the same extra freedom: the halo tunes 5 (6 for NGC 7331), MOND 4 (5 for NGC 7331) (a<sub>0</sub>, M/L, distance and tilt). χ<sup>2</sup><sub>r</sub> accounts for this, so extra freedom is not free.</li>
@@ -2648,9 +2684,12 @@ window.GALAXIES = {
       const model=activeFitModel(),k=tunedCount(model,activeFit());
       const chi=obsV.reduce((s,v,i)=>s+((v-total[i])/obsErr[i])**2,0),red=reducedChi(chi,obsV.length,k),verdict=fitVerdict(red);
       shownRedChi=red;shownModelKms=total;
-      document.getElementById('chiFit').textContent=`${fitLabel(model)} · ${k} tuned`;
+      const miss=Math.sqrt(chi/obsV.length); // root-mean-square gap in error bars, as on the Scorecard
+      document.getElementById('chiFit').textContent=`${fitLabel(model)} · ${k} tuned · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off`;
       document.getElementById('chiVerdict').textContent=verdict.word;
-      document.getElementById('chiNumbers').innerHTML='χ² '+chi.toFixed(0)+' · χ²<sub>r</sub> '+red.toFixed(2);
+      const nums=document.getElementById('chiNumbers');
+      nums.innerHTML='χ²<sub>r</sub> '+red.toFixed(2);
+      nums.title=`χ² = ${chi.toFixed(0)} over ${obsV.length} measured speeds, ${k} values tuned. Lower is better; about 1 is as close as the measurements allow.`;
       b.className=verdict.cls;
       const fc=document.getElementById('tm-chi');fc.textContent=red.toFixed(2);fc.className=verdict.cls;
     }
@@ -2663,21 +2702,28 @@ window.GALAXIES = {
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
     const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
     const buildCurveData=(halo,total)=>[
-      {type:'scatter',mode:'markers',name:'Observed (SPARC)',visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(232,238,246,0.5)',thickness:1.1,width:3},marker:{size:6.5,color:'#f4f7fb',line:{color:'#070b14',width:1.4}},customdata:obsErr,hovertemplate:'Observed <b>%{y:.0f}</b> ± %{customdata:.0f} km/s<extra></extra>'},
-      {type:'scatter',mode:'lines',name:'Visible matter (baryons)',x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.2,dash:'6px,4px',shape:'spline',smoothing:0.6},hovertemplate:'Visible <b>%{y:.0f}</b> km/s<extra></extra>'},
+      {type:'scatter',mode:'markers',name:LEGEND_NAMES.observed,visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(232,238,246,0.5)',thickness:1.1,width:3},marker:{size:6.5,color:'#f4f7fb',line:{color:'#070b14',width:1.4}},customdata:obsErr,hovertemplate:'Observed <b>%{y:.0f}</b> ± %{customdata:.0f} km/s<extra></extra>'},
+      {type:'scatter',mode:'lines',name:LEGEND_NAMES.visible,x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.2,dash:'6px,4px',shape:'spline',smoothing:0.6},hovertemplate:'Visible <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.08)',line:{color:'#b39ae8',width:1.8,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
     ];
+    // Phone-width legends use shorter names so two entries fit on each row.
+    const NARROW_LEGEND=innerWidth<600;
+    const LEGEND_NAMES=NARROW_LEGEND?{observed:'Observed',visible:'Visible matter',noHalo:'No halo'}:{observed:'Observed (SPARC)',visible:'Visible matter (baryons)',noHalo:'Dark matter halo (none)'};
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
       yaxis2:{...AXIS,title:{text:'Obs − model',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,tracegroupgap:4},
       hovermode:false,dragmode:false};
-    // On a phone-width screen the legend sits two entries per row, leaving more height for the graph.
-    if(innerWidth<600)curveLayout.legend={...curveLayout.legend,entrywidth:0.5,entrywidthmode:'fraction',font:{...curveLayout.legend.font,size:11}};
+    // On a phone-width screen the legend sits two entries per row (with shorter names, see LEGEND_NAMES) and the
+    // speed axis has a shorter title, leaving more height for the graph.
+    if(NARROW_LEGEND){
+      curveLayout.legend={...curveLayout.legend,entrywidth:0.5,entrywidthmode:'fraction',itemwidth:30,font:{...curveLayout.legend.font,size:11}};
+      curveLayout.yaxis.title={...curveLayout.yaxis.title,text:'Speed, V (km/s)'};
+    }
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
     const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout;
@@ -3021,7 +3067,7 @@ window.GALAXIES = {
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
       const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)');
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:['Visible matter (baryons)',mondMode?'Dark matter halo (none)':'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
@@ -3406,14 +3452,23 @@ window.GALAXIES = {
       const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
       return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>`;
     }
+    // At a glance: one verdict per model (standard values → best realistic fit), from the same scores as the full table.
+    function glanceRowHtml(galaxy){
+      const score=scoreGalaxy(galaxy),{nfw,mond}=galaxy.best_fit;
+      const pill=model=>{const v=fitVerdict(reducedChi(score.chi[model],score.pointCount,score.k[model]));return `<span class="score ${v.cls}">${v.word.replace(' fit','')}</span>`;};
+      const limited=fit=>fit.at_limit&&Object.values(fit.at_limit).some(Boolean)?'<sup title="Needed a value at its realistic limit">†</sup>':'';
+      const pair=(std,best,fit)=>`<span class="glance-pair">${pill(std)}<span class="glance-arrow" aria-label="then, with the best realistic fit,">→</span>${pill(best)}${limited(fit)}</span>`;
+      return `<tr><th scope="row"><button type="button" class="score-show glance-name" data-galaxy="${galaxy.id}" title="Show in simulator">${galaxy.name}</button></th><td data-label="${SCORE_COLUMNS.visible}">${pill('visible')}</td><td data-label="Dark matter halo (NFW): standard → best fit">${pair('nfwStd','nfw',nfw)}</td><td data-label="MOND: standard → best fit">${pair('mond','mondBest',mond)}</td></tr>`;
+    }
     const scoreBody=document.getElementById('scoreBody');
     function renderScorecard(){
       const galaxies=Object.values(GALAXIES);
       document.getElementById('scoreCount').textContent=String(galaxies.length);
       scoreBody.innerHTML=galaxies.map(scoreRowHtml).join('');
+      document.getElementById('glanceBody').innerHTML=galaxies.map(glanceRowHtml).join('');
     }
     setTimeout(renderScorecard,400);
-    scoreBody.addEventListener('click',e=>{
+    document.querySelector('.scorecard').addEventListener('click',e=>{
       const button=e.target.closest('.score-show');
       if(!button)return;
       if(customActive)setGalaxyMode('preset');
