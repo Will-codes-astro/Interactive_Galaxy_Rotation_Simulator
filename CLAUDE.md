@@ -10,6 +10,14 @@ halos and MOND against real SPARC rotation curves.
 - Notion: EPQ Main Hub, with Top-Band Plan, Source Evaluations (CRAAP),
   My Websites Creation (the build log), Explain My Code (flashcards) and
   User Testing Kit. The Diary database is Will's own: never write to it.
+- **Project context lives in Notion, read on demand.** My Websites Creation
+  (id `416c4fda4ef4813fa741fda5b6f61f5b`) holds "Where things stand" at the
+  top and Part 3: Project context (report state, bibliography, AI
+  declaration, open to-dos) at the end. Fetch it only when a decision or a
+  build needs context that this file, the docs and the code don't give
+  (e.g. report work, what was decided before, open to-dos, sources). For a
+  task that is clear from the request and the repo, don't fetch it: it
+  wastes Will's usage.
 - Next deadline: 1500-word checkpoint, 11 Dec 2026
 - If Notion, the browser or the report folder can't be reached, say so in
   one line rather than silently skipping a step.
