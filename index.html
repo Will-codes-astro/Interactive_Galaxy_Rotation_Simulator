@@ -391,11 +391,15 @@
     @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
     .tutorial-actions button { min-height:36px; }
     .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
-    .tutorial-spotlight { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:3px solid #a8ddff; border-radius:9px; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); transition:opacity .45s ease; animation:tutorial-pulse 2.2s ease-in-out infinite; }
+    .tutorial-spotlight { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:3px solid #a8ddff; border-radius:9px; box-shadow:0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); transition:opacity .45s ease; animation:tutorial-pulse 2.2s ease-in-out infinite; }
     /* Gentle pulse on the highlight ring (visual only). */
-    @keyframes tutorial-pulse { 0%,100% { border-color:#a8ddff; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); } 50% { border-color:#ffffff; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 26px 9px rgba(120,210,255,.95), inset 0 0 16px rgba(120,210,255,.5); } }
+    @keyframes tutorial-pulse { 0%,100% { border-color:#a8ddff; box-shadow:0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); } 50% { border-color:#ffffff; box-shadow:0 0 26px 9px rgba(120,210,255,.95), inset 0 0 16px rgba(120,210,255,.5); } }
     .tutorial-spotlight[hidden] { display:none; }
-    .tutorial-spotlight.in-fs { --spot-dim:transparent; }
+    /* One dim layer over the page with a hole for every highlighted control (main ring and the blue/yellow rings),
+       so the things to use or watch stay at full brightness. No dim in full screen. */
+    .tutorial-dim { position:fixed; inset:0; z-index:9997; width:100%; height:100%; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
+    .tutorial-dim.is-on { opacity:1; }
+    .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.2s ease 1.8s; }
     .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
@@ -421,8 +425,8 @@
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
     /* When the task is done the highlight turns green with a soft glow and one small ripple, holds, then fades (visual only). */
-    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease 1.8s, border-color .3s ease, box-shadow .3s ease; }
-    @keyframes tutorial-done-glow { 0% { box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 5px rgba(165,227,194,.7); } }
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease 1.8s, border-color .3s ease, box-shadow .3s ease; }
+    @keyframes tutorial-done-glow { 0% { box-shadow:0 0 18px 5px rgba(165,227,194,.7); } }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
     .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
     .tutorial-spotlight.is-revisit, .tutorial-spotlight.is-revisit::after { animation:none; transition:none; opacity:0; }
@@ -1103,6 +1107,7 @@
     <span class="tutorial-tag" id="tutorialTag"></span>
     <svg class="tutorial-pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2v23l6-5 4 10 5-2-4-10h8z" fill="#eaffff" stroke="#09212c" stroke-width="2" stroke-linejoin="round"/></svg>
   </div>
+  <svg class="tutorial-dim" id="tutorialDim" aria-hidden="true"><path fill-rule="evenodd"/></svg>
   <aside class="tutorial-card" id="tutorialCard" aria-labelledby="tutorialTitle" hidden>
     <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
@@ -4134,7 +4139,7 @@ window.GALAXIES = {
     if(spotlightResize)spotlightResize.observe(document.body);
     function updateTutorialSpotlight(){
       if(tutorialCard.hidden){tutorialSpotlight.hidden=true;positionTutorialAlso(true);return;}
-      tutorialSpotlight.classList.toggle('in-fs',tutorialIsFullscreen());positionTutorialAlso();
+      positionTutorialAlso();
       const step=tutorialStep(),blocker=tutorialBlocker(),aim=blocker?null:tutorialCurrentAim(step);
       if(!blocker&&!aim){tutorialSpotlight.hidden=true;return;}
       let target=blocker?blocker.target:document.getElementById(aim.id),gesture=blocker?blocker.gesture:aim.gesture;
@@ -4268,11 +4273,28 @@ window.GALAXIES = {
         unit.classList.toggle('tutorial-locked',locked);
       }));
     }
+    // Cuts a rounded hole in the dim layer for the main ring and each visible extra ring.
+    const tutorialDim=document.getElementById('tutorialDim'),tutorialDimPath=tutorialDim.firstElementChild;
+    function updateTutorialDim(){
+      const on=!tutorialCard.hidden&&!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-revisit')&&!tutorialIsFullscreen();
+      tutorialDim.classList.toggle('is-on',on);
+      tutorialDim.classList.toggle('is-done',tutorialSpotlight.classList.contains('is-complete'));
+      if(!on)return;
+      const W=innerWidth,H=innerHeight;
+      let d=`M0,0H${W}V${H}H0Z`;
+      [tutorialSpotlight,...tutorialAlsoRings.values()].forEach(el=>{
+        if(el.hidden||!el.isConnected)return;
+        const r=el.getBoundingClientRect(),k=Math.min(parseFloat(el.style.borderRadius)||0,r.width/2,r.height/2);
+        d+=`M${r.left+k},${r.top}H${r.right-k}A${k},${k} 0 0 1 ${r.right},${r.top+k}V${r.bottom-k}A${k},${k} 0 0 1 ${r.right-k},${r.bottom}H${r.left+k}A${k},${k} 0 0 1 ${r.left},${r.bottom-k}V${r.top+k}A${k},${k} 0 0 1 ${r.left+k},${r.top}Z`;
+      });
+      if(tutorialDimPath.getAttribute('d')!==d)tutorialDimPath.setAttribute('d',d);
+    }
     (function trackTutorialSpot(){
       if(!tutorialCard.hidden)tutorialUpdateChecks();
       applyTutorialLocks();
       positionTutorialAlso();
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
+      updateTutorialDim();
       requestAnimationFrame(trackTutorialSpot);
     })();
     function syncTutorialFullscreen(){
