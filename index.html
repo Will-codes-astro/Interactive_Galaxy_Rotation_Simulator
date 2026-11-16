@@ -442,6 +442,10 @@
     /* When the task is done the highlight turns green with a soft glow and one small ripple, holds, then fades (visual only). */
     .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease-in-out 1.4s, border-color .5s ease, box-shadow .5s ease; }
     @keyframes tutorial-done-glow { 0% { box-shadow:0 0 18px 5px rgba(165,227,194,.7); } }
+    /* A wrong prediction: the same fade, in orange instead of green, with no ripple. */
+    .tutorial-feedback.is-missed { color:#ffb36b; }
+    .tutorial-spotlight.is-complete.is-missed { border-color:#ffb36b; box-shadow:0 0 12px 3px rgba(255,179,107,.45); animation:none; }
+    .tutorial-spotlight.is-complete.is-missed::after { content:none; }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
     .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
     .tutorial-spotlight.is-revisit, .tutorial-spotlight.is-revisit::after { animation:none; transition:none; opacity:0; }
@@ -3966,7 +3970,7 @@ window.GALAXIES = {
          text:'The two ringed stars move at similar speeds, but the outer one is about four times further out.',
          action:'Press ▶ Play and watch the lap counts on the two ringed stars.',
          done:()=>tutorialFlags.prediction!=null&&tutorialPlayedMyr>=400,
-         doneText:()=>tutorialFlags.prediction===0?'You called it: at similar speeds, the inner star’s much shorter lap means it laps far more often.':'The inner star wins: at similar speeds, its much shorter lap means it laps far more often.'},
+         doneText:()=>tutorialFlags.prediction===0?'You called it: at similar speeds, the inner star’s much shorter lap means it laps far more often.':'The inner star wins. Both move at similar speeds, but a lap is a circle of length 2πr, so the outer star, about four times further out, has about four times as far to go each lap. The inner star finishes several laps for each one the outer star completes.'},
         {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',tag:'1 · Edge-on',also:['fsPlay:2 · Keep playing'],gesture:'click',title:'Turn it on its side',
          text:'Edge-on, the disk is a thin line. The ringed star bobs above and below it once a lap.',
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
@@ -4341,23 +4345,29 @@ window.GALAXIES = {
     // noAuto: no countdown, so the viewer can watch the simulation and press Next when ready.
     // A word of praise before each 'done' message, taken in turn so it varies from card to card.
     const TUTORIAL_PRAISE=['Nice work!','Great!','Spot on!','Well done!','Brilliant!','Perfect!'];
-    function showTutorialFeedback(text){
+    // A wrong prediction is the one place the tour gives negative feedback: orange 'Not quite.', no tick, no green.
+    const tutorialMissed={};
+    function showTutorialFeedback(text,missed){
       tutorialFeedbackText.textContent='';
+      tutorialFeedback.classList.toggle('is-missed',!!missed);
+      if(missed){tutorialFeedbackText.append(Object.assign(document.createElement('b'),{textContent:'Not quite.'}),' '+text);return;}
       const cut=text.indexOf('!')+1;
       tutorialFeedbackText.append(Object.assign(document.createElement('b'),{textContent:'✓ '+text.slice(0,cut)}),text.slice(cut));
     }
     // Done while a slider is still held: wait until it is let go, so the viewer can keep dragging and watching.
     let tutorialPending=null;
-    // plain: no praise word in front (a missed prediction).
-    function completeTutorialAction(id,message,noAuto,plain){
+    // missed: a wrong prediction (no praise, no tick, orange instead of green).
+    function completeTutorialAction(id,message,noAuto,missed){
       if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
-      if(tutorialHolding){tutorialPending=[id,message,noAuto,plain];return;}
+      if(tutorialHolding){tutorialPending=[id,message,noAuto,missed];return;}
       tutorialPending=null;
-      tutorialCompleted[id]=plain?message:TUTORIAL_PRAISE[tutorialIndex%TUTORIAL_PRAISE.length]+' '+message;
+      tutorialMissed[id]=!!missed;
+      tutorialCompleted[id]=missed?message:TUTORIAL_PRAISE[tutorialIndex%TUTORIAL_PRAISE.length]+' '+message;
       tutorialFeedback.hidden=false;
-      showTutorialFeedback(tutorialCompleted[id]);
-      tutorialCard.classList.remove('is-celebrating');void tutorialCard.offsetWidth;tutorialCard.classList.add('is-celebrating');
+      showTutorialFeedback(tutorialCompleted[id],missed);
+      tutorialCard.classList.remove('is-celebrating');void tutorialCard.offsetWidth;if(!missed)tutorialCard.classList.add('is-celebrating');
       if(!noAuto)startTutorialAuto();
+      tutorialSpotlight.classList.toggle('is-missed',!!missed);
       tutorialSpotlight.classList.remove('is-revisit');tutorialSpotlight.classList.add('is-complete');
       updateTutorialNextGate();
     }
@@ -4613,7 +4623,7 @@ window.GALAXIES = {
       renderTutorialTry();
       syncTutorialSlider();
       tutorialFeedback.hidden=!tutorialCompleted[step.id];
-      showTutorialFeedback(tutorialCompleted[step.id]||'');
+      showTutorialFeedback(tutorialCompleted[step.id]||'',tutorialMissed[step.id]);
       tutorialCard.classList.remove('is-celebrating');
       stopTutorialAuto();
       // Back on a card already done: no green glow replayed; the ring is simply not shown.
