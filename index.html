@@ -4404,7 +4404,12 @@ window.GALAXIES = {
       const step=tutorialStep(),blocker=tutorialBlocker(),aim=blocker?null:tutorialCurrentAim(step);
       // A many-part card just finished: the ring stays on the last part so it can turn green and fade out slowly.
       const finished=!blocker&&!aim&&tutorialCompleted[step.id]&&tutorialAimTarget&&tutorialAimTarget.isConnected&&!tutorialSpotlight.classList.contains('is-revisit');
-      if(!blocker&&!aim&&!finished){tutorialSpotlight.hidden=true;return;}
+      // Every ringed part is done but the card still waits on something unringed (Score your fit's χ² goal): the last
+      // part still turns green and fades like the others, then the main ring goes.
+      if(!blocker&&!aim&&!finished){
+        if(tutorialAimTarget){leaveTutorialGhost();tutorialAimTarget=null;}
+        tutorialSpotlight.hidden=true;return;
+      }
       let target=finished?tutorialAimTarget:blocker?blocker.target:aim.id===tutorialSliderId?tutorialSliderInput:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
       if(gesture==='switch'&&!finished){
         target=document.querySelector('#modelBar .track');gesture='click';
