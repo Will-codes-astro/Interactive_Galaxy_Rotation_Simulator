@@ -2731,7 +2731,7 @@ __GALAXIES_JS__
             metric.addEventListener('pointerleave',event=>{
                 if(event.pointerType!=='touch')metric.classList.remove('hovered');
             });
-            // A mouse only hovers (a click does not pin the card open); touch and keyboard toggle it instead.
+            // A mouse only hovers (a click does not pin the card open); touch and keyboard toggle it instead, one card at a time.
             const sync=()=>button.setAttribute('aria-expanded',String(metric.classList.contains('hovered')||metric.classList.contains('expanded')));
             let lastPointer='';
             metric.addEventListener('pointerenter',sync);metric.addEventListener('pointerleave',sync);
@@ -2739,6 +2739,12 @@ __GALAXIES_JS__
             button.addEventListener('click',()=>{
                 const mouse=lastPointer==='mouse';lastPointer='';
                 if(mouse)return;
+                // Opening one card closes the others, so only one explainer is open at a time.
+                document.querySelectorAll('.halo-metric.expanded').forEach(other=>{
+                    if(other===metric)return;
+                    other.classList.remove('expanded');
+                    other.querySelector('button').setAttribute('aria-expanded',String(other.classList.contains('hovered')));
+                });
                 metric.classList.toggle('expanded');sync();
             });
         });
