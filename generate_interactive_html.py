@@ -478,13 +478,22 @@ HTML_TEMPLATE = r"""<!doctype html>
     .mond-note { color:#ffc48a; font-size:12px; }
     .preset-picker { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
     .preset-picker[hidden], .sandbox[hidden], .stability-chip[hidden] { display:none; }
-    .source-toggle { display:inline-grid; grid-template-columns:1fr 1fr; padding:2px; border-radius:999px; background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.1); }
-    .source-toggle label { position:relative; cursor:pointer; }
+    /* Galaxy source: two big choice cards (real data or build your own), the first decision on the Simulator. Visual only. */
+    .source-toggle { flex:1 1 100%; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .source-toggle label { position:relative; display:flex; cursor:pointer; border-radius:12px; }
     .source-toggle input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
-    .source-toggle span { display:block; padding:5px 14px; border-radius:999px; color:var(--muted); font-size:12px; text-align:center; white-space:nowrap; transition:background .15s,color .15s; }
-    .source-toggle label:hover input:not(:checked) + span { color:var(--ink); }
-    .source-toggle input:checked + span { background:rgba(138,180,248,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(138,180,248,.5); }
-    .source-toggle input:focus-visible + span { outline:2px solid var(--cyan); outline-offset:2px; }
+    .source-card { flex:1; display:flex; align-items:flex-start; gap:14px; padding:14px 16px; border:1px solid var(--line-strong); border-radius:12px; background:rgba(255,255,255,.025); color:var(--muted); transition:background .2s,border-color .2s,box-shadow .2s,color .2s; }
+    .source-icon { flex:none; width:40px; height:40px; padding:6px; border-radius:10px; background:rgba(138,180,248,.08); color:var(--muted); transition:color .2s,background .2s; }
+    .source-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .source-text small { font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+    .source-text b { font-size:17px; font-weight:600; color:var(--ink); }
+    .source-text > span { font-size:12.5px; line-height:1.45; }
+    .source-toggle label:hover input:not(:checked) + .source-card { border-color:rgba(138,180,248,.5); background:rgba(138,180,248,.05); color:var(--ink-2); }
+    .source-toggle input:checked + .source-card { border-color:rgba(138,180,248,.75); background:linear-gradient(180deg,rgba(138,180,248,.16),rgba(138,180,248,.06)); color:var(--ink); box-shadow:0 0 0 1px rgba(138,180,248,.35), 0 0 22px rgba(120,170,255,.22); }
+    .source-toggle input:checked + .source-card .source-icon { color:#cfe0ff; background:rgba(138,180,248,.22); }
+    .source-toggle input:checked + .source-card .source-text small { color:var(--cyan); }
+    .source-toggle input:focus-visible + .source-card { outline:2px solid var(--cyan); outline-offset:2px; }
+    @media (max-width:640px) { .source-toggle { grid-template-columns:1fr; gap:8px; } .source-card { padding:11px 13px; gap:11px; } .source-icon { width:34px; height:34px; } .source-text b { font-size:15.5px; } }
     .sandbox { margin-bottom:14px; padding:13px 16px 14px; border:1px solid var(--line); background:var(--panel); border-radius:5px; }
     .galaxy-type { margin:0 0 12px; padding:10px 14px 11px; border:1px solid rgba(242,200,121,0.3); border-left:3px solid var(--gold); border-radius:6px; background:linear-gradient(160deg,rgba(242,200,121,0.08),rgba(242,200,121,0.01)); }
     .galaxy-type-kicker { margin:0; color:var(--muted); font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
@@ -944,7 +953,6 @@ HTML_TEMPLATE = r"""<!doctype html>
     button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     #applyObservedFit, .tutorial-primary { background:rgba(138,180,248,.16); border-color:rgba(138,180,248,.6); color:#eef4ff; }
     #applyObservedFit:hover, .tutorial-primary:hover { background:rgba(138,180,248,.26); }
-    .source-toggle span { padding:6px 16px; font-weight:500; }
     .preset-picker { flex:1 1 420px; min-width:0; gap:12px 14px; }
     .galaxy-menu { position:relative; }
     .galaxy-menu-btn { display:flex; align-items:center; gap:10px; min-width:200px; padding:6px 36px 6px 7px; background-color:var(--panel-2); background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 19px) 52%,calc(100% - 14px) 52%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; font:600 14px var(--f-ui); text-align:left; }
@@ -1199,8 +1207,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
       <div class="source-toggle" id="sourceToggle" role="radiogroup" aria-label="Galaxy source">
-        <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span>Preset Galaxies</span></label>
-        <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span>Custom Sandbox</span></label>
+        <label><input type="radio" name="galaxyMode" value="preset" checked autocomplete="off"><span class="source-card"><svg class="source-icon" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 20c3-1 4-5 1-7s-9 0-10 5 3 11 10 11 13-5 12-13S24 3 15 5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="20" cy="20" r="2.4" fill="currentColor"/></svg><span class="source-text"><small>Real data</small><b>Preset Galaxies</b><span>Test both ideas against real galaxies whose speeds astronomers have measured (SPARC).</span></span></span></label>
+        <label><input type="radio" name="galaxyMode" value="custom" autocomplete="off"><span class="source-card"><svg class="source-icon" viewBox="0 0 40 40" aria-hidden="true"><g stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M8 11h24M8 20h24M8 29h24" opacity=".45"/></g><g fill="currentColor"><circle cx="15" cy="11" r="3.4"/><circle cx="26" cy="20" r="3.4"/><circle cx="12" cy="29" r="3.4"/></g></svg><span class="source-text"><small>Build your own</small><b>Custom Sandbox</b><span>Design a galaxy’s stars, gas and bulge, and see the dark matter halo it would need.</span></span></span></label>
       </div>
       <div class="preset-picker" id="presetPicker">
         <span class="model-label" id="galaxyLabel">Galaxy</span>

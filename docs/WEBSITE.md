@@ -78,7 +78,9 @@ offer another SPARC galaxy, add a `GalaxyPreset` to `GALAXY_PRESETS` in
 `data/sparc/table2.dat`) and run the generator again. It reads that galaxy's rows, fits
 its starting NFW halo and rewrites both files.
 
-The Preset Galaxies / Custom Sandbox switch beside the Galaxy menu opens
+Model setup opens with two large choice cards: Preset Galaxies (real data,
+the SPARC galaxies) and Custom Sandbox (build your own). The chosen card glows
+blue; on phones they stack. Choosing Custom Sandbox opens
 a builder with six anatomy sliders: stellar disk mass, disk scale length,
 truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
 radius is disabled while the bulge mass is zero. A "What you have built" card
