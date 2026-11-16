@@ -404,7 +404,8 @@
        so the things to use or watch stay at full brightness. No dim in full screen. */
     .tutorial-dim { position:fixed; inset:0; z-index:9997; width:100%; height:100%; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
     .tutorial-dim.is-on { opacity:1; }
-    .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.6s ease-in-out 2s; }
+    /* Every finished highlight (main ring, part rings, dim) holds green for 1.4 s then fades over 1.2 s. */
+    .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.2s ease-in-out 1.4s; }
     .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
@@ -434,12 +435,12 @@
     .tutorial-also.is-handover { animation:tutorial-handover .7s ease forwards; }
     @keyframes tutorial-handover { to { opacity:0; } }
     .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
-    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 50% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
+    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 54% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
     /* When the task is done the highlight turns green with a soft glow and one small ripple, holds, then fades (visual only). */
-    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.6s ease-in-out 2s, border-color .5s ease, box-shadow .5s ease; }
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease-in-out 1.4s, border-color .5s ease, box-shadow .5s ease; }
     @keyframes tutorial-done-glow { 0% { box-shadow:0 0 18px 5px rgba(165,227,194,.7); } }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
     .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
@@ -4076,7 +4077,9 @@ window.GALAXIES = {
       for(const id in step.checks){
         const ok=step.checks[id]();
         if(tutorialStale&&!ok)tutorialStale[id]=true;
-        if(!tutorialLatched[id]&&ok&&(!tutorialStale||tutorialStale[id]))tutorialLatched[id]=true;
+        // A part only counts once the slider (or finger) is let go, so its ring never moves on mid-drag;
+        // this check runs every frame, so it latches on the first frame after release.
+        if(!tutorialHolding&&!tutorialLatched[id]&&ok&&(!tutorialStale||tutorialStale[id]))tutorialLatched[id]=true;
       }
       const sig=Object.keys(tutorialLatched).join();
       if(sig===tutorialCheckSig)return;

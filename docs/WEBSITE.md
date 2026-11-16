@@ -251,8 +251,10 @@ Each card has one or two short sentences of explanation and an
 ("1. … 2. …") shows one part at a time ("Part 1 of 2"), and each new part fades
 in. Controls to use get a blue box; the numbers or graph to watch while doing
 it (halo mass, scale radius, χ², M/L, tilt, the Ejected count) get yellow dashed
-boxes. A step finished by dragging a slider only counts as done once the slider
-is let go. When a task is done the highlight turns green with one small ripple, the card
+boxes. A step, or one part of a many-part card, finished by dragging a slider
+only counts as done once the slider is let go, so no highlight moves on mid-drag.
+When a task is done the highlight turns green with one small ripple (every
+finished highlight holds green 1.4 s, then fades over 1.2 s), the card
 border tints green briefly, and the done message starts with a short word of
 praise; a 10 s countdown (paused while a control is held, restarted by more
 input) then fades to the next card. Green only ever marks something done on that
