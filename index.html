@@ -4019,7 +4019,7 @@ window.GALAXIES = {
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['scaleValue:Scale radius','stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny or huge scale radius makes a halo unlike any real one. The monitor turns red, but it still runs.',
          action:'Drag Scale radius to one end until the monitor turns red.'},
-        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],gesture:'adjust',
+        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],gesture:'decrease',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 × the typical halo. The stars start balanced for the typical one.',
          action:'1. Drag Halo mass low, then high. 2. Press Typical Halo to reset it.'},
@@ -4094,7 +4094,9 @@ window.GALAXIES = {
       const first={id:step.target,label:step.tag,gesture:step.gesture};
       if(!step.checks)return first;
       const parts=[first,...(step.also||[]).map(e=>{const k=e.indexOf(':'),id=k<0?e:e.slice(0,k),el=document.getElementById(id);
-        return{id,label:k<0?'':e.slice(k+1),gesture:el&&el.matches('input[type=range]')?'adjust':'click'};})];
+        // A slider part labelled 'Drag to 0' points left, towards 0; any other slider part points either way.
+        const label=k<0?'':e.slice(k+1),range=el&&el.matches('input[type=range]');
+        return{id,label,gesture:range?(/\bto 0\b/.test(label)?'zero':'adjust'):'click'};})];
       return parts.find(p=>!tutorialLatched[p.id])||null;
     }
     // Slider steps whose result shows far from the slider (the sandbox sliders sit above the plots): the card carries a
@@ -4414,10 +4416,11 @@ window.GALAXIES = {
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
-      if(gesture==='zero'||gesture==='increase'||gesture==='adjust'){
+      // zero: slide to the left end; decrease / increase: slide left / right; adjust: slide whichever way has more room.
+      if(gesture==='zero'||gesture==='decrease'||gesture==='increase'||gesture==='adjust'){
         const fraction=(Number(target.value)-Number(target.min))/(Number(target.max)-Number(target.min));
         fromX=8+(rect.width-16)*fraction;
-        const destination=gesture==='zero'?0:gesture==='increase'?Math.min(1,Math.max(.55,fraction+.2)):(fraction>.5?.2:.8);
+        const destination=gesture==='zero'?0:gesture==='decrease'?Math.max(0,Math.min(.45,fraction-.2)):gesture==='increase'?Math.min(1,Math.max(.55,fraction+.2)):(fraction>.5?.2:.8);
         toX=8+(rect.width-16)*destination;
       }
       tutorialSpotlight.style.setProperty('--from-x',(fromX+pad-2)+'px');
