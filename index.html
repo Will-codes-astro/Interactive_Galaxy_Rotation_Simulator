@@ -383,7 +383,7 @@
     @keyframes tutorial-card-in { from { opacity:0; transform:translateY(10px) scale(.98); } }
     @keyframes tutorial-pop { from { opacity:0; transform:translateY(4px); } }
     /* The highlight settles onto each new control instead of appearing there. */
-    .tutorial-spotlight.is-arriving { animation:tutorial-pulse 2.2s ease-in-out infinite, tutorial-arrive .45s cubic-bezier(.2,.8,.2,1); }
+    .tutorial-spotlight.is-arriving { animation:tutorial-pulse 2.2s ease-in-out infinite, tutorial-arrive .7s cubic-bezier(.2,.8,.2,1); }
     @keyframes tutorial-arrive { from { opacity:0; transform:scale(1.06); } }
     .tutorial-feedback[hidden] { display:none; }
     .tutorial-actions { display:flex; flex:none; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:12px; }
@@ -399,7 +399,7 @@
        so the things to use or watch stay at full brightness. No dim in full screen. */
     .tutorial-dim { position:fixed; inset:0; z-index:9997; width:100%; height:100%; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
     .tutorial-dim.is-on { opacity:1; }
-    .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.2s ease 1.8s; }
+    .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.6s ease-in-out 2s; }
     .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
@@ -416,16 +416,20 @@
     .tutorial-choices { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .tutorial-choices button { min-height:34px; padding:6px 12px; border-radius:999px; font-size:12px; }
     .tutorial-try .tutorial-prediction { display:block; margin-bottom:4px; color:var(--muted); font-size:11px; }
-    @keyframes tutorial-also-pulse { 0%,100% { opacity:.8; } 50% { opacity:1; } }
+    /* The current task's ring is the brightest; the other rings sit a little dimmer. */
+    @keyframes tutorial-also-pulse { 0%,100% { opacity:.5; } 50% { opacity:.68; } }
     /* A finished part's ring turns green and fades away instead of vanishing (visual only). */
-    .tutorial-also.is-leaving { animation:tutorial-ring-done 1.2s ease forwards; }
+    .tutorial-also.is-leaving { animation:tutorial-ring-done 2.6s ease-in-out forwards; }
+    /* The next part's ring hands over to the main ring with a short cross-fade instead of vanishing. */
+    .tutorial-also.is-handover { animation:tutorial-handover .7s ease forwards; }
+    @keyframes tutorial-handover { to { opacity:0; } }
     .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
-    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 45% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
+    @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 50% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
     .tutorial-spotlight.is-reached .tutorial-pointer { opacity:0; animation-play-state:paused; }
     /* When the task is done the highlight turns green with a soft glow and one small ripple, holds, then fades (visual only). */
-    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.2s ease 1.8s, border-color .3s ease, box-shadow .3s ease; }
+    .tutorial-spotlight.is-complete { opacity:0; border-color:#a5e3c2; animation:tutorial-done-glow .7s ease-out; box-shadow:0 0 12px 3px rgba(165,227,194,.5); transition:opacity 1.6s ease-in-out 2s, border-color .5s ease, box-shadow .5s ease; }
     @keyframes tutorial-done-glow { 0% { box-shadow:0 0 18px 5px rgba(165,227,194,.7); } }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
     .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
@@ -3772,6 +3776,8 @@ window.GALAXIES = {
     // Leave (~0.45 s) plus the staggered enter animation (~0.85 s): the card's scrollbar stays hidden for this long.
     const TUTORIAL_SWITCH_MS=1350;let tutorialScrollTimer=0;
     const TUTORIAL_RING_MIN_RADIUS_PX=8;  // softest corner any highlight ring gets
+    const TUTORIAL_RING_FADE_MS=2650;     // a done part's green ring holds, then fades (matches tutorial-ring-done)
+    const TUTORIAL_HANDOVER_MS=700;       // the next part's ring cross-fades into the main ring (matches tutorial-handover)
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
         {id:'puzzle',mode:'preset',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the puzzle',
@@ -4163,17 +4169,30 @@ window.GALAXIES = {
     // (the χ² badge widening as its numbers get longer), never a frame or more later.
     const spotlightResize=window.ResizeObserver?new ResizeObserver(()=>{if(!tutorialCard.hidden){updateTutorialSpotlight();positionTutorialAlso();}}):null;
     if(spotlightResize)spotlightResize.observe(document.body);
+    // When a part of a card is done and the main ring moves on, a green copy stays where it was and fades slowly.
+    function leaveTutorialGhost(){
+      const prev=tutorialAimTarget;
+      if(!prev||!prev.id||!tutorialLatched[prev.id]||tutorialSpotlight.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const ghost=document.createElement('div');
+      ghost.className='tutorial-also is-leaving';ghost.setAttribute('aria-hidden','true');
+      ['left','top','width','height','borderRadius'].forEach(k=>{ghost.style[k]=tutorialSpotlight.style[k];});
+      tutorialSpotlight.parentElement.appendChild(ghost);
+      setTimeout(()=>ghost.remove(),TUTORIAL_RING_FADE_MS);
+    }
     function updateTutorialSpotlight(){
       if(tutorialCard.hidden){tutorialSpotlight.hidden=true;positionTutorialAlso(true);return;}
       positionTutorialAlso();
       const step=tutorialStep(),blocker=tutorialBlocker(),aim=blocker?null:tutorialCurrentAim(step);
-      if(!blocker&&!aim){tutorialSpotlight.hidden=true;return;}
-      let target=blocker?blocker.target:document.getElementById(aim.id),gesture=blocker?blocker.gesture:aim.gesture;
-      if(gesture==='switch'){
+      // A many-part card just finished: the ring stays on the last part so it can turn green and fade out slowly.
+      const finished=!blocker&&!aim&&tutorialCompleted[step.id]&&tutorialAimTarget&&tutorialAimTarget.isConnected&&!tutorialSpotlight.classList.contains('is-revisit');
+      if(!blocker&&!aim&&!finished){tutorialSpotlight.hidden=true;return;}
+      let target=finished?tutorialAimTarget:blocker?blocker.target:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
+      if(gesture==='switch'&&!finished){
         target=document.querySelector('#modelBar .track');gesture='click';
       }
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
       if(target!==tutorialAimTarget){
+        leaveTutorialGhost();
         if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
         tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached','is-arriving');
         void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
@@ -4190,7 +4209,7 @@ window.GALAXIES = {
       tutorialSpotlight.style.height=(rect.height+2*pad)+'px';
       tutorialSpotlight.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,rect.height/2)+pad)+'px';
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
-      const tag=document.getElementById('tutorialTag'),label=blocker?'':tutorialTagNumber(aim.label);
+      const tag=document.getElementById('tutorialTag'),label=blocker||!aim?'':tutorialTagNumber(aim.label);
       if(tag.textContent!==label)tag.textContent=label;
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
@@ -4239,8 +4258,12 @@ window.GALAXIES = {
         // skipped card, something in the way, the tour ending) clears at once, so no green ring is left floating
         // over a spot the page has scrolled away from.
         const earned=ring.dataset.card===cardKey&&step&&(tutorialLatched[id]||tutorialCompleted[step.id]);
+        if(!earned&&aim&&aim.id===id&&ring.dataset.card===cardKey&&!ring.hidden){
+          if(!ring.classList.contains('is-handover')){ring.classList.add('is-handover');setTimeout(()=>{ring.remove();if(tutorialAlsoRings.get(id)===ring)tutorialAlsoRings.delete(id);},TUTORIAL_HANDOVER_MS);}
+          return;
+        }
         if(!earned||tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
-        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();if(tutorialAlsoRings.get(id)===ring)tutorialAlsoRings.delete(id);}},1250);}
+        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();if(tutorialAlsoRings.get(id)===ring)tutorialAlsoRings.delete(id);}},TUTORIAL_RING_FADE_MS);}
       });
       ids.forEach(item=>{
         let ring=tutorialAlsoRings.get(item.id);
