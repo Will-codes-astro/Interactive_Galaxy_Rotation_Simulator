@@ -361,18 +361,22 @@ with each score labelled by its column, so nothing is off-screen.
 It is calculated in the page when it loads (`scoreGalaxy`), with the
 same functions as the fit badge, so the two always agree. "Show in simulator"
 loads that galaxy (leaving the sandbox if needed). Five short cards underneath (including
-"Realistic limits", which names the sources of the fit limits) state
+"Only realistic values", which names the sources of the fit limits) state
 what limits the comparison; they do not say which idea wins.
 
 Background has a third, full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
-and the radial acceleration relation, each with its source and a tag for the
-idea it points to. Two "Still open" cards follow: no confirmed dark matter
+and the radial acceleration relation, each with a tag for the idea it points
+to and two short lines, "Seen:" (the observation, with its source) and "Why it
+matters:". Two "Still open" cards follow: no confirmed dark matter
 particle (including the single LZ candidate event of September 2026, a 2.6σ
 preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds a
 three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
 v⁴ = GMa₀) under "Show the maths"; the full interpolating formula appears
-only in Method. The dark matter box has a matching schematic (not real data) in the simulator's colours:
+only in Method. The dark matter box has its own "Show the maths": v = √(GM(r)/r)
+with the shell theorem, why visible matter alone gives falling speeds, why a flat
+curve needs density ∝ 1/r², and the NFW density profile (1/r inside r_s, 1/r³
+far outside, about 1/r² near r_s; halo speed peaks near 2.2 r_s). It also has a matching schematic (not real data) in the simulator's colours:
 the visible matter's share of the speed falls, the halo's grows, and together they stay level. Method's
 cards flow in two columns (read down the left, then the right; one column at 900 px or narrower).
 Method & sources ends with a Harvard reference list of every

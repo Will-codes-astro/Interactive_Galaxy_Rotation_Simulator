@@ -1219,7 +1219,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             </dl>
             <div class="gp-mass-head"><span>Visible mass, in billions of Suns</span><span><i class="gp-dot stars"></i>Stars <b id="gpStars"></b> &nbsp; <i class="gp-dot gas"></i>Gas <b id="gpGas"></b></span></div>
             <div class="gp-bar" role="img" id="gpBar"><span id="gpStarsBar"></span></div>
-            <p class="gp-note">SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016). Stars: 0.5 × their 3.6 μm light, a rough estimate. Gas: 1.33 × the hydrogen, to include helium. Bulge: whether SPARC’s mass model includes one.</p>
+            <p class="gp-note">Source: SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016).</p>
             </div>
           </div>
         </div>
@@ -1244,7 +1244,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
       <div class="ml-col">
         <div class="ml-row">
-        <div class="stat ml" id="mlStat" title="Stellar mass-to-light ratios used for the baryonic (visible-matter) trajectories"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
+        <div class="stat ml" id="mlStat" title="Mass-to-light ratios used to turn the stars’ light into mass"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
         <div class="stat ml" id="tiltStat" title="The galaxy’s tilt (inclination) in use"><div class="stat-label"><span>Tilt</span><button type="button" class="ml-info" id="tiltInfoBtn" aria-expanded="false" aria-controls="tiltExplainer" title="What is the tilt?">?</button></div><div class="stat-value"><b id="tiltValue">–</b></div><small class="ml-source" id="tiltSource">standard SPARC value</small></div>
         </div>
         <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
@@ -1336,7 +1336,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </section>
     </article>
       <article class="panel" id="curvePanel">
-        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><div class="chi-wrap"><small id="chiFit" class="chi-fit" title="Every model uses the same settings: SPARC’s standard values, or, with Best realistic fits on, values each model tunes within the same limits."></small><span id="chiBadge" title="Goodness of fit of baryons + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div></div>
+        <div class="panel-heading"><h2><span class="fig">Fig. 2</span>Rotation curve</h2><div class="chi-wrap"><small id="chiFit" class="chi-fit" title="Every model uses the same settings: SPARC’s standard values, or, with Best realistic fits on, values each model tunes within the same limits."></small><span id="chiBadge" title="Goodness of fit of visible matter + NFW halo to the SPARC points"><b id="chiVerdict"></b> <span id="chiNumbers">χ² –</span></span></div></div>
         <div class="curve-wrap"><div id="curvePlot" class="plot" role="img" aria-label="__DEFAULT_GALAXY_NAME__ observed, baryonic, and fitted rotation curves"></div></div>
         <p class="curve-hint">Tap the graph, or slide your finger along it, to read the speeds at each radius. Tap outside the graph to close.</p>
         <div class="stability" id="stabilityMonitor" data-state="stable" aria-label="Halo stability monitor" hidden>
@@ -1368,7 +1368,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="page" data-page="scorecard">
     <div class="section-head" id="scorecard"><span class="kicker">04</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
-      <p>Each fit is scored with χ<sup>2</sup><sub>r</sub>: the model’s typical miss, in error bars, squared. Lower is better; about 1 is as close as the measurements allow.</p>
+      <p>Each fit gets a score, χ<sup>2</sup><sub>r</sub> (reduced chi-squared), which compares how far the model’s curve misses the measured points with the size of their error bars. Lower is better. About 1 means the misses are no bigger than the measurements’ own uncertainty: as close as the data allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
       <p class="score-notes-title">At a glance</p>
       <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard summary">
@@ -1389,11 +1389,11 @@ HTML_TEMPLATE = r"""<!doctype html>
       </details>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
-        <li><b>Same rules for every model</b>With standard values, all three use SPARC’s M/L, distance and tilt, so the visible matter is identical and only the explanation differs. Best realistic fits give both models the same extra freedom. χ<sup>2</sup><sub>r</sub> charges for every value tuned (listed in the full scores), so extra freedom is not free.</li>
-        <li><b>Realistic limits</b>Best fits use only believable values: M/L that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a halo of typical density for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> sits at the edge of its range: the fit was pushing further, so that model could only match the galaxy more closely with an unrealistic value.</li>
-        <li><b>MOND’s best case</b>a<sub>0</sub> may vary from __A0_MIN__ to __A0_MAX__ × 10⁻¹⁰ m/s², within __FIT_LIMIT_SIGMA__× its measured error, like every other limit (McGaugh, Lelli &amp; Schombert 2016). Their larger ±0.24 uncertainty comes from the stars’ M/L, which the fits already vary, so it is not counted twice. MOND says a<sub>0</sub> should be the same everywhere (Milgrom 1983). Check the fitted values, not just the score.</li>
-        <li><b>Error bars</b>Scores use SPARC’s error on each speed. Distance and tilt errors shift a whole curve, so the best fits allow for them.</li>
-        <li><b>Small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to settle it.</li>
+        <li><b>A fair test</b>With standard values, all three models start from the same visible matter: SPARC’s mass-to-light ratio (M/L, how much mass the stars have for each unit of their light), distance and tilt. Only the explanation for the extra pull differs. Best realistic fits let both models adjust those same values. The score allows for how many values each model tuned (listed in the full scores), so extra freedom does not come for free.</li>
+        <li><b>Only realistic values</b>Best fits stay inside believable ranges: M/L values that models of stars allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s quoted errors, and a halo about as dense as is typical for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> hit the edge of its range: the model could only have fitted that galaxy better with an unrealistic value.</li>
+        <li><b>MOND’s constant</b>In best fits, MOND may also adjust a<sub>0</sub>, from __A0_MIN__ to __A0_MAX__ × 10⁻¹⁰ m/s² (within __FIT_LIMIT_SIGMA__× its measured error, like every other limit; McGaugh, Lelli &amp; Schombert 2016). Their quoted ±0.24 is wider because it includes the stars’ M/L, which the fits already vary. MOND says a<sub>0</sub> is the same in every galaxy (Milgrom 1983), so if galaxies need clearly different values, that is a warning sign even when the scores look good.</li>
+        <li><b>What the error bars cover</b>Scores use SPARC’s error bar on each measured speed. A wrong distance or tilt would shift the whole curve at once, not single points, so the best fits let distance and tilt vary instead.</li>
+        <li><b>A small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show how the method works, not to decide between the models.</li>
       </ul>
     </section>
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#background">Next: the two ideas and the wider evidence →</a></nav>
@@ -1403,9 +1403,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <article class="nfw"><h3>What is a dark matter halo?</h3>
         <div class="learn-content">
-        <p class="tldr">Dark matter is matter we cannot see; we only notice it through its gravity. A halo is a huge cloud of it surrounding a galaxy.</p>
-        <p>Its gravity supplies the missing pull from the puzzle, keeping the fast outer stars of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> in orbit.</p>
-        <p>This simulator uses an NFW halo (Navarro, Frenk &amp; White 1996): dense in the middle, thinning outwards. Two sliders set it: its mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is).</p>
+        <p class="tldr">Dark matter is matter that gives out no light, so we only notice it through its gravity. A halo is a huge, roughly round cloud of it surrounding a galaxy and stretching far beyond its stars.</p>
+        <p>The halo’s gravity supplies the missing pull, keeping the fast outer stars of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> in orbit. Newton’s gravity stays exactly as it is; there is just more mass than we can see.</p>
+        <p>This simulator uses an <b>NFW halo</b>, named after Navarro, Frenk &amp; White (1996). They did not invent its shape to fit rotation curves: it came out of computer simulations of how dark matter clumps together as the Universe grows. It is dense in the middle and thins out further away. Two sliders set it: its mass (M<sub>200</sub>) and its scale radius (r<sub>s</sub>, how spread out it is).</p>
         <figure class="schematic">
           <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: the speed from visible matter falls with radius, the halo’s share grows, and together they stay level">
             <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
@@ -1421,12 +1421,22 @@ HTML_TEMPLATE = r"""<!doctype html>
           </svg>
           <figcaption>Schematic only, not real data. Colours match the simulator: the halo’s share of the speed (purple) grows as the visible matter’s (cyan) falls, so together (orange) they stay level.</figcaption>
         </figure>
+        <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
+        <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration. For a round distribution of mass, only the mass M(r) inside the orbit pulls overall (Newton’s shell theorem):</p>
+        <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>v</mi><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt></math></div>
+        <p><b>2. Visible matter alone.</b> Beyond most of the stars, M(r) hardly grows, so v ∝ 1/√r: the speed should fall, like the planets’ speeds in the Solar System.</p>
+        <p><b>3. What a flat curve needs.</b> For v to stay constant, M(r) must grow in step with r. That happens if the density falls as 1/r²: each thin shell of thickness Δr then holds the same mass, 4πr²ρΔr, so every step outwards adds the same amount.</p>
+        <p><b>4. The NFW density.</b> With ρ<sub>s</sub> setting how dense the halo is:</p>
+        <div class="eq"><math display="block"><mi>ρ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>ρ</mi><mi>s</mi></msub><mrow><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac></math></div>
+        <p>Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method).</p>
+        </details>
         </div>
       </article>
       <article class="mond"><h3>What is MOND?</h3>
         <div class="learn-content">
-        <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves a little differently when it is extremely weak.</p>
-        <p>Near a galaxy's centre gravity is strong and MOND agrees with Newton. Far out it drops below a tiny threshold, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (about 10¹¹ times weaker than gravity at Earth’s surface). There MOND makes gravity stronger than Newton predicts, so the outer stars keep moving fast.</p>
+        <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity itself behaves differently when it is extremely weak.</p>
+        <p>Mordehai Milgrom proposed it in 1983. Near a galaxy’s centre gravity is strong and MOND agrees exactly with Newton. Far out, gravity drops below a tiny threshold, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², about 10¹¹ times weaker than gravity at Earth’s surface. Below it, MOND makes gravity stronger than Newton predicts, so the outer stars keep moving fast.</p>
+        <p>There is no halo to adjust: once the visible matter is known, MOND predicts the whole rotation curve with one constant, a<sub>0</sub>, shared by every galaxy.</p>
         <figure class="schematic">
           <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
             <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
@@ -1458,16 +1468,16 @@ HTML_TEMPLATE = r"""<!doctype html>
       </article>
       <article class="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
         <div class="learn-content">
-        <p class="tldr">Rotation curves are one clue among several. Each idea has to explain all of them.</p>
+        <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
         <div class="evidence-grid">
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p>Galaxies in the Coma cluster move too fast for its visible mass to hold them (Zwicky 1933). MOND narrows the gap but still needs unseen matter there (Famaey &amp; McGaugh 2012).</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p>Two clusters collided. Their hot gas, most of the visible matter, was slowed, yet the bending of light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p>The pattern of hot and cool patches in the cosmic microwave background fits a universe with about five times more dark matter than ordinary matter (Planck Collaboration 2020).</p></div>
-          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p>In 153 galaxies, astronomers compared two pulls at each radius: the real one, from the measured speed (g = V²/r), and the one Newton predicts from the visible matter alone. Every point, from every galaxy, falls on one narrow curve (McGaugh, Lelli &amp; Schombert 2016).</p><p>So where the visible matter is tells you the full pull, even where dark matter should dominate. MOND predicts exactly this curve. Dark matter can match it too, but only if each halo is somehow always shaped by its galaxy’s visible matter, which still needs explaining.</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
+          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
         </div>
         <p class="evidence-open-title">Still open</p>
         <div class="evidence-grid two">
-          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event that could be a dark matter particle. The team rates it at 2.6σ, well short of proof, and the paper is not yet peer reviewed (LZ Collaboration 2026).</p></div>
+          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event that might be one, but at 2.6σ it is far short of the 5σ usually needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
           <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
         </div>
         </div>
