@@ -3991,9 +3991,9 @@ window.GALAXIES = {
         {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and it is an estimate.',
          action:'Hover over (or tap) the ? in the blue box.'},
-        {id:'scorecard',closing:true,target:'scoreDetails',gesture:'click',tag:'Open',watch:['glanceTable:Compare the colours'],title:'How both ideas score',
-         text:'Every galaxy on this site, scored under each idea. Green is a close fit, red a poor one. A † means the best fit needed a value at its realistic limit.',
-         action:'Open Full scores (blue box) to see what each model tuned.'},
+        {id:'scorecard',closing:true,target:'glanceTable',gesture:'scan',tag:'Read along the rows',title:'How both ideas score',
+         text:'Each row is a galaxy, scored under each idea: close (blue), rough (orange) or poor (red). Each arrow goes from the standard values to the best realistic fit. A † means that fit had to use a value at the edge of what is realistic.',
+         action:'Read along the rows in the blue box, then press Next.'},
         {id:'finish',closing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
          text:'A close fit does not prove either idea: both models are simplified and the measurements have errors.',
          action:'Read on below to learn more.'}
@@ -4906,7 +4906,6 @@ window.GALAXIES = {
     fullHaloBtn.addEventListener('click',()=>{tutorialFlags.fullHalo=true;});
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{tutorialFlags[Number(massSlider.value)===0?'restart0':'restartHalo']=true;onSliderInput(0);setPlaying(true);});
-    document.getElementById('scoreDetails').addEventListener('toggle',e=>{if(e.target.open)completeTutorialAction('scorecard','Full scores open: each best fit lists the values it tuned.');});
     document.getElementById('mlInfoBtn').addEventListener('explainerread',()=>completeTutorialAction('ml','Explainer read.'));
     const SANDBOX_STEP_FEEDBACK={
       sbDiskMass:['sbDisk','Disk mass changed: the typical halo followed it.'],

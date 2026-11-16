@@ -245,7 +245,7 @@ opens, so they cannot give the answer away, and start again if the clock is take
 through the thin disk, switch on the ejection line, remove the halo and follow
 the first star to cross it, then restore the halo and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer, the Scorecard
-(done once Full scores is opened) and the theory guide. The rings and labels are tutorial aids drawn from the
+(read the At a glance table, then press Next) and the theory guide. The rings and labels are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
