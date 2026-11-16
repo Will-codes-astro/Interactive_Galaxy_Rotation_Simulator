@@ -28,8 +28,8 @@ Its hint reads "Flip to MOND…" in NFW mode and gives a₀ in MOND mode.
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
 of that page load; a refresh or a new tab offers it again (Will's choice:
-nothing is stored between visits). Each tour step opens the page its control is on (the last step
-opens Background); if the visitor moves to another page mid-tour, the card asks
+nothing is stored between visits). Each tour step opens the page its control is on (the last two
+open the Scorecard, then Background); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
 The puzzle page opens the site, before any control. Four numbered steps
@@ -40,7 +40,9 @@ speeds against the speed its visible matter predicts, with the gap between them
 shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
 visual aid only. "Take the full guided tour" runs the simulator tutorial and
-then, straight on, the sandbox tutorial ("Part 1 of 2", "Part 2 of 2"). "Open
+then, straight on, the sandbox tutorial and a short "Wrapping up" part ("Part 1 of 3" to
+"Part 3 of 3"). The simulator tutorial's two closing cards (Scorecard, Background) are held back
+for that last part, so the full tour ends on them. "Open
 the simulator" instead brings up the welcome offer, whose "Start simulator
 tutorial" runs the simulator tutorial alone.
 
@@ -212,7 +214,7 @@ when something is in the way, only the control that fixes it is free. Playback
 speed, the info (?) buttons and the halo-card explainers stay free. Ending or
 skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
-The main tutorial's 18 steps start from the puzzle in the rotation curve
+The main tutorial's 19 steps start from the puzzle in the rotation curve
 (measured speeds stay above the visible-matter prediction; the pointer must
 cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
@@ -229,8 +231,8 @@ speeds show differential rotation on a flat rotation curve; the lap counts start
 opens, so they cannot give the answer away, and start again if the clock is taken back), turn edge-on to see a ringed star bob
 through the thin disk, switch on the ejection line, remove the halo and follow
 the first star to cross it, then restore the halo and zoom out to the full halo.
-It ends with the Galaxy menu, the mass-to-light explainer and the theory
-guide. The rings and labels are tutorial aids drawn from the
+It ends with the Galaxy menu, the mass-to-light explainer, the Scorecard
+(done once Full scores is opened) and the theory guide. The rings and labels are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
