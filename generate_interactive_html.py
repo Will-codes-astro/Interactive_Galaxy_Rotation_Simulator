@@ -807,6 +807,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     @keyframes tutorial-done-glow { 0% { box-shadow:0 0 0 9999px var(--spot-dim,rgba(2,7,14,.42)), 0 0 18px 5px rgba(165,227,194,.7); } }
     /* The ripple grows by a fixed distance, so it looks the same on a small button and on the whole graph. */
     .tutorial-spotlight.is-complete::after { content:''; position:absolute; inset:-3px; border:1.5px solid #a5e3c2; border-radius:11px; animation:tutorial-ripple .7s ease-out both; }
+    .tutorial-spotlight.is-revisit, .tutorial-spotlight.is-revisit::after { animation:none; transition:none; opacity:0; }
     @keyframes tutorial-ripple { from { opacity:.5; } to { opacity:0; inset:-11px; border-radius:16px; } }
     /* The card's border tints green for a moment when a task is done. */
     .tutorial-card.is-celebrating { animation:tutorial-card-glow 1.2s ease-out; }
@@ -4167,16 +4168,24 @@ __GALAXIES_JS__
     const tutorialStep=()=>tutorialSteps[tutorialIndex];
     // Multi-part steps: checks maps each ringed control to a test of whether its part is done. A part, once done,
     // stays done for that card; its ring disappears and the pointer moves on to the next part.
-    let tutorialFlags={},tutorialLatched={},tutorialStart={},tutorialCheckSig='';
+    // tutorialStale: when a card opens with every part already true (an earlier card was skipped, so the page is
+    // already in this card's end state), a part only counts once it has been undone and redone on this card, so a
+    // skipped card never earns praise for nothing. Holds the ids seen false since the card opened (false = not stale).
+    let tutorialFlags={},tutorialLatched={},tutorialStart={},tutorialCheckSig='',tutorialStale=null;
     const sbVal=id=>{const el=document.getElementById(id);return el?Number(el.value):0;};
     function tutorialResetChecks(){
-      tutorialFlags={};tutorialLatched={};tutorialCheckSig='';
+      tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;
       tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
     }
     function tutorialUpdateChecks(){
       const step=tutorialStep();
       if(!step.checks||tutorialCard.hidden||tutorialBlocker())return;
-      for(const id in step.checks)if(!tutorialLatched[id]&&step.checks[id]())tutorialLatched[id]=true;
+      if(tutorialStale===null)tutorialStale=Object.keys(step.checks).every(id=>step.checks[id]())?{}:false;
+      for(const id in step.checks){
+        const ok=step.checks[id]();
+        if(tutorialStale&&!ok)tutorialStale[id]=true;
+        if(!tutorialLatched[id]&&ok&&(!tutorialStale||tutorialStale[id]))tutorialLatched[id]=true;
+      }
       const sig=Object.keys(tutorialLatched).join();
       if(sig===tutorialCheckSig)return;
       tutorialCheckSig=sig;
@@ -4396,7 +4405,7 @@ __GALAXIES_JS__
       showTutorialFeedback(tutorialCompleted[id]);
       tutorialCard.classList.remove('is-celebrating');void tutorialCard.offsetWidth;tutorialCard.classList.add('is-celebrating');
       if(!noAuto)startTutorialAuto();
-      tutorialSpotlight.classList.add('is-complete');
+      tutorialSpotlight.classList.remove('is-revisit');tutorialSpotlight.classList.add('is-complete');
       updateTutorialNextGate();
     }
     // The 'press Fullscreen' steps cannot be skipped with Next: the steps after them need fullscreen.
@@ -4481,17 +4490,21 @@ __GALAXIES_JS__
       const aim=step&&!hideAll&&!tutorialCard.hidden?tutorialCurrentAim(step):null;
       // Rings go once their part is done, or once the whole card is done; the part being pointed at has the main ring.
       const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||tutorialCompleted[step.id]?[]:tutorialRingList(step).filter(r=>!tutorialLatched[r.id]&&!(aim&&aim.id===r.id));
-      const keep=new Set(ids.map(item=>item.id));
+      const keep=new Set(ids.map(item=>item.id)),cardKey=tutorialTour+tutorialIndex;
       tutorialAlsoRings.forEach((ring,id)=>{
         if(keep.has(id))return;
-        // Ending the tour clears them at once; anything else fades them out gently.
-        if(tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
-        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();tutorialAlsoRings.delete(id);}},1250);}
+        // Only a part actually done on this card turns green and fades where it is. Anything else (a new card, a
+        // skipped card, something in the way, the tour ending) clears at once, so no green ring is left floating
+        // over a spot the page has scrolled away from.
+        const earned=ring.dataset.card===cardKey&&step&&(tutorialLatched[id]||tutorialCompleted[step.id]);
+        if(!earned||tutorialCard.hidden||ring.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches){ring.remove();tutorialAlsoRings.delete(id);return;}
+        if(!ring.classList.contains('is-leaving')){ring.classList.add('is-leaving');setTimeout(()=>{if(ring.classList.contains('is-leaving')){ring.remove();if(tutorialAlsoRings.get(id)===ring)tutorialAlsoRings.delete(id);}},1250);}
       });
       ids.forEach(item=>{
         let ring=tutorialAlsoRings.get(item.id);
         const el=document.getElementById(item.id);
-        if(!ring){ring=document.createElement('div');ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.id,ring);if(spotlightResize&&el)spotlightResize.observe(el);}
+        if(ring&&ring.dataset.card!==cardKey){ring.remove();ring=null;}
+        if(!ring){ring=document.createElement('div');ring.dataset.card=cardKey;ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.id,ring);if(spotlightResize&&el)spotlightResize.observe(el);}
         const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;
         if(ring.parentElement!==tutorialSpotlight.parentElement)tutorialSpotlight.parentElement.appendChild(ring);
         const r=el&&el.getClientRects().length?tutorialSpotRect(el):null;
@@ -4584,7 +4597,9 @@ __GALAXIES_JS__
       showTutorialFeedback(tutorialCompleted[step.id]||'');
       tutorialCard.classList.remove('is-celebrating');
       stopTutorialAuto();
+      // Back on a card already done: no green glow replayed; the ring is simply not shown.
       tutorialSpotlight.classList.toggle('is-complete',!!tutorialCompleted[step.id]);
+      tutorialSpotlight.classList.toggle('is-revisit',!!tutorialCompleted[step.id]);
       document.getElementById('tutorialContent').scrollTop=0;
       tutorialBack.disabled=tutorialIndex===0;
       const nextTour=tutorialFull&&FULL_TOUR[FULL_TOUR.indexOf(tutorialTour)+1];

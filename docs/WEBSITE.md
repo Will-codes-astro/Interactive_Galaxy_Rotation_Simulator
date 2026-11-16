@@ -243,7 +243,12 @@ boxes. A step finished by dragging a slider only counts as done once the slider
 is let go. When a task is done the highlight turns green with one small ripple, the card
 border tints green briefly, and the done message starts with a short word of
 praise; a 10 s countdown (paused while a control is held, restarted by more
-input) then fades to the next card. On screens wider than 700 px every card shows all its text without
+input) then fades to the next card. Green only ever marks something done on that
+card: Next skips a card without a tick, a card that opens already in its end state
+(because an earlier card was skipped) only ticks once its part is undone and redone,
+leaving a card clears its rings at once, and going back to a finished card shows
+its message without replaying the glow. Back always returns to a skipped card so it
+can be done. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
 phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tutorial covers
