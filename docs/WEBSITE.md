@@ -376,7 +376,7 @@ v⁴ = GMa₀) under "Show the maths"; the full interpolating formula appears
 only in Method. The dark matter box has its own "Show the maths": v = √(GM(r)/r)
 with the shell theorem, why visible matter alone gives falling speeds, why a flat
 curve needs density ∝ 1/r², and the NFW density profile (1/r inside r_s, 1/r³
-far outside, about 1/r² near r_s; halo speed peaks near 2.2 r_s). It also has a matching schematic (not real data) in the simulator's colours:
+far outside, about 1/r² near r_s; halo speed peaks near 2.2 r_s), followed by a short "A known weakness" note on the cusp–core problem (de Blok 2010). It also has a matching schematic (not real data) in the simulator's colours:
 the visible matter's share of the speed falls, the halo's grows, and together they stay level. Method's
 cards flow in two columns (read down the left, then the right; one column at 900 px or narrower).
 Method & sources ends with a Harvard reference list of every

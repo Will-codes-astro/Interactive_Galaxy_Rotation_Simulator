@@ -1430,6 +1430,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="eq"><math display="block"><mi>ρ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>ρ</mi><mi>s</mi></msub><mrow><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac></math></div>
         <p>Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method).</p>
         </details>
+        <p><b>A known weakness:</b> in many small, faint galaxies the speeds near the centre rise too gently for NFW’s dense middle. The data suggest a flatter centre instead, the “cusp–core problem” (de Blok 2010). Whether gas blown around by exploding stars could stir the dark matter enough to flatten it is still debated.</p>
         </div>
       </article>
       <article class="mond"><h3>What is MOND?</h3>
@@ -1502,6 +1503,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <ul>
           <li>Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href="https://doi.org/10.1103/RevModPhys.90.045002" target="_blank" rel="noopener">doi:10.1103/RevModPhys.90.045002</a></li>
           <li>Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href="https://doi.org/10.1086/508162" target="_blank" rel="noopener">doi:10.1086/508162</a></li>
+          <li>de Blok, W.J.G. (2010) ‘The core-cusp problem’, <i>Advances in Astronomy</i>, 2010, 789293. <a href="https://doi.org/10.1155/2010/789293" target="_blank" rel="noopener">doi:10.1155/2010/789293</a></li>
           <li>de Blok, W.J.G. and McGaugh, S.S. (1996) ‘Does low surface brightness mean low density?’, <i>The Astrophysical Journal</i>, 469(2), pp. L89–L92. <a href="https://doi.org/10.1086/310266" target="_blank" rel="noopener">doi:10.1086/310266</a></li>
           <li>Dutton, A.A. and Macciò, A.V. (2014) ‘Cold dark matter haloes in the Planck era: evolution of structural parameters for Einasto and NFW profiles’, <i>Monthly Notices of the Royal Astronomical Society</i>, 441(4), pp. 3359–3374. <a href="https://doi.org/10.1093/mnras/stu742" target="_blank" rel="noopener">doi:10.1093/mnras/stu742</a></li>
           <li>Famaey, B. and McGaugh, S.S. (2012) ‘Modified Newtonian Dynamics (MOND): observational phenomenology and relativistic extensions’, <i>Living Reviews in Relativity</i>, 15, 10. <a href="https://doi.org/10.12942/lrr-2012-10" target="_blank" rel="noopener">doi:10.12942/lrr-2012-10</a></li>
