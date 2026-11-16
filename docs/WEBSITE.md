@@ -93,9 +93,10 @@ scale radius sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile"
 badge (also over the 3D view) whenever c falls outside 3–25
 (`STABLE_CONCENTRATION` in the generator).
 
-In the sandbox the anatomy sliders drive the rotation curve, the halo and the
-3D stars live (`PhysicsEngine` and `rebuildCustomGalaxy` in the generator's
-page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
+In the sandbox the anatomy sliders drive the rotation curve and the halo live,
+every frame; the 3D stars and their orbits (about 0.1 s of work) are rebuilt
+once the slider pauses (`PhysicsEngine`, `rebuildCustomGalaxy` and
+`rebuildCustomStars` in the generator's page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
 Galaxy menu and profile card, the observed SPARC points, the residual bars and the χ² badge
 are hidden, and the curves are drawn on an even grid of 60 radii out to
 1.25 × the truncation radius. Its CSV export leaves out the observed and
@@ -176,7 +177,15 @@ a few red giants) and the disk gets bluer outwards (de Jong 1996). Underneath,
 a diffuse glow shows the unresolved starlight: an exponential disk with the
 galaxy's own scale length (Freeman 1970) and a de Vaucouleurs bulge, weighted
 by their masses. Colour saturation, diffraction spikes and bloom are visual
-choices only.
+choices only. To stay smooth on large or high-DPI screens, the 3D view lowers
+its render resolution in steps while frames run slow and raises it again when
+there is headroom (`trackFrameTime` in the generator); 4x antialiasing is used
+only on low-DPI screens at full resolution.
+
+While a halo or sandbox slider moves, the rotation curve is redrawn every frame
+through Plotly's light transition path (`updateHalo(true)`); the speed axis only
+grows mid-drag, and a full redraw fits the axes and residual colours once the
+slider settles.
 
 The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
 Gas switch turns it off): an exponential disk

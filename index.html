@@ -2001,7 +2001,10 @@ window.GALAXIES = {
         }
 
         /* ---------- Three.js scene ---------- */
-        const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+        // With bloom, the scene is drawn into the composer's own target and the canvas only receives a full-screen copy,
+        // so the canvas needs no antialiasing of its own (the composer target does that where it is worth it).
+        const BLOOM_AVAILABLE=!!(THREE.EffectComposer&&THREE.UnrealBloomPass);
+        const renderer=new THREE.WebGLRenderer({antialias:!BLOOM_AVAILABLE,powerPreference:'high-performance'});
         renderer.setClearColor(0x020206, 1.0); // Deep space dark navy/black.
         orbitPlot.appendChild(renderer.domElement);
         const scene=new THREE.Scene();
@@ -2009,13 +2012,12 @@ window.GALAXIES = {
         // Bloom (visual choice, like a camera exposure): bright light bleeds softly into its surroundings, then a soft
         // highlight shoulder stops piled-up light clipping to flat white. Falls back to a plain render if the add-ons fail to load.
         const composer=(()=>{
-            if(!THREE.EffectComposer||!THREE.UnrealBloomPass)return null;
+            if(!BLOOM_AVAILABLE)return null;
             try{
                 const gl2=renderer.capabilities&&renderer.capabilities.isWebGL2;
                 const opts={type:THREE.HalfFloatType,format:THREE.RGBAFormat};
                 const target=gl2&&THREE.WebGLMultisampleRenderTarget?new THREE.WebGLMultisampleRenderTarget(1,1,opts):new THREE.WebGLRenderTarget(1,1,opts);
-                if(gl2)target.samples=4;
-                const fx=new THREE.EffectComposer(renderer,target);
+                const fx=new THREE.EffectComposer(renderer,target); // MSAA samples are set per resolution level in resizeOrbit
                 fx.addPass(new THREE.RenderPass(scene,camera));
                 fx.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(256,256),0.55,0.45,0.62));
                 fx.addPass(new THREE.ShaderPass({uniforms:{tDiffuse:{value:null}},
@@ -2647,15 +2649,54 @@ window.GALAXIES = {
         });
         let containerOriginalWidth = orbitPlot.clientWidth || 800;
         let containerOriginalHeight = orbitPlot.clientHeight || 600;
+        /* Adaptive resolution (performance only; the physics is untouched). The GPU cost of the 3D view grows with its pixel
+           count, so a large or high-DPI screen (fullscreen especially) can drop well below 60 fps. While the view redraws every
+           frame, resolution levels step down when most frames run slow and back up after a spell of smooth frames; a level that
+           proves too slow waits longer each time before it is tried again, so the resolution does not flicker between two.
+           Level 0 is the screen's own pixel ratio (capped at 2), with 4x MSAA only on low-DPI screens, where edges show most. */
+        const RES_SCALES=[1,0.85,0.7,0.6,0.5],RES_MIN_PIXEL_RATIO=0.6;
+        const RES_WINDOW_FRAMES=20,RES_SLOW_MS=1000/45,RES_FAST_MS=1000/55,RES_UPGRADE_WINDOWS=8,RES_IGNORE_MS=250;
+        let resLevels=[],resLevel=0,resFrames=0,resSlow=0,resFastWindows=0,resUpgradeWindows=RES_UPGRADE_WINDOWS,resLastDowngradeFrom=-1;
+        function buildResolutionLevels(){
+            const native=Math.min(window.devicePixelRatio||1,2);
+            resLevels=native<1.5?[{pixelRatio:native,msaa:true}]:[];
+            RES_SCALES.forEach(s=>{const pixelRatio=Math.round(native*s*100)/100;if(pixelRatio>=RES_MIN_PIXEL_RATIO||s===1)resLevels.push({pixelRatio,msaa:false});});
+            resLevel=Math.min(resLevel,resLevels.length-1);
+        }
+        buildResolutionLevels();
+        function setResolutionLevel(level){
+            resLevel=level;resFrames=resSlow=resFastWindows=0;
+            resizeOrbit();
+        }
+        // Called once per drawn frame with the time since the previous one (only when the previous frame was drawn too).
+        function trackFrameTime(ms){
+            if(ms>RES_IGNORE_MS)return; // a background tab or a one-off stall, not the steady frame rate
+            resFrames++;if(ms>RES_SLOW_MS)resSlow++;
+            if(resFrames<RES_WINDOW_FRAMES)return;
+            const slow=resSlow>RES_WINDOW_FRAMES/2,fast=resSlow===0&&ms<RES_FAST_MS;
+            resFrames=resSlow=0;
+            if(slow&&resLevel<resLevels.length-1){
+                // Falling straight back from a level just tried means it is too slow: wait twice as long before the next try.
+                resUpgradeWindows=resLastDowngradeFrom===resLevel?Math.min(resUpgradeWindows*2,64*RES_UPGRADE_WINDOWS):RES_UPGRADE_WINDOWS;
+                resLastDowngradeFrom=resLevel;setResolutionLevel(resLevel+1);
+            }else if(fast&&resLevel>0&&++resFastWindows>=resUpgradeWindows){
+                resLastDowngradeFrom=resLevel-1;setResolutionLevel(resLevel-1);
+            }else if(!fast)resFastWindows=0;
+        }
         function resizeOrbit(){
             if (!nativeFsElement()) {
                 containerOriginalWidth = orbitPlot.clientWidth;
                 containerOriginalHeight = orbitPlot.clientHeight;
             }
-            const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),dpr=Math.min(window.devicePixelRatio||1,2);
-            renderer.setPixelRatio(dpr);renderer.setSize(w,h,false);
-            if(composer){composer.setPixelRatio(dpr);composer.setSize(w,h);}
-            starUniforms.uDpr.value=dpr;
+            if(Math.min(window.devicePixelRatio||1,2)!==(resLevels[0]&&resLevels[0].pixelRatio))buildResolutionLevels(); // moved to another screen
+            const w=Math.max(orbitPlot.clientWidth,1),h=Math.max(orbitPlot.clientHeight,1),{pixelRatio,msaa}=resLevels[resLevel];
+            renderer.setPixelRatio(pixelRatio);renderer.setSize(w,h,false);
+            if(composer){
+                const samples=msaa?4:0;
+                [composer.renderTarget1,composer.renderTarget2].forEach(t=>{if(t.samples!==undefined&&t.samples!==samples){t.samples=samples;t.dispose();}});
+                composer.setPixelRatio(pixelRatio);composer.setSize(w,h);
+            }
+            starUniforms.uDpr.value=pixelRatio;
             camera.aspect=w/h;camera.updateProjectionMatrix();
             needsRender=true;
         }
@@ -2670,8 +2711,9 @@ window.GALAXIES = {
         }
         document.addEventListener('fullscreenchange', onFullscreenChange);
         document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+        let drewLastFrame=false;
         function renderLoop(now){
-            const dt=Math.min((now-lastTime)/1000,0.1);
+            const frameMs=now-lastTime,dt=Math.min(frameMs/1000,0.1);
             lastTime=now;
             if(controls.update(dt))needsRender=true;
             if(playing){
@@ -2691,6 +2733,8 @@ window.GALAXIES = {
                 }
                 needsRender=true;
             }
+            if(needsRender&&drewLastFrame)trackFrameTime(frameMs); // only back-to-back frames measure the frame rate
+            drewLastFrame=needsRender;
             if(needsRender){needsRender=false;haloUniforms.uScale.value=starUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
                 // Diffuse glow: dimmer close up so single stars stand out; the disk plane brightens edge-on (longer line of sight).
                 const glowZoom=0.35+0.65*smoothStep(20,GAS_RESET_RADIUS,controls.view.radius);
@@ -2760,7 +2804,7 @@ window.GALAXIES = {
     // The custom galaxy's stellar disk, bulge and gas speeds are drawn as thin dotted lines (hidden for presets).
     const COMPONENT_STYLE=[['Stellar disk','#ffd166'],['Bulge','#ff8fab'],['Gas','#7bd88f']];
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
-    const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
+    const componentVisible=i=>customActive&&(i!==1||sandbox.bulgeMass>0); // the sliders' anatomy: the stars may still be catching up
     // "Before" line (a visual aid only): while a slider that reshapes the curve is moved, and for CURVE_GHOST_HOLD_MS
     // after it is let go, a faint wide band in the same colour stays where the changed line was, labelled "before".
     // Anatomy sliders leave the cyan visible-matter line behind; the halo sliders leave the orange total.
@@ -2908,7 +2952,7 @@ window.GALAXIES = {
     }
 
     const massSlider=document.getElementById('massSlider'),scaleSlider=document.getElementById('scaleSlider');
-    let sliderUpdateTimer=null,sliderDragging=false;
+    let sliderFrame=0,curveSettleTimer=null,sliderDragging=false;
     const fsSliders=document.getElementById('fsSliders'),fsMass=document.getElementById('fsMassSlider'),fsScale=document.getElementById('fsScaleSlider');
     // The mass slider grows for massive halos so a fitted value is never pinned to the end of its track. In the Custom
     // Sandbox it spans 0 to HALO_FINE_RANGE x the stellar-to-halo baseline, so it fine-tunes that baseline: haloFine is
@@ -2933,6 +2977,7 @@ window.GALAXIES = {
     const haloMassText=massT=>customActive?formatMass(massT*1e12):`${massT.toFixed(2)} × 10¹² M☉`;
     function refreshOrbits(){
       clearTimeout(orbitModelTimer);
+      if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
       activeTrajectories=integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value));
       fillOrbitLines();
       updateStarTransforms(simTime);
@@ -3120,11 +3165,18 @@ window.GALAXIES = {
     galaxyModeRadios.forEach(radio=>radio.addEventListener('change',()=>{if(radio.checked)setGalaxyMode(radio.value);}));
     setGalaxyMode(galaxyModeRadios.find(radio=>radio.checked).value);
 
-    function updateHalo(){
+    // A full Plotly.update re-lays out the whole chart (~40 ms), too slow to follow a slider. While a slider moves, the
+    // curves are redrawn through Plotly's transition path instead (about 1 ms): only the line, fill and bar shapes move,
+    // and the speed axis only grows if a curve would leave it. Once the slider settles, a full update tidies everything
+    // (axis fit, residual colours, names), CURVE_SETTLE_MS after the last move or at once when it is let go.
+    const CURVE_SETTLE_MS=150;
+    const LIVE_CURVE_ANIMATION={transition:{duration:0},frame:{duration:0,redraw:false},mode:'immediate'};
+    function updateHalo(live){
+      live=live===true; // event listeners pass an Event here
       if(activeFit()!==appliedFit)applyBaryonState(); // the halo slider reached or left zero
       syncFsSliders();
       updateStability();
-      clearTimeout(sliderUpdateTimer);sliderUpdateTimer=null;
+      cancelAnimationFrame(sliderFrame);sliderFrame=0;clearTimeout(curveSettleTimer);curveSettleTimer=null;
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
       const{halo,total}=modelCurves(massT,rs);
       document.getElementById('massValue').textContent=haloMassText(massT);
@@ -3136,7 +3188,22 @@ window.GALAXIES = {
       const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total,...(curveGhost.visible?curveGhost.y:[]))*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
       const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)');
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
+      const curvePlot=document.getElementById('curvePlot'),visible=[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))];
+      // A line appearing or vanishing (e.g. the bulge set to zero) needs the full update even mid-drag.
+      if(live&&visible.every((v,k)=>curvePlot.data[k+1].visible===v)){
+        const range=curvePlot.layout.yaxis.range;
+        Plotly.animate(curvePlot,{data:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())].map(y=>({y})),
+          traces:[1,2,3,4,5,6,7],layout:yMax>range[1]?{yaxis:{range:[0,yMax]}}:{}},LIVE_CURVE_ANIMATION).catch(()=>{}); // a newer move interrupts it
+        // The transition path moves the residual bars but keeps their old colours, so a bar crossing zero is recoloured
+        // here (one bar per radius, in order); the settling full update then stores the same colours in the chart.
+        // Plotly keeps the 0.6 alpha in the bar's fill-opacity, so only the rgb part is set.
+        curvePlot.querySelectorAll('.barlayer .point path').forEach((bar,i)=>{if(residualColors[i])bar.style.fill=residualColors[i].replace(/rgba\(([^,]+,[^,]+,[^,]+),[^)]*\)/,'rgb($1)');});
+        curveSettleTimer=setTimeout(updateHalo,CURVE_SETTLE_MS);
+        updateHaloVisual(massT,rs);
+        clearTimeout(orbitModelTimer); // the settling full update schedules the orbits once
+        return;
+      }
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible,'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
@@ -3244,7 +3311,7 @@ window.GALAXIES = {
       updateStability();
       document.getElementById('massValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('scaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
-      if(sliderUpdateTimer===null)sliderUpdateTimer=setTimeout(updateHalo,100);
+      if(!sliderFrame)sliderFrame=requestAnimationFrame(()=>{sliderFrame=0;updateHalo(true);}); // at most one redraw per frame
     }
     [massSlider,scaleSlider].forEach(slider=>{
       slider.addEventListener('input',queueSliderUpdate);
@@ -3436,7 +3503,15 @@ window.GALAXIES = {
         }
       }
     }
-    function rebuildCustomGalaxy({replot=false}={}){
+    // New test stars (and their 1 Gyr orbits, ~100 ms) are too slow to rebuild on every slider move, so a live rebuild
+    // only records the anatomy here; refreshOrbits builds the stars from it once the slider pauses (scheduleOrbitUpdate).
+    let pendingCustomStars=null;
+    function rebuildCustomStars(){
+      const{anatomy,baseline}=pendingCustomStars;pendingCustomStars=null;
+      setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));
+      syncStarMeshes();updateStarTelemetry();updateCustomSummary(baseline);
+    }
+    function rebuildCustomGalaxy({replot=false,live=false}={}){
       const anatomy={diskMass:sandbox.diskMass,diskScale:sandbox.diskScale,rMax:sandbox.truncation,bulgeMass:sandbox.bulgeMass,bulgeRadius:sandbox.bulgeRadius,gasMass:sandbox.gasMass};
       if(anatomy.rMax!==customGridRmax){loadCustomGrid(anatomy.rMax);customGridRmax=anatomy.rMax;replot=true;}
       // Rotation curve: the baryonic speed of the new anatomy on the force-table grid and at the data radii.
@@ -3458,12 +3533,12 @@ window.GALAXIES = {
       // Stars start on the orbits of the baryons plus baseline halo, then feel whatever halo the sliders leave.
       const baselineHalo=nfwVelocityModel(baseline.m200,DEFAULTS.scaleRadius);
       referenceSpeedSquared=r=>{const vb=baryonicVelocity(r),vh=baselineHalo(r);return vb*vb+vh*vh;};
-      setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));
-      syncStarMeshes();updateStarTelemetry();updateCustomSummary(baseline);
+      pendingCustomStars={anatomy,baseline};
       if(replot){
         const{halo,total}=modelCurves(Number(massSlider.value),Number(scaleSlider.value));
         Plotly.react('curvePlot',buildCurveData(halo,total),curveLayoutNow(),curveConfig);
       }
+      if(live){updateCustomSummary(baseline);updateHalo(true);return;} // updateHalo schedules the stars and orbits
       refreshOrbits();
       updateHalo();clearTimeout(orbitModelTimer);
     }
@@ -3475,12 +3550,11 @@ window.GALAXIES = {
       controls.reset();
       document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy:activeGalaxy}}));
     }
-    let customUpdateTimer=null;
+    let customUpdateFrame=0;
     document.addEventListener('sandboxchange',()=>{
       if(!customActive)return;
       haloFine=1;rsManual=false; // a new galaxy gets its own typical halo: earlier halo tuning is dropped
-      if(customUpdateTimer!==null)return;
-      customUpdateTimer=setTimeout(()=>{customUpdateTimer=null;rebuildCustomGalaxy();},40);
+      if(!customUpdateFrame)customUpdateFrame=requestAnimationFrame(()=>{customUpdateFrame=0;rebuildCustomGalaxy({live:true});});
     });
     document.getElementById('sandboxReset').addEventListener('click',()=>{haloFine=1;rsManual=false;});
     function selectGalaxy(id){
@@ -3793,6 +3867,8 @@ window.GALAXIES = {
       requestRender();
     }
     function updateStarMarks(){
+      // Read the view size once: reading it between style writes would force a fresh page layout for every mark.
+      const viewW=orbitPlot.clientWidth,viewH=orbitPlot.clientHeight;
       starMarkEls.forEach((el,i)=>{
         const marks=trackedStar>=0?[...starMarks.slice(0,2),trackMark]:starMarks;
         const mark=marks[i],idx=mark?mark.pick():-1;
@@ -3805,7 +3881,7 @@ window.GALAXIES = {
         el.classList.toggle('edge',edge);
         el.classList.toggle('flip',markVec.x>0.4); // keep the label on screen near the right edge
         el.hidden=false;
-        el.style.transform=`translate(${((markVec.x+1)/2*orbitPlot.clientWidth).toFixed(1)}px,${((1-markVec.y)/2*orbitPlot.clientHeight).toFixed(1)}px)`;
+        el.style.transform=`translate(${((markVec.x+1)/2*viewW).toFixed(1)}px,${((1-markVec.y)/2*viewH).toFixed(1)}px)`;
         el.classList.toggle('warm',!!mark.warm);el.classList.toggle('track',!!mark.track);
         const text=mark.label(idx);
         if(el.firstChild.textContent!==text)el.firstChild.textContent=text;
