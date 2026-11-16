@@ -415,6 +415,11 @@
     .tutorial-tag { position:absolute; left:-11px; top:-11px; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:#a8ddff; color:#06131f; font-size:11px; font-weight:700; line-height:1; box-shadow:0 0 0 2px #06131f, 0 0 10px rgba(120,210,255,.8); pointer-events:none; }
     .tutorial-tag:empty { display:none; }
     .tutorial-try ol { margin:5px 0 0; padding-left:20px; }
+    .tutorial-slider { margin-top:10px; padding:9px 12px 6px; border:1px solid rgba(138,180,248,.24); border-radius:7px; background:rgba(120,150,180,.06); }
+    .tutorial-slider label { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--ink); }
+    .tutorial-slider output { font-variant-numeric:tabular-nums; color:var(--cyan); }
+    .tutorial-slider input { width:100%; margin:6px 0 0; }
+    .tutorial-spotlight.in-card { z-index:10001; }
     .tutorial-try li { margin:2px 0; }
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
@@ -1145,6 +1150,7 @@
     <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
     <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
+    <div class="tutorial-slider" id="tutorialSlider" hidden><label for="tutorialSliderInput"><span id="tutorialSliderName"></span><output id="tutorialSliderValue" for="tutorialSliderInput"></output></label><input id="tutorialSliderInput" type="range" autocomplete="off"></div>
     <div class="tutorial-feedback" id="tutorialFeedback" hidden><span id="tutorialFeedbackText" role="status" aria-live="polite"></span><button type="button" class="tutorial-auto" id="tutorialAuto" aria-label="Go to the next slide now" title="Moving on in a few seconds. Press to go now." hidden>Next slide<span class="tutorial-clock" aria-hidden="true"><svg viewBox="0 0 20 20"><circle class="track" cx="10" cy="10" r="7"/><circle class="ring" id="tutorialAutoRing" cx="10" cy="10" r="7"/></svg><b id="tutorialAutoNum">5</b></span></button></div>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" id="tutorialMore" hidden>Sandbox tutorial</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
@@ -2755,13 +2761,22 @@ window.GALAXIES = {
     const COMPONENT_STYLE=[['Stellar disk','#ffd166'],['Bulge','#ff8fab'],['Gas','#7bd88f']];
     let componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
     const componentVisible=i=>customActive&&(i!==1||currentAnatomy.bulgeMass>0);
+    // "Before" line (a visual aid only): while a slider that reshapes the curve is moved, and for CURVE_GHOST_HOLD_MS
+    // after it is let go, a faint wide band in the same colour stays where the changed line was, labelled "before".
+    // Anatomy sliders leave the cyan visible-matter line behind; the halo sliders leave the orange total.
+    const CURVE_GHOST_HOLD_MS=4000;
+    const curveGhost={x:[],y:[],rgb:'95,208,224',visible:false};
+    const curveGhostTrace=()=>({type:'scatter',mode:'lines+text',name:'Before',showlegend:false,hoverinfo:'skip',visible:curveGhost.visible,x:curveGhost.x,y:curveGhost.y,
+      text:curveGhost.y.map((_,i,a)=>i===a.length-1?'before':''),textposition:'top left',textfont:{size:11,color:`rgba(${curveGhost.rgb},0.8)`},
+      line:{color:`rgba(${curveGhost.rgb},0.2)`,width:7,shape:'spline',smoothing:0.6}});
     const buildCurveData=(halo,total)=>[
       {type:'scatter',mode:'markers',name:LEGEND_NAMES.observed,visible:!customActive,x:radii,y:obsV,error_y:{type:'data',array:obsErr,visible:true,color:'rgba(232,238,246,0.5)',thickness:1.1,width:3},marker:{size:6.5,color:'#f4f7fb',line:{color:'#070b14',width:1.4}},customdata:obsErr,hovertemplate:'Observed <b>%{y:.0f}</b> ± %{customdata:.0f} km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:LEGEND_NAMES.visible,x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.2,dash:'6px,4px',shape:'spline',smoothing:0.6},hovertemplate:'Visible <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.08)',line:{color:'#b39ae8',width:1.8,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:residualsOf(total).map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)')},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
-      ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'}))
+      ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'})),
+      curveGhostTrace() // last trace: updateHalo's Plotly.update leaves it alone
     ];
     // Phone-width legends use shorter names so two entries fit on each row.
     const NARROW_LEGEND=innerWidth<600;
@@ -3118,7 +3133,7 @@ window.GALAXIES = {
       const fit=activeFit();
       document.getElementById('chiBadge').title=(mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of visible matter + NFW halo to the SPARC points')
         +(fit&&bestFits?`, using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)`:'');
-      const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total)*1.1;
+      const yMax=Math.max(...obsV.map((v,i)=>v+obsErr[i]),...vBary,...halo,...total,...(curveGhost.visible?curveGhost.y:[]))*1.1;
       // One Plotly call redraws the model lines, the three custom-galaxy component lines and the residual bars (trace 4).
       const residualColors=res.map(r=>r>=0?'rgba(95,208,224,0.6)':'rgba(255,138,128,0.6)');
       Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible:[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))],'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
@@ -3890,17 +3905,17 @@ window.GALAXIES = {
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
          text:'Here you design the galaxy: how much its stars and gas weigh, and how they are spread out.',
          action:'Look at the three groups of sliders in the blue box, then press Next.'},
-        {id:'sbDisk',mode:'custom',target:'sbDiskMass',gesture:'adjust',tag:'Drag both ways',watch:['sbDiskMassValue:Disk mass','massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
+        {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['sbDiskMassValue:Disk mass','massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
          text:'The disk is the flat, spinning part where most stars are. Galaxies with more stars sit in bigger halos.',
          action:'Drag Disk mass up and down. Watch the cyan line and Halo mass.'},
-        {id:'sbSize',mode:'custom',target:'sbDiskScale',tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
+        {id:'sbSize',mode:'custom',target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
          checks:{sbDiskScale:()=>sbVal('sbDiskScale')!==tutorialStart.sbDiskScale,sbTruncation:()=>sbVal('sbTruncation')!==tutorialStart.sbTruncation},doneText:'Disk reshaped and edge moved.',title:'Spread the stars out',
          text:'Scale length sets how quickly the disk fades outwards. Truncation radius is where it ends.',
          action:'1. Drag Scale length and watch the peak of the cyan line. 2. Drag Truncation radius and watch the 3D galaxy’s size.'},
-        {id:'sbBulge',mode:'custom',target:'sbBulgeMass',gesture:'increase',watch:['sbBulgeMassValue:Bulge mass','curvePlot:Watch the left of the cyan line'],allow:['sbBulgeRadius'],title:'Add a bulge',
+        {id:'sbBulge',mode:'custom',target:'sbBulgeMass',cardSlider:{sbBulgeMass:'curvePlot'},gesture:'increase',watch:['sbBulgeMassValue:Bulge mass','curvePlot:Watch the left of the cyan line'],allow:['sbBulgeRadius'],title:'Add a bulge',
          text:'A bulge is a ball of stars at the centre. It speeds up the innermost orbits.',
          action:'Drag Bulge mass above 0. Watch the left of the cyan line climb.'},
-        {id:'sbGas',mode:'custom',target:'sbGasMass',gesture:'adjust',tag:'Drag both ways',watch:['sbGasMassValue:Gas mass','curvePlot:Watch the right of the cyan line'],title:'Add the gas',
+        {id:'sbGas',mode:'custom',target:'sbGasMass',cardSlider:{sbGasMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['sbGasMassValue:Gas mass','curvePlot:Watch the right of the cyan line'],title:'Add the gas',
          text:'Gas spreads about three times wider than the stars, so it matters most far out.',
          action:'Drag Gas mass up and down. Watch the right of the cyan line.'},
         {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
@@ -3909,10 +3924,10 @@ window.GALAXIES = {
         {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo stability monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
          action:'Point at the monitor (blue box) and find its marker. Is it inside the shaded band?'},
-        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',tag:'Drag to each end',watch:['scaleValue:Scale radius','stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
+        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['scaleValue:Scale radius','stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny or huge scale radius makes a halo unlike any real one. The monitor turns red, but it still runs.',
          action:'Drag Scale radius to one end until the monitor turns red.'},
-        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],gesture:'adjust',
+        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],gesture:'adjust',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 × the typical halo. The stars start balanced for the typical one.',
          action:'1. Drag Halo mass low, then high. 2. Press Typical Halo to reset it.'},
@@ -3985,6 +4000,44 @@ window.GALAXIES = {
         return{id,label:k<0?'':e.slice(k+1),gesture:el&&el.matches('input[type=range]')?'adjust':'click'};})];
       return parts.find(p=>!tutorialLatched[p.id])||null;
     }
+    // Slider steps whose result shows far from the slider (the sandbox sliders sit above the plots): the card carries a
+    // copy of the one slider the current part asks for, and the page scrolls to what it changes. step.cardSlider maps
+    // a slider id to the id of the view to watch. A slider in the pinned bar stays beside the plots, so it gets no copy.
+    const tutorialSlider=document.getElementById('tutorialSlider'),tutorialSliderInput=document.getElementById('tutorialSliderInput');
+    let tutorialSliderId=null;
+    function tutorialCardSliderId(){
+      const step=tutorialStep();
+      if(tutorialCard.hidden||!step.cardSlider||tutorialBlocker())return null;
+      const aim=tutorialCurrentAim(step),id=aim?aim.id:Object.keys(step.cardSlider).pop(),real=step.cardSlider[id]&&document.getElementById(id);
+      if(!real||tutorialBar.contains(real)&&getComputedStyle(tutorialBar).position==='sticky')return null;
+      return id;
+    }
+    // scroll: glide to the new view when the part (and so the slider) changes.
+    function syncTutorialSlider(scroll){
+      const id=tutorialCardSliderId();
+      if(id!==tutorialSliderId){
+        if(tutorialHolding&&tutorialSliderId)return; // never swap the slider mid-drag
+        tutorialSliderId=id;tutorialSlider.hidden=!id;
+        if(id){
+          const real=document.getElementById(id);
+          ['max','min','step'].forEach(k=>{tutorialSliderInput[k]=real[k];});
+          document.getElementById('tutorialSliderName').innerHTML=real.labels[0].querySelector('span').innerHTML;
+        }
+        if(scroll)scrollTutorialTarget(true);
+      }
+      if(!id)return;
+      const real=document.getElementById(id),shown=real.labels[0].querySelector('output').textContent,out=document.getElementById('tutorialSliderValue');
+      if(tutorialSliderInput.value!==real.value)tutorialSliderInput.value=real.value;
+      if(out.textContent!==shown)out.textContent=shown;
+    }
+    // The copy drives the real slider, so every listener (the model, the tour's checks) runs as if it moved itself.
+    tutorialSliderInput.addEventListener('input',()=>{
+      const real=document.getElementById(tutorialSliderId);
+      real.value=tutorialSliderInput.value;real.dispatchEvent(new Event('input',{bubbles:true}));
+      syncTutorialSlider();
+    });
+    tutorialSliderInput.addEventListener('change',()=>document.getElementById(tutorialSliderId).dispatchEvent(new Event('change',{bubbles:true})));
+    tutorialSliderInput.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
     // Watch steps finish by themselves: each render checks the step's done() test (camera angle, layers, play time).
     let tutorialPlayedMyr=0,tutorialWatchLast=0,tutorialScaleSeen=[0,0,0];
     function tutorialWatchTick(){
@@ -4120,6 +4173,7 @@ window.GALAXIES = {
     function refreshTutorialGuidance(){
       if(tutorialCard.hidden)return;
       renderTutorialTry();
+      syncTutorialSlider(true);
       updateTutorialSpotlight();
     }
     // A gentle eased glide (our own animation, so it is smooth in every browser), about 0.6 to 1.1 s depending on
@@ -4140,7 +4194,8 @@ window.GALAXIES = {
     }
     function scrollTutorialTarget(smooth){
       const step=tutorialStep(),blocker=tutorialBlocker();
-      const target=blocker?blocker.target:(step.scroll&&innerWidth>960?document.getElementById(step.scroll):tutorialTarget);
+      const view=!blocker&&tutorialSliderId&&document.getElementById(step.cardSlider[tutorialSliderId]);
+      const target=blocker?blocker.target:view||(step.scroll&&innerWidth>960?document.getElementById(step.scroll):tutorialTarget);
       if(tutorialTopbar.contains(target))return; // the top menu is always in view
       const y=window.scrollY,clear=tutorialTopbar.offsetHeight+16; // the gap kept between the top menu and the control
       // A slider comes into view with its label and value (its whole .control), not just its track.
@@ -4240,7 +4295,7 @@ window.GALAXIES = {
       // A many-part card just finished: the ring stays on the last part so it can turn green and fade out slowly.
       const finished=!blocker&&!aim&&tutorialCompleted[step.id]&&tutorialAimTarget&&tutorialAimTarget.isConnected&&!tutorialSpotlight.classList.contains('is-revisit');
       if(!blocker&&!aim&&!finished){tutorialSpotlight.hidden=true;return;}
-      let target=finished?tutorialAimTarget:blocker?blocker.target:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
+      let target=finished?tutorialAimTarget:blocker?blocker.target:aim.id===tutorialSliderId?tutorialSliderInput:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
       if(gesture==='switch'&&!finished){
         target=document.querySelector('#modelBar .track');gesture='click';
       }
@@ -4251,6 +4306,7 @@ window.GALAXIES = {
         tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached','is-arriving');
         void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
       }
+      tutorialSpotlight.classList.toggle('in-card',tutorialCard.contains(target));
       const rect=tutorialSpotRect(target),pad=4;
       tutorialSpotLast=rectKey(rect);
       if(!fitTutorialRing(tutorialSpotlight,target)){tutorialSpotlight.hidden=true;return;}
@@ -4419,7 +4475,7 @@ window.GALAXIES = {
       if(html!==tutorialDimLast){tutorialDimLast=html;tutorialDimHoles.innerHTML=html;}
     }
     (function trackTutorialSpot(){
-      if(!tutorialCard.hidden)tutorialUpdateChecks();
+      if(!tutorialCard.hidden){tutorialUpdateChecks();syncTutorialSlider(true);}
       applyTutorialLocks();
       positionTutorialAlso();
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
@@ -4455,6 +4511,7 @@ window.GALAXIES = {
       tutorialTitle.textContent=step.title;
       tutorialText.textContent=step.text;
       renderTutorialTry();
+      syncTutorialSlider();
       tutorialFeedback.hidden=!tutorialCompleted[step.id];
       showTutorialFeedback(tutorialCompleted[step.id]||'');
       tutorialCard.classList.remove('is-celebrating');
@@ -4524,7 +4581,7 @@ window.GALAXIES = {
       tutorialAutoFrame=requestAnimationFrame(tickTutorialAuto);
     }
     tutorialAuto.addEventListener('click',()=>goTutorialStep(tutorialIndex+1,1));
-    window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target);},{capture:true,passive:true});
+    window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target)||e.target===tutorialSliderInput;},{capture:true,passive:true});
     // Still using the controls (another drag, a key press on a slider): the countdown starts again from 10 s,
     // so a card never moves on while the viewer is mid-experiment.
     ['pointerdown','input'].forEach(type=>window.addEventListener(type,e=>{
@@ -4555,6 +4612,7 @@ window.GALAXIES = {
       stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
       tutorialTarget=null;
       tutorialCard.hidden=true;
+      syncTutorialSlider();
       tutorialSpotlight.hidden=true;
       visibleMatterOnly.hidden=false;
       tutorialSpotlight.classList.remove('is-interacting');
@@ -4628,6 +4686,32 @@ window.GALAXIES = {
       const set=()=>{const h=bar.offsetHeight;if(Math.abs(h-last)<2)return;last=h;document.documentElement.style.setProperty('--ctrl-h',h+'px');window.dispatchEvent(new Event('resize'));};
       set();if(window.ResizeObserver)new ResizeObserver(set).observe(bar);})();
     const sandboxInputs=SANDBOX_SLIDERS.map(slider=>slider.input);
+    // The "before" line: the curve is copied as a slider is grabbed (or first nudged from the keyboard), shown once it
+    // moves, and cleared CURVE_GHOST_HOLD_MS after it is let go, or at once when the galaxy or model changes.
+    const curveGhostSliders=[massSlider,scaleSlider,...sandboxInputs];
+    let curveGhostArmed=false,curveGhostTimer=0;
+    function setCurveGhost(on){
+      curveGhost.visible=on;
+      const plot=document.getElementById('curvePlot');
+      const t=curveGhostTrace(); // restyle reads an array as one value per trace, so each data array is wrapped
+      Plotly.restyle(plot,{visible:on,x:[t.x],y:[t.y],text:[t.text],'line.color':t.line.color,'textfont.color':t.textfont.color},[plot.data.length-1]);
+    }
+    function clearCurveGhost(){clearTimeout(curveGhostTimer);curveGhostArmed=false;if(curveGhost.visible)setCurveGhost(false);}
+    function armCurveGhost(e){
+      const slider=e.target===tutorialSliderInput?document.getElementById(tutorialSliderId):e.target;
+      if(!curveGhostSliders.includes(slider)||e.type==='keydown'&&curveGhost.visible)return;
+      const halo=slider===massSlider||slider===scaleSlider,line=document.getElementById('curvePlot').data[halo?3:1];
+      curveGhost.x=line.x.slice();curveGhost.y=line.y.slice();curveGhost.rgb=halo?'255,174,92':'95,208,224';
+      clearTimeout(curveGhostTimer);curveGhostArmed=true;
+    }
+    window.addEventListener('pointerdown',armCurveGhost,{capture:true,passive:true});
+    window.addEventListener('keydown',armCurveGhost,{capture:true,passive:true});
+    curveGhostSliders.forEach(slider=>{
+      slider.addEventListener('input',()=>{if(curveGhostArmed&&!curveGhost.visible)setCurveGhost(true);clearTimeout(curveGhostTimer);});
+      slider.addEventListener('change',()=>{clearTimeout(curveGhostTimer);curveGhostTimer=setTimeout(clearCurveGhost,CURVE_GHOST_HOLD_MS);});
+    });
+    ['galaxychange','galaxymodechange'].forEach(type=>document.addEventListener(type,clearCurveGhost));
+    document.getElementById('mondToggle').addEventListener('change',clearCurveGhost);
     [massSlider,scaleSlider,...sandboxInputs].forEach(slider=>{
       slider.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
       slider.addEventListener('change',updateTutorialSpotlight);

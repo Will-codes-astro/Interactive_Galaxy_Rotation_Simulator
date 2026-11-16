@@ -260,7 +260,11 @@ orbits, then the first star lost without dark matter). It follows on from the si
 tutorial in the full guided tour, or starts from the Sandbox tutorial button on
 the simulator tutorial's last step (which opens the Custom Sandbox), or from the
 Simulator tutorial button, which reads "Sandbox tutorial" while the sandbox is
-open. If a step needs a different mode (NFW or MOND, a halo above
+open. On the slider steps whose result shows far from the slider, the card
+carries a copy of the one slider the current part asks for (`cardSlider` on the
+step), linked to the real one, and the page scrolls to the graph, 3D view or
+stability monitor it changes. A slider in the pinned slider bar (wide screens) needs no copy.
+If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
@@ -371,3 +375,9 @@ but the numbers are always the values at a real data point, never interpolated.
 On touch screens the readout stays until you tap outside the graph and updates
 live as the sliders move. Touch screens also get larger slider thumbs, tap-to-open
 "?" tips and a two-column legend on narrow screens.
+
+"Before" line: while a halo or sandbox anatomy slider is moved, and for 4 s after
+it is let go (`CURVE_GHOST_HOLD_MS`), a faint wide band labelled "before" stays
+where the line it changes was: the cyan visible-matter line for the anatomy
+sliders, the orange total for the halo sliders. The speed axis keeps room for it.
+Changing galaxy, galaxy source or gravity model clears it. It is a visual aid only.
