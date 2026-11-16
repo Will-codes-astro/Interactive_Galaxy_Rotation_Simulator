@@ -218,9 +218,13 @@ The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Simulator tutorial button beside the
 Model setup heading. The tours do not reset or change simulator settings.
 While a card is open, every simulator control it does not name is locked
-(inert and dimmed), and so are the top menu and the 3D camera's drag and zoom;
-when something is in the way, only the control that fixes it is free. Playback
-speed, the info (?) buttons and the halo-card explainers stay free. Ending or
+(inert and dimmed), and so are the top menu and the 3D camera's drag and zoom
+(except from "Now watch it happen" until Face-on is done on "Look down on the
+disk", where the camera moves as normal); when something is in the way, only
+the control that fixes it is free. Playback speed, the info (?) buttons and the
+halo-card explainers stay free. A box ring covers an opened info box only when
+the box opens right beside its control, and if an opened info box would sit
+under the tutorial card, the card moves to the other side. Ending or
 skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
 The main tutorial's 19 steps start from the puzzle in the rotation curve

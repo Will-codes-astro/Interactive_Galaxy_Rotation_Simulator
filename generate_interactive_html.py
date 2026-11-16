@@ -4206,6 +4206,7 @@ __GALAXIES_JS__
     // Leave (~0.45 s) plus the staggered enter animation (~0.85 s): the card's scrollbar stays hidden for this long.
     const TUTORIAL_SWITCH_MS=1350;let tutorialScrollTimer=0;
     const TUTORIAL_RING_MIN_RADIUS_PX=8;  // softest corner any highlight ring gets
+    const TUTORIAL_BESIDE_PX=16;          // an opened box this close to its control is drawn inside the control's ring
     const TUTORIAL_RING_FADE_MS=2650;     // a done part's green ring holds, then fades (matches tutorial-ring-done)
     const TUTORIAL_HANDOVER_MS=700;       // the next part's ring cross-fades into the main ring (matches tutorial-handover)
     const TUTORIAL_NEAR_PX=160;           // a ringed thing this close above the control is scrolled into view with it
@@ -4242,15 +4243,15 @@ __GALAXIES_JS__
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
-        {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],title:'Now watch it happen',
+        {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Now watch it happen',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
          text:'The 3D view moves hundreds of test stars under the model’s gravity for a billion years.',
          action:'1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space).'},
-        {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',title:'Clear the stage',
+        {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',freeCamera:true,title:'Clear the stage',
          text:'The blue haze is gas. The purple cloud is the halo, drawn so you can see it: real dark matter is invisible.',
          action:'1. Switch off Gas. 2. Switch off Halo.',
          checks:{toggleGas:()=>!gasCloud.visible,toggleHalo:()=>haloHidden||mondMode||Number(massSlider.value)===0},doneText:'Clear view: everything left is a test star.'},
-        {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',tag:'1 · Face-on',also:['toggleOrbits:2 · Orbits on','fsPlay:3 · Play'],gesture:'click',title:'Look down on the disk',
+        {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',tag:'1 · Face-on',also:['toggleOrbits:2 · Orbits on','fsPlay:3 · Play'],gesture:'click',freeCamera:()=>!tutorialLatched.viewFaceOn,title:'Look down on the disk',
          text:'Face-on, you look straight down on the disk. Each line is one star’s path: near-perfect circles.',
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: a galaxy in balance.'},
@@ -4705,6 +4706,7 @@ __GALAXIES_JS__
         void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
       }
       tutorialSpotlight.classList.toggle('in-card',tutorialCard.contains(target));
+      dodgeTutorialBox(target);
       const rect=tutorialSpotRect(target),pad=4;
       tutorialSpotLast=rectKey(rect);
       if(!fitTutorialRing(tutorialSpotlight,target)){tutorialSpotlight.hidden=true;return;}
@@ -4727,6 +4729,17 @@ __GALAXIES_JS__
       tutorialSpotlight.style.setProperty('--from-y',(fromY+pad-2)+'px');
       tutorialSpotlight.style.setProperty('--to-y',(toY+pad-2)+'px');
     }
+    // An info box the highlighted control opens (the M/L ? box) must never sit under the card: if it would, the card
+    // moves to the other side of the screen and stays there for the rest of that card.
+    let tutorialDodged=false; // moved aside once on this card already (never flips back and forth)
+    function dodgeTutorialBox(target){
+      if(tutorialDodged||tutorialIsFullscreen()||innerWidth<=600||tutorialCard.contains(target))return;
+      const card=tutorialCard.getBoundingClientRect();
+      const hit=[...target.querySelectorAll('[aria-expanded="true"][aria-controls]'),...(target.matches('[aria-expanded="true"][aria-controls]')?[target]:[])]
+        .map(btn=>document.getElementById(btn.getAttribute('aria-controls'))).filter(pop=>pop&&!pop.hidden)
+        .some(pop=>{const p=pop.getBoundingClientRect();return p.width&&p.left<card.right&&p.right>card.left&&p.top<card.bottom&&p.bottom>card.top;});
+      if(hit){tutorialDodged=true;tutorialCard.classList.toggle('on-left');}
+    }
     // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
     // highlight grows to cover a box that expands out of it.
     // A slider's <output> stretches to fill its label row, so measure the number text itself.
@@ -4741,7 +4754,10 @@ __GALAXIES_JS__
         if(!p.width||!p.height)return;
         left=Math.min(left,p.left);top=Math.min(top,p.top);right=Math.max(right,p.right);bottom=Math.max(bottom,p.bottom);
       };
-      openers.forEach(btn=>{const pop=document.getElementById(btn.getAttribute('aria-controls'));if(pop&&!pop.hidden)grow(pop);});
+      // Only a box that opens right beside the control joins its ring. A box that opens further away (the M/L ? box,
+      // which drops below both stat tiles) would stretch the ring over controls it has nothing to do with.
+      const beside=pop=>{const p=pop.getBoundingClientRect();return p.left<=r.right+TUTORIAL_BESIDE_PX&&p.right>=r.left-TUTORIAL_BESIDE_PX&&p.top<=r.bottom+TUTORIAL_BESIDE_PX&&p.bottom>=r.top-TUTORIAL_BESIDE_PX;};
+      openers.forEach(btn=>{const pop=document.getElementById(btn.getAttribute('aria-controls'));if(pop&&!pop.hidden&&beside(pop))grow(pop);});
       // An open drop-down list inside the control (the Galaxy menu) is part of it too.
       target.querySelectorAll('[role="listbox"]:not([hidden])').forEach(grow);
       return{left,top,right,bottom,width:right-left,height:bottom-top};
@@ -4836,10 +4852,12 @@ __GALAXIES_JS__
       return[...(blocker?[blocker.target]:[]),...ids.map(id=>document.getElementById(id))].filter(Boolean).map(el=>el.closest('label')||el);
     }
     function applyTutorialLocks(){
-      const roots=tutorialAllowed(),key=roots&&roots.map(el=>el.id||el.className).join('|')+'|'+tutorialIndex+tutorialTour;
+      // step.freeCamera: the 3D view can be dragged, zoomed and turned as normal on this card (a function: only while true).
+      const step=tutorialCard.hidden?null:tutorialStep(),freeCamera=!!step&&(typeof step.freeCamera==='function'?step.freeCamera():!!step.freeCamera);
+      const roots=tutorialAllowed(),key=roots&&roots.map(el=>el.id||el.className).join('|')+'|'+tutorialIndex+tutorialTour+freeCamera;
       if(key===tutorialLockKey)return;
       tutorialLockKey=key;
-      controls.enabled=!roots;
+      controls.enabled=!roots||freeCamera;
       tutorialLockScopes.forEach(scope=>scope.querySelectorAll(TUTORIAL_LOCKABLE).forEach(el=>{
         const unit=el.closest('label')||el;
         if(tutorialCard.contains(unit))return;
@@ -4924,7 +4942,7 @@ __GALAXIES_JS__
       tutorialNext.textContent=lastStep?(nextTour?`Next: ${TOURS[nextTour].label}`:'Finish'):'Next';
       updateTutorialNextGate();
       tutorialMore.hidden=!(lastStep&&tutorialTour==='main'&&!nextTour);
-      tutorialCard.classList.toggle('on-left',innerWidth>960&&!step.cardRight);
+      tutorialCard.classList.toggle('on-left',innerWidth>960&&!step.cardRight);tutorialDodged=false;
       setStarMarks(step.marks);
       // The ejection steps pull the camera back far enough to frame the ring, so the escaping star stays in view.
       if(step.ring&&tutorialIsFullscreen())controls.flyTo({phi:0.35,radius:ejectionRadius*4,target:[0,0,0],rate:2.4});
