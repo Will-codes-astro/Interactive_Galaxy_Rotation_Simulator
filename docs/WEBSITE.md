@@ -291,6 +291,14 @@ colour key and fit explanation. Select it or a theory box to open it. Halo
 values reveal their explanations on hover or when selected with a mouse, touch,
 or keyboard.
 
+Hover explainers (the halo value cards and the M/L, Tilt and Test stars "?"
+boxes) open only after the mouse rests on them for 0.35 s, so sweeping past
+does not open them, and fade in over 0.45 s. Opening one halo card closes
+the others. In the tutorial, an explainer counts as read only once it has
+stayed open for 1.5 s (`HOVER_OPEN_DELAY_MS`, `EXPLAINER_READ_MS`). While a
+tutorial card is up, the page is dimmed except for every control the card
+names and any explainer it has opened.
+
 Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
 fit") sits in front of χ²ᵣ; χ² itself, the point count and the values tuned are in
 the number's tooltip. The grey label beside it ends with the same plain-words gap

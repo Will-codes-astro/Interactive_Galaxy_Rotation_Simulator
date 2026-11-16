@@ -435,7 +435,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stat.ml.off { display:none; }
     [data-preset-only][hidden], .stability[hidden] { display:none !important; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
-    .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .2s ease, transform .2s ease, visibility 0s linear .2s; }
+    .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .45s ease, transform .45s ease, visibility 0s linear .45s; }
     /* While the explainer is open, lift its section above the sticky slider bar (z-index 150) so the bar can't cover it. */
     .stats-row:has(.ml-explainer.open) { position:relative; z-index:160; }
     .stats-row { margin-bottom:14px; }
@@ -443,7 +443,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .stats-row .fit-toggle { align-self:center; padding:9px 14px; font-size:12px; }
     .sim-head .tutorial-launch { justify-self:end; }
     @media (max-width:900px) { .sim-head .tutorial-launch { justify-self:start; } }
-    .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .2s ease, transform .2s ease, visibility 0s; }
+    .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .45s ease, transform .45s ease, visibility 0s; }
     @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
     .ml-explainer p { margin:0 0 8px; }
@@ -502,7 +502,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .sandbox-summary dt { color:var(--muted); white-space:nowrap; }
     .stat-q { position:relative; display:inline-grid; place-items:center; margin-left:5px; vertical-align:1px; width:14px; height:14px; flex:none; border:1px solid rgba(138,180,248,0.45); border-radius:3px; color:var(--cyan); font-size:9px; font-weight:600; line-height:1; cursor:help; }
     .stat-q::after { content:attr(data-tip); position:absolute; left:-4px; bottom:calc(100% + 6px); z-index:20; width:210px; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:#0d1825; color:var(--ink); font-size:11px; font-weight:400; line-height:1.4; text-align:left; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,0.5); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .12s; }
-    .stat-q:hover::after,.stat-q:focus-visible::after { opacity:1; visibility:visible; }
+    .stat-q:hover::after,.stat-q:focus-visible::after { opacity:1; visibility:visible; transition:opacity .3s ease .35s; }
     .sandbox-summary dd { margin:0; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
     .sandbox-footer { display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:11px; }
     .sandbox-footer p { margin:0; }
@@ -706,7 +706,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .halo-metric button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px; }
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
-    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:grid-template-rows .2s ease, opacity .2s ease, visibility 0s linear .2s; }
+    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:grid-template-rows .45s ease, opacity .45s ease, visibility 0s linear .45s; }
     .halo-metric dd > span { min-height:0; overflow:hidden; }
     .halo-metric dd > span > span { display:block; padding-top:5px; }
     .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition-delay:0s; }
@@ -2725,16 +2725,23 @@ __GALAXIES_JS__
         });
         document.querySelectorAll('.halo-metric').forEach(metric=>{
             const button=metric.querySelector('button');
+            // A mouse has to rest on the card for a moment before it opens, so sweeping past does not open it.
+            let openTimer=null;
             metric.addEventListener('pointerenter',event=>{
-                if(event.pointerType!=='touch')metric.classList.add('hovered');
+                if(event.pointerType==='touch')return;
+                clearTimeout(openTimer);openTimer=setTimeout(()=>{metric.classList.add('hovered');sync();},HOVER_OPEN_DELAY_MS);
             });
             metric.addEventListener('pointerleave',event=>{
-                if(event.pointerType!=='touch')metric.classList.remove('hovered');
+                if(event.pointerType==='touch')return;
+                clearTimeout(openTimer);metric.classList.remove('hovered');sync();
             });
             // A mouse only hovers (a click does not pin the card open); touch and keyboard toggle it instead, one card at a time.
-            const sync=()=>button.setAttribute('aria-expanded',String(metric.classList.contains('hovered')||metric.classList.contains('expanded')));
+            const sync=()=>{
+                const open=metric.classList.contains('hovered')||metric.classList.contains('expanded');
+                button.setAttribute('aria-expanded',String(open));
+                trackExplainerRead(metric,open);
+            };
             let lastPointer='';
-            metric.addEventListener('pointerenter',sync);metric.addEventListener('pointerleave',sync);
             button.addEventListener('pointerdown',event=>{lastPointer=event.pointerType;});
             button.addEventListener('click',()=>{
                 const mouse=lastPointer==='mouse';lastPointer='';
@@ -2743,7 +2750,9 @@ __GALAXIES_JS__
                 document.querySelectorAll('.halo-metric.expanded').forEach(other=>{
                     if(other===metric)return;
                     other.classList.remove('expanded');
-                    other.querySelector('button').setAttribute('aria-expanded',String(other.classList.contains('hovered')));
+                    const open=other.classList.contains('hovered');
+                    other.querySelector('button').setAttribute('aria-expanded',String(open));
+                    trackExplainerRead(other,open);
                 });
                 metric.classList.toggle('expanded');sync();
             });
@@ -3417,6 +3426,15 @@ __GALAXIES_JS__
     // "?" on the M/L and tilt tiles: a mouse hover fades the explainer in and moving away fades it out
     // (a short grace period lets the pointer travel into the box). Touch and keyboard users tap/press
     // the button instead, and close it with ×, Escape or a tap elsewhere.
+    // Hover explainers (halo cards, the ? boxes): a mouse rests this long before one opens, and it counts as read
+    // (for the tutorial) only once it has stayed open this long, so a brushed-past box is neither opened nor ticked.
+    const HOVER_OPEN_DELAY_MS=350;
+    const EXPLAINER_READ_MS=1500;
+    // Fires an 'explainerread' event on el once it has stayed open for EXPLAINER_READ_MS; closing early cancels it.
+    function trackExplainerRead(el,open){
+      if(!open){clearTimeout(el._readTimer);el._readTimer=null;return;}
+      if(!el._readTimer)el._readTimer=setTimeout(()=>el.dispatchEvent(new Event('explainerread')),EXPLAINER_READ_MS);
+    }
     function setupExplainer(btnId,boxId,closeId){
       const btn=document.getElementById(btnId),box=document.getElementById(boxId);
       let hover=false,pinned=false,closeTimer=null,lastPointer='';
@@ -3431,10 +3449,12 @@ __GALAXIES_JS__
         box.classList.toggle('open',open);
         box.setAttribute('aria-hidden',String(!open));
         btn.setAttribute('aria-expanded',String(open));
+        trackExplainerRead(btn,open);
       };
       const close=()=>{hover=false;pinned=false;clearTimeout(closeTimer);render();};
       [btn,box].forEach(el=>{
-        el.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(closeTimer);hover=true;render();});
+        // Already open (moving from the ? into its box): stay open. Otherwise rest on it for a moment first.
+        el.addEventListener('pointerenter',e=>{if(e.pointerType!=='mouse')return;clearTimeout(closeTimer);closeTimer=setTimeout(()=>{hover=true;render();},isOpen()?0:HOVER_OPEN_DELAY_MS);});
         el.addEventListener('pointerleave',e=>{if(e.pointerType!=='mouse')return;clearTimeout(closeTimer);closeTimer=setTimeout(()=>{hover=false;render();},150);});
       });
       btn.addEventListener('pointerdown',e=>{lastPointer=e.pointerType;});
@@ -4842,7 +4862,7 @@ __GALAXIES_JS__
       tutorialLastScale=value;
     });
     document.querySelectorAll('#haloMetrics .halo-metric').forEach(metric=>{
-      ['pointerenter','click','focusin'].forEach(type=>metric.addEventListener(type,()=>{tutorialFlags[metric.id]=true;}));
+      metric.addEventListener('explainerread',()=>{tutorialFlags[metric.id]=true;});
     });
     visibleMatterOnly.addEventListener('click',()=>{
       if(!mondMode)completeTutorialAction('removeHalo','Halo removed: the orange line now shows visible matter only.');
@@ -4862,9 +4882,7 @@ __GALAXIES_JS__
     fullHaloBtn.addEventListener('click',()=>{tutorialFlags.fullHalo=true;});
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{tutorialFlags[Number(massSlider.value)===0?'restart0':'restartHalo']=true;onSliderInput(0);setPlaying(true);});
-    ['pointerenter','focus','click'].forEach(type=>{
-      document.getElementById('mlInfoBtn').addEventListener(type,()=>completeTutorialAction('ml','Explainer opened.'));
-    });
+    document.getElementById('mlInfoBtn').addEventListener('explainerread',()=>completeTutorialAction('ml','Explainer read.'));
     const SANDBOX_STEP_FEEDBACK={
       sbDiskMass:['sbDisk','Disk mass changed: the typical halo followed it.'],
       sbGasMass:['sbGas','Gas mass changed.']
