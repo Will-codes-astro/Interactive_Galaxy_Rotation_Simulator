@@ -1489,7 +1489,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <span class="tutorial-tag" id="tutorialTag"></span>
     <svg class="tutorial-pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2v23l6-5 4 10 5-2-4-10h8z" fill="#eaffff" stroke="#09212c" stroke-width="2" stroke-linejoin="round"/></svg>
   </div>
-  <svg class="tutorial-dim" id="tutorialDim" aria-hidden="true"><path fill-rule="evenodd"/></svg>
+  <svg class="tutorial-dim" id="tutorialDim" aria-hidden="true"><mask id="tutorialDimMask"><rect width="100%" height="100%" fill="#fff"/><g id="tutorialDimHoles" fill="#000"></g></mask><rect width="100%" height="100%" mask="url(#tutorialDimMask)"/></svg>
   <aside class="tutorial-card" id="tutorialCard" aria-labelledby="tutorialTitle" hidden>
     <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
@@ -4562,21 +4562,27 @@ __GALAXIES_JS__
         unit.classList.toggle('tutorial-locked',locked);
       }));
     }
-    // Cuts a rounded hole in the dim layer for the main ring and each visible extra ring.
-    const tutorialDim=document.getElementById('tutorialDim'),tutorialDimPath=tutorialDim.firstElementChild;
+    // Cuts a rounded hole in the dim layer for the main ring, each visible extra ring, and every control the card
+    // names (with any info box it has opened), so parts already done and text to read stay bright too. Holes are
+    // drawn into a mask, so where two overlap (an opened info box over the next card) they still stay clear.
+    const tutorialDim=document.getElementById('tutorialDim'),tutorialDimHoles=document.getElementById('tutorialDimHoles');
+    let tutorialDimLast='';
     function updateTutorialDim(){
       const on=!tutorialCard.hidden&&!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-revisit')&&!tutorialIsFullscreen();
       tutorialDim.classList.toggle('is-on',on);
       tutorialDim.classList.toggle('is-done',tutorialSpotlight.classList.contains('is-complete'));
       if(!on)return;
-      const W=innerWidth,H=innerHeight;
-      let d=`M0,0H${W}V${H}H0Z`;
-      [tutorialSpotlight,...tutorialAlsoRings.values()].forEach(el=>{
-        if(el.hidden||!el.isConnected)return;
-        const r=el.getBoundingClientRect(),k=Math.min(parseFloat(el.style.borderRadius)||0,r.width/2,r.height/2);
-        d+=`M${r.left+k},${r.top}H${r.right-k}A${k},${k} 0 0 1 ${r.right},${r.top+k}V${r.bottom-k}A${k},${k} 0 0 1 ${r.right-k},${r.bottom}H${r.left+k}A${k},${k} 0 0 1 ${r.left},${r.bottom-k}V${r.top+k}A${k},${k} 0 0 1 ${r.left+k},${r.top}Z`;
+      const holes=[tutorialSpotlight,...tutorialAlsoRings.values()].filter(el=>!el.hidden&&el.isConnected)
+        .map(el=>[el.getBoundingClientRect(),parseFloat(el.style.borderRadius)||0]);
+      const step=tutorialStep(),pad=4;
+      if(!tutorialBlocker())[step.target,...tutorialRingList(step).map(r=>r.id)].forEach(id=>{
+        const el=document.getElementById(id);
+        if(!el||!el.getClientRects().length)return;
+        const r=tutorialSpotRect(el);
+        holes.push([{left:r.left-pad,top:r.top-pad,width:r.width+2*pad,height:r.height+2*pad},TUTORIAL_RING_MIN_RADIUS_PX]);
       });
-      if(tutorialDimPath.getAttribute('d')!==d)tutorialDimPath.setAttribute('d',d);
+      const html=holes.map(([r,k])=>`<rect x="${r.left}" y="${r.top}" width="${r.width}" height="${r.height}" rx="${Math.min(k,r.width/2,r.height/2)}"/>`).join('');
+      if(html!==tutorialDimLast){tutorialDimLast=html;tutorialDimHoles.innerHTML=html;}
     }
     (function trackTutorialSpot(){
       if(!tutorialCard.hidden)tutorialUpdateChecks();
