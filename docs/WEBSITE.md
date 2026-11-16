@@ -225,7 +225,8 @@ switch. A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
 predict which of two ringed stars will finish more laps (Play stays locked
 until a prediction is chosen), then watch them race (live lap counts and
-speeds show differential rotation on a flat rotation curve), turn edge-on to see a ringed star bob
+speeds show differential rotation on a flat rotation curve; the lap counts start at zero when the race card
+opens, so they cannot give the answer away, and start again if the clock is taken back), turn edge-on to see a ringed star bob
 through the thin disk, switch on the ejection line, remove the halo and follow
 the first star to cross it, then restore the halo and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer and the theory
@@ -299,6 +300,19 @@ stayed open for 1.5 s (`HOVER_OPEN_DELAY_MS`, `EXPLAINER_READ_MS`). While a
 tutorial card is up, the page is dimmed except for every control the card
 names and any explainer it has opened.
 
+Highlight boxes: each box follows its control every frame, including while it fades out green, so a box
+never hangs where a control used to be. A box whose control has scrolled under the top menu (or, for the
+plots, under the pinned slider bar) is cut off at that edge rather than drawn over it. Each card scrolls
+its control to just below the top menu, a slider together with its label and value, and brings a watched
+box that sits just above it (the M/L and tilt tiles) or further down (the stability monitor) into view
+too. The box round the Galaxy menu grows to cover its open list, and the yellow box on the profile card
+hides while the list is over it. The box round a "?" button and its explainer has square-ish corners.
+The pointer fades out once a step is done.
+
+On screens 1200 px or wider the two figure headings keep one fixed height and a long fit label wraps
+inside its own space, so the graph does not move when the label changes. The stat tiles are all the same
+height. With no halo (MOND, or zero halo mass) the "Your NFW halo" box drops its "hover over a value" line.
+
 Fit badge: above the rotation curve, a word ("Close fit", "Rough fit" or "Poor
 fit") sits in front of χ²ᵣ; χ² itself, the point count and the values tuned are in
 the number's tooltip. The grey label beside it ends with the same plain-words gap
@@ -343,7 +357,10 @@ particle (including the single LZ candidate event of September 2026, a 2.6σ
 preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds a
 three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
 v⁴ = GMa₀) under "Show the maths"; the full interpolating formula appears
-only in Method. Method & sources ends with a Harvard reference list of every
+only in Method. The dark matter box has a matching schematic (not real data) in the simulator's colours:
+the visible matter's share of the speed falls, the halo's grows, and together they stay level. Method's
+cards flow in two columns (read down the left, then the right; one column at 900 px or narrower).
+Method & sources ends with a Harvard reference list of every
 source cited on the page, each linked by DOI (checked against Crossref on
 14 Nov 2026).
 
