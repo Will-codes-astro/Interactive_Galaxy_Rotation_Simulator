@@ -1342,7 +1342,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     </section>
     <div id="controlsAnchor" aria-hidden="true"></div>
     <section class="controls" aria-label="Model controls">
-    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold shading is where your galaxy’s gravity is that weak.</span></p></div>
+    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold shading is where the galaxy’s visible matter pulls that weakly.</span></p></div>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
@@ -3166,15 +3166,18 @@ __GALAXIES_JS__
     }
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
-    const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false},...mondZoneLayout()}:curveLayout;
-    // MOND zone (sandbox + MOND only): shades the radii where the visible matter's own gravity, g_N = V_bar²/R, is
-    // weaker than a₀, which is where MOND boosts gravity (Milgrom 1983; Famaey & McGaugh 2012). Each edge is placed
-    // where g_N crosses a₀, interpolated in log g between neighbouring radii. The shading itself is a visual aid.
+    const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout),...mondZoneLayout()});
+    // MOND zone (MOND mode, every galaxy): shades the radii where the visible matter's own gravity, g_N = V_bar²/R, is
+    // weaker than a₀, which is where MOND boosts gravity (Milgrom 1983; Famaey & McGaugh 2012). g_N is taken in the
+    // same distance and tilt frame as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows
+    // the fit's distance, tilt and a₀. Each edge is placed where g_N crosses a₀, interpolated in log g between
+    // neighbouring radii. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid.
     const MOND_ZONE_FILL='rgba(255,196,90,0.13)',MOND_ZONE_EDGE='rgba(242,200,121,0.6)';
-    const mondNewtonianSomewhere=()=>radii.some((r,i)=>r>0&&(vBary[i]*1000)**2/(r*M_PER_KPC)>=MOND_A0);
+    const mondLogGN=()=>radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*fitFrame.s*1000)**2/(r*fitFrame.f*M_PER_KPC)):-Infinity);
+    const mondNewtonianSomewhere=()=>mondLogGN().some(g=>g>=Math.log(MOND_A0));
     function mondZoneLayout(){
-      if(!(customActive&&mondMode))return{shapes:[],annotations:[]};
-      const logG=radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*1000)**2/(r*M_PER_KPC)):-Infinity),cut=Math.log(MOND_A0);
+      if(!mondMode)return{shapes:[],annotations:[]};
+      const logG=mondLogGN(),cut=Math.log(MOND_A0);
       const runs=[];let start=null;
       const edge=i=>{const a=logG[i-1],b=logG[i];return isFinite(a)&&isFinite(b)&&a!==b?radii[i-1]+(radii[i]-radii[i-1])*(cut-a)/(b-a):radii[i];};
       logG.forEach((g,i)=>{
@@ -3188,9 +3191,9 @@ __GALAXIES_JS__
       // A dashed gold line marks each place inside the graph where visible gravity crosses a₀.
       const edges=runs.flat().filter(x=>x>first&&x<last);
       return{
-        shapes:[...runs.map(([x0,x1])=>({type:'rect',layer:'below',xref:'x',yref:'paper',x0,x1,y0:0,y1:1,fillcolor:MOND_ZONE_FILL,line:{width:0}})),
-          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'paper',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1.2,dash:'dash'}}))],
-        annotations:widest?[{xref:'x',yref:'paper',x:(widest[0]+widest[1])/2,y:0.98,yanchor:'top',showarrow:false,
+        shapes:[...runs.map(([x0,x1])=>({type:'rect',layer:'below',xref:'x',yref:'y domain',x0,x1,y0:0,y1:1,fillcolor:MOND_ZONE_FILL,line:{width:0}})),
+          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1.2,dash:'dash'}}))],
+        annotations:widest?[{xref:'x',yref:'y domain',x:(widest[0]+widest[1])/2,y:0.98,yanchor:'top',showarrow:false,
           text:(everywhere?'MOND boosts gravity everywhere here':'MOND boosts gravity here')+'<br><span style="font-size:10px">visible matter’s gravity is weaker than a₀</span>',font:{size:11,color:'#f2c879'}}]:[]
       };
     }
@@ -3536,7 +3539,7 @@ __GALAXIES_JS__
       document.getElementById('massValue').textContent=haloMassText(massT);
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       const res=residualsOf(total);updateChi(total);
-      document.getElementById('mondZoneNote').hidden=!(customActive&&mondMode);
+      document.getElementById('mondZoneNote').hidden=!mondMode;
       const fit=activeFit();
       document.getElementById('chiBadge').title=(mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of visible matter + NFW halo to the SPARC points')
         +(fit&&bestFits?`, using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)`:'');
@@ -4291,7 +4294,7 @@ __GALAXIES_JS__
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
          action:'1. Drag Halo mass away from where it is until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Now fine-tune both sliders until the yellow box reads Close fit. No shortcuts: Apply Observed Fit is locked, so this is all you.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
-         text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says.',
+         text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says. Gold shading on the graph marks where.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
