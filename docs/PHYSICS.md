@@ -220,8 +220,8 @@ site, not a published standard, and the page says so.
   (`fillForceTable`, `accelFactor`). Beyond 160 kpc, a ∝ r⁻².
 - **Softening:** a cubic-spline kernel (`softeningFactor`), with
   ε = 0.5–1.0 kpc (`SOFTENING_RANGE_KPC`). It is exactly Newtonian beyond
-  2.8 ε. The kernel is in the standard GADGET form; a source for it has not yet
-  been added to the page (see Open questions).
+  2.8 ε. The kernel is in the standard GADGET form; it is cited on the page as
+  Springel (2005).
 - **Integrator:** velocity-Verlet (symplectic), 2 substeps per 1 Myr frame,
   over 1000 Myr (`integrateTrajectories`). A star counts as ejected beyond
   1.5 × R_max (`EJECTION_RADIUS_FACTOR`).
@@ -258,7 +258,9 @@ RAR function on 17 Nov 2026; the current values are in `galaxies.js` (`best_fit.
    column.
 4. `anatomyFromRotation` estimates the gas mass from V_gas(last)²·r/G, which
    ignores the sign. This is visual only and does not affect the rotation curve.
-5. The softening kernel has no source cited on the page yet.
+5. Resolved 17 Nov 2026: the softening kernel is cited on the page as the
+   GADGET-2 spline softening (Springel 2005), with the spherical-force
+   simplification stated beside it.
 6. The same baryonic and NFW formulas exist in five places: the generator
    Python, page JS, two analysis scripts and Blender. The website is the
    reference version. If you change one, change all of them, or record the
