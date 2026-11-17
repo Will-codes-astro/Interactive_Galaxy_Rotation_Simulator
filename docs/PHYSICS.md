@@ -144,10 +144,20 @@ site uses hard limits.
 
 ## MOND (Milgrom 1983)
 
-μ(g/a₀) g = g_N, with the "standard" interpolating function
-μ(x) = x/√(1 + x²) (Famaey & McGaugh 2012). Solved exactly for g:
+g = g_N / (1 − e^(−√(g_N/a₀))),  where g_N = V_bar²/r (SI), and V_MOND = √(g r)
 
-g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI), and V_MOND = √(g r)
+This is the radial acceleration relation's interpolating function (McGaugh, Lelli &
+Schombert 2016, eq. 4). **Will's choice (17 Nov 2026)**, replacing the "standard"
+μ(x) = x/√(1 + x²) (Famaey & McGaugh 2012), because a₀ = 1.20 ± 0.02 was measured
+with this function on the same SPARC data, and Li et al. (2018), whose realistic
+fit limits the site follows, fit with it too. In the transition it is close to the
+"simple" μ(x) = x/(1 + x) (Famaey & Binney 2005), and at high g_N its boost dies away
+exponentially, like the standard μ. The code uses −expm1(−x) for 1 − e^(−x) so tiny
+g_N keeps full precision. Method shows plain MOND's χ²_ν with both functions
+(`mond_formula_table`; `_mond_boost_standard` exists only for that table). On
+17 Nov 2026 (standard → RAR): NGC 3198 21.3 → 13.4, NGC 2403 338 → 75.6,
+NGC 7331 4.70 → 35.8, UGC 128 115 → 97.0; across all 175 SPARC galaxies the
+median χ²/N barely moves (9.9 → 10.5).
 
 - No halo is used in MOND mode (M₂₀₀ = 0).
 - The limits are checked by the physics checks: g → g_N when g_N ≫ a₀, and
@@ -162,11 +172,11 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
   MOND's boost matters (Milgrom 1983; Famaey & McGaugh 2012). Edges are found by
   interpolating ln g_N linearly between neighbouring radii. The threshold is a
   guide, not a sharp switch: μ changes smoothly, so at the line (g_N = a₀) MOND
-  already raises the speed by about 13%, falling to about 2.4% at g_N = 3a₀ and
-  0.2% at 10a₀. Inside the zone the shade deepens with the speed boost
+  already raises the speed by about 26%, falling to about 10% at g_N = 3a₀ and
+  2.2% at 10a₀. Inside the zone the shade deepens with the speed boost
   V_MOND/V_bar − 1 at each radius (computed with `mondVelocity`, so it uses the same
-  interpolating function), from faint at the edge (≈13%) to full at a 200% boost, V_MOND = 3 V_bar
-  (`MOND_ZONE_FULL_BOOST`, at g_N ≈ 0.012 a₀). Between radii ln g_N is interpolated
+  interpolating function), from faint at the edge (≈26%) to full at a 200% boost, V_MOND = 3 V_bar
+  (`MOND_ZONE_FULL_BOOST`, at g_N ≈ 0.014 a₀). Between radii ln g_N is interpolated
   linearly, as for the edges. This is a visual choice, not a model result. For the default sandbox galaxy g_N < a₀ at
   every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
   √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses
@@ -237,6 +247,8 @@ plotting scripts and the Blender model, **not** by the website.
 ## Open questions and known differences
 
 These are documented here, not changed. Any change needs Will's decision.
+MOND numbers in 7 and 8 were found with the standard μ, before the switch to the
+RAR function on 17 Nov 2026; the current values are in `galaxies.js` (`best_fit.mond`).
 
 1. Resolved 15 Nov 2026: the NFW fit no longer uses a 1 km/s error floor or
    fixed Υ (see Best realistic fits). It still stays inside the scale-radius

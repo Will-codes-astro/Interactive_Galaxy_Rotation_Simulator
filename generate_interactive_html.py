@@ -142,14 +142,35 @@ def _r200_kpc(m200_msun: float) -> float:
     return (3.0 * m200_msun / (4.0 * math.pi * 200.0 * critical_density)) ** (1.0 / 3.0)
 
 
-def _mond_velocity(v_bar_kms: float, radius_kpc: float, a0_ms2: float) -> float:
-    """MOND speed with the standard interpolating function mu(x) = x / sqrt(1 + x^2), solved exactly. Same as mondVelocity (page JS)."""
+def _mond_boost_rar(y: float) -> float:
+    """g / g_N for y = g_N / a0: the radial acceleration relation, g = g_N / (1 - e^-sqrt(y)) (McGaugh, Lelli & Schombert 2016, eq. 4)."""
+    return 1.0 / -math.expm1(-math.sqrt(y))
+
+
+def _mond_boost_standard(y: float) -> float:
+    """g / g_N for y = g_N / a0 with the "standard" mu(x) = x / sqrt(1 + x^2) (Famaey & McGaugh 2012). Only for the Method comparison."""
+    return math.sqrt((1.0 + math.sqrt(1.0 + 4.0 / (y * y))) / 2.0)
+
+
+def _mond_velocity(v_bar_kms: float, radius_kpc: float, a0_ms2: float, boost=_mond_boost_rar) -> float:
+    """MOND speed, by default with the RAR interpolating function (Will's choice, 17 Nov 2026). Same as mondVelocity (page JS)."""
     r_m, v_ms = radius_kpc * M_PER_KPC, v_bar_kms * 1000.0
     if r_m <= 0.0 or v_ms <= 0.0:
         return 0.0
     g_n = v_ms * v_ms / r_m
-    g = math.sqrt((g_n * g_n + math.sqrt(g_n**4 + 4.0 * g_n * g_n * a0_ms2 * a0_ms2)) / 2.0)
-    return math.sqrt(g * r_m) / 1000.0
+    return math.sqrt(g_n * boost(g_n / a0_ms2) * r_m) / 1000.0
+
+
+def mond_formula_table(galaxies: list[dict[str, Any]], galaxy_info: dict[str, GalaxyInfo]) -> str:
+    """Method's table rows: plain MOND's reduced chi-squared (standard values, k = 0) with each interpolating function."""
+    rows = []
+    for galaxy in galaxies:
+        info, n = galaxy_info[galaxy["id"].upper()], len(galaxy["rotation"]["radius_kpc"])
+        standard = [lo for lo, _ in _standard_settings(info)]
+        chi = [_chi_squared(galaxy["rotation"], info, standard, lambda v, r, b=boost: _mond_velocity(v, r, MOND_A0_MEASURED_MS2, b)) / n
+               for boost in (_mond_boost_standard, _mond_boost_rar)]
+        rows.append(f"<tr><td>{escape(galaxy['name'])}</td><td>{chi[0]:.3g}</td><td>{chi[1]:.3g}</td></tr>")
+    return "".join(rows)
 
 
 def _pattern_search(cost, x: list[float], fx: float, bounds, step: list[float]) -> tuple[float, list[float]]:
@@ -1030,6 +1051,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .eq { display:block; margin:8px 0 12px; padding:10px 12px; border-left:2px solid var(--line-strong); border-radius:var(--r); background:rgba(0,0,0,.22); overflow-x:auto; color:var(--ink); }
     .eq math { font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math,serif; font-size:1.25em; margin:0; }
     .method-grid .eq { margin:6px 0; padding:6px 10px; }
+    .mini-table { border-collapse:collapse; margin:6px 0 12px; font-size:.92em; font-variant-numeric:tabular-nums; }
+    .mini-table th, .mini-table td { padding:3px 12px 3px 0; text-align:left; border-bottom:1px solid var(--line); }
+    .mini-table th { color:var(--muted); font-weight:500; }
     .method-grid .eq math { font-size:1.1em; }
     footer { flex-wrap:wrap; align-items:baseline; gap:8px 24px; margin:28px 0 0; padding:18px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); font-size:12px; }
     .footer-title { flex-basis:100%; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
@@ -1488,7 +1512,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <p><b>3. Far out,</b> put the weak rule into step 1:</p>
         <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><msqrt><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></msqrt><mi>r</mi></mfrac></math></div>
         <div class="eq"><math display="block"><mo>⇒</mo><mspace width="0.5em"/><msup><mi>v</mi><mn>4</mn></msup><mo>=</mo><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></math></div>
-        <p>r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using the standard formula (Famaey &amp; McGaugh 2012; see Method).</p>
+        <p>r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using the formula measured from SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method).</p>
         </details>
         <p>Compare both on the Simulator page; one galaxy alone cannot settle which is right.</p>
         </div>
@@ -1520,7 +1544,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div data-preset-only><dt>Tilt (inclination)</dt><dd><p>We see each disk at a tilt i: 0° face-on, 90° edge-on. A telescope only measures motion along our line of sight (the Doppler shift), so it sees just part of each star’s orbital speed:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>obs</mi></msub><mo>=</mo><mfrac><msub><mi>V</mi><mi>line of sight</mi></msub><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>In words:</b> divide the speed we see by sin i to get the true speed. SPARC has already done this using its own tilt, i<sub>SPARC</sub>, which has an error of a few degrees.</p><p><b>If the true tilt is different</b>, every point moves by the same factor (Li et al. 2018, eq. 5):</p><span class="eq"><math display="block"><mi>s</mi><mo>=</mo><mfrac><mrow><mi>sin</mi><msub><mi>i</mi><mi>SPARC</mi></msub></mrow><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>Example:</b> SPARC says 60° but the truth is 55°: s = 0.866 / 0.819 ≈ 1.06, so the real speeds are 6% higher. At 30° instead of 25°, s ≈ 1.18: nearly face-on galaxies are far more sensitive.</p><p><b>On the page,</b> Best realistic fits may change i within __FIT_LIMIT_SIGMA__× SPARC’s error (at most 90°). The points stay where SPARC put them and the model is divided by s instead, which gives the same χ². Tilt and distance can partly make up for each other, so the fitted tilt is less certain than the score.</p></dd></div>
         <div><dt>Visible matter</dt><dd><div id="footerModel"><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed a star would orbit at if only the visible matter pulled on it.</p><p><b>Why add squares?</b> For a circular orbit, the pull g = V²/r, so V² = gr. Pulls from different masses add, so V² values add; then take the square root.</p><p><b>The numbers</b> are mass-to-light ratios (in use: <b id="ftMlSource">standard SPARC values</b>; the standard 0.50 and 0.70 come from McGaugh &amp; Schombert 2014). SPARC gives V<sub>disk</sub> and V<sub>bulge</sub> for a ratio of 1, and V² is proportional to mass, so scaling the mass scales V².</p><p><b>Why V<sub>gas</sub>|V<sub>gas</sub>|?</b> Much of a galaxy’s gas lies in a ring further out. Inside the ring, more gas is outside you than inside, so its overall pull points outwards and SPARC lists V<sub>gas</sub> as negative. V<sub>gas</sub>|V<sub>gas</sub>| keeps that minus sign (squaring would lose it), so the gas then lowers the total.</p></div><div id="footerCustom" hidden><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed from your sandbox galaxy’s visible matter alone, added as squares for the same reason as in a real galaxy (V² = gr, and pulls add).</p><p>Each speed comes from the masses you set: an exponential disk (density fading steadily outwards) for the stars and the gas, and a Hernquist bulge (a standard ball-shaped profile).</p></div></dd></div>
         <div><dt>Dark matter (NFW halo)</dt><dd><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the model’s speed is visible matter plus the halo, added as squares like the parts above.</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>halo</mi></msub><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt><mo>,</mo><mspace width="1em"/><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>200</mn></msub><mfrac><mrow><mi>f</mi><mo>(</mo><mi>r</mi><mo>/</mo><msub><mi>r</mi><mi>s</mi></msub><mo>)</mo></mrow><mrow><mi>f</mi><mo>(</mo><mi>c</mi><mo>)</mo></mrow></mfrac></math></span><span class="eq"><math display="block"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>x</mi><mo>)</mo><mo>−</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>+</mo><mi>x</mi></mrow></mfrac><mo>,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mfrac><msub><mi>r</mi><mn>200</mn></msub><msub><mi>r</mi><mi>s</mi></msub></mfrac></math></span><p><b>The halo’s speed</b> is the A-level orbit speed V = √(GM/r). For a round cloud, only the mass inside the orbit pulls overall (Newton’s shell theorem), so M<sub>halo</sub>(r) is the dark matter inside radius r.</p><p><b>f</b> describes how that mass builds up with radius in an NFW halo (Navarro, Frenk &amp; White 1996); dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>. <b>r<sub>200</sub></b> is the halo’s conventional edge, where its average density falls to 200 times the Universe’s critical density; the model adds no mass beyond it. <b>r<sub>s</sub></b> (the scale radius slider) sets how concentrated the halo is.</p></dd></div>
-        <div><dt>MOND</dt><dd><p>No halo (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p><p><b>1. Newton’s pull</b> from the visible matter:</p><span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span><p><b>2. MOND’s boost.</b> Multiply by a boost factor:</p><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mo>×</mo><msqrt><mfrac><mrow><mn>1</mn><mo>+</mo><msqrt><mn>1</mn><mo>+</mo><msup><mrow><mo>(</mo><mn>2</mn><msub><mi>a</mi><mn>0</mn></msub><mo>/</mo><msub><mi>g</mi><mi>N</mi></msub><mo>)</mo></mrow><mn>2</mn></msup></msqrt></mrow><mn>2</mn></mfrac></msqrt></math></span><p>When g<sub>N</sub> is much bigger than a<sub>0</sub>, the bracket is about 1, so g = g<sub>N</sub>: plain Newton. When g<sub>N</sub> is much smaller, it grows and gives g ≈ √(g<sub>N</sub>a<sub>0</sub>), the stronger pull that flattens the curve. This is MOND’s standard interpolating function, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012), rearranged for g.</p><p><b>3. Back to a speed</b>, since g = V²/r:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></dd></div>
+        <div><dt>MOND</dt><dd><p>No halo (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p><p><b>1. Newton’s pull</b> from the visible matter:</p><span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span><p><b>2. MOND’s boost.</b> Divide by a switch-on factor:</p><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msub><mi>g</mi><mi>N</mi></msub><mrow><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><mo>/</mo><msub><mi>a</mi><mn>0</mn></msub></msqrt></mrow></msup></mrow></mfrac></math></span><p>When g<sub>N</sub> is much bigger than a<sub>0</sub>, e<sup>−…</sup> is almost 0, so g = g<sub>N</sub>: plain Newton. When g<sub>N</sub> is much smaller, 1 − e<sup>−x</sup> ≈ x, which gives g ≈ √(g<sub>N</sub>a<sub>0</sub>), the stronger pull that flattens the curve. This is the radial acceleration relation’s formula (McGaugh, Lelli &amp; Schombert 2016, eq. 4).</p><p><b>Why this formula?</b> MOND fixes the two limits but not how gravity switches between them. Older work often used the “standard” formula, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012). This site uses the RAR formula because a<sub>0</sub> was measured with it, from the same SPARC data, and the realistic best fits follow Li et al. (2018), who use it too. The choice matters for single galaxies. χ<sup>2</sup><sub>r</sub> for MOND at standard values:</p><table class="mini-table"><thead><tr><th>Galaxy</th><th>Standard</th><th>RAR (used)</th></tr></thead><tbody>__MOND_FORMULA_ROWS__</tbody></table><p><b>3. Back to a speed</b>, since g = V²/r:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></dd></div>
         <div><dt>Simulation</dt><dd><p>The 3D view follows massless <b>test stars</b> (800 for the presets): they feel the model’s gravity but do not pull on each other, so each moves on its own. Disk stars start on circular orbits, bulge stars with random motions. Each star’s acceleration is a = V<sub>model</sub>(r)²/r, towards the centre.</p><p>An orbit cannot be solved in one go, so the computer moves each star in small time steps, Δt = 0.5 Myr, 2000 times over 1 Gyr. Each step uses the <b>Velocity-Verlet method</b>:</p><span class="eq"><math display="block"><msub><mi>x</mi><mi>new</mi></msub><mo>=</mo><mi>x</mi><mo>+</mo><mi>v</mi><mi>Δ</mi><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>a</mi><msup><mrow><mi>Δ</mi><mi>t</mi></mrow><mn>2</mn></msup></math></span><p>This is SUVAT’s s = ut + ½at². Next, it finds the new acceleration a<sub>new</sub> at the new position, then updates the velocity with the <i>average</i> of the old and new accelerations:</p><span class="eq"><math display="block"><msub><mi>v</mi><mi>new</mi></msub><mo>=</mo><mi>v</mi><mo>+</mo><mfrac><mrow><mi>a</mi><mo>+</mo><msub><mi>a</mi><mi>new</mi></msub></mrow><mn>2</mn></mfrac><mi>Δ</mi><mi>t</mi></math></span><p><b>Why this method?</b> Using only the old acceleration would make each step slightly too big or small, and the error would build up, slowly spiralling stars in or out. Averaging stops this energy drift, so any star that leaves does so because of the physics, not rounding.</p></dd></div>
         <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math></span><p><b>In words:</b> for each measured point, find how far the model misses, divide by that point’s error bar σ, square it, then add them all up. Squaring makes misses above and below both count, and big misses count much more.</p><span class="eq"><math display="block"><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span><p><b>N</b> is the number of points and <b>k</b> the number of values tuned to fit this galaxy, so χ<sup>2</sup><sub>r</sub> is roughly the squared miss per point. About 1 means misses the size of the error bars.</p><p>With standard values: k = 0 for visible matter only and MOND, and k = 2 for the halo (M<sub>200</sub> and r<sub>s</sub>, also when set by hand). Best realistic fits also tune disk M/L (and bulge M/L), plus distance and tilt within __FIT_LIMIT_SIGMA__× SPARC’s errors: k = __K_NFW_FIT__ for NFW and __K_MOND_FIT__ for MOND (which adds a<sub>0</sub>).</p></dd></div>
       </dl>
@@ -1952,12 +1976,13 @@ __GALAXIES_JS__
         const MOND_A0_DEFAULT = 1.2e-10; // m/s^2
         let MOND_A0 = MOND_A0_DEFAULT;
         let mondMode = false;
-        // SI calculation with the standard interpolating function mu(x) = x / sqrt(1 + x^2)
+        // SI calculation with the RAR interpolating function, g = g_N / (1 − e^−√(g_N/a₀)) (McGaugh, Lelli & Schombert 2016,
+        // eq. 4), the form a₀ was measured with. −expm1(−x) is 1 − e^−x without rounding loss when x is tiny.
         function mondVelocity(vBarKms, rKpc, a0 = MOND_A0) {
             const rM = rKpc * M_PER_KPC, vMs = vBarKms * 1000;
             if (rM <= 0 || vMs <= 0) return 0;
             const gN = vMs * vMs / rM;
-            const g = Math.sqrt((gN * gN + Math.sqrt(gN ** 4 + 4 * gN * gN * a0 * a0)) / 2);
+            const g = gN / -Math.expm1(-Math.sqrt(gN / a0));
             return Math.sqrt(g * rM) / 1000;
         }
         // MOND prediction drawn against SPARC's points, for a drawn visible-matter speed and a best fit's distance and tilt.
@@ -3178,7 +3203,7 @@ __GALAXIES_JS__
     // the fit's distance, tilt and a₀. Each edge is placed where g_N crosses a₀, interpolated in log g between
     // neighbouring radii. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid.
     // Inside the zone the gold deepens with MOND's speed boost at that radius (V_MOND/V_bar − 1, from mondVelocity, so
-    // it follows the interpolating function): faint at the edge (≈13 % boost) and strongest once the boost reaches
+    // it follows the interpolating function): faint at the edge (≈26 % boost) and strongest once the boost reaches
     // MOND_ZONE_FULL_BOOST. The zone is cut into strips at most 1/MOND_ZONE_STRIPS of the graph wide, each shaded at its
     // midpoint's boost, rounded to MOND_ZONE_LEVELS steps so neighbouring strips of the same shade merge.
     const MOND_ZONE_EDGE='rgba(242,200,121,0.45)';
@@ -5407,6 +5432,7 @@ def main() -> None:
         "__GALAXY_NAMES__", escape(join_names([preset.name for preset in GALAXY_PRESETS]))
     )
     html = html.replace("__FRAME_MAX__", "1000")
+    html = html.replace("__MOND_FORMULA_ROWS__", mond_formula_table(galaxies, galaxy_info))
     html = html.replace("__K_NFW_FIT__", escape(tuned_count_text(galaxies, "nfw", "nfw")))
     html = html.replace("__K_MOND_FIT__", escape(tuned_count_text(galaxies, "mondBest", "mond")))
     html = html.replace("__FIT_LIMIT_SIGMA__", f"{FIT_LIMIT_SIGMA:g}")

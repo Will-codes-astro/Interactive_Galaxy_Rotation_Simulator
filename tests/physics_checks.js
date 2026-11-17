@@ -182,7 +182,7 @@ out.reduced_chi2_mond = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total, 
 P.setMond(false);
 // Deep-MOND limit: g -> sqrt(gN * a0), so v^4 -> vN^2 * a0 * r.
 {
-  const r = 200, vN = 5; // a far, weak-gravity point (kpc, km/s)
+  const r = 500, vN = 1; // a far, very weak-gravity point (kpc, km/s): the RAR formula nears this limit only as sqrt(g_N/a0)
   const rM = r * 3.0857e19, vNms = vN * 1000;
   const expected = Math.pow(vNms * vNms * P.MOND_A0 * rM, 0.25) / 1000;
   out.mond_deep_limit_relative_error = Math.abs(P.mondVelocity(vN, r) - expected) / expected;
