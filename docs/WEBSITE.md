@@ -301,9 +301,12 @@ If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
 picker shows a one-line summary with the number of measured speeds. On a keyboard,
-the left and right arrow keys navigate the tour when a control is not being
-edited (sliders and switches let go of focus after a mouse or touch drag, so
-the arrows return to the tour). Outside the tour, in fullscreen only, the arrows
+the left and right arrow keys always navigate the tour while it is open, even
+when the last control used (a slider, the Galaxy menu, a button) still has
+focus; only a text box being typed in keeps them, and up and down still move a
+focused slider. The highlight on a slider step rings the slider together with
+its label row (name and value); the sandbox tutorial's first card points at
+each of the three slider groups' headings in turn. Outside the tour, in fullscreen only, the arrows
 step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In MOND mode the halo mass and scale radius sliders (and their fullscreen

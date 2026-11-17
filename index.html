@@ -479,9 +479,12 @@
     @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.85); } }
     .tutorial-spotlight.is-complete .tutorial-pointer { opacity:0; animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
+    /* groups: the pointer rests on each group's heading in turn (no drag), then pops back to the first. */
+    .tutorial-spotlight.is-groups .tutorial-pointer { animation-name:tutorial-groups; animation-duration:4.5s; }
+    @keyframes tutorial-groups { 0%,24% { transform:translate(var(--from-x),var(--from-y)) scale(1); } 32%,56% { transform:translate(var(--mid-x),var(--mid-y)) scale(1); } 64%,88% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 93% { transform:translate(var(--to-x),var(--to-y)) scale(0); } 95% { transform:translate(var(--from-x),var(--from-y)) scale(0); } 100% { transform:translate(var(--from-x),var(--from-y)) scale(1); } }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, .tutorial-spotlight.is-groups .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -4083,7 +4086,7 @@ window.GALAXIES = {
         {id:'galaxies',mode:'preset',target:'galaxyMenu',gesture:'click',tag:'Choose a galaxy',watch:['galaxyProfile:Its profile'],title:'Try another galaxy',
          text:'Each galaxy has its own measured speeds. The card in the yellow box says what kind of galaxy it is.',
          action:'Open the Galaxy menu (blue box) and pick another galaxy.'},
-        {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
+        {id:'ml',mode:'preset',cardRight:true,target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and it is an estimate.',
          action:'Hover over (or tap) the ? in the blue box.'},
         {id:'scorecard',closing:true,target:'glanceTable',gesture:'scan',tag:'Read along the rows',title:'How both ideas score',
@@ -4094,7 +4097,7 @@ window.GALAXIES = {
          action:'Read on below to learn more.'}
       ]},
       sandbox:{label:'Sandbox tutorial',steps:[
-        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'scan',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
+        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'groups',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
          text:'Here you design the galaxy: how much its stars and gas weigh, and how they are spread out.',
          action:'Look at the three groups of sliders in the blue box, then press Next.'},
         {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['sbDiskMassValue:Disk mass','massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
@@ -4534,12 +4537,20 @@ window.GALAXIES = {
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
+      // groups: rest on each sandbox group's heading in turn.
+      const heads=gesture==='groups'?[...target.querySelectorAll('.sandbox-group h3')].map(h=>{const b=h.getBoundingClientRect();return[b.left-rect.left+Math.min(40,b.width/2),b.top-rect.top+b.height/2];}):[];
+      tutorialSpotlight.classList.toggle('is-groups',heads.length===3);
+      if(heads.length===3){[fromX,fromY]=heads[0];[toX,toY]=heads[2];
+        tutorialSpotlight.style.setProperty('--mid-x',(heads[1][0]+pad-2)+'px');tutorialSpotlight.style.setProperty('--mid-y',(heads[1][1]+pad-2)+'px');}
       // zero: slide to the left end; decrease / increase: slide left / right; adjust: slide whichever way has more room.
+      // The ring also holds the slider's label row, so the pointer is placed on the slider track itself.
       if(gesture==='zero'||gesture==='decrease'||gesture==='increase'||gesture==='adjust'){
         const fraction=(Number(target.value)-Number(target.min))/(Number(target.max)-Number(target.min));
-        fromX=8+(rect.width-16)*fraction;
+        const track=target.getBoundingClientRect(),x0=track.left-rect.left;
+        fromX=x0+8+(track.width-16)*fraction;
         const destination=gesture==='zero'?0:gesture==='decrease'?Math.max(0,Math.min(.45,fraction-.2)):gesture==='increase'?Math.min(1,Math.max(.55,fraction+.2)):(fraction>.5?.2:.8);
-        toX=8+(rect.width-16)*destination;
+        toX=x0+8+(track.width-16)*destination;
+        fromY=toY=track.top-rect.top+track.height/2;
       }
       tutorialSpotlight.style.setProperty('--from-x',(fromX+pad-2)+'px');
       tutorialSpotlight.style.setProperty('--to-x',(toX+pad-2)+'px');
@@ -4560,9 +4571,18 @@ window.GALAXIES = {
     // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
     // highlight grows to cover a box that expands out of it.
     // A slider's <output> stretches to fill its label row, so measure the number text itself.
-    function tutorialSpotRect(target){
+    // A slider is ringed together with its label row (its name and value), so the box shows what is being changed.
+    const tutorialSliderLabel=el=>el.matches('input[type=range]')&&el.id?document.querySelector(`label[for="${el.id}"]`):null;
+    function tutorialBaseRect(target){
       let r=target.getBoundingClientRect();
       if(target.tagName==='OUTPUT'&&target.textContent.trim()){const range=document.createRange();range.selectNodeContents(target);r=range.getBoundingClientRect();}
+      const label=tutorialSliderLabel(target),l=label&&label.getClientRects().length?label.getBoundingClientRect():null;
+      if(!l)return r;
+      const left=Math.min(r.left,l.left),top=Math.min(r.top,l.top),right=Math.max(r.right,l.right),bottom=Math.max(r.bottom,l.bottom);
+      return{left,top,right,bottom,width:right-left,height:bottom-top};
+    }
+    function tutorialSpotRect(target){
+      const r=tutorialBaseRect(target);
       let left=r.left,top=r.top,right=r.right,bottom=r.bottom;
       const openers=[...target.querySelectorAll('[aria-expanded="true"][aria-controls]')];
       if(target.matches('[aria-expanded="true"][aria-controls]'))openers.push(target);
@@ -4609,7 +4629,9 @@ window.GALAXIES = {
       const step=tutorialSteps[tutorialIndex];
       const aim=step&&!hideAll&&!tutorialCard.hidden?tutorialCurrentAim(step):null;
       // Rings go once their part is done, or once the whole card is done; the part being pointed at has the main ring.
-      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||tutorialCompleted[step.id]?[]:tutorialRingList(step).filter(r=>!tutorialLatched[r.id]&&!(aim&&aim.id===r.id));
+      // A watched value inside the main ring (the number in the slider's own label row) needs no ring of its own.
+      const aimLabel=aim&&aim.id!==tutorialSliderId&&document.getElementById(aim.id)?tutorialSliderLabel(document.getElementById(aim.id)):null;
+      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||tutorialCompleted[step.id]?[]:tutorialRingList(step).filter(r=>!tutorialLatched[r.id]&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
       const keep=new Set(ids.map(item=>item.id)),cardKey=tutorialTour+tutorialIndex;
       const still=hideAll||tutorialCard.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches;
       tutorialAlsoRings.forEach((ring,id)=>{
@@ -4628,7 +4650,7 @@ window.GALAXIES = {
       tutorialGhosts=tutorialGhosts.filter(([ghost,el])=>ghost.isConnected&&(!still&&fitTutorialRing(ghost,el)||(ghost.remove(),false)));
       // While the control being pointed at has a box open over the page (the Galaxy menu's list), rings on anything
       // the box covers are hidden, so no ring is drawn across it.
-      const aimEl=aim?document.getElementById(aim.id):null,open=aimEl?tutorialSpotRect(aimEl):null,shut=aimEl?aimEl.getBoundingClientRect():null;
+      const aimEl=aim?document.getElementById(aim.id):null,open=aimEl?tutorialSpotRect(aimEl):null,shut=aimEl?tutorialBaseRect(aimEl):null;
       const box=open&&(open.width>shut.width+1||open.height>shut.height+1)?open:null;
       const underBox=el=>{if(!box||aimEl.contains(el))return false;const r=el.getBoundingClientRect();return r.left<box.right&&r.right>box.left&&r.top<box.bottom&&r.bottom>box.top;};
       ids.forEach(item=>{
@@ -5045,21 +5067,27 @@ window.GALAXIES = {
     tutorialMore.addEventListener('click',()=>startTutorial('sandbox'));
     // Left/Right arrows: move between tour cards while the tour is open; otherwise, in fullscreen only, step the
     // simulation time by ARROW_TIME_STEP_MYR (hold to scrub).
+    // While the tour is open, Left/Right always turn the card, even when the last control used (a slider, the Galaxy
+    // menu, a button) still has focus; only a box being typed in keeps them. Up/Down still move a focused slider.
+    // Runs in the capture phase so the focused control never sees the key as well.
     const ARROW_TIME_STEP_MYR=50;
     document.addEventListener('keydown',e=>{
       if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey)return;
       if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
-      const control=e.target instanceof Element?e.target.closest('input,select,textarea,button,a,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="radio"]'):null;
-      if(control&&control!==tutorialBack&&control!==tutorialNext)return;
+      const el=e.target instanceof Element?e.target:null;
       const dir=e.key==='ArrowRight'?1:-1;
       if(!tutorialCard.hidden){
-        e.preventDefault();
+        if(el&&el.closest('textarea,[contenteditable]:not([contenteditable="false"]),input:not([type=range],[type=checkbox],[type=radio],[type=button],[type=submit])'))return;
+        e.preventDefault();e.stopPropagation();
         if(!e.repeat)(dir>0?tutorialNext:tutorialBack).click();
-      }else if(tutorialIsFullscreen()){
+        return;
+      }
+      if(el&&el.closest('input,select,textarea,button,a,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="radio"]'))return;
+      if(tutorialIsFullscreen()){
         e.preventDefault();
         onSliderInput(simTime+dir*ARROW_TIME_STEP_MYR);
       }
-    });
+    },true);
     // The tour is offered the first time the Simulator page opens in each page load (a refresh or new tab offers it
     // again; Will's choice), not over the opening story. Nothing is stored between visits.
     let tourOffered=false;
