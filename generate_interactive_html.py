@@ -1913,10 +1913,15 @@ __GALAXIES_JS__
         }
         loadGalaxyData(activeGalaxy);
         // The Custom Sandbox galaxy is imaginary, so it has no measured speeds: its curves are drawn on an even
-        // grid of 60 radii out to 1.25 x R_max instead of at a SPARC galaxy's data radii.
+        // grid of 60 radii out to 1.25 x R_max instead of at a SPARC galaxy's data radii. A few extra radii inside
+        // the first grid step (CUSTOM_GRID_INNER, as fractions of that step) let the curve start right at the centre,
+        // where every speed goes to zero, instead of jumping in at the first step. r = 0 itself is left out, since
+        // some speed and gravity formulas divide by r.
+        const CUSTOM_GRID_INNER=[0.05,0.25,0.5,0.75];
         function loadCustomGrid(rMax){
-            const n=60,rEnd=1.25*rMax;
-            rotationRows=Array.from({length:n},(_,i)=>({radius_kpc:rEnd*(i+1)/n,observed_kms:0,error_kms:0,gas_kms:0,gas_sq:0,disk_kms:0,bulge_kms:0}));
+            const n=60,rEnd=1.25*rMax,step=rEnd/n;
+            const gridRadii=[...CUSTOM_GRID_INNER.map(f=>f*step),...Array.from({length:n},(_,i)=>step*(i+1))];
+            rotationRows=gridRadii.map(r=>({radius_kpc:r,observed_kms:0,error_kms:0,gas_kms:0,gas_sq:0,disk_kms:0,bulge_kms:0}));
             radii=rotationRows.map(p=>p.radius_kpc);
             vObs=radii.map(()=>0);obsV=vObs.slice();obsErr=vObs.slice();
             vBary=radii.map(()=>0);
@@ -3166,7 +3171,7 @@ __GALAXIES_JS__
     }
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
-    const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout),...mondZoneLayout()});
+    const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y',range:[0,radii[radii.length-1]]},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout),...mondZoneLayout()});
     // MOND zone (MOND mode, every galaxy): shades the radii where the visible matter's own gravity, g_N = V_bar²/R, is
     // weaker than a₀, which is where MOND boosts gravity (Milgrom 1983; Famaey & McGaugh 2012). g_N is taken in the
     // same distance and tilt frame as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows

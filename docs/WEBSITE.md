@@ -110,7 +110,8 @@ once the slider pauses (`PhysicsEngine`, `rebuildCustomGalaxy` and
 `rebuildCustomStars` in the generator's page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
 Galaxy menu and profile card, the observed SPARC points, the residual bars and the χ² badge
 are hidden, and the curves are drawn on an even grid of 60 radii out to
-1.25 × the truncation radius. Its CSV export leaves out the observed and
+1.25 × the truncation radius, plus four radii inside the first step so every
+curve starts at the centre; the radius axis starts at 0. Its CSV export leaves out the observed and
 residual columns.
 
 - Stellar disk and gas are exponential disks cut at the truncation radius, each
