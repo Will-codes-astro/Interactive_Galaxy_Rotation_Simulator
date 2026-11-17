@@ -169,7 +169,7 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
   a₀ at 0.80 kpc in NGC 3198 (of 44 kpc measured) and 12.2 kpc in NGC 7331 (of
   36 kpc). NGC 2403 (peak g_N ≈ 0.98 a₀) and UGC 128 (≤ 0.09 a₀) are below a₀ at
   every measured radius, so the zone covers the whole curve. Checked from
-  SPARC Table 2 via `analysis/sparc_data.py`, 18 Nov 2026. `mondZoneLayout` (page JS); it changes no model numbers.
+  SPARC Table 2 via `analysis/sparc_data.py`, 17 Nov 2026. `mondZoneLayout` (page JS); it changes no model numbers.
 
 ## Goodness of fit
 
