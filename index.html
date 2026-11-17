@@ -4571,9 +4571,12 @@ window.GALAXIES = {
     // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
     // highlight grows to cover a box that expands out of it.
     // A slider's <output> stretches to fill its label row, so measure the number text itself.
-    // A slider is ringed together with its label row (its name and value), so the box shows what is being changed.
+    // A slider is ringed together with its label row (its name and value), so the box shows what is being changed;
+    // the tour card's own slider is ringed round its whole panel.
     const tutorialSliderLabel=el=>el.matches('input[type=range]')&&el.id?document.querySelector(`label[for="${el.id}"]`):null;
+    const tutorialRingBox=el=>el&&el.closest?el.closest('.tutorial-slider')||el:el;
     function tutorialBaseRect(target){
+      if(tutorialRingBox(target)!==target)return tutorialRingBox(target).getBoundingClientRect();
       let r=target.getBoundingClientRect();
       if(target.tagName==='OUTPUT'&&target.textContent.trim()){const range=document.createRange();range.selectNodeContents(target);r=range.getBoundingClientRect();}
       const label=tutorialSliderLabel(target),l=label&&label.getClientRects().length?label.getBoundingClientRect():null;
@@ -4613,7 +4616,7 @@ window.GALAXIES = {
       const r=el&&el.getClientRects().length?tutorialSpotRect(el):null;
       if(!r||!r.width||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth)return false;
       // The ring is border-box, so it sits exactly pad px outside the control on every side, with matching corners.
-      const pad=4,radius=parseFloat(getComputedStyle(el).borderTopLeftRadius)||0;
+      const pad=4,radius=parseFloat(getComputedStyle(tutorialRingBox(el)).borderTopLeftRadius)||0;
       ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
       ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
       // Corners follow the control itself, not a box it has opened (a round ? button with its square info box).
