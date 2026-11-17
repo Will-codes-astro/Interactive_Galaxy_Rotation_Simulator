@@ -4362,7 +4362,7 @@ __GALAXIES_JS__
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
         {id:'sbMond',mode:'custom',target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
-         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard enough near its centre that MOND leaves it alone there, as Newton’s law says. MOND only takes over further out.',
+         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard near its centre, so there MOND barely changes gravity and the speeds stay close to Newton’s. MOND’s boost grows further out.',
          text:'MOND only changes gravity where it is very weak, below a tiny acceleration called a₀. The gold shading on the graph marks where your galaxy’s visible matter pulls that weakly, so MOND boosts it there.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until a clear, unshaded part opens up near the centre of the graph.'},
         {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo stability monitor',
