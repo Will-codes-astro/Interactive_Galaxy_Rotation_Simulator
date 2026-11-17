@@ -4064,7 +4064,7 @@ window.GALAXIES = {
          text:'Face-on, you look straight down on the disk. Each line is one star’s path: near-perfect circles.',
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: a galaxy in balance.'},
-        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'Play',checks:{fsPlay:()=>tutorialFlags.prediction!=null&&playing},title:'Which star laps more?',
+        {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'2 · Play',checks:{fsPlay:()=>tutorialFlags.prediction!=null&&playing},title:'Which star laps more?',
          predict:{question:'Predict first: over the next 400 million years, which ringed star will finish more laps?',options:['Inner star','Outer star','About the same'],answer:0},
          text:'The two ringed stars move at similar speeds, but the outer one is about four times further out.',
          action:'Press ▶ Play and watch the lap counts on the two ringed stars.',
@@ -4198,6 +4198,8 @@ window.GALAXIES = {
     // The control to point at now: the first part not yet done (null once every part is done).
     function tutorialCurrentAim(step){
       if(tutorialCompleted[step.id]&&step.checks)return null;
+      // A predict-first card points at its answer buttons (on the card) before anything else.
+      if(step.predict&&tutorialFlags.prediction==null)return{id:'tutorialChoices',label:'1 · Predict',gesture:'click'};
       const first={id:step.target,label:step.tag,gesture:step.gesture};
       if(!step.checks)return first;
       const parts=[first,...(step.also||[]).map(e=>{const k=e.indexOf(':'),id=k<0?e:e.slice(0,k),el=document.getElementById(id);
@@ -4371,7 +4373,7 @@ window.GALAXIES = {
     // A predict-first question: the step's controls stay locked (and the race paused) until it is answered.
     function tutorialPredictionPrompt(predict){
       const box=document.createElement('div'),q=document.createElement('strong'),row=document.createElement('div');
-      q.textContent=predict.question;row.className='tutorial-choices';
+      q.textContent=predict.question;row.className='tutorial-choices';row.id='tutorialChoices';
       predict.options.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.textContent=label;
         b.addEventListener('click',()=>{tutorialFlags.prediction=i;tutorialPlayedMyr=0;tutorialWatchLast=raceStartMyr=simTime;refreshTutorialGuidance();});row.appendChild(b);});
       box.append(q,row);return box;
