@@ -155,6 +155,14 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
 - **MOND best fit** (Best realistic fits on): `fit_mond` (generator), within the realistic limits above.
 - Implemented in `mondVelocity`, `mondModelVelocity` and `extraVelocityModel`
   (page JS), and `_mond_velocity` (generator, used only by the fit).
+- **MOND zone (sandbox, display only):** in the Custom Sandbox with MOND on, the
+  rotation curve shades every radius where g_N = V_bar²/r < a₀, the regime where
+  MOND's boost matters (Milgrom 1983; Famaey & McGaugh 2012). Edges are found by
+  interpolating ln g_N linearly between neighbouring radii. The threshold is a
+  guide, not a sharp switch: μ changes smoothly, so the boost is already a few
+  per cent just inside the line. For the default sandbox galaxy g_N < a₀ at
+  every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
+  √(G M / a₀). `mondZoneLayout` (page JS); it changes no model numbers.
 
 ## Goodness of fit
 

@@ -246,7 +246,20 @@
     .control[hidden] { display:none; }
     @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto repeat(2,minmax(0,1fr)); } }
     .gravity-label { display:block; margin-bottom:9px; color:var(--ink-2); font-size:12.5px; font-weight:500; }
-    .gravity-control .switch { display:flex; justify-content:flex-start; margin:0; gap:9px; font-size:13px; }
+    /* Gravity model: two colour-coded cards. Purple = dark matter (the halo line and 3D halo), gold = MOND (its zone). */
+    .model-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:2px 0 0; }
+    .model-card { position:relative; display:flex; cursor:pointer; border-radius:10px; }
+    .model-card input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
+    .model-card > span { flex:1; display:flex; flex-direction:column; gap:1px; padding:8px 11px 8px 26px; border:1px solid var(--line-strong); border-radius:10px; background:rgba(255,255,255,.025); color:var(--muted); transition:background .2s,border-color .2s,box-shadow .2s; }
+    .model-card > span::before { content:''; position:absolute; left:10px; top:13px; width:9px; height:9px; border-radius:50%; border:1.5px solid currentColor; transition:background .2s; }
+    .model-card b { font-size:14px; font-weight:600; color:var(--ink-2); }
+    .model-card small { font-size:11.5px; line-height:1.3; }
+    .model-card.is-dm { --mc:179,154,232; } .model-card.is-mond { --mc:242,200,121; }
+    .model-card:hover input:not(:checked) + span { border-color:rgba(var(--mc),.55); }
+    .model-card input:checked + span { border-color:rgba(var(--mc),.85); background:linear-gradient(180deg,rgba(var(--mc),.18),rgba(var(--mc),.06)); color:rgb(var(--mc)); box-shadow:0 0 0 1px rgba(var(--mc),.35), 0 0 18px rgba(var(--mc),.22); }
+    .model-card input:checked + span::before { background:rgb(var(--mc)); }
+    .model-card input:checked + span b { color:var(--ink); }
+    .model-card input:focus-visible + span { outline:2px solid var(--cyan); outline-offset:2px; }
     .gravity-control .control-help { max-width:300px; }
     @media (max-width:960px) { .gravity-control { grid-column:1/-1; } }
     .fs-time { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
@@ -947,7 +960,7 @@
     </section>
     <div id="controlsAnchor" aria-hidden="true"></div>
     <section class="controls" aria-label="Model controls">
-    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><label class="switch" title="Switch between a dark matter halo and modified gravity (MOND)"><input type="checkbox" id="mondToggle" role="switch" autocomplete="off" aria-label="Use MOND theory instead of NFW dark matter halo"><span class="opt active" id="optNfw">NFW Dark Matter Halo</span><span class="track" aria-hidden="true"></span><span class="opt" id="optMond">MOND Theory</span></label><p class="control-help" id="nfwNote">Flip to MOND, a change to gravity with no dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².</p></div>
+    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold shading is where your galaxy’s gravity is that weak.</span></p></div>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
@@ -2864,7 +2877,34 @@ window.GALAXIES = {
     }
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
-    const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout;
+    const curveLayoutNow=()=>customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y'},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false},...mondZoneLayout()}:curveLayout;
+    // MOND zone (sandbox + MOND only): shades the radii where the visible matter's own gravity, g_N = V_bar²/R, is
+    // weaker than a₀, which is where MOND boosts gravity (Milgrom 1983; Famaey & McGaugh 2012). Each edge is placed
+    // where g_N crosses a₀, interpolated in log g between neighbouring radii. The shading itself is a visual aid.
+    const MOND_ZONE_FILL='rgba(255,196,90,0.13)',MOND_ZONE_EDGE='rgba(242,200,121,0.6)';
+    const mondNewtonianSomewhere=()=>radii.some((r,i)=>r>0&&(vBary[i]*1000)**2/(r*M_PER_KPC)>=MOND_A0);
+    function mondZoneLayout(){
+      if(!(customActive&&mondMode))return{shapes:[],annotations:[]};
+      const logG=radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*1000)**2/(r*M_PER_KPC)):-Infinity),cut=Math.log(MOND_A0);
+      const runs=[];let start=null;
+      const edge=i=>{const a=logG[i-1],b=logG[i];return isFinite(a)&&isFinite(b)&&a!==b?radii[i-1]+(radii[i]-radii[i-1])*(cut-a)/(b-a):radii[i];};
+      logG.forEach((g,i)=>{
+        const weak=g<cut;
+        if(weak&&start===null)start=i===0?radii[0]:edge(i);
+        if(!weak&&start!==null){runs.push([start,edge(i)]);start=null;}
+      });
+      if(start!==null)runs.push([start,radii[radii.length-1]]);
+      const widest=runs.reduce((w,r)=>!w||r[1]-r[0]>w[1]-w[0]?r:w,null),first=radii[0],last=radii[radii.length-1];
+      const everywhere=runs.length===1&&widest[0]<=first&&widest[1]>=last;
+      // A dashed gold line marks each place inside the graph where visible gravity crosses a₀.
+      const edges=runs.flat().filter(x=>x>first&&x<last);
+      return{
+        shapes:[...runs.map(([x0,x1])=>({type:'rect',layer:'below',xref:'x',yref:'paper',x0,x1,y0:0,y1:1,fillcolor:MOND_ZONE_FILL,line:{width:0}})),
+          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'paper',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1.2,dash:'dash'}}))],
+        annotations:widest?[{xref:'x',yref:'paper',x:(widest[0]+widest[1])/2,y:0.98,yanchor:'top',showarrow:false,
+          text:(everywhere?'MOND boosts gravity everywhere here':'MOND boosts gravity here')+'<br><span style="font-size:10px">visible matter’s gravity is weaker than a₀</span>',font:{size:11,color:'#f2c879'}}]:[]
+      };
+    }
     Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayoutNow(),curveConfig);
     updateChi(totalCurve);
     setupCurveReadout();
@@ -3207,6 +3247,7 @@ window.GALAXIES = {
       document.getElementById('massValue').textContent=haloMassText(massT);
       document.getElementById('scaleValue').textContent=`${rs.toFixed(1)} kpc`;
       const res=residualsOf(total);updateChi(total);
+      document.getElementById('mondZoneNote').hidden=!(customActive&&mondMode);
       const fit=activeFit();
       document.getElementById('chiBadge').title=(mondMode?'Goodness of fit of the MOND prediction to the SPARC points':'Goodness of fit of visible matter + NFW halo to the SPARC points')
         +(fit&&bestFits?`, using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)`:'');
@@ -3228,7 +3269,7 @@ window.GALAXIES = {
         clearTimeout(orbitModelTimer); // the settling full update schedules the orbits once
         return;
       }
-      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible,'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax]},[1,2,3,4,5,6,7]);
+      Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible,'marker.color':[undefined,undefined,undefined,residualColors,undefined,undefined,undefined]},{'yaxis.range':[0,yMax],...mondZoneLayout()},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
       scheduleOrbitUpdate();
     }
@@ -3321,10 +3362,15 @@ window.GALAXIES = {
     setupExplainer('mlInfoBtn','mlExplainer','mlExplainerClose');
     setupExplainer('tiltInfoBtn','tiltExplainer','tiltExplainerClose');
     setupExplainer('starsInfoBtn','starsExplainer','starsExplainerClose');
+    // The two model cards set the hidden mondToggle, which every other listener (tutorial, "before" line) watches.
+    const gravityRadios=[...document.querySelectorAll('input[name=gravityModel]')];
+    gravityRadios.forEach(radio=>radio.addEventListener('change',()=>{
+      if(!radio.checked||(radio.value==='mond')===mondToggle.checked)return;
+      mondToggle.checked=radio.value==='mond';mondToggle.dispatchEvent(new Event('change',{bubbles:true}));
+    }));
     mondToggle.addEventListener('change',()=>{
       mondMode=mondToggle.checked;
-      document.getElementById('optNfw').classList.toggle('active',!mondMode);
-      document.getElementById('optMond').classList.toggle('active',mondMode);
+      gravityRadios.forEach(radio=>{radio.checked=(radio.value==='mond')===mondMode;});
       document.getElementById('mondNote').hidden=!mondMode;
       document.getElementById('nfwNote').hidden=mondMode;
       applyBaryonState();
@@ -3955,9 +4001,9 @@ window.GALAXIES = {
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
          action:'1. Drag Halo mass away from where it is until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Now fine-tune both sliders until the yellow box reads Close fit. No shortcuts: Apply Observed Fit is locked, so this is all you.'},
-        {id:'mond',target:'modelBar',gesture:'switch',tag:'Click MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
+        {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says.',
-         action:'Click the switch in the blue box to choose MOND. Compare χ² in the yellow box.'},
+         action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
@@ -4026,6 +4072,10 @@ window.GALAXIES = {
         {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
+        {id:'sbMond',mode:'custom',target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
+         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard enough near its centre that MOND leaves it alone there, as Newton’s law says. MOND only takes over further out.',
+         text:'MOND only changes gravity where it is very weak, below a tiny acceleration called a₀. The gold shading on the graph marks where your galaxy’s visible matter pulls that weakly, so MOND boosts it there.',
+         action:'1. Choose MOND. 2. Drag Disk mass to the right until a clear, unshaded part opens up near the centre of the graph.'},
         {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo stability monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
          action:'Point at the monitor (blue box) and find its marker. Is it inside the shaded band?'},
@@ -4081,7 +4131,7 @@ window.GALAXIES = {
     const sbVal=id=>{const el=document.getElementById(id);return el?Number(el.value):0;};
     function tutorialResetChecks(){
       tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;
-      tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
+      tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
     }
     function tutorialUpdateChecks(){
       const step=tutorialStep();
@@ -4107,9 +4157,9 @@ window.GALAXIES = {
       const first={id:step.target,label:step.tag,gesture:step.gesture};
       if(!step.checks)return first;
       const parts=[first,...(step.also||[]).map(e=>{const k=e.indexOf(':'),id=k<0?e:e.slice(0,k),el=document.getElementById(id);
-        // A slider part labelled 'Drag to 0' points left, towards 0; any other slider part points either way.
+        // A slider part labelled 'Drag to 0' points left to 0, 'Drag right' points right; any other slider part either way.
         const label=k<0?'':e.slice(k+1),range=el&&el.matches('input[type=range]');
-        return{id,label,gesture:range?(/\bto 0\b/.test(label)?'zero':'adjust'):'click'};})];
+        return{id,label,gesture:range?(/\bto 0\b/.test(label)?'zero':/\bright\b/.test(label)?'increase':'adjust'):'click'};})];
       return parts.find(p=>!tutorialLatched[p.id])||null;
     }
     // Slider steps whose result shows far from the slider (the sandbox sliders sit above the plots): the card carries a
@@ -4186,10 +4236,10 @@ window.GALAXIES = {
           say:step.mode==='custom'?'Switch to Custom Sandbox first. ':'Switch back to Preset Galaxies first. '};
       }
       if(step.nfw&&mondMode){
-        return{target:document.querySelector('#modelBar .track'),gesture:'click',
-          say:step.halo?'Switch back to NFW first; MOND does not use a dark matter halo. ':'Switch back to NFW first. '};
+        return{target:document.getElementById('optNfw'),gesture:'click',
+          say:step.halo?'Choose Dark matter halo first; MOND does not use one. ':'Choose Dark matter halo first. '};
       }
-      if(step.mond&&!mondMode)return{target:document.querySelector('#modelBar .track'),gesture:'click',say:'Switch to MOND first. '};
+      if(step.mond&&!mondMode)return{target:document.getElementById('optMond'),gesture:'click',say:'Choose MOND first. '};
       // Page settings come first: fixing them needs the page, so fullscreen is asked for last.
       if(step.fs&&!fullscreen){
         const viewClosed=viewPanel.classList.contains('collapsed');
@@ -4420,7 +4470,7 @@ window.GALAXIES = {
       }
       let target=finished?tutorialAimTarget:blocker?blocker.target:aim.id===tutorialSliderId?tutorialSliderInput:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
       if(gesture==='switch'&&!finished){
-        target=document.querySelector('#modelBar .track');gesture='click';
+        target=document.getElementById('optMond');gesture='click';
       }
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
       if(target!==tutorialAimTarget){

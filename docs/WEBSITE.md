@@ -20,10 +20,18 @@ fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
 the controls that change them. On wide screens the galaxy profile card splits into
 two columns (who the galaxy is | its numbers) to keep the figures nearer the top.
-The NFW/MOND switch ("Gravity model", `#modelBar`) is the first control in
+The gravity model choice ("Gravity model", `#modelBar`) is the first control in
 the slider bar (Will's choice), so on screens at least 961 × 700 px, where that bar
-sticks to the top, the theory can be flipped while watching the figures and χ².
-Its hint reads "Flip to MOND…" in NFW mode and gives a₀ in MOND mode.
+sticks to the top, the theory can be changed while watching the figures and χ².
+It is two colour-coded cards (Will's choice): "Dark matter halo: extra unseen
+mass" (purple, like the halo line) and "MOND: gravity changes, no extra mass"
+(gold). The cards set the hidden `#mondToggle` checkbox that the rest of the page
+listens to. Its hint suggests trying MOND in NFW mode and gives a₀ in MOND mode.
+In the Custom Sandbox with MOND on, the rotation curve shades in gold every
+radius where the visible matter's gravity is weaker than a₀ ("MOND boosts
+gravity here"), with a dashed line where it crosses a₀ (see PHYSICS.md). The
+sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
+until an unshaded centre opens up.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
