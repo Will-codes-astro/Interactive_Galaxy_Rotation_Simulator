@@ -1195,7 +1195,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (max-width:560px) { .answers { grid-template-columns:1fr; } }
     .score-legend { display:flex; flex-wrap:wrap; gap:8px 22px; margin:0 0 14px; padding:0; list-style:none; color:var(--ink-2); font-size:12.5px; }
     .score-legend .score { min-width:0; margin-right:8px; font-size:11.5px; }
-    .score-notes-title + .score-notes { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; padding:0; list-style:none; }
+    .score-notes-title + .score-notes { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:0; list-style:none; }
+    /* Six cards: 3 + 3 on wide screens, 2 + 2 + 2 on tablets, one column on phones, so no row is left half empty. */
+    @media (max-width:1000px) { .score-notes-title + .score-notes { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:640px) { .score-notes-title + .score-notes { grid-template-columns:1fr; } }
     .score-notes-title + .score-notes li { max-width:none; margin:0; padding:12px 14px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); font-size:12.5px; line-height:1.55; }
     .score-notes-title + .score-notes b { display:block; margin-bottom:4px; font:600 13.5px var(--f-serif); }
     .evidence-grid.two { grid-template-columns:1fr 1fr; margin-bottom:6px; }
