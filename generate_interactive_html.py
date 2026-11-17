@@ -849,8 +849,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-try li { margin:2px 0; }
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
+    /* The three answers share one row; they only wrap on a very narrow card. */
     .tutorial-choices { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
-    .tutorial-choices button { min-height:34px; padding:6px 12px; border-radius:999px; font-size:12px; }
+    .tutorial-choices button { flex:1 1 auto; min-height:34px; padding:6px 8px; border-radius:999px; font-size:12px; white-space:nowrap; }
     .tutorial-try .tutorial-prediction { display:block; margin-bottom:4px; color:var(--muted); font-size:11px; }
     /* The current task's ring is the brightest; the other rings sit a little dimmer. */
     @keyframes tutorial-also-pulse { 0%,100% { opacity:.5; } 50% { opacity:.68; } }
@@ -4474,7 +4475,7 @@ __GALAXIES_JS__
     TOURS.closing={label:'Wrapping up',steps:TOURS.main.steps.filter(s=>s.closing)};
     const FULL_TOUR=['main','sandbox','closing'];let tutorialFull=false;
     const tourSteps=(tour,full)=>full&&tour==='main'?TOURS.main.steps.filter(s=>!s.closing):TOURS[tour].steps;
-    let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null,tutorialAimTarget=null;
+    let tutorialLastMass=0,tutorialLastScale=0,tutorialLastTime=0,tutorialDrag=null,tutorialShortcutUnlocked=false,tutorialBlockTarget=null,tutorialAimTarget=null,tutorialCarryTarget=null;
     const tutorialStep=()=>tutorialSteps[tutorialIndex];
     // Multi-part steps: checks maps each ringed control to a test of whether its part is done. A part, once done,
     // stays done for that card; its ring disappears and the pointer moves on to the next part.
@@ -4834,9 +4835,11 @@ __GALAXIES_JS__
       if(target!==tutorialAimTarget){
         leaveTutorialGhost();
         if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
-        tutorialAimTarget=target;tutorialSpotlight.classList.remove('is-reached','is-arriving');
-        void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');
+        const carried=target===tutorialCarryTarget;
+        tutorialAimTarget=target;
+        if(!carried){tutorialSpotlight.classList.remove('is-reached','is-arriving');void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');}
       }
+      tutorialCarryTarget=null;
       tutorialSpotlight.classList.toggle('in-card',tutorialCard.contains(target));
       dodgeTutorialBox(target);
       const rect=tutorialSpotRect(target),pad=4;
@@ -4971,7 +4974,9 @@ __GALAXIES_JS__
       ids.forEach(item=>{
         let ring=tutorialAlsoRings.get(item.id);
         const el=document.getElementById(item.id);
-        if(ring&&ring.dataset.card!==cardKey){ring.remove();ring=null;}
+        // A box the last card also had on this control carries over as it is (no restart); one already fading
+        // green from that card is replaced by a fresh one.
+        if(ring&&ring.dataset.card!==cardKey){if(/is-leaving|is-handover/.test(ring.className)){ring.remove();ring=null;}else ring.dataset.card=cardKey;}
         if(!ring){ring=document.createElement('div');ring.dataset.card=cardKey;ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.id,ring);if(spotlightResize&&el)spotlightResize.observe(el);}
         const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;
         if(ring.parentElement!==tutorialSpotlight.parentElement)tutorialSpotlight.parentElement.appendChild(ring);
@@ -5070,6 +5075,8 @@ __GALAXIES_JS__
       tutorialScaleSeen=[tutorialLastScale,tutorialLastScale,tutorialLastScale];
       tutorialLastTime=Number(timeSlider.value);
       tutorialDrag=null;
+      // A box still showing on the control the new card starts on stays put instead of replaying its arrival.
+      tutorialCarryTarget=!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-complete')?tutorialAimTarget:null;
       tutorialAimTarget=null;
       tutorialResetChecks();
       tutorialTarget=document.getElementById(step.target);
