@@ -91,17 +91,17 @@ Model setup opens with two large choice cards: Preset Galaxies (real data,
 the SPARC galaxies) and Custom Sandbox (build your own). The chosen card glows
 blue; on phones they stack. Choosing Custom Sandbox opens
 a builder with six anatomy sliders: stellar disk mass, disk scale length,
-truncation radius, bulge mass, bulge effective radius and gas mass. The bulge
+truncation radius, bulge mass, bulge Hernquist scale radius and gas mass. The bulge
 radius is disabled while the bulge mass is zero. A "What you have built" card
 above the sliders names the galaxy type (dwarf, gas-rich dwarf irregular, low
 surface brightness, Sa/Sb/Sc spirals, bulgeless disk, lenticular, giant or
 monster) from the star mass, bulge-to-total ratio, gas fraction and disk
 surface density (`classifyGalaxy` in the generator), with a real example and
 trait tags. The thresholds are rough rules of thumb. The sandbox never blocks a
-configuration. Its halo stability monitor, under the rotation curve, computes
+configuration. Its halo shape monitor, under the rotation curve, computes
 the concentration c = r200 / rs of the current NFW halo from the halo mass and
-scale radius sliders and shows a "⚠️ Unphysical / Unstable Galaxy Profile"
-badge (also over the 3D view) whenever c falls outside 3–25
+scale radius sliders and shows a "⚠️ Unusual halo shape"
+badge (otherwise "✓ Typical halo shape") (also over the 3D view) whenever c falls outside 3–25
 (`STABLE_CONCENTRATION` in the generator).
 
 In the sandbox the anatomy sliders drive the rotation curve and the halo live,
@@ -283,7 +283,7 @@ scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
 phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tutorial covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
-halo stability monitor (what it reads, then pushing a halo out of range), the
+halo shape monitor (what it reads, then pushing a halo out of range), the
 halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
 orbits, then the first star lost without dark matter). It follows on from the simulator
 tutorial in the full guided tour, or starts from the Sandbox tutorial button on
@@ -292,7 +292,7 @@ Simulator tutorial button, which reads "Sandbox tutorial" while the sandbox is
 open. On the slider steps whose result shows far from the slider, the card
 carries a copy of the one slider the current part asks for (`cardSlider` on the
 step), linked to the real one, and the page scrolls to the graph, 3D view or
-stability monitor it changes. A slider in the pinned slider bar (wide screens) needs no copy.
+shape monitor it changes. A slider in the pinned slider bar (wide screens) needs no copy.
 If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
@@ -337,7 +337,7 @@ Highlight boxes: each box follows its control every frame, including while it fa
 never hangs where a control used to be. A box whose control has scrolled under the top menu (or, for the
 plots, under the pinned slider bar) is cut off at that edge rather than drawn over it. Each card scrolls
 its control to just below the top menu, a slider together with its label and value, and brings a watched
-box that sits just above it (the M/L and tilt tiles) or further down (the stability monitor) into view
+box that sits just above it (the M/L and tilt tiles) or further down (the shape monitor) into view
 too. The box round the Galaxy menu grows to cover its open list, and the yellow box on the profile card
 hides while the list is over it. The box round a "?" button and its explainer has square-ish corners.
 The pointer fades out once a step is done.
