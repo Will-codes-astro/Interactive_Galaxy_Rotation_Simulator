@@ -3188,7 +3188,7 @@ window.GALAXIES = {
     });
     const UNSTABLE_BADGE='⚠️ Unphysical / Unstable Galaxy Profile';
     function stabilityReport(){
-      if(mondMode)return{state:'none',badge:'No halo to assess',message:'MOND has no dark matter halo, so there is no concentration to check. Switch back to the NFW halo to see it.'};
+      if(mondMode)return{state:'none',badge:'No halo to assess',message:'MOND has no dark matter halo, so there is no concentration to check. Choose Dark matter halo to see it.'};
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
       if(massT<=0)return{state:'none',badge:'No halo to assess',message:'With the halo mass at zero there is no halo to check. Raise it to see its concentration.'};
       const r200=Math.cbrt(3*massT*1e12/(4*Math.PI*200*(3*H0*H0/(8*Math.PI*G))));
@@ -4048,7 +4048,7 @@ window.GALAXIES = {
         {id:'scorecard',closing:true,target:'glanceTable',gesture:'scan',tag:'Read along the rows',title:'How both ideas score',
          text:'Each row is a galaxy, scored under each idea: close (blue), rough (orange) or poor (red). Each arrow goes from the standard values to the best realistic fit. A † means that fit had to use a value at the edge of what is realistic.',
          action:'Read along the rows in the blue box, then press Next.'},
-        {id:'finish',closing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
+        {id:'finish',closing:true,noRing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
          text:'A close fit does not prove either idea: both models are simplified and the measurements have errors.',
          action:'Read on below to learn more.'}
       ]},
@@ -4460,6 +4460,8 @@ window.GALAXIES = {
       if(tutorialCard.hidden){tutorialSpotlight.hidden=true;positionTutorialAlso(true);return;}
       positionTutorialAlso();
       const step=tutorialStep(),blocker=tutorialBlocker(),aim=blocker?null:tutorialCurrentAim(step);
+      // noRing: a card about a whole section (the last one) gets no box or dimming, which would cover most of the page.
+      if(step.noRing&&!blocker){tutorialSpotlight.hidden=true;return;}
       // A many-part card just finished: the ring stays on the last part so it can turn green and fade out slowly.
       const finished=!blocker&&!aim&&tutorialCompleted[step.id]&&tutorialAimTarget&&tutorialAimTarget.isConnected&&!tutorialSpotlight.classList.contains('is-revisit');
       // Every ringed part is done but the card still waits on something unringed (Score your fit's χ² goal): the last
