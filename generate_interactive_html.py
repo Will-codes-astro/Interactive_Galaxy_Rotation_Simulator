@@ -4847,8 +4847,8 @@ __GALAXIES_JS__
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
-      // groups: rest on each sandbox group's heading in turn.
-      const heads=gesture==='groups'?[...target.querySelectorAll('.sandbox-group h3')].map(h=>{const b=h.getBoundingClientRect();return[b.left-rect.left+Math.min(40,b.width/2),b.top-rect.top+b.height/2];}):[];
+      // groups: rest on the heading of each sandbox group that has sliders (not Stats), in turn.
+      const heads=gesture==='groups'?[...target.querySelectorAll('.sandbox-group')].filter(g=>g.querySelector('input[type=range]')).map(g=>g.querySelector('h3')).map(h=>{const b=h.getBoundingClientRect();return[b.left-rect.left+Math.min(40,b.width/2),b.top-rect.top+b.height/2];}):[];
       tutorialSpotlight.classList.toggle('is-groups',heads.length===3);
       if(heads.length===3){[fromX,fromY]=heads[0];[toX,toY]=heads[2];
         tutorialSpotlight.style.setProperty('--mid-x',(heads[1][0]+pad-2)+'px');tutorialSpotlight.style.setProperty('--mid-y',(heads[1][1]+pad-2)+'px');}
