@@ -163,7 +163,11 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
   interpolating ln g_N linearly between neighbouring radii. The threshold is a
   guide, not a sharp switch: μ changes smoothly, so at the line (g_N = a₀) MOND
   already raises the speed by about 13%, falling to about 2.4% at g_N = 3a₀ and
-  0.2% at 10a₀. For the default sandbox galaxy g_N < a₀ at
+  0.2% at 10a₀. Inside the zone the shade deepens with the speed boost
+  V_MOND/V_bar − 1 at each radius (computed with `mondVelocity`, so it uses the same
+  interpolating function), from faint at the edge (≈13%) to full at a 200% boost, V_MOND = 3 V_bar
+  (`MOND_ZONE_FULL_BOOST`, at g_N ≈ 0.012 a₀). Between radii ln g_N is interpolated
+  linearly, as for the edges. This is a visual choice, not a model result. For the default sandbox galaxy g_N < a₀ at
   every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
   √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses
   a₀ at 0.80 kpc in NGC 3198 (of 44 kpc measured) and 12.2 kpc in NGC 7331 (of

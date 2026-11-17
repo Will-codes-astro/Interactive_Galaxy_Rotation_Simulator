@@ -28,7 +28,7 @@ mass" (purple, like the halo line) and "MOND: gravity changes, no extra mass"
 (gold). The cards set the hidden `#mondToggle` checkbox that the rest of the page
 listens to. Its hint suggests trying MOND in NFW mode and gives a₀ in MOND mode.
 With MOND on, for every galaxy (preset or sandbox), the rotation curve's speed panel shades in gold every
-radius where the visible matter's gravity is weaker than a₀ ("MOND boosts
+radius where the visible matter's gravity is weaker than a₀, faint at the edge and deeper where MOND's boost is bigger ("MOND boosts
 gravity here", in small gold text in the zone's empty bottom-right corner so it
 never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The
 sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
