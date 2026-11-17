@@ -2883,7 +2883,7 @@ window.GALAXIES = {
     // same distance and tilt frame as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows
     // the fit's distance, tilt and a₀. Each edge is placed where g_N crosses a₀, interpolated in log g between
     // neighbouring radii. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid.
-    const MOND_ZONE_FILL='rgba(255,196,90,0.13)',MOND_ZONE_EDGE='rgba(242,200,121,0.6)';
+    const MOND_ZONE_FILL='rgba(242,200,121,0.07)',MOND_ZONE_EDGE='rgba(242,200,121,0.45)';
     const mondLogGN=()=>radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*fitFrame.s*1000)**2/(r*fitFrame.f*M_PER_KPC)):-Infinity);
     const mondNewtonianSomewhere=()=>mondLogGN().some(g=>g>=Math.log(MOND_A0));
     function mondZoneLayout(){
@@ -2898,14 +2898,15 @@ window.GALAXIES = {
       });
       if(start!==null)runs.push([start,radii[radii.length-1]]);
       const widest=runs.reduce((w,r)=>!w||r[1]-r[0]>w[1]-w[0]?r:w,null),first=radii[0],last=radii[radii.length-1];
-      const everywhere=runs.length===1&&widest[0]<=first&&widest[1]>=last;
       // A dashed gold line marks each place inside the graph where visible gravity crosses a₀.
       const edges=runs.flat().filter(x=>x>first&&x<last);
       return{
         shapes:[...runs.map(([x0,x1])=>({type:'rect',layer:'below',xref:'x',yref:'y domain',x0,x1,y0:0,y1:1,fillcolor:MOND_ZONE_FILL,line:{width:0}})),
-          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1.2,dash:'dash'}}))],
-        annotations:widest?[{xref:'x',yref:'y domain',x:(widest[0]+widest[1])/2,y:0.98,yanchor:'top',showarrow:false,
-          text:(everywhere?'MOND boosts gravity everywhere here':'MOND boosts gravity here')+'<br><span style="font-size:10px">visible matter’s gravity is weaker than a₀</span>',font:{size:11,color:'#f2c879'}}]:[]
+          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1,dash:'dot'}}))],
+        // The label sits in the bottom-right corner of the widest gold stretch, below the curves, where the graph is
+        // emptiest, so it never covers a line.
+        annotations:widest?[{xref:'x',yref:'y domain',x:widest[1],xanchor:'right',xshift:-6,y:0.02,yanchor:'bottom',showarrow:false,
+          text:'MOND boosts gravity here',font:{size:11,color:'#f2c879'}}]:[]
       };
     }
     Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayoutNow(),curveConfig);

@@ -165,8 +165,11 @@ g = √{[g_N² + √(g_N⁴ + 4 g_N² a₀²)] / 2},  where g_N = V_bar²/r (SI)
   already raises the speed by about 13%, falling to about 2.4% at g_N = 3a₀ and
   0.2% at 10a₀. For the default sandbox galaxy g_N < a₀ at
   every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
-  √(G M / a₀). For NGC 3198 at SPARC's standard values the zone starts at about
-  0.8 kpc. `mondZoneLayout` (page JS); it changes no model numbers.
+  √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses
+  a₀ at 0.80 kpc in NGC 3198 (of 44 kpc measured) and 12.2 kpc in NGC 7331 (of
+  36 kpc). NGC 2403 (peak g_N ≈ 0.98 a₀) and UGC 128 (≤ 0.09 a₀) are below a₀ at
+  every measured radius, so the zone covers the whole curve. Checked from
+  SPARC Table 2 via `analysis/sparc_data.py`, 18 Nov 2026. `mondZoneLayout` (page JS); it changes no model numbers.
 
 ## Goodness of fit
 
