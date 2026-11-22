@@ -57,7 +57,7 @@
     [data-preset-only][hidden], .stability[hidden] { display:none !important; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
     .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .45s ease, transform .45s ease, visibility 0s linear .45s; }
-    /* While the explainer is open, lift its section above the sticky slider bar (z-index 150) so the bar can't cover it. */
+    /* While the explainer is open, lift its section above the slider bar below it so the bar can't cover it. */
     .stats-row:has(.ml-explainer.open) { position:relative; z-index:160; }
     .stats-row { margin-bottom:14px; }
     .stats-row .header-stats { justify-content:flex-start; flex-wrap:wrap; }
@@ -224,7 +224,7 @@
       .fs-sliders input[type=range] { height:30px; }
       .fs-play { width:36px; height:36px; }
     }
-    /* isolation: the readout, warning chip and star rings stack inside the 3D view, so they never show through the top menu or the pinned slider bar. */
+    /* isolation: the readout, warning chip and star rings stack inside the 3D view, so they never show through the top menu. */
     #orbitPlot { position:relative; isolation:isolate; touch-action:none; overscroll-behavior:contain; user-select:none; -webkit-user-select:none; cursor:grab; }
     #orbitPlot.dragging { cursor:grabbing; }
     #orbitPlot canvas { display:block; width:100% !important; height:100% !important; touch-action:none; }
@@ -239,10 +239,13 @@
     body.fullscreen-lock { overflow:hidden; }
     .fs-sliders { display:none; position:absolute; left:12px; bottom:12px; z-index:3; width:min(280px,calc(100% - 24px)); padding:8px 10px; gap:4px; flex-direction:column; border-radius:10px; border:1px solid rgba(255,255,255,.14); background:rgba(14,24,38,.55); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); color:var(--ink); font-size:11px; cursor:default; }
     #orbitPlot:fullscreen .fs-sliders, #orbitPlot:-webkit-full-screen .fs-sliders, #orbitPlot.fullscreen-active .fs-sliders { display:flex; }
+    /* Outside fullscreen (laptops and tablets), the same box docks in the 3D view once the slider bar is off screen. */
+    @media (min-width:641px) { body:not(.tutorial-active) #orbitPlot.slider-dock .fs-sliders { display:flex; } }
+    .fs-sliders .fs-row { display:flex; flex-direction:column; gap:4px; }
+    .fs-sliders .fs-row[hidden] { display:none; }
     .fs-sliders label { display:flex; justify-content:space-between; gap:8px; color:var(--muted); }
     .fs-sliders output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .fs-sliders input[type=range] { width:100%; height:16px; margin:0; }
-    #orbitPlot .fs-sliders.mond-hidden { display:none; }
     .control[hidden] { display:none; }
     @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto repeat(2,minmax(0,1fr)); } }
     .gravity-label { display:block; margin-bottom:9px; color:var(--ink-2); font-size:12.5px; font-weight:500; }
@@ -535,6 +538,7 @@
     .topnav { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
     .topnav a { padding:6px 11px; border-radius:7px; color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; white-space:nowrap; transition:color .15s,background .15s; }
     .topnav .nav-short { display:none; }
+    @media (max-width:900px) { .topnav .nav-long { display:none; } .topnav .nav-short { display:inline; } } /* tablets: room for the menu and the gear */
     /* Phones: short labels, and the menu wraps onto a second row rather than running off the screen. */
     @media (max-width:640px) {
       .topbar { height:auto; min-height:56px; }
@@ -597,7 +601,7 @@
     .control label { color:var(--ink-2); font-size:12.5px; font-weight:500; }
     .control output, .fs-sliders output { font-family:var(--f-mono); font-size:12px; color:var(--ink); white-space:nowrap; flex:none; }
     .control-help { font-size:12px; line-height:1.5; }
-    /* Layout: the halo sliders sit directly above the plots they change and stay pinned while you scroll the plots (layout choice only). */
+    /* Layout: the halo sliders sit directly above the plots they change (layout choice only). */
     .sim-stage .controls { grid-template-columns:auto minmax(0,1.35fr) repeat(3,minmax(0,1fr)); gap:14px 26px; padding:14px 20px; margin-bottom:14px; }
     .sim-stage .control-help { font-size:11.5px; line-height:1.45; min-height:0; margin-top:4px; }
     .sim-stage .control label { flex-wrap:wrap; row-gap:2px; } .sim-stage .control label > span { flex:1 0 auto; }
@@ -614,9 +618,19 @@
       #curvePlot.plot { height:34dvh; min-height:220px; }
       body.tutorial-active #curvePanel { position:relative; max-height:none; overflow:hidden; }
     }
-    @media (min-width:961px) and (min-height:700px) {
-      .sim-stage .controls { position:sticky; top:56px; z-index:150; background:linear-gradient(180deg,var(--panel-2),var(--panel)); }
-      .sim-stage .plot { height:clamp(420px, calc(100vh - 56px - var(--ctrl-h,190px) - 84px), 700px); min-height:0; }
+    /* Laptops and projectors: the slider bar scrolls with the page (not pinned), and each figure fits the screen below the
+       menu, so both figures can be seen whole at once. Once the bar is scrolled away, the slider box (.fs-sliders) appears
+       in the corner of the 3D view, so a slider can always be moved while watching both figures (layout choice only). */
+    @media (min-width:961px) {
+      .sim-stage .plot { height:clamp(360px, calc(100vh - 56px - 96px), 700px); min-height:0; }
+    }
+    /* Narrower laptops: the gravity model takes its own row, so the four slider columns have room for their values. */
+    @media (min-width:961px) and (max-width:1279px) {
+      .sim-stage .controls { grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .sim-stage .gravity-control { grid-column:1/-1; display:flex; align-items:center; flex-wrap:wrap; gap:8px 18px; }
+      .sim-stage .gravity-control .model-cards { flex:0 1 460px; }
+      .sim-stage .gravity-control .control-help { flex:1 1 240px; margin:0; }
     }
     @media (max-width:960px) { .sim-stage .controls { grid-template-columns:1fr 1fr; } .sim-stage .control:last-child { grid-column:auto; } }
     @media (max-width:560px) { .sim-stage .controls { grid-template-columns:1fr; } }
@@ -758,7 +772,7 @@
       .chi-wrap { flex:1 1 0; min-width:0; flex-wrap:nowrap; }
       .chi-fit { min-width:0; text-align:right; line-height:1.3; }
     }
-    @media (min-width:1200px) and (min-height:700px) { .sim-stage .plot { height:clamp(420px, calc(100vh - 56px - var(--ctrl-h,190px) - 94px), 700px); } }
+    @media (min-width:1200px) { .sim-stage .plot { height:clamp(360px, calc(100vh - 56px - 106px), 700px); } }
     /* Scorecard: every preset galaxy scored under each model. */
     .scorecard { padding:18px 22px 16px; }
     .scorecard > p { max-width:88ch; margin:0 0 14px; color:var(--ink-2); font-size:13.5px; line-height:1.65; }
@@ -950,7 +964,7 @@
           <p>The number is a display choice, not a real count: 800 for NGC 3198, scaled with each galaxy’s visible mass (200 to 2400). A real galaxy has billions of stars.</p>
         </div>
       </div>
-      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Gyr<small>1000 Myr</small></div></div>
+      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Billion Years</div></div>
       <div class="ml-col">
         <div class="ml-row">
         <div class="stat ml" id="mlStat" title="Mass-to-light ratios used to turn the stars’ light into mass"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
@@ -1026,13 +1040,13 @@
     <div id="controlsAnchor" aria-hidden="true"></div>
     <section class="controls" aria-label="Model controls">
     <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted, mostly where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold shading is where the galaxy’s visible matter pulls that weakly, and the deeper the gold, the bigger MOND’s boost.</span></p></div>
-    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Apply Observed Fit</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible Matter Only</button></div></div>
+    <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Fit halo to data</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible matter only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number"><p class="control-help">Rings one star and shows its laps, speed and distance. Star 1 starts nearest the centre, star <span id="trackLast">800</span> furthest out. Clear the box to stop.</p></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 Gyr</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Fullscreen controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div>
+    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
@@ -2574,7 +2588,6 @@ window.GALAXIES = {
 
         // Render loop: continuous delta-time playback spanning 0 to 1000 Myr (1 Gyr)
         let needsRender=true,lastTime=performance.now(),simTime=0.0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
-        window.simTime=simTime;
         const PLAYBACK_SPEED_MYR_PER_SEC=25.0; // half of the nominal 50 Myr/s; UI labels stay 0.25x-2x
         const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
@@ -2655,15 +2668,8 @@ window.GALAXIES = {
             // iOS Safari silently ignores the request on non-video elements.
             setTimeout(()=>{ if(!nativeFsElement()&&!container.classList.contains('fullscreen-active'))setCssFullscreen(true); },250);
         }
-        window.toggleFullscreen = toggleFullscreen;
-        const fsBtn = document.getElementById('toggleFullscreen') || document.getElementById('viewFullscreen');
-        if (fsBtn) {
-            fsBtn.addEventListener('click', toggleFullscreen);
-        }
-        const viewFsBtn = document.getElementById('viewFullscreen');
-        if (viewFsBtn && viewFsBtn !== fsBtn) {
-            viewFsBtn.addEventListener('click', toggleFullscreen);
-        }
+        const fsBtn = document.getElementById('toggleFullscreen');
+        fsBtn.addEventListener('click', toggleFullscreen);
         // Builds the Time vs. Escaped Count log from the exact escape times of the active run (independent of scrubbing).
         const LOG_INTERVAL_MYR=5;
         function buildSimulationLog(){
@@ -2863,10 +2869,8 @@ window.GALAXIES = {
             if(controls.update(dt))needsRender=true;
             if(playing){
                 simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC*playbackMultiplier;
-                window.simTime=simTime;
                 if(simTime>=SIM_TOTAL_TIME_MYR){
                     simTime=SIM_TOTAL_TIME_MYR;
-                    window.simTime=simTime;
                     setPlaying(false);
                 }
                 updateStarTransforms(simTime);
@@ -2902,7 +2906,7 @@ window.GALAXIES = {
     const MODEL_VALUES=DATA.model_tuned_values; // MODEL_TUNED_VALUES in the generator
     const tunedCount=(model,fit)=>MODEL_VALUES[model]+(fit?fit.tuned_settings:0);
     const reducedChi=(chi,pointCount,k)=>chi/Math.max(1,pointCount-k);
-    // The fit in use: the halo fit (Apply Observed Fit, until Visible Matter Only) in NFW mode, or the MOND best fit
+    // The fit in use: the halo fit (Fit halo to data, until Visible matter only) in NFW mode, or the MOND best fit
     // when Best realistic fits is on. Which halo fit depends on the switch (nfwFitOf). With the halo mass at zero
     // the model is visible matter only, so SPARC's standard values apply however the slider got there.
     let nfwFitApplied=true,appliedFit=null; // appliedFit: the fit applyBaryonState last applied
@@ -2969,8 +2973,9 @@ window.GALAXIES = {
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'})),
       curveGhostTrace() // last trace: updateHalo's Plotly.update leaves it alone
     ];
-    // Phone-width legends use shorter names so two entries fit on each row.
-    const NARROW_LEGEND=innerWidth<600;
+    // Narrow graphs (phones, and laptops under 1200px where it shares the row with the 3D view) use shorter legend names
+    // so no entry is cut off.
+    const NARROW_LEGEND=innerWidth<600||(innerWidth>960&&innerWidth<1200);
     const LEGEND_NAMES=NARROW_LEGEND?{observed:'Observed',visible:'Visible matter',noHalo:'No halo'}:{observed:'Observed (SPARC)',visible:'Visible matter (baryons)',noHalo:'Dark matter halo (none)'};
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
@@ -3197,7 +3202,8 @@ window.GALAXIES = {
       fsMass.value=massSlider.value;fsScale.value=scaleSlider.value;
       document.getElementById('fsMassValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('fsScaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
-      fsSliders.classList.toggle('mond-hidden',mondMode); // no halo in MOND, so no halo sliders
+      document.getElementById('fsHaloRows').hidden=mondMode; // no halo in MOND, so no halo sliders
+      document.getElementById('fsSandboxRows').hidden=!customActive;
     }
     [[fsMass,massSlider],[fsScale,scaleSlider]].forEach(([mini,main])=>{
       mini.addEventListener('input',()=>{main.value=mini.value;main.dispatchEvent(new Event('input'));});
@@ -3303,8 +3309,19 @@ window.GALAXIES = {
       document.getElementById('sbBulgeFraction').textContent=formatPercent(sandbox.bulgeMass/stellar);
       document.getElementById('sbGasFraction').textContent=formatPercent(sandbox.gasMass/visible);
       updateGalaxyType(sandbox);
+      fsSandboxSliders.forEach(({mini,input,output,miniOutput})=>{mini.value=input.value;miniOutput.textContent=output.textContent;});
       document.dispatchEvent(new CustomEvent('sandboxchange',{detail:{...sandbox}}));
     }
+    // The quick-controls box (fullscreen, or docked in the 3D view) also carries the sandbox's three mass sliders.
+    const FS_SANDBOX_KEYS=['diskMass','bulgeMass','gasMass'];
+    const fsSandboxSliders=SANDBOX_SLIDERS.filter(s=>FS_SANDBOX_KEYS.includes(s.key)).map(s=>{
+      const mini=document.createElement('input'),label=document.createElement('label'),name=document.createElement('span'),miniOutput=document.createElement('output');
+      mini.type='range';mini.id='fs-'+s.id;mini.min=s.input.min;mini.max=s.input.max;mini.step=s.input.step;mini.value=s.input.value;
+      label.htmlFor=mini.id;name.textContent=s.input.labels[0].querySelector('span').textContent.split(',')[0];
+      label.append(name,miniOutput);document.getElementById('fsSandboxRows').append(label,mini);
+      mini.addEventListener('input',()=>{s.input.value=mini.value;s.input.dispatchEvent(new Event('input'));});
+      return {...s,mini,miniOutput};
+    });
     SANDBOX_SLIDERS.forEach(({input})=>input.addEventListener('input',updateSandbox));
     document.getElementById('sandboxReset').addEventListener('click',()=>{
       SANDBOX_SLIDERS.forEach(({input})=>{input.value=input.defaultValue;});
@@ -3441,7 +3458,7 @@ window.GALAXIES = {
     bestFitToggle.addEventListener('change',()=>{
       bestFits=bestFitToggle.checked;
       DEFAULTS=haloDefaultsOf(activeGalaxy);
-      if(!customActive){ // the halo sliders follow the new fit unless the halo was set to zero (Visible Matter Only)
+      if(!customActive){ // the halo sliders follow the new fit unless the halo was set to zero (Visible matter only)
         const m=massSlider.value,rs=scaleSlider.value;
         configureHaloSliders();
         if(!nfwFitApplied){massSlider.value=m;scaleSlider.value=rs;}
@@ -3655,7 +3672,7 @@ window.GALAXIES = {
       document.getElementById('scaleHelp').textContent=custom
         ?'How spread out the halo is. Small packs the dark matter near the centre. Starts at the typical value for this halo mass (Dutton & Macciò 2014).'
         :'How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.';
-      fitButton.textContent=custom?'Typical Halo':'Apply Observed Fit';
+      fitButton.textContent=custom?'Typical halo':'Fit halo to data';
       if(custom)fitButton.title='Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)';else fitButton.removeAttribute('title');
       document.getElementById('footerModel').hidden=custom;
       document.getElementById('footerCustom').hidden=!custom;
@@ -3677,7 +3694,7 @@ window.GALAXIES = {
       setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),PRESET_TEMPLATE_MASS));
       syncStarMeshes();updateStarTelemetry();controls.reset();
       // Restart the orbit clock and integrate the new population in the new galaxy's potential.
-      simTime=0;window.simTime=0;syncTimelineUI(0);
+      simTime=0;syncTimelineUI(0);
       refreshOrbits();
       const{halo,total}=modelCurves(DEFAULTS.massT,DEFAULTS.scaleRadius);
       Plotly.react('curvePlot',buildCurveData(halo,total),curveLayoutNow(),curveConfig);
@@ -3750,7 +3767,7 @@ window.GALAXIES = {
     function activateCustom(){
       customActive=true;haloFine=1;rsManual=false;
       applyModeLabels();
-      simTime=0;window.simTime=0;syncTimelineUI(0);
+      simTime=0;syncTimelineUI(0);
       rebuildCustomGalaxy({replot:true});
       controls.reset();
       document.dispatchEvent(new CustomEvent('galaxychange',{detail:{galaxy:activeGalaxy}}));
@@ -3941,7 +3958,6 @@ window.GALAXIES = {
         }else{
             if(simTime>=SIM_TOTAL_TIME_MYR){
                 simTime=0.0;
-                window.simTime=simTime;
                 updateStarTransforms(simTime);
                 updateEscapeCounter(simTime);
                 syncTimelineUI(simTime);
@@ -3983,7 +3999,6 @@ window.GALAXIES = {
 
     function onSliderInput(val){
         simTime=Math.max(0,Math.min(SIM_TOTAL_TIME_MYR,Number(val)));
-        window.simTime=simTime;
         updateStarTransforms(simTime);
         updateEscapeCounter(simTime);
         syncTimelineUI(simTime);
@@ -4149,7 +4164,7 @@ window.GALAXIES = {
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass&&shownRedChi>=tutorialChiGoal(),scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale,
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
-         action:'1. Drag Halo mass away from where it is until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Now fine-tune both sliders until the yellow box reads Close fit. No shortcuts: Apply Observed Fit is locked, so this is all you.'},
+         action:'1. Drag Halo mass away from where it is until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Now fine-tune both sliders until the yellow box reads Close fit. No shortcuts: Fit halo to data is locked, so this is all you.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says. Gold shading on the graph marks where.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
@@ -4234,7 +4249,7 @@ window.GALAXIES = {
         {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['curvePlot:Watch the orange line'],gesture:'decrease',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 × the typical halo. The stars start balanced for the typical one.',
-         action:'1. Drag Halo mass low, then high. 2. Press Typical Halo to reset it.'},
+         action:'1. Drag Halo mass low, then high. 2. Press Typical halo to reset it.'},
         {id:'sbFs',given:['toggleFullscreen'],mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Watch your galaxy',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
          text:'Now watch your own galaxy run.',
@@ -4330,7 +4345,7 @@ window.GALAXIES = {
     }
     // Slider steps whose result shows far from the slider (the sandbox sliders sit above the plots): the card carries a
     // copy of the one slider the current part asks for, and the page scrolls to what it changes. step.cardSlider maps
-    // a slider id to the id of the view to watch. A slider in the pinned bar stays beside the plots, so it gets no copy.
+    // a slider id to the id of the view to watch.
     const tutorialSlider=document.getElementById('tutorialSlider'),tutorialSliderInput=document.getElementById('tutorialSliderInput');
     let tutorialSliderId=null;
     function tutorialCardSliderId(){
@@ -4340,7 +4355,7 @@ window.GALAXIES = {
       // A card with no parts whose ring is on something else (the totals) still carries its slider.
       const aim=tutorialCurrentAim(step),keys=Object.keys(step.cardSlider);
       const id=tutorialPartHold||(aim?(step.cardSlider[aim.id]||step.checks?aim.id:keys[0]):keys.pop()),real=step.cardSlider[id]&&document.getElementById(id);
-      if(!real||tutorialBar.contains(real)&&getComputedStyle(tutorialBar).position==='sticky')return null;
+      if(!real)return null;
       return id;
     }
     // scroll: glide to the new view when the part (and so the slider) changes.
@@ -4446,7 +4461,7 @@ window.GALAXIES = {
           .replace('the yellow box reads Close fit',`χ²ᵣ drops below ${goal}, close to the best the published fit manages for this galaxy`);
       }
       if(step.id==='removeHalo'){
-        if(tutorialShortcutUnlocked)return 'Compare the orange line with the white points on the right. (The new Visible Matter Only button is a shortcut back to 0.)';
+        if(tutorialShortcutUnlocked)return 'Compare the orange line with the white points on the right. (The new Visible matter only button is a shortcut back to 0.)';
         if(Number(massSlider.value)===0)return 'Halo mass is already 0: drag it right, then back to 0.';
       }
       return step.action;
@@ -4536,14 +4551,13 @@ window.GALAXIES = {
       // Anything ringed just above the control (the M/L and tilt tiles beside the best-fit switch) comes with it.
       const targetTop=boxTop(target);
       let top=Math.min(targetTop,...extras.map(boxTop).filter(t=>t<targetTop&&t>targetTop-TUTORIAL_NEAR_PX))+y-clear;
-      // Sliders and plots: line the pinned slider bar up under the top bar so the plots it changes are in view too.
+      // Sliders and plots: line the slider bar up under the top bar so as much as possible of the plots it changes is in view.
       const anchor=document.getElementById('controlsAnchor'),inPlots=tutorialPlots.contains(target);
       if(tutorialBar&&innerWidth>960&&!document.fullscreenElement&&(tutorialBar.contains(target)||inPlots)){
         top=anchor.getBoundingClientRect().top+y-56;
-        // Something further down (the halo numbers, or the monitor a slider step says to watch while the bar stays
-        // pinned): scroll on, keeping it clear of the pinned bar.
-        // scrollPad leaves room below for boxes that open on hover (the halo cards' explainers).
-        const low=inPlots?target:getComputedStyle(tutorialBar).position==='sticky'?extras.find(el=>tutorialPlots.contains(el)):null;
+        // A target in the plots (e.g. the halo numbers): scroll on until it is in view, but no further than keeps the bar
+        // on screen. scrollPad leaves room below for boxes that open on hover (the halo cards' explainers).
+        const low=inPlots?target:null;
         if(low){const r=low.getBoundingClientRect(),need=r.bottom+y-innerHeight+16+(step.scrollPad||0);if(need>top)top=Math.min(need,r.top+y-64-tutorialBar.offsetHeight);}
       }
       // Phones: when the control (or what its card slider changes) and everything else the card rings fit between the
@@ -4739,14 +4753,11 @@ window.GALAXIES = {
       target.querySelectorAll('[role="listbox"]:not([hidden])').forEach(grow);
       return{left,top,right,bottom,width:right-left,height:bottom-top};
     }
-    // A ring whose control has scrolled under the top menu (or, for the plots, under the pinned slider bar) is cut off
-    // at that edge, so no highlight is ever drawn over the menu or the bar. Returns how far down the page is covered.
+    // A ring whose control has scrolled under the top menu is cut off at that edge, so no highlight is ever drawn over
+    // the menu. Returns how far down the page is covered.
     function tutorialCoverBottom(el){
       if(tutorialIsFullscreen()||tutorialTopbar.contains(el))return 0;
-      const menu=tutorialTopbar.getBoundingClientRect().bottom;
-      if(!tutorialPlots.contains(el)||getComputedStyle(tutorialBar).position!=='sticky')return menu;
-      const bar=tutorialBar.getBoundingClientRect();
-      return bar.top<=menu+1?bar.bottom:menu;
+      return tutorialTopbar.getBoundingClientRect().bottom;
     }
     // Fits a ring round its control (with any box the control has opened); false when the control is off screen.
     function fitTutorialRing(ring,el){
@@ -4863,7 +4874,7 @@ window.GALAXIES = {
       tutorialDim.classList.toggle('is-on',on);
       tutorialDim.classList.toggle('is-done',tutorialSpotlight.classList.contains('is-complete'));
       if(!on)return;
-      // Like the rings, a hole stops at the top menu (or the pinned slider bar) when its control has scrolled under it.
+      // Like the rings, a hole stops at the top menu when its control has scrolled under it.
       const holes=[],step=tutorialStep(),pad=4;
       const cutHole=(el,r,k)=>{const cut=Math.max(0,tutorialCoverBottom(el)-r.top);if(cut<r.height)holes.push([{left:r.left,top:r.top+cut,width:r.width,height:r.height-cut},k]);};
       cutHole(tutorialAimTarget,tutorialSpotlight.getBoundingClientRect(),parseFloat(tutorialSpotlight.style.borderRadius)||0);
@@ -4889,7 +4900,7 @@ window.GALAXIES = {
       if(key===tutorialTrimKey)return;
       tutorialTrimKey=key;
       const fs=document.getElementById('fsSliders');
-      const rows=[...viewPanel.children].filter(el=>el!==viewToggle&&!el.matches('.view-label')).concat([...fs.children].filter(el=>el.tagName!=='LABEL'));
+      const rows=[...viewPanel.children].filter(el=>el!==viewToggle&&!el.matches('.view-label')).concat([...fs.querySelectorAll(':scope > :not(.fs-row), .fs-row > *')].filter(el=>el.tagName!=='LABEL'));
       rows.forEach(row=>{
         const hide=on&&!named.some(el=>row===el||row.contains(el));
         row.classList.toggle('tutorial-trim',hide);
@@ -4996,7 +5007,7 @@ window.GALAXIES = {
       stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('leave','leave-side');
       tutorialIndex=0;
       tutorialCompleted={};
-      // In the main tour the Visible Matter Only shortcut is revealed by the step that sets the halo to zero.
+      // In the main tour the Visible matter only shortcut is revealed by the step that sets the halo to zero.
       visibleMatterOnly.hidden=tutorialTour==='main'&&!tutorialShortcutUnlocked;
       document.body.classList.add('tutorial-active');
       tutorialCard.hidden=false;
@@ -5129,9 +5140,13 @@ window.GALAXIES = {
       if(tutorialCard.hidden)return;
       clearTimeout(tutorialSnapTimer);tutorialSnapTimer=setTimeout(tutorialSnapBack,1200);
     },{passive:true});
-    (()=>{const bar=document.querySelector('.sim-stage .controls');if(!bar)return;let last=0;
-      const set=()=>{const h=bar.offsetHeight;if(Math.abs(h-last)<2)return;last=h;document.documentElement.style.setProperty('--ctrl-h',h+'px');window.dispatchEvent(new Event('resize'));};
-      set();if(window.ResizeObserver)new ResizeObserver(set).observe(bar);})();
+    // Slider dock: while less than SLIDER_DOCK_MIN_VISIBLE of the slider bar is on screen, the quick-controls box shows in
+    // the 3D view (CSS: laptops and tablets only, never during a tour), so the sliders stay in reach beside both figures.
+    const SLIDER_DOCK_MIN_VISIBLE=0.6;
+    (()=>{const bar=document.querySelector('.sim-stage .controls'),plot=document.getElementById('orbitPlot');
+      if(!bar||!plot||!window.IntersectionObserver)return;
+      new IntersectionObserver(([entry])=>plot.classList.toggle('slider-dock',entry.intersectionRatio<SLIDER_DOCK_MIN_VISIBLE),
+        {threshold:[0,SLIDER_DOCK_MIN_VISIBLE,1],rootMargin:'-56px 0px 0px 0px'}).observe(bar);})();
     const sandboxInputs=SANDBOX_SLIDERS.map(slider=>slider.input);
     // The "before" line: the curve is copied as a slider is grabbed (or first nudged from the keyboard), shown once it
     // moves, and cleared CURVE_GHOST_HOLD_MS after it is let go, or at once when the galaxy or model changes.

@@ -151,7 +151,7 @@ residual columns.
   The existing halo mass slider becomes the fine-tuning control, spanning
   0 to 5 times the baseline. Any change to the anatomy sliders resets both
   halo sliders to the new typical halo.
-  The Typical Halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
+  The Typical halo button (under the halo mass slider) restores both. The MOND mass-to-light fit does not apply
   to a sandbox galaxy and is hidden.
 - The header's Mass-to-light (M/L) and Tilt tiles are hidden in the sandbox,
   because sandbox masses are set directly rather than converted from light,
@@ -198,7 +198,7 @@ Test stars:
 - Stars start on the orbits that balance a reference galaxy: the observed
   SPARC speeds of a preset, or the baryons plus baseline halo of a sandbox
   galaxy. Moving the halo sliders, or switching to MOND, changes the gravity
-  under them, so they can spiral in or be ejected (try Visible Matter Only).
+  under them, so they can spiral in or be ejected (try Visible matter only).
 - The orbit integrator uses a cubic-spline gravitational softening of
   0.5–1.0 kpc (`SOFTENING_RANGE_KPC`; 0.5 kpc for a pure disk, following the
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
@@ -241,11 +241,20 @@ view shows only the ejected count and the halo r200 ("no halo" in MOND or at
 zero halo mass).
 
 The halo, time and tracking sliders sit in one bar directly above the 3D
-view and rotation curve. On a large enough screen the bar stays pinned under
-the top menu while you scroll the plots, so every slider change is visible at
-once, and the tutorial scrolls so the bar and the plots are both on screen.
-In that bar a long readout (e.g. the orbit time) drops under its label rather than
-running into the next column, and between 961 and 1280 px Play shows its icon only.
+view and rotation curve. The bar scrolls with the page (it is not pinned). On
+laptops each figure is sized to fit the screen below the menu, so both figures
+can be seen whole at once, and on a large monitor the bar fits on screen with
+them. Once less than 60% of the bar is on screen (`SLIDER_DOCK_MIN_VISIBLE`),
+the quick-controls box that fullscreen uses (`#fsSliders`: play, restart, track
+a star, halo mass and scale radius, plus disk, bulge and gas mass in the
+sandbox) docks in the corner of the 3D view, so a slider can always be moved
+while both figures are in view. It docks on screens wider than 640 px and
+never during a tutorial. In MOND only the halo sliders leave the box.
+Between 961 and 1279 px the gravity model takes its own row above the four
+slider columns, so readouts such as the orbit time have room, and Play shows
+its icon only. Below 1200 px on laptops (and on phones) the curve's legend uses
+the short names. Below 900 px the top menu uses short labels ("Puzzle",
+"Method") so the settings gear fits.
 On phones (640 px or narrower) the order is 3D view, rotation curve, sliders, and
 the rotation curve stays pinned under the menu while the sliders scroll beneath it,
 so a slider's effect is visible while dragging (layout choice only). It is unpinned
@@ -278,8 +287,8 @@ cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
 measured speeds over the outer third of the points), change its shape, open all three halo cards (r200, scale
 radius, concentration), then fit the halo by hand: break the fit with Halo
-mass, then tune both sliders until the badge reads Close fit (Apply Observed
-Fit stays locked). For a galaxy whose published halo fit is not Close, the goal
+mass, then tune both sliders until the badge reads Close fit (Fit halo to
+data stays locked). For a galaxy whose published halo fit is not Close, the goal
 is χ²ᵣ within 1.25 × that fit's value. Then it compares MOND and its best-fit
 switch. A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
@@ -327,7 +336,7 @@ Simulator tutorial button, which reads "Sandbox tutorial" while the sandbox is
 open. On the slider steps whose result shows far from the slider, the card
 carries a copy of the one slider the current part asks for (`cardSlider` on the
 step), linked to the real one, and the page scrolls to the graph, 3D view or
-shape monitor it changes. A slider in the pinned slider bar (wide screens) needs no copy.
+shape monitor it changes.
 If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy
@@ -338,7 +347,7 @@ focus; only a text box being typed in keeps them, and up and down still move a
 focused slider. The highlight on a slider step rings the slider together with
 its label row (name and value) and its description; the sandbox tutorial's first
 card boxes the slider groups with no pointer. Outside the tour, in fullscreen only, the arrows
-step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
+step the time by 50 Myr (hold to scrub). During the tutorial, the Visible matter only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In MOND mode the halo mass and scale radius sliders (and their fullscreen
 copies) are hidden, not greyed out, since MOND has no halo; on wide screens the
@@ -348,11 +357,11 @@ default, so every model uses SPARC's standard M/L, distance and tilt and the
 cyan visible-matter curve is the same in NFW and MOND mode. On, the NFW and
 MOND best fits each tune those within the same realistic limits (MOND also
 a₀); see PHYSICS.md. It replaced the MOND-only "MOND best fit" switch.
-In NFW mode, Visible Matter Only sets the halo mass to zero without changing
+In NFW mode, Visible matter only sets the halo mass to zero without changing
 the scale radius and returns to SPARC's standard M/L, distance and tilt.
 Dragging the halo mass to zero does the same, and dragging it back up
-restores the fit's M/L, distance and tilt until Visible Matter Only is pressed; Apply
-Observed Fit restores the halo fit for the switch's state (halo only, or the
+restores the fit's M/L, distance and tilt until Visible matter only is pressed; Fit halo
+to data restores the halo fit for the switch's state (halo only, or the
 NFW best fit's halo, M/L, distance and tilt).
 The M/L tile shows the values in use and, under them, where they come from
 ("standard SPARC values", "NFW best fit" or "MOND best fit"); the Method page's
@@ -372,8 +381,8 @@ tutorial card is up, the page is dimmed except for every control the card
 names and any explainer it has opened.
 
 Highlight boxes: each box follows its control every frame, including while it fades out green, so a box
-never hangs where a control used to be. A box whose control has scrolled under the top menu (or, for the
-plots, under the pinned slider bar) is cut off at that edge rather than drawn over it. Each card scrolls
+never hangs where a control used to be. A box whose control has scrolled under the top menu is cut off at
+that edge rather than drawn over it. Each card scrolls
 its control to just below the top menu, a slider together with its label and value, and brings a watched
 box that sits just above it (the M/L and tilt tiles) or further down (the shape monitor) into view
 too. The box round the Galaxy menu grows to cover its open list, and the yellow box on the profile card

@@ -116,10 +116,10 @@ site uses hard limits.
   and Υ, D and i are then refitted with the halo fixed, so the page shows the
   fit exactly. The physics checks confirm that the page's χ² matches the
   generator's (`chi2` in `galaxies.js`).
-- **On the page.** Apply Observed Fit (and loading a preset) applies the halo
+- **On the page.** Fit halo to data (and loading a preset) applies the halo
   fit for the switch's state (`nfwFitOf`): the standard-values halo, or the NFW
   best fit's halo, Υ, D and i. They stay while the halo sliders move, until
-  Visible Matter Only returns to SPARC's standard values. Turning the switch on
+  Visible matter only returns to SPARC's standard values. Turning the switch on
   in MOND mode applies the MOND best fit. Visible matter only always uses
   SPARC's values.
 - **At a limit.** A fitted value within `LIMIT_TOLERANCE` (0.1 %) of its range
