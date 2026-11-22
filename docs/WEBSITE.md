@@ -312,7 +312,7 @@ predict which of two ringed stars will finish more laps (Play stays locked
 until a prediction is chosen), then watch them race (live lap counts and
 speeds show differential rotation on a flat rotation curve; the lap counts start at zero when the race card
 opens, so they cannot give the answer away, and start again if the clock is taken back), turn edge-on to see a ringed star bob
-through the thin disk, switch on the ejection line, remove the halo and follow
+through the thin disk, type a number in the Star # box to follow any star, switch on the ejection line, remove the halo and follow
 the first star to cross it, then restore the halo and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer, the Scorecard
 (read the At a glance table, then press Next) and the theory guide (no box or dimming, since it covers a whole section). The rings and labels are tutorial aids drawn from the
