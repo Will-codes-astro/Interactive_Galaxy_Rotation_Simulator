@@ -3431,15 +3431,17 @@ __GALAXIES_JS__
     // same distance and tilt frame as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows
     // the fit's distance, tilt and a₀. Each edge is placed where g_N crosses a₀, interpolated in log g between
     // neighbouring radii. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid.
-    // MOND never switches on at one radius, so the gold follows MOND's speed boost at every radius (V_MOND/V_bar − 1,
-    // from mondVelocity, so it follows the interpolating function): invisible where the boost is tiny, already showing
-    // a little before the a₀ line (≈10 % boost at 3a₀), clear at the line (≈26 %) and deepest once the boost reaches
-    // MOND_ZONE_FULL_BOOST. Shade = MOND_ZONE_ALPHA_MAX × (boost / full)^MOND_ZONE_GAMMA; the power below 1 makes small
-    // boosts visible. The graph is cut into MOND_ZONE_STRIPS strips, each shaded at its midpoint's boost, rounded to
+    // The gold starts at the a₀ line and deepens with MOND's speed boost (V_MOND/V_bar − 1, from mondVelocity, so it
+    // follows the interpolating function), deepest once the boost reaches MOND_ZONE_FULL_BOOST. Visual choice (Will's,
+    // 22 Nov): MOND has no real switch-on point (its boost is already ≈10 % at 3a₀ and ≈26 % at a₀), but a gold area
+    // that begins at the dashed line reads more clearly, so the boost the line already has is taken off:
+    // shade = MOND_ZONE_ALPHA_MAX × ((boost − boost at a₀) / (full − boost at a₀))^MOND_ZONE_GAMMA below a₀, none above.
+    // The power below 1 makes the gold visible soon after the line. The graph is cut into MOND_ZONE_STRIPS strips, each shaded at its midpoint's boost, rounded to
     // MOND_ZONE_LEVELS steps so neighbouring strips of the same shade merge.
     const MOND_ZONE_EDGE='rgba(242,200,121,0.35)';
     const MOND_ZONE_ALPHA_MAX=0.3,MOND_ZONE_GAMMA=0.6,MOND_ZONE_FULL_BOOST=2,MOND_ZONE_STRIPS=120,MOND_ZONE_LEVELS=30;
     const mondBoostOfGN=gN=>{const vb=Math.sqrt(gN*M_PER_KPC)/1000;return mondVelocity(vb,1)/vb-1;};
+    // MOND_A0 changes with Best realistic fits, so the boost at the line is worked out each time.
     // ln g_N at any radius, linear between the radii where it is finite (as for the edges); held flat beyond them.
     function mondLogGNAt(logG,r){
       const pts=radii.map((x,i)=>[x,logG[i]]).filter(p=>isFinite(p[1]));
@@ -3450,13 +3452,17 @@ __GALAXIES_JS__
     }
     // The shade at radius r, 0 (no boost) to 1 (MOND_ZONE_FULL_BOOST or more); the graph and the 3D plane both use it.
     function mondZoneLevel(logG,r){
-      const lg=mondLogGNAt(logG,r),boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):MOND_ZONE_FULL_BOOST;
-      return Math.min(1,Math.max(0,boost/MOND_ZONE_FULL_BOOST))**MOND_ZONE_GAMMA;
+      const lg=mondLogGNAt(logG,r);
+      if(isFinite(lg)&&lg>=Math.log(MOND_A0))return 0; // above a₀: no gold, so it starts exactly at the dashed line
+      const atLine=mondBoostOfGN(MOND_A0),boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):MOND_ZONE_FULL_BOOST;
+      return Math.min(1,Math.max(0,(boost-atLine)/(MOND_ZONE_FULL_BOOST-atLine)))**MOND_ZONE_GAMMA;
     }
-    function mondZoneStrips([x0,x1],logG){
+    // edges (the a₀ crossings) are strip boundaries too, so the gold starts exactly at each dashed line.
+    function mondZoneStrips([x0,x1],logG,edges){
       const width=(radii[radii.length-1]-radii[0])/MOND_ZONE_STRIPS,n=Math.max(1,Math.ceil((x1-x0)/width)),strips=[];
-      for(let k=0;k<n;k++){
-        const a=x0+(x1-x0)*k/n,b=x0+(x1-x0)*(k+1)/n,level=Math.round(mondZoneLevel(logG,(a+b)/2)*MOND_ZONE_LEVELS);
+      const cuts=[...new Set([...Array.from({length:n+1},(_,k)=>x0+(x1-x0)*k/n),...edges])].sort((p,q)=>p-q);
+      for(let k=0;k<cuts.length-1;k++){
+        const a=cuts[k],b=cuts[k+1],level=Math.round(mondZoneLevel(logG,(a+b)/2)*MOND_ZONE_LEVELS);
         const last=strips[strips.length-1];
         if(last&&last.level===level)last.x1=b;else strips.push({x0:a,x1:b,level});
       }
@@ -3484,7 +3490,7 @@ __GALAXIES_JS__
       const outer=runs[runs.length-1];
       setMondZone3D(r=>mondZoneLevel(logG,r),last,outer&&outer[1]>=last&&outer[0]>first?outer[0]:null);
       return{
-        shapes:[...mondZoneStrips([first,last],logG),
+        shapes:[...mondZoneStrips([first,last],logG,edges),
           ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1,dash:'dot'}}))],
         // The label sits in the bottom-right corner of the widest gold stretch, below the curves, where the graph is
         // emptiest, so it never covers a line.
@@ -4613,7 +4619,7 @@ __GALAXIES_JS__
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
         {id:'mondZone3d',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Faint gold means a small boost; deep gold means MOND is doing most of the work.',
-         text:'The same gold as the graph, laid on the galaxy itself. It fades in where MOND starts to boost gravity and deepens further out, where the visible matter pulls more weakly.',
+         text:'The same gold as the graph, laid on the galaxy itself. It starts where the visible matter’s pull drops below a₀ and deepens further out, where that pull is weaker still.',
          action:'Switch on Where MOND acts in the View panel.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],keepWatch:true,title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
