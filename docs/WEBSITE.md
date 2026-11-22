@@ -36,7 +36,7 @@ until an unshaded centre opens up (MOND already chosen when the card opens count
 as done). On that card and "Spread the stars out", a finished first part's ring
 turns green and fades before the second part and its ring appear. The halo shape
 monitor card only asks the visitor to look at the monitor; clicking it (or Next)
-moves on. Read-only cards (the sandbox totals, the halo
+moves on. Read-only cards (the sandbox intro, the sandbox totals, the halo
 shape monitor, the Scorecard) get a box but no pointer arrow. A slider's box also
 takes in its description lines and follows any change to their length. Switches
 that are already in a card's end state when it opens (orbit lines on, gas or halo
@@ -319,8 +319,8 @@ the left and right arrow keys always navigate the tour while it is open, even
 when the last control used (a slider, the Galaxy menu, a button) still has
 focus; only a text box being typed in keeps them, and up and down still move a
 focused slider. The highlight on a slider step rings the slider together with
-its label row (name and value); the sandbox tutorial's first card points at
-each of the three slider groups' headings in turn. Outside the tour, in fullscreen only, the arrows
+its label row (name and value) and its description; the sandbox tutorial's first
+card boxes the slider groups with no pointer. Outside the tour, in fullscreen only, the arrows
 step the time by 50 Myr (hold to scrub). During the tutorial, the Visible Matter Only shortcut appears after
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In MOND mode the halo mass and scale radius sliders (and their fullscreen

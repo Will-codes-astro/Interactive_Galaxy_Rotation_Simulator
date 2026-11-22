@@ -886,11 +886,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* look: a card that only asks you to read something gets the box but no pointer, since nothing needs hovering. */
     .tutorial-spotlight.is-look .tutorial-pointer { display:none; }
     /* groups: the pointer rests on each group's heading in turn (no drag), then pops back to the first. */
-    .tutorial-spotlight.is-groups .tutorial-pointer { animation-name:tutorial-groups; animation-duration:4.5s; }
-    @keyframes tutorial-groups { 0%,24% { transform:translate(var(--from-x),var(--from-y)) scale(1); } 32%,56% { transform:translate(var(--mid-x),var(--mid-y)) scale(1); } 64%,88% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 93% { transform:translate(var(--to-x),var(--to-y)) scale(0); } 95% { transform:translate(var(--from-x),var(--from-y)) scale(0); } 100% { transform:translate(var(--from-x),var(--from-y)) scale(1); } }
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, .tutorial-spotlight.is-groups .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -4410,7 +4408,7 @@ __GALAXIES_JS__
          action:'Read on below to learn more.'}
       ]},
       sandbox:{label:'Sandbox tutorial',steps:[
-        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'groups',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
+        {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'look',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
          text:'Here you design the galaxy: how much its stars and gas weigh, and how they are spread out.',
          action:'Look at the three groups of sliders in the blue box, then press Next.'},
         {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
@@ -4870,11 +4868,6 @@ __GALAXIES_JS__
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
       if(gesture==='scan'){fromX=rect.width*.55;toX=rect.width*.82;fromY=toY=rect.height*.43;}
       if(gesture==='drag'){fromX=rect.width*.35;toX=rect.width*.62;fromY=rect.height*.5;toY=rect.height*.42;}
-      // groups: rest on the heading of each sandbox group that has sliders (not Stats), in turn.
-      const heads=gesture==='groups'?[...target.querySelectorAll('.sandbox-group')].filter(g=>g.querySelector('input[type=range]')).map(g=>g.querySelector('h3')).map(h=>{const b=h.getBoundingClientRect();return[b.left-rect.left+Math.min(40,b.width/2),b.top-rect.top+b.height/2];}):[];
-      tutorialSpotlight.classList.toggle('is-groups',heads.length===3);
-      if(heads.length===3){[fromX,fromY]=heads[0];[toX,toY]=heads[2];
-        tutorialSpotlight.style.setProperty('--mid-x',(heads[1][0]+pad-2)+'px');tutorialSpotlight.style.setProperty('--mid-y',(heads[1][1]+pad-2)+'px');}
       // zero: slide to the left end; decrease / increase: slide left / right; adjust: slide whichever way has more room.
       // The ring also holds the slider's label row, so the pointer is placed on the slider track itself.
       if(gesture==='zero'||gesture==='decrease'||gesture==='increase'||gesture==='adjust'){
