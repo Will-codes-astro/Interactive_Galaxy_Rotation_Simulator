@@ -541,8 +541,33 @@
       .topnav { flex-wrap:wrap; justify-content:flex-end; row-gap:2px; overflow:visible; }
       .topnav .nav-long { display:none; } .topnav .nav-short { display:inline; }
     }
-    @media (max-width:420px) { .topbar .brand { display:none; } .topbar { justify-content:center; } }
+    @media (max-width:420px) { .topbar .brand { display:none; } .topbar { justify-content:center; } .topnav { margin-right:auto; } }
     .topnav a:hover, .topnav a:focus-visible { color:var(--ink); background:rgba(255,255,255,.05); outline:none; }
+    /* Settings: a small gear at the far right of the top bar opens a panel of display choices. */
+    .topnav { margin-left:auto; }
+    .settings { position:relative; flex:none; margin-right:-10px; }
+    .settings-btn { display:grid; place-items:center; width:32px; height:32px; padding:0; border:0; border-radius:8px; background:none; color:var(--muted); cursor:pointer; transition:color .15s,background .15s; }
+    .settings-btn svg { width:18px; height:18px; transition:transform .4s ease; }
+    .settings-btn:hover, .settings-btn:focus-visible, .settings-btn[aria-expanded=true] { color:var(--ink); background:rgba(255,255,255,.06); outline:none; }
+    .settings-btn:focus-visible { box-shadow:0 0 0 2px var(--accent); }
+    .settings-btn[aria-expanded=true] svg { transform:rotate(60deg); }
+    .settings-panel { position:absolute; top:calc(100% + 10px); right:0; z-index:70; width:min(300px,calc(100vw - 24px)); padding:12px; border:1px solid var(--line-strong); border-radius:var(--r); background:#0d1625; box-shadow:0 14px 36px rgba(0,0,0,.5); }
+    .settings-panel h2 { margin:0 2px 8px; color:var(--muted); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
+    .settings-row { display:flex; align-items:flex-start; gap:11px; padding:9px 10px; border-radius:8px; cursor:pointer; user-select:none; transition:background .15s; }
+    .settings-row:hover { background:rgba(255,255,255,.045); }
+    .settings-row input { appearance:none; -webkit-appearance:none; flex:none; display:grid; place-items:center; width:18px; height:18px; margin:1px 0 0; border:1.5px solid var(--line-strong); border-radius:5px; background:rgba(255,255,255,.03); cursor:pointer; transition:background .15s,border-color .15s; }
+    .settings-row input::after { content:""; width:9px; height:5px; margin-top:-2px; border:solid #06101e; border-width:0 0 2px 2px; transform:rotate(-45deg) scale(0); transition:transform .15s ease; }
+    .settings-row input:checked { background:var(--accent); border-color:var(--accent); }
+    .settings-row input:checked::after { transform:rotate(-45deg) scale(1); }
+    .settings-row input:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .settings-row input:disabled, .settings-row:has(input:disabled) { cursor:default; opacity:.55; }
+    .settings-row b { display:block; color:var(--ink); font-size:13px; font-weight:500; }
+    .settings-row small { display:block; margin-top:2px; color:var(--muted); font-size:11.5px; line-height:1.45; }
+    .settings-note { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 10px 0; color:var(--muted); font-size:11px; }
+    .settings-note button { padding:0; border:0; background:none; color:var(--accent); font:inherit; cursor:pointer; white-space:nowrap; }
+    .settings-note button:hover, .settings-note button:focus-visible { text-decoration:underline; outline:none; }
+    @media (max-width:640px) { .settings { margin-right:-4px; } }
+    @media (prefers-reduced-motion:reduce) { .settings-btn svg, .settings-row input, .settings-row input::after { transition:none; } }
     a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
     .eyebrow { color:var(--accent); font:500 11px/1.4 var(--f-mono); letter-spacing:.14em; }
@@ -837,6 +862,14 @@
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
     <div class="topnav"><a href="#puzzle" aria-current="page"><span class="nav-long">The puzzle</span><span class="nav-short">Puzzle</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background">Background</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
+    <div class="settings">
+      <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
+        <h2>Settings</h2>
+        <label class="settings-row"><input type="checkbox" id="qualityToggle" disabled><span><b>High-quality visuals</b><small>A sharper 3D galaxy view. Untick it if the simulation feels slow or jerky.</small></span></label>
+        <p class="settings-note"><span id="qualityNote" aria-live="polite">The 3D view has not loaded.</span><button type="button" id="qualityAuto" hidden>Use automatic</button></p>
+      </div>
+    </div>
   </nav>
   <main>
     <div class="page active" data-page="puzzle">
@@ -2744,19 +2777,44 @@ window.GALAXIES = {
         const RES_SCALES=[1,0.85,0.7,0.6,0.5],RES_MIN_PIXEL_RATIO=0.6;
         const RES_WINDOW_FRAMES=20,RES_SLOW_MS=1000/45,RES_FAST_MS=1000/55,RES_UPGRADE_WINDOWS=8,RES_IGNORE_MS=250;
         let resLevels=[],resLevel=0,resFrames=0,resSlow=0,resFastWindows=0,resUpgradeWindows=RES_UPGRADE_WINDOWS,resLastDowngradeFrom=-1;
+        /* Settings' "High-quality visuals" tick box. Until the visitor uses it, quality is automatic (the adaptive steps above)
+           and the box shows whether the view is at full resolution. Ticking fixes level 0; unticking fixes the lowest level.
+           The choice is remembered in this browser (localStorage) so it can be set once before a presentation. */
+        const QUALITY_STORAGE_KEY='galaxySimQuality';
+        let qualityChoice=null; // 'high', 'low' or null (automatic)
+        try{const saved=localStorage.getItem(QUALITY_STORAGE_KEY);if(saved==='high'||saved==='low')qualityChoice=saved;}catch(e){}
         function buildResolutionLevels(){
             const native=Math.min(window.devicePixelRatio||1,2);
             resLevels=native<1.5?[{pixelRatio:native,msaa:true}]:[];
             RES_SCALES.forEach(s=>{const pixelRatio=Math.round(native*s*100)/100;if(pixelRatio>=RES_MIN_PIXEL_RATIO||s===1)resLevels.push({pixelRatio,msaa:false});});
-            resLevel=Math.min(resLevel,resLevels.length-1);
+            resLevel=qualityChoice==='high'?0:qualityChoice==='low'?resLevels.length-1:Math.min(resLevel,resLevels.length-1);
         }
         buildResolutionLevels();
+        const qualityToggle=document.getElementById('qualityToggle'),qualityNote=document.getElementById('qualityNote'),qualityAuto=document.getElementById('qualityAuto');
+        function syncQualitySetting(){
+            const full=resLevel===0;
+            qualityToggle.checked=qualityChoice?qualityChoice==='high':full;
+            qualityNote.textContent=qualityChoice?'Your choice, remembered on this device.'
+                :full?'Automatic: high quality on this device.':'Automatic: lowered to keep the 3D view smooth.';
+            qualityAuto.hidden=!qualityChoice;
+        }
+        function setQualityChoice(choice){
+            qualityChoice=choice;
+            try{if(choice)localStorage.setItem(QUALITY_STORAGE_KEY,choice);else localStorage.removeItem(QUALITY_STORAGE_KEY);}catch(e){}
+            resUpgradeWindows=RES_UPGRADE_WINDOWS;resLastDowngradeFrom=-1; // automatic starts afresh
+            setResolutionLevel(choice==='high'?0:choice==='low'?resLevels.length-1:resLevel);
+        }
+        qualityToggle.disabled=false;
+        qualityToggle.addEventListener('change',()=>setQualityChoice(qualityToggle.checked?'high':'low'));
+        qualityAuto.addEventListener('click',()=>{setQualityChoice(null);qualityToggle.focus();});
         function setResolutionLevel(level){
             resLevel=level;resFrames=resSlow=resFastWindows=0;
-            resizeOrbit();
+            resizeOrbit();syncQualitySetting();
         }
+        syncQualitySetting();
         // Called once per drawn frame with the time since the previous one (only when the previous frame was drawn too).
         function trackFrameTime(ms){
+            if(qualityChoice)return; // the visitor fixed the quality in Settings
             if(ms>RES_IGNORE_MS)return; // a background tab or a one-off stall, not the steady frame rate
             resFrames++;if(ms>RES_SLOW_MS)resSlow++;
             if(resFrames<RES_WINDOW_FRAMES)return;
@@ -3813,6 +3871,18 @@ window.GALAXIES = {
     }
     drawPuzzleFigure();
 
+    /* ---------- Settings panel ----------
+       The gear opens it; a click outside, Escape or the gear again closes it. The settings themselves are wired where they act
+       (High-quality visuals: beside the 3D view's resolution levels). */
+    const settingsBtn=document.getElementById('settingsBtn'),settingsPanel=document.getElementById('settingsPanel');
+    function setSettingsOpen(open){
+      settingsPanel.hidden=!open;settingsBtn.setAttribute('aria-expanded',String(open));
+      if(open)(settingsPanel.querySelector('input:not(:disabled)')||settingsPanel).focus();
+    }
+    settingsBtn.addEventListener('click',()=>setSettingsOpen(settingsPanel.hidden));
+    document.addEventListener('pointerdown',e=>{if(!settingsPanel.hidden&&!e.target.closest('.settings'))setSettingsOpen(false);});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidden){setSettingsOpen(false);settingsBtn.focus();}});
+
     /* ---------- Pages ----------
        The site is one file split into pages. The top menu, or any #link, shows one .page and hides the rest; a #link
        to something inside a page (such as #curvePanel) opens that page and scrolls to it. */
@@ -4778,7 +4848,7 @@ window.GALAXIES = {
         const unit=el.closest('label')||el;
         if(tutorialCard.contains(unit))return;
         // The tour's own launch button (beside the Model setup heading) is always locked while a tour runs.
-        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer,#starsExplainer')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
+        const locked=!!roots&&(unit===tutorialLaunch||!unit.matches(TUTORIAL_ALWAYS_FREE)&&!unit.closest('#mlExplainer,#tiltExplainer,#starsExplainer,#settingsPanel')&&!roots.some(r=>r.contains(unit)||unit.contains(r)));
         if(unit.inert!==locked)unit.inert=locked;
         unit.classList.toggle('tutorial-locked',locked);
       }));

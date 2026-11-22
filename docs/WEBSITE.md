@@ -216,7 +216,12 @@ by their masses. Colour saturation, diffraction spikes and bloom are visual
 choices only. To stay smooth on large or high-DPI screens, the 3D view lowers
 its render resolution in steps while frames run slow and raises it again when
 there is headroom (`trackFrameTime` in the generator); 4x antialiasing is used
-only on low-DPI screens at full resolution.
+only on low-DPI screens at full resolution. The gear at the far right of the
+top bar opens Settings, whose "High-quality visuals" tick box overrides this:
+ticked fixes full resolution, unticked fixes the lowest level, and "Use
+automatic" hands control back. Until it is used, the box shows whether the
+automatic choice is at full resolution. The choice is kept in the browser's
+localStorage (`galaxySimQuality`) and the panel stays usable during the tour.
 
 While a halo or sandbox slider moves, the rotation curve is redrawn every frame
 through Plotly's light transition path (`updateHalo(true)`); the speed axis only
