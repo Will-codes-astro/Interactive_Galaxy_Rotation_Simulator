@@ -853,6 +853,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
     .tutorial-locked { opacity:.38; filter:saturate(.4); transition:opacity .25s ease; }
     /* Blue boxes = controls to use; yellow dashed boxes = things to watch. */
+    /* Phones: live copies of watched values that are off screen, boxed like the yellow watch rings. */
+    .tutorial-readout { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .tutorial-readout span { padding:4px 9px; border:1.5px dashed #ffcf7a; border-radius:8px; color:var(--ink); font-size:12px; font-variant-numeric:tabular-nums; }
+    .tutorial-readout b { margin-right:5px; color:#ffcf7a; font-weight:600; }
     .tutorial-also.is-watch { border:2px dashed #ffcf7a; box-shadow:0 0 12px 3px rgba(255,207,122,.45); }
     /* A small numbered dot on the corner of each ring when a task has several steps (matches the card's list). */
     .tutorial-tag { position:absolute; left:-11px; top:-11px; display:grid; place-items:center; width:20px; height:20px; border-radius:50%; background:#a8ddff; color:#06131f; font-size:11px; font-weight:700; line-height:1; box-shadow:0 0 0 2px #06131f, 0 0 10px rgba(120,210,255,.8); pointer-events:none; }
@@ -1630,6 +1634,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
     <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
     <div class="tutorial-slider" id="tutorialSlider" hidden><label for="tutorialSliderInput"><span id="tutorialSliderName"></span><output id="tutorialSliderValue" for="tutorialSliderInput"></output></label><input id="tutorialSliderInput" type="range" autocomplete="off"></div>
+    <div class="tutorial-readout" id="tutorialReadout" aria-live="polite" hidden></div>
     <div class="tutorial-feedback" id="tutorialFeedback" hidden><span id="tutorialFeedbackText" role="status" aria-live="polite"></span><button type="button" class="tutorial-auto" id="tutorialAuto" aria-label="Go to the next slide now" title="Moving on in a few seconds. Press to go now." hidden>Next slide<span class="tutorial-clock" aria-hidden="true"><svg viewBox="0 0 20 20"><circle class="track" cx="10" cy="10" r="7"/><circle class="ring" id="tutorialAutoRing" cx="10" cy="10" r="7"/></svg><b id="tutorialAutoNum">5</b></span></button></div>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" id="tutorialMore" hidden>Sandbox tutorial</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
   </aside>
@@ -5133,8 +5138,26 @@ __GALAXIES_JS__
         if(head&&(head.matches('.view-label')||head.tagName==='LABEL'))head.classList.toggle('tutorial-trim',hide);
       });
     }
+    // Phones: a value the card says to watch that is off screen (χ² above the graph while the model cards sit below it;
+    // the M/L and tilt tiles far up the page) is copied live onto the card, so it can be read without scrolling.
+    const TUTORIAL_READOUTS={
+      chiBadge:{label:'Fit',value:el=>el.innerText.replace(/\s+/g,' ').trim()},
+      mlStat:{label:'M/L',value:el=>[...el.querySelectorAll('.stat-value b')].map(b=>b.textContent).join(' / ')},
+      tiltStat:{label:'Tilt',value:()=>document.getElementById('tiltValue').textContent}
+    };
+    const tutorialReadout=document.getElementById('tutorialReadout');let tutorialReadoutKey='';
+    function syncTutorialReadout(){
+      const step=tutorialStep(),card=tutorialCard.getBoundingClientRect(),top=tutorialCoverBottom(tutorialCard);
+      const offScreen=el=>{if(!el.getClientRects().length)return false;const r=el.getBoundingClientRect();return r.top<top||r.bottom>card.top;};
+      const items=tutorialPhone()&&!tutorialBlocker()?tutorialRingList(step).filter(r=>r.watch&&TUTORIAL_READOUTS[r.id]).map(r=>[r.id,document.getElementById(r.id)]).filter(([,el])=>el&&offScreen(el)):[];
+      const key=items.map(([id,el])=>id+'='+TUTORIAL_READOUTS[id].value(el)).join('|');
+      if(key===tutorialReadoutKey)return;
+      tutorialReadoutKey=key;tutorialReadout.hidden=!items.length;
+      tutorialReadout.replaceChildren(...items.map(([id,el])=>{const chip=document.createElement('span');chip.append(Object.assign(document.createElement('b'),{textContent:TUTORIAL_READOUTS[id].label}),TUTORIAL_READOUTS[id].value(el));return chip;}));
+    }
     (function trackTutorialSpot(){
-      if(!tutorialCard.hidden){tutorialUpdateChecks();syncTutorialSlider(true);}
+      if(!tutorialCard.hidden){tutorialUpdateChecks();syncTutorialSlider(true);syncTutorialReadout();}
+      else if(!tutorialReadout.hidden){tutorialReadout.hidden=true;tutorialReadoutKey='';}
       applyTutorialLocks();
       trimTutorialPanels();
       positionTutorialAlso();

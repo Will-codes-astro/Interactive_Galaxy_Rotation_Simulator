@@ -52,8 +52,9 @@ card's control and everything it rings are scrolled into view together when they
 fit above the card, the View panel opens by itself on cards that use it, and in
 fullscreen the View panel and the halo slider panel show only the rows the card
 names, so the galaxy stays visible. Star labels flip left before they would run
-off the right edge. Known limit: on "Test a rival idea" the χ² badge and the
-model cards do not fit on a phone screen together.
+off the right edge. When a value the card says to watch (χ², M/L, tilt) is off
+screen, a live copy of it sits on the card in a yellow dashed box, so "Test a
+rival idea" can compare χ² without scrolling.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
