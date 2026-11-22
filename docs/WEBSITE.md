@@ -33,11 +33,12 @@ deepening outwards, so there is no hard start ("MOND boosts
 gravity here", in small gold text in the empty bottom-right corner of the widest stretch below a₀ so it
 never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The View panel's
 "Where MOND acts" switch (off by default, usable only in MOND mode) lays the same gold into the 3D
-disk plane: each radius gets the graph's shade, a thin brighter band marks where the visible gravity
-last drops below a₀, the gold fades softly to nothing beyond the data (to 1.6 × the last radius),
+disk plane in the graph's gold (#f2c879): each radius gets the graph's shade, a dashed gold circle marks
+where the visible gravity last drops below a₀, the gold fades softly to nothing beyond the data (to 1.6 × the last radius),
 and a haze of faint points just above and below the plane gives it depth (a visual choice). Both
 tours ask for it on the card after choosing MOND ("See where MOND acts"; sandbox: "MOND in your
-galaxy"); already on counts as done. The
+galaxy"); already on counts as done. While the gold shows, the panels over the 3D view (View,
+the slider box, the readouts, star labels) go solid (`.mond-zone-on`) so the gold never tints them. The
 sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
 until an unshaded centre opens up (MOND already chosen when the card opens counts
 as done). On that card and "Spread the stars out", a finished first part's ring

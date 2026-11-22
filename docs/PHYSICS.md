@@ -181,7 +181,7 @@ median χ²/N barely moves (9.9 → 10.5).
   linearly, as for the edges. This is a visual choice, not a model result. The 3D
   view's gold plane (`setMondZone3D`, "Where MOND acts" switch) uses the same shade
   (`mondZoneLevel`) at each radius, holds the last shade beyond the data and fades out by
-  1.6 × the last radius; its bright band sits at the start of the outermost below-a₀
+  1.6 × the last radius; its dashed circle sits at the start of the outermost below-a₀
   stretch, if it starts inside the data. Display only. For the default sandbox galaxy g_N < a₀ at
   every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
   √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses

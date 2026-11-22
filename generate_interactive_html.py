@@ -715,7 +715,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .view-panel [aria-checked=true] .sw::after { transform:translateX(11px); background:#fff; }
     .view-panel .sw-eject[aria-checked=true] .sw { background:rgba(255,138,128,.45); border-color:#ff8a80; }
     .view-panel .view-switches button:disabled { opacity:.45; cursor:not-allowed; }
+    .view-panel .view-switches .sw-mond { grid-column:1 / -1; } /* its longer label gets its own row, so the columns keep their width */
     .view-panel .sw-mond[aria-checked=true] .sw { background:rgba(242,200,121,.45); border-color:#f2c879; }
+    /* With the 3D MOND zone on, the panels over the view go solid, so the gold behind never tints them or their text. */
+    .mond-zone-on .view-panel, .mond-zone-on .fs-sliders, .mond-zone-on .telemetry, .mond-zone-on .stability-chip, .mond-zone-on .star-mark span { background:rgba(9,14,24,.94); -webkit-backdrop-filter:none; backdrop-filter:none; }
     /* Outside fullscreen the panel sits over a small plot, so it drops the section labels and tightens up. */
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) { min-width:0; width:172px; padding:7px; top:8px; right:8px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-label { display:none; }
@@ -723,7 +726,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row { gap:5px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row button { padding:4px 4px; font-size:11px; white-space:nowrap; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel :is(.view-seg,.speed-toggle,.mode-toggle) button { padding:3px 2px; font-size:10.5px; }
-    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-switches { grid-template-columns:auto auto; justify-content:space-between; gap:0 6px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-switches { grid-template-columns:auto auto; justify-content:space-between; gap:0 2px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-switches button { width:auto; gap:5px; padding:2px 0; font-size:10.5px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .sw { width:20px; height:11px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .sw::after { width:7px; height:7px; }
@@ -2682,30 +2685,33 @@ __GALAXIES_JS__
         // MOND zone in 3D (MOND mode, "Where MOND acts" switch): the graph's gold shading laid into the disk plane. Each
         // radius glows with the same shade as the graph at that radius (mondZoneLayout hands over mondZoneLevel), so
         // the gold fades in where MOND's boost starts and deepens outwards; past the last data radius it holds the last
-        // shade and fades softly to nothing by MOND_PLANE_EXTENT x that radius. A thin, brighter band marks where the
-        // visible matter's pull last drops below a0 (the graph's dotted line). A haze of faint points spread a little
+        // shade and fades softly to nothing by MOND_PLANE_EXTENT x that radius. A dashed gold circle marks where the
+        // visible matter's pull last drops below a0 (the graph's dotted line). It is drawn in the graph's gold
+        // (MOND_GOLD, #f2c879) so the two read as one thing. A haze of faint points spread a little
         // above and below the plane, brighter where the shade is deeper, gives it depth like the stars. All a visual
         // choice: the plane and haze carry no physics beyond the graph's shading.
-        const MOND_PLANE_SAMPLES=256,MOND_PLANE_EXTENT=1.6,MOND_PLANE_STRENGTH=0.22,MOND_PLANE_EDGE_WIDTH=0.006;
-        const MOND_HAZE_POINTS=3000,MOND_HAZE_THICKNESS=0.012,MOND_HAZE_STRENGTH=0.85;
+        const MOND_PLANE_SAMPLES=256,MOND_PLANE_EXTENT=1.6,MOND_PLANE_STRENGTH=0.16,MOND_GOLD=[242/255,200/255,121/255];
+        const MOND_HAZE_POINTS=3000,MOND_HAZE_THICKNESS=0.012,MOND_HAZE_STRENGTH=0.65,MOND_EDGE_OPACITY=0.8;
         let mondZoneShown=false,mondZoneReady=false;
         const mondZone=new THREE.Group();mondZone.visible=false;scene.add(mondZone);
         const mondLevelData=new Uint8Array(MOND_PLANE_SAMPLES*4);
         const mondLevelTexture=new THREE.DataTexture(mondLevelData,MOND_PLANE_SAMPLES,1,THREE.RGBAFormat);
         mondLevelTexture.magFilter=mondLevelTexture.minFilter=THREE.LinearFilter;
-        const mondPlaneUniforms={uLevels:{value:mondLevelTexture},uDataEdge:{value:1/MOND_PLANE_EXTENT},uEdge:{value:-1},
-            uStrength:{value:MOND_PLANE_STRENGTH},uEdgeWidth:{value:MOND_PLANE_EDGE_WIDTH}};
+        const mondPlaneUniforms={uLevels:{value:mondLevelTexture},uDataEdge:{value:1/MOND_PLANE_EXTENT},
+            uStrength:{value:MOND_PLANE_STRENGTH},uGold:{value:new THREE.Vector3(...MOND_GOLD)}};
         const mondPlane=new THREE.Mesh(new THREE.CircleGeometry(1,256),new THREE.ShaderMaterial({
             uniforms:mondPlaneUniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
             vertexShader:`varying float vU;void main(){vU=length(position.xy);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-            fragmentShader:`varying float vU;uniform sampler2D uLevels;uniform float uDataEdge;uniform float uEdge;uniform float uStrength;uniform float uEdgeWidth;
+            fragmentShader:`varying float vU;uniform sampler2D uLevels;uniform float uDataEdge;uniform float uStrength;uniform vec3 uGold;
                 void main(){float level=texture2D(uLevels,vec2(min(vU,uDataEdge)/uDataEdge*(1.0-1.0/${MOND_PLANE_SAMPLES}.0)+0.5/${MOND_PLANE_SAMPLES}.0,0.5)).r;
                 float fade=1.0-smoothstep(uDataEdge,1.0,vU);
-                float d=vU-uEdge,band=uEdge>0.0?exp(-d*d/(2.0*uEdgeWidth*uEdgeWidth)):0.0;
-                float a=(uStrength*level+0.22*band)*fade;
-                gl_FragColor=vec4(mix(vec3(1.0,0.68,0.28),vec3(1.0,0.84,0.55),band),a);}`
+                gl_FragColor=vec4(mix(uGold,vec3(1.0),0.3),uStrength*level*fade);}`
         }));
         mondPlane.frustumCulled=false;mondPlane.renderOrder=1;mondZone.add(mondPlane);
+        // The start line: a dashed unit circle scaled to the crossing radius, so the dashes keep their count at any size.
+        const mondEdge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:256},(_,i)=>new THREE.Vector3(Math.cos(i*Math.PI/128),Math.sin(i*Math.PI/128),0))),
+            new THREE.LineDashedMaterial({color:new THREE.Color(...MOND_GOLD),dashSize:0.045,gapSize:0.035,transparent:true,opacity:MOND_EDGE_OPACITY,depthWrite:false}));
+        mondEdge.computeLineDistances();mondEdge.frustumCulled=false;mondEdge.renderOrder=1;mondEdge.visible=false;scene.add(mondEdge);
         // Haze: fixed points spread evenly over the plane's area; their brightness is set from the shade where they sit.
         const mondHazeU=new Float32Array(MOND_HAZE_POINTS),mondHazeGeom=new THREE.BufferGeometry();
         (()=>{const rng=mulberry32(5310),pos=new Float32Array(MOND_HAZE_POINTS*3),tw=new Float32Array(MOND_HAZE_POINTS);
@@ -2724,11 +2730,18 @@ __GALAXIES_JS__
                 void main(){vA=aAlpha*aTwinkle;vec4 mv=modelViewMatrix*vec4(position,1.0);
                 gl_PointSize=clamp(uSize*uScale/max(-mv.z,1.0),1.5,9.0);gl_Position=projectionMatrix*mv;}`,
             fragmentShader:`varying float vA;void main(){vec2 d=gl_PointCoord-0.5;float r2=dot(d,d)*4.0;if(r2>1.0)discard;
-                gl_FragColor=vec4(1.0,0.72,0.38,vA*exp(-3.0*r2));}`
+                gl_FragColor=vec4(${MOND_GOLD.join(',')},vA*exp(-3.0*r2));}`
         }));
         mondHaze.frustumCulled=false;mondHaze.renderOrder=1;mondZone.add(mondHaze);
         const mondZoneToggle=document.getElementById('toggleMondZone');
-        const showMondZone=()=>{mondZone.visible=mondMode&&mondZoneShown&&mondZoneReady;requestRender();};
+        // While the gold shows, the panels over the 3D view turn solid (CSS .mond-zone-on) so it never tints them.
+        let mondEdgeKpc=null;
+        const showMondZone=()=>{
+            mondZone.visible=mondMode&&mondZoneShown&&mondZoneReady;
+            mondEdge.visible=mondZone.visible&&mondEdgeKpc!=null;
+            orbitPlot.classList.toggle('mond-zone-on',mondZone.visible);
+            requestRender();
+        };
         // levelAt(rKpc): the graph's shade at that radius, 0 to 1; lastKpc: the last data radius; edgeKpc: where the
         // pull last drops below a0 inside the data (null if it doesn't). levelAt null clears it (NFW mode).
         function setMondZone3D(levelAt,lastKpc,edgeKpc){
@@ -2739,7 +2752,7 @@ __GALAXIES_JS__
                 for(let i=0;i<MOND_PLANE_SAMPLES;i++){levels[i]=levelAt(lastKpc*i/(MOND_PLANE_SAMPLES-1));mondLevelData[4*i]=Math.round(255*levels[i]);}
                 mondLevelTexture.needsUpdate=true;
                 mondZone.scale.set(extent,extent,extent);
-                mondPlaneUniforms.uEdge.value=edgeKpc!=null?edgeKpc/extent:-1;
+                mondEdgeKpc=edgeKpc;if(edgeKpc!=null)mondEdge.scale.set(edgeKpc,edgeKpc,1);
                 const alpha=mondHazeGeom.attributes.aAlpha.array,dataEdge=1/MOND_PLANE_EXTENT;
                 for(let i=0;i<MOND_HAZE_POINTS;i++){
                     const u=mondHazeU[i],k=Math.min(1,u/dataEdge)*(MOND_PLANE_SAMPLES-1),j=Math.min(Math.floor(k),MOND_PLANE_SAMPLES-2);
