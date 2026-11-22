@@ -340,7 +340,10 @@ leaving a card clears its rings at once, and going back to a finished card shows
 its message without replaying the glow. Rings and the dim layer are placed in
 page coordinates, so they scroll with the page and stay locked to their
 controls; only a ring on something that stays put on screen (top menu, tour
-card, fullscreen) is fixed to the screen. Back always returns to a skipped card so it
+card, fullscreen) is fixed to the screen. Pop-ups the visitor opens always sit
+above the tour: open Settings lifts the top bar over the rings, dim and card,
+and a ring is cut away wherever an open info box, the galaxy list, the View
+panel or the fullscreen slider box covers it (open info boxes are not dimmed). Back always returns to a skipped card so it
 can be done. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On

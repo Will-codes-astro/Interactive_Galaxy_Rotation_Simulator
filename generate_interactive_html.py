@@ -994,6 +994,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     html.lite .tutorial-pointer { animation:none; transform:translate(var(--to-x),var(--to-y)); } /* as with reduce-motion: the pointer rests where to act */
     html.lite .tutorial-spotlight.is-complete::after { display:none; }
     html.lite .topbar { background:rgba(6,10,18,.97); }
+    /* Open Settings sits above everything, the tour's rings, dim layer and card included (they are z-index 9997-10001). */
+    .topbar.settings-open { z-index:10010; }
     html.lite .view-panel, html.lite .fs-sliders, html.lite .telemetry, html.lite .stability-chip, html.lite .star-mark span, html.lite .curve-hover .ch-box { background:rgba(9,14,24,.94); }
     a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
@@ -4332,6 +4334,7 @@ __GALAXIES_JS__
     const settingsBtn=document.getElementById('settingsBtn'),settingsPanel=document.getElementById('settingsPanel');
     function setSettingsOpen(open){
       settingsPanel.hidden=!open;settingsBtn.setAttribute('aria-expanded',String(open));
+      document.querySelector('.topbar').classList.toggle('settings-open',open); // lifts the menu over the tour's rings and dim
       if(open)(settingsPanel.querySelector('input:not(:disabled)')||settingsPanel).focus();
     }
     settingsBtn.addEventListener('click',()=>setSettingsOpen(settingsPanel.hidden));
@@ -5223,9 +5226,36 @@ __GALAXIES_JS__
       ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
       // Corners follow the control itself, not a box it has opened (a round ? button with its square info box).
       ring.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,el.getBoundingClientRect().height/2)+pad)+'px';
-      const cut=Math.ceil(tutorialCoverBottom(el)-(r.top-pad)),clip=cut>0?`inset(${cut}px -40px -40px -40px)`:'';
-      if(ring.style.clipPath!==clip)ring.style.clipPath=clip;
+      clipTutorialRing(ring,el,{left:r.left-pad,top:r.top-pad,right:r.right+pad,bottom:r.bottom+pad});
       return true;
+    }
+    /* Pop-ups the visitor opens (info boxes, the galaxy list, the View and slider panels) always sit above the tour's
+       rings: a ring is cut away wherever one covers it, and wherever the top menu does. A pop-up that is part of the
+       ring's own control (inside it, or taken into its box) is left alone. Settings is lifted above it all instead. */
+    const TUTORIAL_POPUPS='#mlExplainer,#tiltExplainer,#starsExplainer,#haloRadiusHelp,#haloScaleHelp,#haloConcentrationHelp,#galaxyMenuList,#viewPanel,#fsSliders';
+    const TUTORIAL_RING_GLOW_PX=40; // room kept round a ring for its glow
+    const tutorialPopupShown=el=>{if(!el.getClientRects().length)return false;const cs=getComputedStyle(el);return cs.visibility!=='hidden'&&parseFloat(cs.opacity)>0.05;};
+    function tutorialPopupRects(el,box){
+      return[...document.querySelectorAll(TUTORIAL_POPUPS)].filter(pop=>!pop.contains(el)&&!el.contains(pop)&&tutorialPopupShown(pop))
+        .map(pop=>pop.getBoundingClientRect()).filter(p=>!(p.left>=box.left-1&&p.right<=box.right+1&&p.top>=box.top-1&&p.bottom<=box.bottom+1));
+    }
+    function clipTutorialRing(ring,el,box){
+      const g=TUTORIAL_RING_GLOW_PX,L=box.left-g,T=box.top-g,R=box.right+g,B=box.bottom+g,cover=tutorialCoverBottom(el);
+      const cuts=tutorialPopupRects(el,box).concat(cover>T?[{left:L,top:T,right:R,bottom:cover}]:[])
+        .map(p=>({l:Math.max(L,p.left),t:Math.max(T,p.top),r:Math.min(R,p.right),b:Math.min(B,p.bottom)})).filter(p=>p.l<p.r&&p.t<p.b);
+      let clip='';
+      if(cuts.length){
+        // The covered area as non-overlapping grid cells, so the even-odd rule cuts each place once even where pop-ups overlap.
+        const xs=[...new Set(cuts.flatMap(c=>[c.l,c.r]))].sort((a,b)=>a-b),ys=[...new Set(cuts.flatMap(c=>[c.t,c.b]))].sort((a,b)=>a-b);
+        const rect=(l,t,r,b)=>`M${(l-box.left).toFixed(1)} ${(t-box.top).toFixed(1)}H${(r-box.left).toFixed(1)}V${(b-box.top).toFixed(1)}H${(l-box.left).toFixed(1)}Z`;
+        let d=rect(L,T,R,B);
+        for(let j=0;j<ys.length-1;j++)for(let i=0;i<xs.length-1;i++){
+          const cx=(xs[i]+xs[i+1])/2,cy=(ys[j]+ys[j+1])/2;
+          if(cuts.some(c=>cx>c.l&&cx<c.r&&cy>c.t&&cy<c.b))d+=rect(xs[i],ys[j],xs[i+1],ys[j+1]);
+        }
+        clip=`path(evenodd,'${d}')`;
+      }
+      if(ring.style.clipPath!==clip)ring.style.clipPath=clip;
     }
     // Dashed rings on the other controls a card names (hidden while something else has to be fixed first).
     // One ring per control id, so a ring whose part is done can fade out where it is instead of vanishing.
@@ -5342,6 +5372,10 @@ __GALAXIES_JS__
         const r=tutorialSpotRect(el);
         cutHole(el,{left:r.left-pad,top:r.top-pad,width:r.width+2*pad,height:r.height+2*pad},TUTORIAL_RING_MIN_RADIUS_PX);
       });
+      // Open pop-ups stay bright too (the always-open View and slider panels follow the dim like the rest of the page).
+      document.querySelectorAll('#mlExplainer,#tiltExplainer,#starsExplainer,#haloRadiusHelp,#haloScaleHelp,#haloConcentrationHelp,#galaxyMenuList').forEach(pop=>{
+        if(tutorialPopupShown(pop))cutHole(pop,pop.getBoundingClientRect(),parseFloat(getComputedStyle(pop).borderTopLeftRadius)||0);
+      });
       const html=holes.map(([r,k])=>`<rect x="${r.left}" y="${r.top}" width="${r.width}" height="${r.height}" rx="${Math.min(k,r.width/2,r.height/2)}"/>`).join('');
       if(html!==tutorialDimLast){tutorialDimLast=html;tutorialDimHoles.innerHTML=html;}
     }
@@ -5390,6 +5424,10 @@ __GALAXIES_JS__
       trimTutorialPanels();
       positionTutorialAlso();
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
+      else if(!tutorialSpotlight.hidden&&tutorialAimTarget){
+        const st=tutorialSpotlight.style,fixed=tutorialSpotlight.classList.contains('is-fixed'),left=parseFloat(st.left)-(fixed?0:scrollX),top=parseFloat(st.top)-(fixed?0:scrollY);
+        clipTutorialRing(tutorialSpotlight,tutorialAimTarget,{left,top,right:left+parseFloat(st.width),bottom:top+parseFloat(st.height)});
+      }
       updateTutorialDim();
       requestAnimationFrame(trackTutorialSpot);
     })();
