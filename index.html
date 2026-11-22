@@ -247,10 +247,10 @@
     @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto repeat(2,minmax(0,1fr)); } }
     .gravity-label { display:block; margin-bottom:9px; color:var(--ink-2); font-size:12.5px; font-weight:500; }
     /* Gravity model: two colour-coded cards. Purple = dark matter (the halo line and 3D halo), gold = MOND (its zone). */
-    .model-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:2px 0 0; }
+    .model-cards { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; margin:2px 0 0; }
     .model-card { position:relative; display:flex; cursor:pointer; border-radius:10px; }
     .model-card input { position:absolute; inset:0; width:100%; height:100%; margin:0; opacity:0; cursor:pointer; }
-    .model-card > span { flex:1; display:flex; flex-direction:column; gap:1px; padding:8px 11px 8px 26px; border:1px solid var(--line-strong); border-radius:10px; background:rgba(255,255,255,.025); color:var(--muted); transition:background .2s,border-color .2s,box-shadow .2s; }
+    .sim-stage .model-cards .model-card > span { flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:1px; padding:8px 11px 8px 26px; border:1px solid var(--line-strong); border-radius:10px; background:rgba(255,255,255,.025); color:var(--muted); transition:background .2s,border-color .2s,box-shadow .2s; }
     .model-card > span::before { content:''; position:absolute; left:10px; top:13px; width:9px; height:9px; border-radius:50%; border:1.5px solid currentColor; transition:background .2s; }
     .model-card b { font-size:14px; font-weight:600; color:var(--ink-2); }
     .model-card small { font-size:11.5px; line-height:1.3; }
@@ -363,6 +363,23 @@
     .tutorial-launch:hover, .tutorial-launch:focus-visible { color:var(--ink); }
     .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(138,180,248,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
     .tutorial-welcome::backdrop { background:rgba(2,6,12,.8); }
+    /* End of a tour: a short celebration (visual only). Three stars orbit a green tick, then the box settles. */
+    .tutorial-done { position:fixed; inset:0; z-index:10002; display:grid; place-items:center; padding:16px; background:rgba(2,6,12,.6); animation:tutorial-done-in .45s ease both; }
+    .tutorial-done[hidden] { display:none; }
+    .tutorial-done.is-leaving { animation:tutorial-done-out .4s ease forwards; }
+    .tutorial-done-box { width:min(400px,100%); padding:26px 24px 22px; text-align:center; border:1px solid rgba(165,227,194,.35); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 40px rgba(165,227,194,.12); animation:tutorial-done-pop .6s cubic-bezier(.2,1.4,.4,1) both; }
+    .tutorial-done-box h2 { margin:14px 0 6px; font-size:22px; }
+    .tutorial-done-box p { margin:0 0 18px; color:#b5c5d5; }
+    .tutorial-done-orbit { position:relative; width:84px; height:84px; margin:0 auto; border:1px dashed rgba(165,227,194,.35); border-radius:50%; }
+    .tutorial-done-orbit b { position:absolute; inset:22px; display:grid; place-items:center; border-radius:50%; background:#a5e3c2; color:#06131f; font-size:22px; box-shadow:0 0 22px rgba(165,227,194,.7); animation:tutorial-done-pop .6s .15s cubic-bezier(.2,1.4,.4,1) both; }
+    .tutorial-done-orbit i { position:absolute; left:50%; top:50%; width:7px; height:7px; margin:-3.5px; border-radius:50%; background:#f4f7fb; box-shadow:0 0 8px #8ab4f8; animation:tutorial-done-spin 3s linear infinite; }
+    .tutorial-done-orbit i:nth-child(2) { animation-delay:-1s; background:#f2c879; }
+    .tutorial-done-orbit i:nth-child(3) { animation-delay:-2s; background:#a8ddff; }
+    @keyframes tutorial-done-spin { from { transform:rotate(0) translateX(42px); } to { transform:rotate(360deg) translateX(42px); } }
+    @keyframes tutorial-done-pop { from { opacity:0; transform:scale(.6); } }
+    @keyframes tutorial-done-in { from { opacity:0; } }
+    @keyframes tutorial-done-out { to { opacity:0; } }
+    @media (prefers-reduced-motion:reduce) { .tutorial-done, .tutorial-done-box, .tutorial-done-orbit b, .tutorial-done-orbit i { animation:none; } .tutorial-done-orbit i { transform:rotate(calc(var(--k,0)*120deg)) translateX(42px); } .tutorial-done-orbit i:nth-child(2) { --k:1; } .tutorial-done-orbit i:nth-child(3) { --k:2; } }
     .tutorial-eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:600; }
     .tutorial-welcome h2 { margin:8px 0; font-size:22px; }
     .tutorial-welcome p { color:#b5c5d5; margin:0 0 18px; }
@@ -480,6 +497,7 @@
     @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.85); } }
     .tutorial-spotlight.is-complete .tutorial-pointer { opacity:0; animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
+    .tutorial-trim { display:none !important; }
     /* look: a card that only asks you to read something gets the box but no pointer, since nothing needs hovering. */
     .tutorial-spotlight.is-look .tutorial-pointer { display:none; }
     /* groups: the pointer rests on each group's heading in turn (no drag), then pops back to the first. */
@@ -1191,6 +1209,14 @@
     <p id="welcomeDescription">New here? The simulator tutorial is a short, hands-on tour of this page. You will find the puzzle in a real galaxy’s rotation curve, then test two answers to it: dark matter and modified gravity. Skip it at any time. The Custom Sandbox, where you build your own galaxy, has a tutorial of its own.</p>
     <div class="tutorial-welcome-actions"><button type="button" class="tutorial-primary" id="tutorialStart">Start simulator tutorial</button><button type="button" id="tutorialWelcomeSkip">I've been here before</button></div>
   </dialog>
+  <div class="tutorial-done" id="tutorialDone" role="status" aria-labelledby="tutorialDoneTitle" hidden>
+    <div class="tutorial-done-box">
+      <div class="tutorial-done-orbit" aria-hidden="true"><i></i><i></i><i></i><b>✓</b></div>
+      <h2 id="tutorialDoneTitle">Tutorial complete!</h2>
+      <p>You’re all set. Now it’s yours to play with: try other galaxies, switch between dark matter and MOND, or build a galaxy of your own.</p>
+      <button type="button" class="tutorial-primary" id="tutorialDoneClose">Start exploring</button>
+    </div>
+  </div>
   <div class="tutorial-spotlight" id="tutorialSpotlight" aria-hidden="true" hidden>
     <span class="tutorial-tag" id="tutorialTag"></span>
     <svg class="tutorial-pointer" viewBox="0 0 28 34" aria-hidden="true"><path d="M3 2v23l6-5 4 10 5-2-4-10h8z" fill="#eaffff" stroke="#09212c" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -3982,6 +4008,7 @@ window.GALAXIES = {
       starMarks=(names||[]).flatMap(name=>STAR_MARKS[name]);
       requestRender();
     }
+    const STAR_LABEL_CHAR_PX=6.6,STAR_LABEL_PAD_PX=34; // rough label width per character, plus the ring and padding
     function updateStarMarks(){
       // Read the view size once: reading it between style writes would force a fresh page layout for every mark.
       const viewW=orbitPlot.clientWidth,viewH=orbitPlot.clientHeight;
@@ -3995,11 +4022,13 @@ window.GALAXIES = {
         const edge=Math.max(Math.abs(markVec.x),Math.abs(markVec.y))>0.92;
         if(edge){const f=0.92/Math.max(Math.abs(markVec.x),Math.abs(markVec.y));markVec.x*=f;markVec.y*=f;}
         el.classList.toggle('edge',edge);
-        el.classList.toggle('flip',markVec.x>0.4); // keep the label on screen near the right edge
+        // Keep the label on screen near the right edge: flip it to the left when its estimated width (from its length,
+        // so nothing is measured mid-frame) would run past the edge, which on a phone happens well short of it.
+        const text=mark.label(idx),px=(markVec.x+1)/2*viewW;
+        el.classList.toggle('flip',markVec.x>0.4||px+text.length*STAR_LABEL_CHAR_PX+STAR_LABEL_PAD_PX>viewW);
         el.hidden=false;
-        el.style.transform=`translate(${((markVec.x+1)/2*viewW).toFixed(1)}px,${((1-markVec.y)/2*viewH).toFixed(1)}px)`;
+        el.style.transform=`translate(${px.toFixed(1)}px,${((1-markVec.y)/2*viewH).toFixed(1)}px)`;
         el.classList.toggle('warm',!!mark.warm);el.classList.toggle('track',!!mark.track);
-        const text=mark.label(idx);
         if(el.firstChild.textContent!==text)el.firstChild.textContent=text;
       });
       tutorialWatchTick();
@@ -4027,21 +4056,21 @@ window.GALAXIES = {
          doneText:'Spotted: all the way out, the white points stay well above the cyan line. Press Next to find out why.',
          text:'Each white point is a measured orbit speed. The cyan line is how fast they would move if only the stars and gas we can see were pulling on them.',
          action:'Slowly move your mouse (or slide your finger) across the whole right half of the graph, from the middle to the far edge, reading the speeds as you go. Do the white points stay above the cyan line?'},
-        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',allow:['visibleMatterOnly'],watch:['curvePlot:Watch the orange line'],title:'Take the dark matter away',
+        {id:'removeHalo',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},gesture:'zero',allow:['visibleMatterOnly'],watch:['curvePlot:Watch the orange line'],title:'Take the dark matter away',
          text:'That gap is the puzzle. The orange line is the model: visible matter plus a dark matter halo.',
          action:'Drag Halo mass (blue box) all the way left, to 0. Left lowers it.'},
-        {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',gesture:'increase',watch:['curvePlot:Watch the orange line'],title:'Add the halo back',
+        {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',cardSlider:{massSlider:'curvePlot'},gesture:'increase',watch:['curvePlot:Watch the orange line'],title:'Add the halo back',
          checks:{massSlider:()=>Number(massSlider.value)>0&&tutorialOuterReached()},doneText:'Gap closed: enough dark matter lifts the orange line up to the measured speeds.',
          text:'A halo is a huge cloud of unseen matter. Its gravity makes the stars orbit faster.',
          action:'Drag Halo mass to the right until the orange line climbs up to the white points on the right of the graph.'},
-        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
+        {id:'haloShape',nfw:true,target:'scaleSlider',cardSlider:{scaleSlider:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
          text:'The scale radius sets how tightly the halo is packed. Its total mass stays the same.',
          action:'1. Drag Scale radius left: the left of the orange line rises. 2. Drag it right: that part drops.'},
         {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloRadiusCard',gesture:'click',tag:'1 · Open',also:['haloScaleCard:2 · Open','haloConcentrationCard:3 · Open'],title:'Read the halo’s numbers',
          checks:{haloRadiusCard:()=>tutorialFlags.haloRadiusCard,haloScaleCard:()=>tutorialFlags.haloScaleCard,haloConcentrationCard:()=>tutorialFlags.haloConcentrationCard},doneText:'All three read: these numbers follow the halo sliders.',
          text:'These cards describe your halo. r₂₀₀ marks its outer edge. Concentration c (r₂₀₀ ÷ scale radius) says how tightly packed it is.',
          action:'1. Hover over (or tap) Halo radius. 2. Now Scale radius. 3. Now Concentration.'},
-        {id:'fit',nfw:true,mode:'preset',target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)'],title:'Score your fit',
+        {id:'fit',nfw:true,mode:'preset',target:'massSlider',cardSlider:{massSlider:'curvePlot',scaleSlider:'curvePlot'},gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass&&shownRedChi>=tutorialChiGoal(),scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale,
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
@@ -4114,7 +4143,7 @@ window.GALAXIES = {
         {id:'sbGas',mode:'custom',target:'sbGasMass',cardSlider:{sbGasMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the right of the cyan line'],title:'Add the gas',
          text:'Gas spreads about three times wider than the stars, so it matters most far out.',
          action:'Drag Gas mass up and down. Watch the right of the cyan line.'},
-        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'look',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
+        {id:'sbSummary',mode:'custom',target:'sandboxSummary',cardSlider:{sbDiskMass:'sandboxSummary'},cardSliderPhone:true,gesture:'look',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
         {id:'sbMond',mode:'custom',partPause:true,given:['optMond'],target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
@@ -4231,8 +4260,11 @@ window.GALAXIES = {
     let tutorialSliderId=null;
     function tutorialCardSliderId(){
       const step=tutorialStep();
-      if(tutorialCard.hidden||!step.cardSlider||tutorialBlocker())return null;
-      const aim=tutorialCurrentAim(step),id=tutorialPartHold||(aim?aim.id:Object.keys(step.cardSlider).pop()),real=step.cardSlider[id]&&document.getElementById(id);
+      // cardSliderPhone: the copy is only needed on a phone, where the slider and what it changes are far apart.
+      if(tutorialCard.hidden||!step.cardSlider||tutorialBlocker()||step.cardSliderPhone&&!tutorialPhone())return null;
+      // A card with no parts whose ring is on something else (the totals) still carries its slider.
+      const aim=tutorialCurrentAim(step),keys=Object.keys(step.cardSlider);
+      const id=tutorialPartHold||(aim?(step.cardSlider[aim.id]||step.checks?aim.id:keys[0]):keys.pop()),real=step.cardSlider[id]&&document.getElementById(id);
       if(!real||tutorialBar.contains(real)&&getComputedStyle(tutorialBar).position==='sticky')return null;
       return id;
     }
@@ -4439,6 +4471,14 @@ window.GALAXIES = {
         const low=inPlots?target:getComputedStyle(tutorialBar).position==='sticky'?extras.find(el=>tutorialPlots.contains(el)):null;
         if(low){const r=low.getBoundingClientRect(),need=r.bottom+y-innerHeight+16+(step.scrollPad||0);if(need>top)top=Math.min(need,r.top+y-64-tutorialBar.offsetHeight);}
       }
+      // Phones: when the control (or what its card slider changes) and everything else the card rings fit between the
+      // top menu and the tour card together, scroll so they are all in view at once.
+      if(tutorialPhone()&&!blocker){
+        const els=[view||target,...extras.filter(el=>!(step.cardSlider&&step.cardSlider[el.id]))],box=el=>(el.closest('.control')||el).getBoundingClientRect();
+        const spanTop=Math.min(...els.map(el=>box(el).top))+y,spanBottom=Math.max(...els.map(el=>box(el).bottom))+y;
+        const room=innerHeight-tutorialCard.offsetHeight-20-clear;
+        if(spanBottom-spanTop<=room)top=spanTop-clear;
+      }
       if(smooth)tutorialGlideTo(Math.max(0,top));else window.scrollTo({top:Math.max(0,top),behavior:'auto'});
     }
     // Once whatever was in the way has been sorted out (or something new is), bring the right control into view.
@@ -4498,6 +4538,7 @@ window.GALAXIES = {
       tutorialNext.disabled=gated;
       tutorialNext.title=gated?'Press Fullscreen to carry on':'';
     }
+    const tutorialPhone=()=>matchMedia('(max-width:600px)').matches;
     function tutorialIsFullscreen(){return !!nativeFsElement()||orbitPlot.classList.contains('fullscreen-active');}
     // Keeps the highlight glued to its control when the control or the page changes size without a scroll or window
     // resize: a hover box opening inside it, a <details> section expanding above it, the sandbox panel appearing.
@@ -4761,9 +4802,31 @@ window.GALAXIES = {
       const html=holes.map(([r,k])=>`<rect x="${r.left}" y="${r.top}" width="${r.width}" height="${r.height}" rx="${Math.min(k,r.width/2,r.height/2)}"/>`).join('');
       if(html!==tutorialDimLast){tutorialDimLast=html;tutorialDimHoles.innerHTML=html;}
     }
+    // Phones in fullscreen: the View panel and the halo slider panel would cover most of the 3D view, so while the tour
+    // is open they show only the rows holding a control the card names (a row's heading goes with it). Everything
+    // comes back when the card moves on, fullscreen ends or the tour closes.
+    let tutorialTrimKey='';
+    function trimTutorialPanels(){
+      const on=!tutorialCard.hidden&&tutorialPhone()&&tutorialIsFullscreen();
+      const step=on?tutorialStep():null,blocker=on?tutorialBlocker():null;
+      const named=on?[blocker&&blocker.target,...(blocker?[]:[step.target,...tutorialRingList(step).map(r=>r.id)].map(id=>document.getElementById(id)))].filter(Boolean):[];
+      const key=on?named.map(el=>el.id).join():'';
+      if(key===tutorialTrimKey)return;
+      tutorialTrimKey=key;
+      const fs=document.getElementById('fsSliders');
+      const rows=[...viewPanel.children].filter(el=>el!==viewToggle&&!el.matches('.view-label')).concat([...fs.children].filter(el=>el.tagName!=='LABEL'));
+      rows.forEach(row=>{
+        const hide=on&&!named.some(el=>row===el||row.contains(el));
+        row.classList.toggle('tutorial-trim',hide);
+        // A row's heading (the View panel's labels, the slider's label) sits just before it.
+        const head=row.previousElementSibling;
+        if(head&&(head.matches('.view-label')||head.tagName==='LABEL'))head.classList.toggle('tutorial-trim',hide);
+      });
+    }
     (function trackTutorialSpot(){
       if(!tutorialCard.hidden){tutorialUpdateChecks();syncTutorialSlider(true);}
       applyTutorialLocks();
+      trimTutorialPanels();
       positionTutorialAlso();
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
       updateTutorialDim();
@@ -4791,6 +4854,8 @@ window.GALAXIES = {
       tutorialAimTarget=null;tutorialAimId=null;
       tutorialResetChecks();
       tutorialTarget=document.getElementById(step.target);
+      // Phones: a card that uses the View panel opens it, so there is no extra toggle to find on a small screen.
+      if(tutorialPhone()&&(step.viewPanel||step.fs)&&viewPanel.classList.contains('collapsed'))viewToggle.click();
       if(pageOf(tutorialTarget))showPage(pageOf(tutorialTarget),{scroll:false});
       const blocker=tutorialBlocker();
       tutorialBlockTarget=blocker?blocker.target:null;
@@ -5112,7 +5177,7 @@ window.GALAXIES = {
     tutorialNext.addEventListener('click',()=>{
       if(tutorialIndex===tutorialSteps.length-1){
         const nextTour=tutorialFull&&FULL_TOUR[FULL_TOUR.indexOf(tutorialTour)+1];
-        if(!nextTour){endTutorial();return;}
+        if(!nextTour){endTutorial();showTutorialDone();return;}
         // The sandbox tour ends in fullscreen but Wrapping up is on the page: leave fullscreen first, and start the
         // next tour only once the exit has finished, so it never opens half-way through the switch.
         if(!tutorialIsFullscreen()||TOURS[nextTour].steps[0].fs){startTutorial(nextTour,true);return;}
@@ -5124,6 +5189,24 @@ window.GALAXIES = {
       }
       goTutorialStep(tutorialIndex+1,1);
     });
+    // Finishing a tour (Finish on its last card, not Skip) shows a short "Tutorial complete" celebration. It sits inside
+    // the 3D view when that is fullscreen, so it is never hidden behind it, and closes on its button, a click outside
+    // it, Esc, or by itself after TUTORIAL_DONE_MS.
+    const tutorialDone=document.getElementById('tutorialDone'),TUTORIAL_DONE_MS=9000;let tutorialDoneTimer=0;
+    function showTutorialDone(){
+      (tutorialIsFullscreen()?orbitPlot:document.body).appendChild(tutorialDone);
+      tutorialDone.classList.remove('is-leaving');tutorialDone.hidden=false;
+      document.getElementById('tutorialDoneClose').focus({preventScroll:true});
+      clearTimeout(tutorialDoneTimer);tutorialDoneTimer=setTimeout(closeTutorialDone,TUTORIAL_DONE_MS);
+    }
+    function closeTutorialDone(){
+      if(tutorialDone.hidden||tutorialDone.classList.contains('is-leaving'))return;
+      clearTimeout(tutorialDoneTimer);tutorialDone.classList.add('is-leaving');
+      setTimeout(()=>{tutorialDone.hidden=true;tutorialDone.classList.remove('is-leaving');},matchMedia('(prefers-reduced-motion: reduce)').matches?0:400);
+    }
+    document.getElementById('tutorialDoneClose').addEventListener('click',closeTutorialDone);
+    tutorialDone.addEventListener('click',e=>{if(e.target===tutorialDone)closeTutorialDone();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!tutorialDone.hidden){e.stopPropagation();closeTutorialDone();}},{capture:true});
     // The main tour's last step offers the sandbox tour; pressing it opens the Custom Sandbox.
     tutorialMore.addEventListener('click',()=>startTutorial('sandbox'));
     // Left/Right arrows: move between tour cards while the tour is open; otherwise, in fullscreen only, step the

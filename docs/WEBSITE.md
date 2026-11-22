@@ -42,7 +42,18 @@ takes in its description lines and follows any change to their length. Switches
 that are already in a card's end state when it opens (orbit lines on, gas or halo
 off, already playing, fullscreen, the ejection line, MOND chosen) count as done.
 Next from the sandbox tour's last card in the full tour leaves fullscreen before
-Wrapping up opens.
+Wrapping up opens. Finishing a tour (Finish on its last card, not Skip) shows a short
+"Tutorial complete!" box with three stars orbiting a green tick (visual only);
+it closes on its button, a tap outside it, Esc, or by itself after 9 s.
+
+On phones (600 px wide or less) the tour adapts: the halo slider cards (and the
+sandbox totals card) carry their slider on the card and scroll to the graph, a
+card's control and everything it rings are scrolled into view together when they
+fit above the card, the View panel opens by itself on cards that use it, and in
+fullscreen the View panel and the halo slider panel show only the rows the card
+names, so the galaxy stays visible. Star labels flip left before they would run
+off the right edge. Known limit: on "Test a rival idea" the χ² badge and the
+model cards do not fit on a phone screen together.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
