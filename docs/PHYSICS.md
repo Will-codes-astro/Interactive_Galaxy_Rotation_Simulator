@@ -173,14 +173,15 @@ median χ²/N barely moves (9.9 → 10.5).
   interpolating ln g_N linearly between neighbouring radii. The threshold is a
   guide, not a sharp switch: μ changes smoothly, so at the line (g_N = a₀) MOND
   already raises the speed by about 26%, falling to about 10% at g_N = 3a₀ and
-  2.2% at 10a₀. Even so, the gold starts at the line (Will's choice, 22 Nov, for a
-  clearer picture): none where g_N ≥ a₀, and below it the shade follows the speed
-  boost V_MOND/V_bar − 1 (computed with `mondVelocity`, so it uses the same
-  interpolating function) minus the boost already present at a₀, as
-  `MOND_ZONE_ALPHA_MAX` × ((boost − boost(a₀)) / (`MOND_ZONE_FULL_BOOST` − boost(a₀)))^`MOND_ZONE_GAMMA`
-  (0.3, 200% i.e. V_MOND = 3 V_bar at g_N ≈ 0.014 a₀, and 0.6, so the gold shows soon after the line).
-  Limitation: the unshaded side of the line still has a real MOND boost (up to
-  ≈26%), so the gold marks where MOND's effect is large, not everywhere it acts.
+  2.2% at 10a₀ (a 1% boost needs g_N ≈ 15a₀). So the shade is not limited to the
+  zone: at every radius it follows the speed boost V_MOND/V_bar − 1 (computed with
+  `mondVelocity`, so it uses the same interpolating function), as
+  `MOND_ZONE_ALPHA_MAX` × (boost / `MOND_ZONE_FULL_BOOST`)^`MOND_ZONE_GAMMA`
+  (0.3, 200% i.e. V_MOND = 3 V_bar at g_N ≈ 0.014 a₀, and 0.6, so small boosts still show).
+  In all four SPARC galaxies the boost is at least about 4% at every measured
+  radius (smallest: NGC 7331 at 2.7 kpc, g_N ≈ 6.4a₀, where the +11 km/s is below
+  that point's ±20 km/s error), so the gold covers the whole graph, faint at the
+  centre; each a₀ crossing keeps its dotted line, tagged "a₀" (Will's choice, 22 Nov).
   Between radii ln g_N is interpolated
   linearly, as for the edges. This is a visual choice, not a model result. The 3D
   view's gold plane (`setMondZone3D`, "Where MOND acts" switch) uses the same shade

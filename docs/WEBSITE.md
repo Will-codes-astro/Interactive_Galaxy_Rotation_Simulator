@@ -28,10 +28,11 @@ mass" (purple, like the halo line) and "MOND: gravity changes, no extra mass"
 (gold). The cards set the hidden `#mondToggle` checkbox that the rest of the page
 listens to. Its hint suggests trying MOND in NFW mode and gives a₀ in MOND mode.
 With MOND on, for every galaxy (preset or sandbox), the rotation curve's speed panel shades in gold
-from the a₀ line outwards, deepening with MOND's boost at each radius (none above a₀, though MOND's
-boost there is not zero; see PHYSICS.md) ("MOND boosts
-gravity here", in small gold text in the empty bottom-right corner of the widest stretch below a₀ so it
-never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The View panel's
+in proportion to MOND's boost at each radius: faint near the centre, where the boost is small, and
+deepening outwards; MOND has no switch-on point, so it covers the whole graph in every preset galaxy
+("Deeper gold = bigger MOND boost", in small gold text in the empty bottom-right corner of the widest
+stretch below a₀ so it never covers a curve), with a faint dotted line, tagged "a₀", where the visible
+gravity crosses a₀ (see PHYSICS.md). The View panel's
 "Where MOND acts" switch (off by default, usable only in MOND mode) lays the same gold into the 3D
 disk plane in the graph's gold (#f2c879): each radius gets the graph's shade, a dashed gold circle marks
 where the visible gravity last drops below a₀, the gold fades softly to nothing beyond the data (to 1.6 × the last radius),
