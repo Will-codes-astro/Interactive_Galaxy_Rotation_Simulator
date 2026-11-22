@@ -36,7 +36,13 @@ until an unshaded centre opens up (MOND already chosen when the card opens count
 as done). On that card and "Spread the stars out", a finished first part's ring
 turns green and fades before the second part and its ring appear. The halo shape
 monitor card only asks the visitor to look at the monitor; clicking it (or Next)
-moves on.
+moves on. Read-only cards (the sandbox totals, the halo
+shape monitor, the Scorecard) get a box but no pointer arrow. A slider's box also
+takes in its description lines and follows any change to their length. Switches
+that are already in a card's end state when it opens (orbit lines on, gas or halo
+off, already playing, fullscreen, the ejection line, MOND chosen) count as done.
+Next from the sandbox tour's last card in the full tour leaves fullscreen before
+Wrapping up opens.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest

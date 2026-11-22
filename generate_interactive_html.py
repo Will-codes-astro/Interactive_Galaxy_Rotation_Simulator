@@ -883,6 +883,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     @keyframes tutorial-tick-pop { from { opacity:0; transform:scale(.85); } }
     .tutorial-spotlight.is-complete .tutorial-pointer { opacity:0; animation-play-state:paused; }
     .tutorial-spotlight.is-click .tutorial-pointer { animation-name:tutorial-click; }
+    /* look: a card that only asks you to read something gets the box but no pointer, since nothing needs hovering. */
+    .tutorial-spotlight.is-look .tutorial-pointer { display:none; }
     /* groups: the pointer rests on each group's heading in turn (no drag), then pops back to the first. */
     .tutorial-spotlight.is-groups .tutorial-pointer { animation-name:tutorial-groups; animation-duration:4.5s; }
     @keyframes tutorial-groups { 0%,24% { transform:translate(var(--from-x),var(--from-y)) scale(1); } 32%,56% { transform:translate(var(--mid-x),var(--mid-y)) scale(1); } 64%,88% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 93% { transform:translate(var(--to-x),var(--to-y)) scale(0); } 95% { transform:translate(var(--from-x),var(--from-y)) scale(0); } 100% { transform:translate(var(--from-x),var(--from-y)) scale(1); } }
@@ -3176,9 +3178,9 @@ __GALAXIES_JS__
     // "Before" line (a visual aid only): while a slider that reshapes the curve is moved, and for CURVE_GHOST_HOLD_MS
     // after it is let go, a faint wide band in the same colour stays where the changed line was, labelled "before".
     // Anatomy sliders leave the cyan visible-matter line behind; the halo sliders leave the orange total.
-    const CURVE_GHOST_HOLD_MS=4000;
-    const curveGhost={x:[],y:[],rgb:'95,208,224',visible:false};
-    const curveGhostTrace=()=>({type:'scatter',mode:'lines+text',name:'Before',showlegend:false,hoverinfo:'skip',visible:curveGhost.visible,x:curveGhost.x,y:curveGhost.y,
+    const CURVE_GHOST_HOLD_MS=4000,CURVE_GHOST_FADE_IN_MS=300,CURVE_GHOST_FADE_OUT_MS=900; // it fades in and out, never pops
+    const curveGhost={x:[],y:[],rgb:'95,208,224',visible:false,fade:0,leaving:false};
+    const curveGhostTrace=()=>({type:'scatter',mode:'lines+text',name:'Before',showlegend:false,hoverinfo:'skip',visible:curveGhost.visible,opacity:curveGhost.fade,x:curveGhost.x,y:curveGhost.y,
       text:curveGhost.y.map((_,i,a)=>i===a.length-1?'before':''),textposition:'top left',textfont:{size:11,color:`rgba(${curveGhost.rgb},0.8)`},
       line:{color:`rgba(${curveGhost.rgb},0.2)`,width:7,shape:'spline',smoothing:0.6}});
     const buildCurveData=(halo,total)=>[
@@ -4363,15 +4365,15 @@ __GALAXIES_JS__
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
-        {id:'fsEnter',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Now watch it happen',
+        {id:'fsEnter',given:['toggleFullscreen'],nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Now watch it happen',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
          text:'The 3D view moves hundreds of test stars under the model’s gravity for a billion years.',
          action:'1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space).'},
-        {id:'fsClean',fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',freeCamera:true,title:'Clear the stage',
+        {id:'fsClean',given:['toggleGas','toggleHalo'],fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',freeCamera:true,title:'Clear the stage',
          text:'The blue haze is gas. The purple cloud is the halo, drawn so you can see it: real dark matter is invisible.',
          action:'1. Switch off Gas. 2. Switch off Halo.',
          checks:{toggleGas:()=>!gasCloud.visible,toggleHalo:()=>haloHidden||mondMode||Number(massSlider.value)===0},doneText:'Clear view: everything left is a test star.'},
-        {id:'fsOrbits',fs:true,viewPanel:true,target:'viewFaceOn',tag:'1 · Face-on',also:['toggleOrbits:2 · Orbits on','fsPlay:3 · Play'],gesture:'click',freeCamera:()=>!tutorialLatched.viewFaceOn,title:'Look down on the disk',
+        {id:'fsOrbits',given:['toggleOrbits','fsPlay'],fs:true,viewPanel:true,target:'viewFaceOn',tag:'1 · Face-on',also:['toggleOrbits:2 · Orbits on','fsPlay:3 · Play'],gesture:'click',freeCamera:()=>!tutorialLatched.viewFaceOn,title:'Look down on the disk',
          text:'Face-on, you look straight down on the disk. Each line is one star’s path: near-perfect circles.',
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: a galaxy in balance.'},
@@ -4385,7 +4387,7 @@ __GALAXIES_JS__
          text:'Edge-on, the disk is a thin line. The ringed star bobs above and below it once a lap.',
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
          checks:{viewEdgeOn:()=>Math.abs(controls.goal.phi-Math.PI/2)<0.2,fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap.'},
-        {id:'fsEscape',fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
+        {id:'fsEscape',given:['toggleEjection'],fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
          checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['escape-counter:Ejected count'],title:'Pull the halo away',
          text:'A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to hold them.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
@@ -4400,7 +4402,7 @@ __GALAXIES_JS__
         {id:'ml',mode:'preset',cardRight:true,target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and it is an estimate.',
          action:'Hover over (or tap) the ? in the blue box.'},
-        {id:'scorecard',closing:true,target:'glanceTable',gesture:'scan',tag:'Read along the rows',title:'How both ideas score',
+        {id:'scorecard',closing:true,target:'glanceTable',gesture:'look',tag:'Read along the rows',title:'How both ideas score',
          text:'Each row is a galaxy, scored under each idea: close (blue), rough (orange) or poor (red). Each arrow goes from the standard values to the best realistic fit. A † means that fit had to use a value at the edge of what is realistic.',
          action:'Read along the rows in the blue box, then press Next.'},
         {id:'finish',closing:true,noRing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
@@ -4424,14 +4426,14 @@ __GALAXIES_JS__
         {id:'sbGas',mode:'custom',target:'sbGasMass',cardSlider:{sbGasMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the right of the cyan line'],title:'Add the gas',
          text:'Gas spreads about three times wider than the stars, so it matters most far out.',
          action:'Drag Gas mass up and down. Watch the right of the cyan line.'},
-        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
+        {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'look',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
         {id:'sbMond',mode:'custom',partPause:true,given:['optMond'],target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
          checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard near its centre, so there MOND barely changes gravity and the speeds stay close to Newton’s. MOND’s boost grows further out.',
          text:'MOND changes gravity mainly where it is very weak, below a tiny acceleration called a₀. The gold shading on the graph marks where your galaxy’s visible matter pulls that weakly, so MOND boosts it there. The deeper the gold, the bigger the boost.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until a clear, unshaded part opens up near the centre of the graph.'},
-        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Look at the gauge',title:'Meet the halo shape monitor',
+        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'look',tag:'Look at the gauge',title:'Meet the halo shape monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
          action:'Look at the monitor (blue box) and find its marker. Is it inside the shaded band? Then press Next.'},
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
@@ -4441,16 +4443,16 @@ __GALAXIES_JS__
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 × the typical halo. The stars start balanced for the typical one.',
          action:'1. Drag Halo mass low, then high. 2. Press Typical Halo to reset it.'},
-        {id:'sbFs',mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Watch your galaxy',
+        {id:'sbFs',given:['toggleFullscreen'],mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Watch your galaxy',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
          text:'Now watch your own galaxy run.',
          action:'1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space).'},
-        {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',tag:'1 · Orbits on',also:['toggleGas:2 · Gas off','toggleHalo:3 · Halo off','fsPlay:4 · Play'],gesture:'click',freeCamera:true,title:'Two kinds of orbit',
+        {id:'sbOrbits',given:['toggleOrbits','toggleGas','toggleHalo','fsPlay'],fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',tag:'1 · Orbits on',also:['toggleGas:2 · Gas off','toggleHalo:3 · Halo off','fsPlay:4 · Play'],gesture:'click',freeCamera:true,title:'Two kinds of orbit',
          checks:{toggleOrbits:()=>orbitLines.visible,toggleGas:()=>!gasCloud.visible,toggleHalo:()=>haloHidden||Number(massSlider.value)===0,fsPlay:()=>playing||tutorialPlayedMyr>0},
          text:'Disk stars trace circles. Bulge stars (the ringed one) trace tangled loops: random motions hold a bulge up.',
          action:'1. Switch on Orbits. 2. Switch off Gas. 3. Switch off Halo. 4. Press ▶ Play.',
          doneText:'Circles in the disk, a tangle in the bulge.'},
-        {id:'sbFsEscape',fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
+        {id:'sbFsEscape',given:['toggleEjection'],fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
          checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['escape-counter:Ejected count'],title:'Starve it of dark matter',
          text:'Take the halo away and the ringed star is the first your galaxy loses.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
@@ -4483,8 +4485,8 @@ __GALAXIES_JS__
     // already in this card's end state), a part only counts once it has been undone and redone on this card, so a
     // skipped card never earns praise for nothing. Holds the ids seen false since the card opened (false = not stale).
     let tutorialFlags={},tutorialLatched={},tutorialStart={},tutorialCheckSig='',tutorialStale=null;
-    // step.given: parts that count as done when already true as the card opens (MOND already chosen), since the
-    // card locks the control that would undo them. step.partPause: when a part is done, its ring turns green and
+    // step.given: parts that count as done when already true as the card opens (MOND already chosen, orbit lines
+    // already on, already playing), so a card never asks for a switch to be undone just to be redone. step.partPause: when a part is done, its ring turns green and
     // fades before the next part appears (tutorialPartHold holds the done part's id until then).
     let tutorialPartHold=null,tutorialPartHoldTimer=0;
     function holdTutorialPart(id){
@@ -4862,6 +4864,7 @@ __GALAXIES_JS__
       if(!fitTutorialRing(tutorialSpotlight,target)){tutorialSpotlight.hidden=true;return;}
       tutorialSpotlight.hidden=false;
       tutorialSpotlight.classList.toggle('is-click',gesture==='click');
+      tutorialSpotlight.classList.toggle('is-look',gesture==='look');
       const tag=document.getElementById('tutorialTag'),label=blocker||!aim?'':tutorialTagNumber(aim.label);
       if(tag.textContent!==label)tag.textContent=label;
       let fromX=rect.width*.5,toX=fromX,fromY=rect.height*.5,toY=fromY;
@@ -4901,7 +4904,7 @@ __GALAXIES_JS__
     // The control plus anything it has opened (an info box from a ? button, a halo card's explainer), so the
     // highlight grows to cover a box that expands out of it.
     // A slider's <output> stretches to fill its label row, so measure the number text itself.
-    // A slider is ringed together with its label row (its name and value), so the box shows what is being changed;
+    // A slider is ringed together with its label row (its name and value) and its description, so the box shows what is being changed;
     // the tour card's own slider is ringed round its whole panel.
     const tutorialSliderLabel=el=>el.matches('input[type=range]')&&el.id?document.querySelector(`label[for="${el.id}"]`):null;
     const tutorialRingBox=el=>el&&el.closest?el.closest('.tutorial-slider')||el:el;
@@ -4909,9 +4912,14 @@ __GALAXIES_JS__
       if(tutorialRingBox(target)!==target)return tutorialRingBox(target).getBoundingClientRect();
       let r=target.getBoundingClientRect();
       if(target.tagName==='OUTPUT'&&target.textContent.trim()){const range=document.createRange();range.selectNodeContents(target);r=range.getBoundingClientRect();}
-      const label=tutorialSliderLabel(target),l=label&&label.getClientRects().length?label.getBoundingClientRect():null;
-      if(!l)return r;
-      const left=Math.min(r.left,l.left),top=Math.min(r.top,l.top),right=Math.max(r.right,l.right),bottom=Math.max(r.bottom,l.bottom);
+      const label=tutorialSliderLabel(target);
+      if(!label)return r;
+      // The slider's own description lines (.control-help) in its .control join the box too. They are measured every
+      // frame like the rest, so the box grows or shrinks with any change to their wording.
+      const control=target.closest('.control');
+      const parts=[label,...(control?[...control.children].filter(el=>el.matches('.control-help')):[])].filter(el=>el.getClientRects().length).map(el=>el.getBoundingClientRect());
+      if(!parts.length)return r;
+      const left=Math.min(r.left,...parts.map(p=>p.left)),top=Math.min(r.top,...parts.map(p=>p.top)),right=Math.max(r.right,...parts.map(p=>p.right)),bottom=Math.max(r.bottom,...parts.map(p=>p.bottom));
       return{left,top,right,bottom,width:right-left,height:bottom-top};
     }
     function tutorialSpotRect(target){
@@ -5287,17 +5295,38 @@ __GALAXIES_JS__
     // The "before" line: the curve is copied as a slider is grabbed (or first nudged from the keyboard), shown once it
     // moves, and cleared CURVE_GHOST_HOLD_MS after it is let go, or at once when the galaxy or model changes.
     const curveGhostSliders=[massSlider,scaleSlider,...sandboxInputs];
-    let curveGhostArmed=false,curveGhostTimer=0;
-    function setCurveGhost(on){
-      curveGhost.visible=on;
-      const plot=document.getElementById('curvePlot');
-      const t=curveGhostTrace(); // restyle reads an array as one value per trace, so each data array is wrapped
-      Plotly.restyle(plot,{visible:on,x:[t.x],y:[t.y],text:[t.text],'line.color':t.line.color,'textfont.color':t.textfont.color},[plot.data.length-1]);
+    let curveGhostArmed=false,curveGhostTimer=0,curveGhostFadeFrame=0;
+    // Eases the band's opacity to `to` over ms, then calls done.
+    function fadeCurveGhost(to,ms,done){
+      cancelAnimationFrame(curveGhostFadeFrame);
+      const plot=document.getElementById('curvePlot'),from=curveGhost.fade,t0=performance.now();
+      if(matchMedia('(prefers-reduced-motion: reduce)').matches)ms=0;
+      (function step(now){
+        const t=ms?Math.min(1,(now-t0)/ms):1;
+        curveGhost.fade=from+(to-from)*t*(2-t);
+        Plotly.restyle(plot,{opacity:curveGhost.fade},[plot.data.length-1]);
+        if(t<1)curveGhostFadeFrame=requestAnimationFrame(step);else if(done)done();
+      })(t0);
     }
-    function clearCurveGhost(){clearTimeout(curveGhostTimer);curveGhostArmed=false;if(curveGhost.visible)setCurveGhost(false);}
+    function setCurveGhost(on){
+      const plot=document.getElementById('curvePlot');
+      curveGhost.leaving=false;
+      if(!on){cancelAnimationFrame(curveGhostFadeFrame);curveGhost.visible=false;curveGhost.fade=0;Plotly.restyle(plot,{visible:false,opacity:0},[plot.data.length-1]);return;}
+      curveGhost.visible=true;
+      const t=curveGhostTrace(); // restyle reads an array as one value per trace, so each data array is wrapped
+      Plotly.restyle(plot,{visible:true,opacity:curveGhost.fade,x:[t.x],y:[t.y],text:[t.text],'line.color':t.line.color,'textfont.color':t.textfont.color},[plot.data.length-1]);
+      fadeCurveGhost(1,CURVE_GHOST_FADE_IN_MS);
+    }
+    // gently: fade out (after the hold); otherwise (new galaxy or model) clear at once.
+    function clearCurveGhost(gently){
+      clearTimeout(curveGhostTimer);curveGhostArmed=false;
+      if(!curveGhost.visible)return;
+      if(gently===true){curveGhost.leaving=true;fadeCurveGhost(0,CURVE_GHOST_FADE_OUT_MS,()=>setCurveGhost(false));}
+      else setCurveGhost(false);
+    }
     function armCurveGhost(e){
       const slider=e.target===tutorialSliderInput?document.getElementById(tutorialSliderId):e.target;
-      if(!curveGhostSliders.includes(slider)||e.type==='keydown'&&curveGhost.visible)return;
+      if(!curveGhostSliders.includes(slider)||e.type==='keydown'&&curveGhost.visible&&!curveGhost.leaving)return;
       const halo=slider===massSlider||slider===scaleSlider,line=document.getElementById('curvePlot').data[halo?3:1];
       curveGhost.x=line.x.slice();curveGhost.y=line.y.slice();curveGhost.rgb=halo?'255,174,92':'95,208,224';
       clearTimeout(curveGhostTimer);curveGhostArmed=true;
@@ -5305,8 +5334,8 @@ __GALAXIES_JS__
     window.addEventListener('pointerdown',armCurveGhost,{capture:true,passive:true});
     window.addEventListener('keydown',armCurveGhost,{capture:true,passive:true});
     curveGhostSliders.forEach(slider=>{
-      slider.addEventListener('input',()=>{if(curveGhostArmed&&!curveGhost.visible)setCurveGhost(true);clearTimeout(curveGhostTimer);});
-      slider.addEventListener('change',()=>{clearTimeout(curveGhostTimer);curveGhostTimer=setTimeout(clearCurveGhost,CURVE_GHOST_HOLD_MS);});
+      slider.addEventListener('input',()=>{if(curveGhostArmed&&(!curveGhost.visible||curveGhost.leaving))setCurveGhost(true);clearTimeout(curveGhostTimer);});
+      slider.addEventListener('change',()=>{clearTimeout(curveGhostTimer);curveGhostTimer=setTimeout(()=>clearCurveGhost(true),CURVE_GHOST_HOLD_MS);});
     });
     ['galaxychange','galaxymodechange'].forEach(type=>document.addEventListener(type,clearCurveGhost));
     document.getElementById('mondToggle').addEventListener('change',clearCurveGhost);
@@ -5400,7 +5429,14 @@ __GALAXIES_JS__
     tutorialNext.addEventListener('click',()=>{
       if(tutorialIndex===tutorialSteps.length-1){
         const nextTour=tutorialFull&&FULL_TOUR[FULL_TOUR.indexOf(tutorialTour)+1];
-        if(nextTour)startTutorial(nextTour,true);else endTutorial();
+        if(!nextTour){endTutorial();return;}
+        // The sandbox tour ends in fullscreen but Wrapping up is on the page: leave fullscreen first, and start the
+        // next tour only once the exit has finished, so it never opens half-way through the switch.
+        if(!tutorialIsFullscreen()||TOURS[nextTour].steps[0].fs){startTutorial(nextTour,true);return;}
+        let started=false;const go=()=>{if(started)return;started=true;startTutorial(nextTour,true);};
+        if(nativeFsElement()){document.addEventListener('fullscreenchange',()=>requestAnimationFrame(go),{once:true});setTimeout(go,600);}
+        toggleFullscreen();
+        if(!nativeFsElement())go();
         return;
       }
       goTutorialStep(tutorialIndex+1,1);
