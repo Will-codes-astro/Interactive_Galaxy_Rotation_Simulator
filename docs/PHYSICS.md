@@ -165,35 +165,27 @@ median χ²/N barely moves (9.9 → 10.5).
 - **MOND best fit** (Best realistic fits on): `fit_mond` (generator), within the realistic limits above.
 - Implemented in `mondVelocity`, `mondModelVelocity` and `extraVelocityModel`
   (page JS), and `_mond_velocity` (generator, used only by the fit).
-- **MOND zone (display only):** with MOND on, for every galaxy (preset or
-  sandbox), the rotation curve's speed panel shades every radius where
-  g_N = V_bar²/r < a₀ (in the same distance and tilt frame and with the same a₀
-  as the MOND curve, so it follows the best fit when that is on), the regime where
-  MOND's boost matters (Milgrom 1983; Famaey & McGaugh 2012). Edges are found by
-  interpolating ln g_N linearly between neighbouring radii. The threshold is a
-  guide, not a sharp switch: μ changes smoothly, so at the line (g_N = a₀) MOND
-  already raises the speed by about 26%, falling to about 10% at g_N = 3a₀ and
-  2.2% at 10a₀ (a 1% boost needs g_N ≈ 15a₀). So the shade is not limited to the
-  zone: at every radius it follows the speed boost V_MOND/V_bar − 1 (computed with
-  `mondVelocity`, so it uses the same interpolating function), as
-  `MOND_ZONE_ALPHA_MAX` × (boost / `MOND_ZONE_FULL_BOOST`)^`MOND_ZONE_GAMMA`
-  (0.3, 200% i.e. V_MOND = 3 V_bar at g_N ≈ 0.014 a₀, and 0.6, so small boosts still show).
-  In all four SPARC galaxies the boost is at least about 4% at every measured
-  radius (smallest: NGC 7331 at 2.7 kpc, g_N ≈ 6.4a₀, where the +11 km/s is below
-  that point's ±20 km/s error), so the gold covers the whole graph, faint at the
-  centre; each a₀ crossing keeps its dotted line, tagged "a₀" (Will's choice, 22 Nov).
-  Between radii ln g_N is interpolated
-  linearly, as for the edges. This is a visual choice, not a model result. The 3D
-  view's gold plane (`setMondZone3D`, "Where MOND acts" switch) uses the same shade
-  (`mondZoneLevel`) at each radius, holds the last shade beyond the data and fades out by
-  1.6 × the last radius; its dashed circle sits at the start of the outermost below-a₀
-  stretch, if it starts inside the data. Display only. For the default sandbox galaxy g_N < a₀ at
-  every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
-  √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses
-  a₀ at 0.80 kpc in NGC 3198 (of 44 kpc measured) and 12.2 kpc in NGC 7331 (of
-  36 kpc). NGC 2403 (peak g_N ≈ 0.98 a₀) and UGC 128 (≤ 0.09 a₀) are below a₀ at
-  every measured radius, so the zone covers the whole curve. Checked from
-  SPARC Table 2 via `analysis/sparc_data.py`, 17 Nov 2026. `mondZoneLayout` (page JS); it changes no model numbers.
+- **MOND boost shading (display only):** with MOND on, for every galaxy (preset
+  or sandbox), the rotation curve's speed panel is shaded gold with opacity
+  proportional to MOND's speed boost V_MOND/V_bar − 1 at each radius:
+  `MOND_ZONE_ALPHA_PER_BOOST` × boost (0.2, so a 1% boost gives opacity 0.002,
+  all but invisible), capped at `MOND_ZONE_ALPHA_MAX` (0.4, a 200% boost). The
+  boost uses `mondVelocity`, so the same interpolating function as the MOND curve,
+  with g_N = V_bar²/r in the same distance and tilt frame and the same a₀ (so it
+  follows the best fit when that is on); ln g_N is interpolated linearly between
+  radii. There is no line or ring (Will's choice, 22 Nov): MOND has no switch-on
+  point. a₀ is where the boost changes from dying away (roughly as e^(−√(g_N/a₀))
+  above it) to growing without limit (V_MOND/V_bar → (a₀/g_N)^¼ far below it).
+  Speed boost: ≈2.2% at g_N = 10a₀, 10% at 3a₀, 26% at a₀, 92% at a₀/10, 224% at
+  a₀/100; a 1% boost needs g_N ≈ 15a₀. At SPARC's standard values (M/L 0.5 disk,
+  0.7 bulge) every measured radius of all four galaxies is boosted at least 4%
+  (smallest: NGC 7331 at 2.7 kpc, g_N ≈ 6.4a₀, +11 km/s against a ±20 km/s error;
+  NGC 3198 17%, NGC 2403 26%, UGC 128 95%), so the gold covers every graph, faint
+  at the centre. Checked from SPARC Table 2 via `analysis/sparc_data.py`, 22 Nov 2026.
+  This is a visual choice, not a model result. The 3D view's gold plane
+  (`setMondZone3D`, "Where MOND acts" switch) uses the same shade (`mondZoneLevel`)
+  at each radius, holds the last shade beyond the data and fades out by 1.6 × the
+  last radius. `mondZoneLayout` (page JS); it changes no model numbers.
 
 ## Goodness of fit
 

@@ -1465,7 +1465,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     </section>
     <div id="controlsAnchor" aria-hidden="true"></div>
     <section class="controls" aria-label="Model controls">
-    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. Gravity is boosted, mostly where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold deepens as the galaxy’s visible matter pulls more weakly and MOND’s boost grows. In the 3D view, the gold ring marks where that pull drops below a<sub>0</sub>.</span></p></div>
+    <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Choose MOND to try changing gravity instead of adding dark matter.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. MOND boosts gravity everywhere: a little where it is strong, a lot where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold is in proportion to the boost: faint gold is a small boost, deep gold a big one.</span></p></div>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Fit halo to data</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible matter only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
@@ -1586,7 +1586,9 @@ HTML_TEMPLATE = r"""<!doctype html>
       <article class="mond"><h3>What is MOND?</h3>
         <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity itself behaves differently when it is extremely weak.</p>
-        <p>Mordehai Milgrom proposed it in 1983. Near a galaxy’s centre gravity is strong and MOND agrees with Newton almost exactly. Far out, gravity drops below a tiny threshold, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², about 10¹¹ times weaker than gravity at Earth’s surface. Below it, MOND makes gravity stronger than Newton predicts, so the outer stars keep moving fast.</p>
+        <p>Mordehai Milgrom proposed it in 1983. MOND boosts gravity everywhere, but by how much depends on how strong gravity already is. Near a galaxy’s centre, where gravity is strong, the boost is small. The weaker gravity gets, the bigger the boost, so the outer stars keep moving fast.</p>
+        <p><b>What a<sub>0</sub> is.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (about 10¹¹ times weaker than gravity at Earth’s surface), is a turning point, not a switch. Well above it the boost dies away fast; below it the boost keeps climbing. With the simulator’s formula, a star’s speed is boosted by about 2% where gravity is 10 × a<sub>0</sub>, 10% at 3 × a<sub>0</sub>, 26% at a<sub>0</sub>, 92% at a<sub>0</sub> ÷ 10 and 224% at a<sub>0</sub> ÷ 100. Even where gravity is strongest in the four galaxies here, MOND adds at least 4%.</p>
+        <p><b>Where a<sub>0</sub> comes from.</b> It is not worked out from theory: it is measured from galaxies. Milgrom set it to match the galaxies known in 1983, and today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). Their study found that how much extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy.</p>
         <p>There is no halo to adjust: once the visible matter is known, MOND predicts the whole rotation curve with one constant, a<sub>0</sub>, shared by every galaxy.</p>
         <figure class="schematic">
           <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
@@ -1601,12 +1603,12 @@ HTML_TEMPLATE = r"""<!doctype html>
             <text x="172" y="142" text-anchor="middle">radius →</text>
             <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
           </svg>
-          <figcaption>Schematic only, not real data. The dotted line marks where gravity falls to a₀; beyond it the speed levels off instead of falling (Milgrom 1983).</figcaption>
+          <figcaption>Schematic only, not real data. The dotted line marks where gravity falls to a₀. MOND already boosts a little inside it; beyond it the boost grows large and the speed levels off instead of falling (Milgrom 1983).</figcaption>
         </figure>
         <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
         <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration, and Newton gives the pull g<sub>N</sub> of the visible mass M:</p>
         <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>,</mo><mspace width="1.5em"/><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></math></div>
-        <p><b>2. MOND’s rule.</b> Strong gravity is unchanged; weak gravity is boosted:</p>
+        <p><b>2. MOND’s rule.</b> Strong gravity is almost unchanged; weak gravity is boosted:</p>
         <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≫</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
         <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><msub><mi>a</mi><mn>0</mn></msub></msqrt><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≪</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
         <p><b>3. Far out,</b> put the weak rule into step 1:</p>
@@ -2707,16 +2709,16 @@ __GALAXIES_JS__
             new THREE.LineBasicMaterial({color:0xff8a80,transparent:true,opacity:0.55,depthWrite:false}));
         ejectionRing.frustumCulled=false;ejectionRing.visible=false;scene.add(ejectionRing);
         let ejectionLineShown=false;
-        // MOND zone in 3D (MOND mode, "Where MOND acts" switch): the graph's gold shading laid into the disk plane. Each
+        // MOND boost in 3D (MOND mode, "Where MOND acts" switch): the graph's gold shading laid into the disk plane. Each
         // radius glows with the same shade as the graph at that radius (mondZoneLayout hands over mondZoneLevel), so
-        // the gold fades in where MOND's boost starts and deepens outwards; past the last data radius it holds the last
-        // shade and fades softly to nothing by MOND_PLANE_EXTENT x that radius. A dashed gold circle marks where the
-        // visible matter's pull last drops below a0 (the graph's dotted line). It is drawn in the graph's gold
+        // the gold is in proportion to MOND's boost: faint near the centre and deeper outwards; past the last data
+        // radius it holds the last shade and fades softly to nothing by MOND_PLANE_EXTENT x that radius. No line or
+        // ring: MOND has no switch-on point. It is drawn in the graph's gold
         // (MOND_GOLD, #f2c879) so the two read as one thing. A haze of faint points spread a little
         // above and below the plane, brighter where the shade is deeper, gives it depth like the stars. All a visual
         // choice: the plane and haze carry no physics beyond the graph's shading.
         const MOND_PLANE_SAMPLES=256,MOND_PLANE_EXTENT=1.6,MOND_PLANE_STRENGTH=0.16,MOND_GOLD=[242/255,200/255,121/255];
-        const MOND_HAZE_POINTS=3000,MOND_HAZE_THICKNESS=0.012,MOND_HAZE_STRENGTH=0.65,MOND_EDGE_OPACITY=0.8;
+        const MOND_HAZE_POINTS=3000,MOND_HAZE_THICKNESS=0.012,MOND_HAZE_STRENGTH=0.65;
         let mondZoneShown=false,mondZoneReady=false;
         const mondZone=new THREE.Group();mondZone.visible=false;scene.add(mondZone);
         const mondLevelData=new Uint8Array(MOND_PLANE_SAMPLES*4);
@@ -2733,10 +2735,6 @@ __GALAXIES_JS__
                 gl_FragColor=vec4(mix(uGold,vec3(1.0),0.3),uStrength*level*fade);}`
         }));
         mondPlane.frustumCulled=false;mondPlane.renderOrder=1;mondZone.add(mondPlane);
-        // The start line: a dashed unit circle scaled to the crossing radius, so the dashes keep their count at any size.
-        const mondEdge=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:256},(_,i)=>new THREE.Vector3(Math.cos(i*Math.PI/128),Math.sin(i*Math.PI/128),0))),
-            new THREE.LineDashedMaterial({color:new THREE.Color(...MOND_GOLD),dashSize:0.045,gapSize:0.035,transparent:true,opacity:MOND_EDGE_OPACITY,depthWrite:false}));
-        mondEdge.computeLineDistances();mondEdge.frustumCulled=false;mondEdge.renderOrder=1;mondEdge.visible=false;scene.add(mondEdge);
         // Haze: fixed points spread evenly over the plane's area; their brightness is set from the shade where they sit.
         const mondHazeU=new Float32Array(MOND_HAZE_POINTS),mondHazeGeom=new THREE.BufferGeometry();
         (()=>{const rng=mulberry32(5310),pos=new Float32Array(MOND_HAZE_POINTS*3),tw=new Float32Array(MOND_HAZE_POINTS);
@@ -2760,16 +2758,14 @@ __GALAXIES_JS__
         mondHaze.frustumCulled=false;mondHaze.renderOrder=1;mondZone.add(mondHaze);
         const mondZoneToggle=document.getElementById('toggleMondZone');
         // While the gold shows, the panels over the 3D view turn solid (CSS .mond-zone-on) so it never tints them.
-        let mondEdgeKpc=null;
         const showMondZone=()=>{
             mondZone.visible=mondMode&&mondZoneShown&&mondZoneReady;
-            mondEdge.visible=mondZone.visible&&mondEdgeKpc!=null;
             orbitPlot.classList.toggle('mond-zone-on',mondZone.visible);
             requestRender();
         };
-        // levelAt(rKpc): the graph's shade at that radius, 0 to 1; lastKpc: the last data radius; edgeKpc: where the
-        // pull last drops below a0 inside the data (null if it doesn't). levelAt null clears it (NFW mode).
-        function setMondZone3D(levelAt,lastKpc,edgeKpc){
+        // levelAt(rKpc): the graph's shade at that radius, 0 to 1; lastKpc: the last data radius. levelAt null clears
+        // it (NFW mode).
+        function setMondZone3D(levelAt,lastKpc){
             mondZoneToggle.hidden=!mondMode; // each model shows only its own controls (no greyed-out ones)
             mondZoneReady=!!levelAt&&lastKpc>0;
             if(mondZoneReady){
@@ -2777,7 +2773,6 @@ __GALAXIES_JS__
                 for(let i=0;i<MOND_PLANE_SAMPLES;i++){levels[i]=levelAt(lastKpc*i/(MOND_PLANE_SAMPLES-1));mondLevelData[4*i]=Math.round(255*levels[i]);}
                 mondLevelTexture.needsUpdate=true;
                 mondZone.scale.set(extent,extent,extent);
-                mondEdgeKpc=edgeKpc;if(edgeKpc!=null)mondEdge.scale.set(edgeKpc,edgeKpc,1);
                 const alpha=mondHazeGeom.attributes.aAlpha.array,dataEdge=1/MOND_PLANE_EXTENT;
                 for(let i=0;i<MOND_HAZE_POINTS;i++){
                     const u=mondHazeU[i],k=Math.min(1,u/dataEdge)*(MOND_PLANE_SAMPLES-1),j=Math.min(Math.floor(k),MOND_PLANE_SAMPLES-2);
@@ -3426,21 +3421,19 @@ __GALAXIES_JS__
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
     const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y',range:[0,radii[radii.length-1]]},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout),...mondZoneLayout()});
-    // MOND zone (MOND mode, every galaxy): shades the radii where the visible matter's own gravity, g_N = V_bar²/R, is
-    // weaker than a₀, which is where MOND boosts gravity (Milgrom 1983; Famaey & McGaugh 2012). g_N is taken in the
-    // same distance and tilt frame as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows
-    // the fit's distance, tilt and a₀. Each edge is placed where g_N crosses a₀, interpolated in log g between
-    // neighbouring radii. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid.
-    // MOND never switches on at one radius, so the gold follows MOND's speed boost at every radius (V_MOND/V_bar − 1,
-    // from mondVelocity, so it follows the interpolating function): faint where the boost is small, ≈10 % at 3a₀,
-    // clearer at the a₀ line (≈26 %, labelled "a₀") and deepest once the boost reaches MOND_ZONE_FULL_BOOST.
-    // Shade = MOND_ZONE_ALPHA_MAX × (boost / full)^MOND_ZONE_GAMMA; the power below 1 makes small boosts visible.
-    // In all four SPARC galaxies the boost is at least ≈4 % at every measured radius, so the gold covers the whole graph. The graph is cut into MOND_ZONE_STRIPS strips, each shaded at its midpoint's boost, rounded to
-    // MOND_ZONE_LEVELS steps so neighbouring strips of the same shade merge.
-    const MOND_ZONE_EDGE='rgba(242,200,121,0.35)';
-    const MOND_ZONE_ALPHA_MAX=0.3,MOND_ZONE_GAMMA=0.6,MOND_ZONE_FULL_BOOST=2,MOND_ZONE_STRIPS=120,MOND_ZONE_LEVELS=30;
+    // MOND boost shading (MOND mode, every galaxy). MOND has no switch-on point: it boosts gravity at every radius, by
+    // an amount that grows as the visible matter's own pull g_N = V_bar²/R weakens (Milgrom 1983; the size of the
+    // boost follows the interpolating function in mondVelocity, McGaugh, Lelli & Schombert 2016). So the gold's
+    // opacity is simply proportional to MOND's speed boost, V_MOND/V_bar − 1: MOND_ZONE_ALPHA_PER_BOOST × boost, so a
+    // 1 % boost is all but invisible and 100 % is clear, capped at MOND_ZONE_ALPHA_MAX (a 200 % boost). There is no
+    // line: the visitor judges where the boost becomes significant. g_N is taken in the same distance and tilt frame
+    // as the MOND curve (mondModelVelocity), so with Best realistic fits on it follows the fit's distance, tilt and
+    // a₀. Only the speed panel is shaded (y domain), not the residuals. The shading is a visual aid. The graph is cut
+    // into MOND_ZONE_STRIPS strips, each shaded at its midpoint's boost, rounded to MOND_ZONE_LEVELS steps (fine
+    // enough that a 1 % boost still gets its own faint step) so neighbouring strips of the same shade merge.
+    const MOND_ZONE_ALPHA_PER_BOOST=0.2,MOND_ZONE_ALPHA_MAX=0.4,MOND_ZONE_STRIPS=120,MOND_ZONE_LEVELS=400;
     const mondBoostOfGN=gN=>{const vb=Math.sqrt(gN*M_PER_KPC)/1000;return mondVelocity(vb,1)/vb-1;};
-    // ln g_N at any radius, linear between the radii where it is finite (as for the edges); held flat beyond them.
+    // ln g_N at any radius, linear between the radii where it is finite; held flat beyond them.
     function mondLogGNAt(logG,r){
       const pts=radii.map((x,i)=>[x,logG[i]]).filter(p=>isFinite(p[1]));
       if(!pts.length)return -Infinity;
@@ -3448,53 +3441,34 @@ __GALAXIES_JS__
       for(let i=1;i<pts.length;i++)if(r<=pts[i][0]){const[a,ga]=pts[i-1],[b,gb]=pts[i];return ga+(gb-ga)*(r-a)/(b-a);}
       return pts[pts.length-1][1];
     }
-    // The shade at radius r, 0 (no boost) to 1 (MOND_ZONE_FULL_BOOST or more); the graph and the 3D plane both use it.
+    // The shade at radius r, 0 (no boost) to 1 (MOND_ZONE_ALPHA_MAX), proportional to the boost; the graph and the
+    // 3D plane both use it.
     function mondZoneLevel(logG,r){
-      const lg=mondLogGNAt(logG,r),boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):MOND_ZONE_FULL_BOOST;
-      return Math.min(1,Math.max(0,boost/MOND_ZONE_FULL_BOOST))**MOND_ZONE_GAMMA;
+      const lg=mondLogGNAt(logG,r),boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):Infinity;
+      return Math.min(1,Math.max(0,boost*MOND_ZONE_ALPHA_PER_BOOST/MOND_ZONE_ALPHA_MAX));
     }
-    // edges (the a₀ crossings) are strip boundaries too, so the shade steps line up with each dashed line.
-    function mondZoneStrips([x0,x1],logG,edges){
+    function mondZoneStrips([x0,x1],logG){
       const width=(radii[radii.length-1]-radii[0])/MOND_ZONE_STRIPS,n=Math.max(1,Math.ceil((x1-x0)/width)),strips=[];
-      const cuts=[...new Set([...Array.from({length:n+1},(_,k)=>x0+(x1-x0)*k/n),...edges])].sort((p,q)=>p-q);
-      for(let k=0;k<cuts.length-1;k++){
-        const a=cuts[k],b=cuts[k+1],level=Math.round(mondZoneLevel(logG,(a+b)/2)*MOND_ZONE_LEVELS);
+      for(let k=0;k<n;k++){
+        const a=x0+(x1-x0)*k/n,b=x0+(x1-x0)*(k+1)/n,level=Math.round(mondZoneLevel(logG,(a+b)/2)*MOND_ZONE_LEVELS);
         const last=strips[strips.length-1];
         if(last&&last.level===level)last.x1=b;else strips.push({x0:a,x1:b,level});
       }
       return strips.filter(s=>s.level>0).map(({x0,x1,level})=>({type:'rect',layer:'below',xref:'x',yref:'y domain',x0,x1,y0:0,y1:1,line:{width:0},
-        fillcolor:`rgba(242,200,121,${(MOND_ZONE_ALPHA_MAX*level/MOND_ZONE_LEVELS).toFixed(3)})`}));
+        fillcolor:`rgba(242,200,121,${(MOND_ZONE_ALPHA_MAX*level/MOND_ZONE_LEVELS).toFixed(4)})`}));
     }
     const mondLogGN=()=>radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*fitFrame.s*1000)**2/(r*fitFrame.f*M_PER_KPC)):-Infinity);
-    const mondNewtonianSomewhere=()=>mondLogGN().some(g=>g>=Math.log(MOND_A0));
+    // True when the visible pull is above a₀ somewhere, where MOND's boost is under ≈26 % and the gold is faint.
+    const mondFaintSomewhere=()=>mondLogGN().some(g=>g>=Math.log(MOND_A0));
     function mondZoneLayout(){
       if(!mondMode){setMondZone3D(null);return{shapes:[],annotations:[]};}
-      const logG=mondLogGN(),cut=Math.log(MOND_A0);
-      const runs=[];let start=null;
-      const edge=i=>{const a=logG[i-1],b=logG[i];return isFinite(a)&&isFinite(b)&&a!==b?radii[i-1]+(radii[i]-radii[i-1])*(cut-a)/(b-a):radii[i];};
-      logG.forEach((g,i)=>{
-        const weak=g<cut;
-        if(weak&&start===null)start=i===0?radii[0]:edge(i);
-        if(!weak&&start!==null){runs.push([start,edge(i)]);start=null;}
-      });
-      if(start!==null)runs.push([start,radii[radii.length-1]]);
-      const widest=runs.reduce((w,r)=>!w||r[1]-r[0]>w[1]-w[0]?r:w,null),first=radii[0],last=radii[radii.length-1];
-      // A dashed gold line marks each place inside the graph where visible gravity crosses a₀.
-      const edges=runs.flat().filter(x=>x>first&&x<last);
-      // The 3D view's gold plane uses the same shade at every radius; its bright band sits where the outermost zone
-      // (the one reaching the edge of the data) begins, if it begins inside.
-      const outer=runs[runs.length-1];
-      setMondZone3D(r=>mondZoneLevel(logG,r),last,outer&&outer[1]>=last&&outer[0]>first?outer[0]:null);
+      const logG=mondLogGN(),last=radii[radii.length-1];
+      setMondZone3D(r=>mondZoneLevel(logG,r),last); // the 3D view's gold plane uses the same shade at every radius
       return{
-        shapes:[...mondZoneStrips([first,last],logG,edges),
-          ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1,dash:'dot'}}))],
-        // The label sits in the bottom-right corner of the widest gold stretch, below the curves, where the graph is
-        // emptiest, so it never covers a line.
-        annotations:[...(widest?[{xref:'x',yref:'y domain',x:widest[1],xanchor:'right',xshift:-6,y:0.02,yanchor:'bottom',showarrow:false,
-          text:'Deeper gold = bigger MOND boost',font:{size:11,color:'#f2c879'}}]:[]),
-          // Each dashed line is tagged a₀: where the visible pull equals a₀ and MOND's boost becomes large (≈26 %).
-          ...edges.map(x=>({xref:'x',yref:'y domain',x,xanchor:'left',xshift:3,y:0.98,yanchor:'top',showarrow:false,
-            text:'a₀',font:{size:11,color:'#f2c879'}}))]
+        shapes:mondZoneStrips([radii[0],last],logG),
+        // The label sits in the bottom-right corner, below the curves, where the graph is emptiest.
+        annotations:[{xref:'x',yref:'y domain',x:last,xanchor:'right',xshift:-6,y:0.02,yanchor:'bottom',showarrow:false,
+          text:'Deeper gold = bigger MOND boost',font:{size:11,color:'#f2c879'}}]
       };
     }
     Plotly.newPlot('curvePlot',buildCurveData(initialHalo,totalCurve),curveLayoutNow(),curveConfig);
@@ -4614,11 +4588,11 @@ __GALAXIES_JS__
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
          action:'1. Drag Halo mass until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Fine-tune both until it reads Close fit again.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
-         text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says. Gold shading on the graph shows how much: the deeper the gold, the bigger the boost.',
+         text:'MOND has no dark matter. Instead, it changes the law of gravity, so it pulls harder than Newton’s law says: a little where gravity is strong, much more where it is weak. The deeper the gold on the graph, the bigger the boost.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
         {id:'mondZone3d',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Faint gold means a small boost; deep gold means MOND is doing most of the work.',
-         text:'The same gold as the graph, laid on the galaxy itself. Faint near the centre, where MOND’s boost is small, and deeper further out; the dashed circle marks a₀, where the boost becomes large.',
+         text:'The same gold as the graph, laid on the galaxy itself. Faint near the centre, where MOND’s boost is small, and deeper further out, always in proportion to the boost.',
          action:'Switch on Where MOND acts in the View panel.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],keepWatch:true,title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
@@ -4693,9 +4667,9 @@ __GALAXIES_JS__
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
         {id:'sbMond',mode:'custom',partPause:true,given:['optMond'],target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
-         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out.',
-         text:'MOND’s boost grows as gravity weakens, and becomes large below a tiny acceleration called a₀ (the dashed line). Deeper gold means a bigger boost.',
-         action:'1. Choose MOND. 2. Drag Disk mass to the right until a dashed a₀ line appears near the centre of the graph.'},
+         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondFaintSomewhere()},doneText:'Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out.',
+         text:'MOND boosts gravity everywhere, but only a little where gravity is strong. The weaker it gets, the bigger the boost, and the deeper the gold on the graph.',
+         action:'1. Choose MOND. 2. Drag Disk mass to the right until the gold near the centre of the graph turns very faint.'},
         {id:'sbMondZone3d',mode:'custom',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'MOND in your galaxy',
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Dim in the middle, where your disk pulls hard, and deeper gold outwards, where MOND takes over.',
          text:'The graph’s gold, laid on your galaxy: the deeper the gold, the more MOND boosts gravity there.',

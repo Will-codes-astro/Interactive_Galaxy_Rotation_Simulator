@@ -28,20 +28,21 @@ mass" (purple, like the halo line) and "MOND: gravity changes, no extra mass"
 (gold). The cards set the hidden `#mondToggle` checkbox that the rest of the page
 listens to. Its hint suggests trying MOND in NFW mode and gives a₀ in MOND mode.
 With MOND on, for every galaxy (preset or sandbox), the rotation curve's speed panel shades in gold
-in proportion to MOND's boost at each radius: faint near the centre, where the boost is small, and
-deepening outwards; MOND has no switch-on point, so it covers the whole graph in every preset galaxy
-("Deeper gold = bigger MOND boost", in small gold text in the empty bottom-right corner of the widest
-stretch below a₀ so it never covers a curve), with a faint dotted line, tagged "a₀", where the visible
-gravity crosses a₀ (see PHYSICS.md). The View panel's
-"Where MOND acts" switch (off by default, usable only in MOND mode) lays the same gold into the 3D
-disk plane in the graph's gold (#f2c879): each radius gets the graph's shade, a dashed gold circle marks
-where the visible gravity last drops below a₀, the gold fades softly to nothing beyond the data (to 1.6 × the last radius),
+with opacity in proportion to MOND's boost at each radius (a 1% boost is all but invisible), so it is
+faint near the centre and deepens outwards and covers the whole graph in every preset galaxy
+("Deeper gold = bigger MOND boost", in small gold text in the empty bottom-right corner so it never
+covers a curve). There is no a₀ line or ring: MOND has no switch-on point (see PHYSICS.md); the
+MOND note under the model cards and the Background's "What is MOND?" say MOND boosts gravity
+everywhere and explain what a₀ is and where it comes from. The View panel's
+"Where MOND acts" switch (off by default, shown only in MOND mode) lays the same gold into the 3D
+disk plane in the graph's gold (#f2c879): each radius gets the graph's shade, the gold fades softly
+to nothing beyond the data (to 1.6 × the last radius),
 and a haze of faint points just above and below the plane gives it depth (a visual choice). Both
 tours ask for it on the card after choosing MOND ("See where MOND acts"; sandbox: "MOND in your
 galaxy"); already on counts as done. While the gold shows, the panels over the 3D view (View,
 the slider box, the readouts, star labels) go solid (`.mond-zone-on`) so the gold never tints them. The
 sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
-until an unshaded centre opens up (MOND already chosen when the card opens counts
+until the gold near the centre turns very faint (the visible pull above a₀ somewhere) (MOND already chosen when the card opens counts
 as done). On that card and "Spread the stars out", a finished first part's ring
 turns green and fades before the second part and its ring appear. The halo shape
 monitor card only asks the visitor to look at the monitor; clicking it (or Next)
