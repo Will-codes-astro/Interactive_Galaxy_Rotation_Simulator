@@ -4027,21 +4027,21 @@ window.GALAXIES = {
          doneText:'Spotted: all the way out, the white points stay well above the cyan line. Press Next to find out why.',
          text:'Each white point is a measured orbit speed. The cyan line is how fast they would move if only the stars and gas we can see were pulling on them.',
          action:'Slowly move your mouse (or slide your finger) across the whole right half of the graph, from the middle to the far edge, reading the speeds as you go. Do the white points stay above the cyan line?'},
-        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',allow:['visibleMatterOnly'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Take the dark matter away',
+        {id:'removeHalo',nfw:true,target:'massSlider',gesture:'zero',allow:['visibleMatterOnly'],watch:['curvePlot:Watch the orange line'],title:'Take the dark matter away',
          text:'That gap is the puzzle. The orange line is the model: visible matter plus a dark matter halo.',
          action:'Drag Halo mass (blue box) all the way left, to 0. Left lowers it.'},
-        {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',gesture:'increase',watch:['massValue:Halo mass','curvePlot:Watch the orange line'],title:'Add the halo back',
+        {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',gesture:'increase',watch:['curvePlot:Watch the orange line'],title:'Add the halo back',
          checks:{massSlider:()=>Number(massSlider.value)>0&&tutorialOuterReached()},doneText:'Gap closed: enough dark matter lifts the orange line up to the measured speeds.',
          text:'A halo is a huge cloud of unseen matter. Its gravity makes the stars orbit faster.',
          action:'Drag Halo mass to the right until the orange line climbs up to the white points on the right of the graph.'},
-        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['scaleValue:Scale radius','curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
+        {id:'haloShape',nfw:true,target:'scaleSlider',gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the left of the orange line'],title:'Pack the halo in or spread it out',
          text:'The scale radius sets how tightly the halo is packed. Its total mass stays the same.',
          action:'1. Drag Scale radius left: the left of the orange line rises. 2. Drag it right: that part drops.'},
         {id:'haloNumbers',nfw:true,halo:true,cardRight:true,scrollPad:130,target:'haloRadiusCard',gesture:'click',tag:'1 · Open',also:['haloScaleCard:2 · Open','haloConcentrationCard:3 · Open'],title:'Read the halo’s numbers',
          checks:{haloRadiusCard:()=>tutorialFlags.haloRadiusCard,haloScaleCard:()=>tutorialFlags.haloScaleCard,haloConcentrationCard:()=>tutorialFlags.haloConcentrationCard},doneText:'All three read: these numbers follow the halo sliders.',
          text:'These cards describe your halo. r₂₀₀ marks its outer edge. Concentration c (r₂₀₀ ÷ scale radius) says how tightly packed it is.',
          action:'1. Hover over (or tap) Halo radius. 2. Now Scale radius. 3. Now Concentration.'},
-        {id:'fit',nfw:true,mode:'preset',target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)','massValue:Halo mass','scaleValue:Scale radius'],title:'Score your fit',
+        {id:'fit',nfw:true,mode:'preset',target:'massSlider',gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass&&shownRedChi>=tutorialChiGoal(),scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale,
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
@@ -4049,7 +4049,7 @@ window.GALAXIES = {
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says. Gold shading on the graph marks where.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
-        {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],title:'Give both their best shot',
+        {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],keepWatch:true,title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
@@ -4076,7 +4076,7 @@ window.GALAXIES = {
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
          checks:{viewEdgeOn:()=>Math.abs(controls.goal.phi-Math.PI/2)<0.2,fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap.'},
         {id:'fsEscape',fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
-         checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['fsMassValue:Halo mass','escape-counter:Ejected count'],title:'Pull the halo away',
+         checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['escape-counter:Ejected count'],title:'Pull the halo away',
          text:'A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to hold them.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Gone: visible matter alone cannot hold the outer stars.'},
@@ -4101,17 +4101,17 @@ window.GALAXIES = {
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'groups',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
          text:'Here you design the galaxy: how much its stars and gas weigh, and how they are spread out.',
          action:'Look at the three groups of sliders in the blue box, then press Next.'},
-        {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['sbDiskMassValue:Disk mass','massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
+        {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
          text:'The disk is the flat, spinning part where most stars are. Galaxies with more stars sit in bigger halos.',
          action:'Drag Disk mass up and down. Watch the cyan line and Halo mass.'},
         {id:'sbSize',mode:'custom',target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
          checks:{sbDiskScale:()=>sbVal('sbDiskScale')!==tutorialStart.sbDiskScale,sbTruncation:()=>sbVal('sbTruncation')!==tutorialStart.sbTruncation},doneText:'Disk reshaped and edge moved.',title:'Spread the stars out',
          text:'Scale length sets how quickly the disk fades outwards. Truncation radius is where it ends.',
          action:'1. Drag Scale length and watch the peak of the cyan line. 2. Drag Truncation radius and watch the 3D galaxy’s size.'},
-        {id:'sbBulge',mode:'custom',target:'sbBulgeMass',cardSlider:{sbBulgeMass:'curvePlot'},gesture:'increase',watch:['sbBulgeMassValue:Bulge mass','curvePlot:Watch the left of the cyan line'],allow:['sbBulgeRadius'],title:'Add a bulge',
+        {id:'sbBulge',mode:'custom',target:'sbBulgeMass',cardSlider:{sbBulgeMass:'curvePlot'},gesture:'increase',watch:['curvePlot:Watch the left of the cyan line'],allow:['sbBulgeRadius'],title:'Add a bulge',
          text:'A bulge is a ball of stars at the centre. It speeds up the innermost orbits.',
          action:'Drag Bulge mass above 0. Watch the left of the cyan line climb.'},
-        {id:'sbGas',mode:'custom',target:'sbGasMass',cardSlider:{sbGasMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['sbGasMassValue:Gas mass','curvePlot:Watch the right of the cyan line'],title:'Add the gas',
+        {id:'sbGas',mode:'custom',target:'sbGasMass',cardSlider:{sbGasMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['curvePlot:Watch the right of the cyan line'],title:'Add the gas',
          text:'Gas spreads about three times wider than the stars, so it matters most far out.',
          action:'Drag Gas mass up and down. Watch the right of the cyan line.'},
         {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
@@ -4124,24 +4124,24 @@ window.GALAXIES = {
         {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo shape monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
          action:'Point at the monitor (blue box) and find its marker. Is it inside the shaded band?'},
-        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['scaleValue:Scale radius','stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
+        {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny or huge scale radius makes a halo unlike any real one. The monitor turns red, but it still runs.',
          action:'Drag Scale radius to one end until the monitor turns red.'},
-        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['massValue:Halo mass','curvePlot:Watch the orange line'],gesture:'decrease',
+        {id:'sbHalo',mode:'custom',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},tag:'1 · Drag',also:['applyObservedFit:2 · Reset'],watch:['curvePlot:Watch the orange line'],gesture:'decrease',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass,applyObservedFit:()=>tutorialFlags.typical},doneText:'Halo back to typical. Try a heavy or light halo in fullscreen after the tour.',title:'Tune the halo yourself',
          text:'Halo mass runs from 0 to 5 × the typical halo. The stars start balanced for the typical one.',
          action:'1. Drag Halo mass low, then high. 2. Press Typical Halo to reset it.'},
-        {id:'sbFs',mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],title:'Watch your galaxy',
+        {id:'sbFs',mode:'custom',nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Watch your galaxy',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
          text:'Now watch your own galaxy run.',
          action:'1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space).'},
-        {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',tag:'1 · Orbits on',also:['toggleGas:2 · Gas off','toggleHalo:3 · Halo off','fsPlay:4 · Play'],gesture:'click',title:'Two kinds of orbit',
+        {id:'sbOrbits',fs:true,viewPanel:true,marks:['bulge'],target:'toggleOrbits',tag:'1 · Orbits on',also:['toggleGas:2 · Gas off','toggleHalo:3 · Halo off','fsPlay:4 · Play'],gesture:'click',freeCamera:true,title:'Two kinds of orbit',
          checks:{toggleOrbits:()=>orbitLines.visible,toggleGas:()=>!gasCloud.visible,toggleHalo:()=>haloHidden||Number(massSlider.value)===0,fsPlay:()=>playing||tutorialPlayedMyr>0},
          text:'Disk stars trace circles. Bulge stars (the ringed one) trace tangled loops: random motions hold a bulge up.',
          action:'1. Switch on Orbits. 2. Switch off Gas. 3. Switch off Halo. 4. Press ▶ Play.',
          doneText:'Circles in the disk, a tangle in the bulge.'},
         {id:'sbFsEscape',fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
-         checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['fsMassValue:Halo mass','escape-counter:Ejected count'],title:'Starve it of dark matter',
+         checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['escape-counter:Ejected count'],title:'Starve it of dark matter',
          text:'Take the halo away and the ringed star is the first your galaxy loses.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
          done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Lost: without dark matter, the outer stars fly off.'}
@@ -4639,7 +4639,9 @@ window.GALAXIES = {
       // Rings go once their part is done, or once the whole card is done; the part being pointed at has the main ring.
       // A watched value inside the main ring (the number in the slider's own label row) needs no ring of its own.
       const aimLabel=aim&&aim.id!==tutorialSliderId&&document.getElementById(aim.id)?tutorialSliderLabel(document.getElementById(aim.id)):null;
-      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||tutorialCompleted[step.id]?[]:tutorialRingList(step).filter(r=>!tutorialLatched[r.id]&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
+      // step.keepWatch: the watch rings stay after the card is done, as the values they ring change only then.
+      const done=step&&tutorialCompleted[step.id];
+      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||done&&!step.keepWatch?[]:tutorialRingList(step).filter(r=>(done?r.watch:!tutorialLatched[r.id])&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
       const keep=new Set(ids.map(item=>item.id)),cardKey=tutorialTour+tutorialIndex;
       const still=hideAll||tutorialCard.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches;
       tutorialAlsoRings.forEach((ring,id)=>{
@@ -4692,17 +4694,20 @@ window.GALAXIES = {
     const TUTORIAL_LOCKABLE='input,select,button,textarea,a[href]';
     const TUTORIAL_ALWAYS_FREE='[data-speed],[aria-controls][aria-expanded],.ml-close,summary';
     const tutorialLockScopes=[document.querySelector('.page[data-page="simulator"]'),document.querySelector('.topbar')].filter(Boolean);
+    // On a freeCamera card the camera buttons are free too, so the view can be reset, turned or pulled back.
+    const TUTORIAL_CAMERA_BUTTONS=['viewReset','viewFaceOn','viewEdgeOn','viewFullHalo'];
     let tutorialLockKey=null;
+    // step.freeCamera: the 3D view can be dragged, zoomed and turned as normal on this card (a function: only while true).
+    const tutorialFreeCamera=step=>!!step&&(typeof step.freeCamera==='function'?step.freeCamera():!!step.freeCamera);
     function tutorialAllowed(){
       if(tutorialCard.hidden)return null;
       const step=tutorialStep(),blocker=tutorialBlocker();
       if(!blocker&&step.predict&&tutorialFlags.prediction==null)return[];
-      const ids=blocker?[]:[step.target,...tutorialRingList(step).filter(r=>!r.watch).map(r=>r.id),...(step.allow||[])];
+      const ids=blocker?[]:[step.target,...tutorialRingList(step).filter(r=>!r.watch).map(r=>r.id),...(step.allow||[]),...(tutorialFreeCamera(step)?TUTORIAL_CAMERA_BUTTONS:[])];
       return[...(blocker?[blocker.target]:[]),...ids.map(id=>document.getElementById(id))].filter(Boolean).map(el=>el.closest('label')||el);
     }
     function applyTutorialLocks(){
-      // step.freeCamera: the 3D view can be dragged, zoomed and turned as normal on this card (a function: only while true).
-      const step=tutorialCard.hidden?null:tutorialStep(),freeCamera=!!step&&(typeof step.freeCamera==='function'?step.freeCamera():!!step.freeCamera);
+      const freeCamera=tutorialFreeCamera(tutorialCard.hidden?null:tutorialStep());
       const roots=tutorialAllowed(),key=roots&&roots.map(el=>el.id||el.className).join('|')+'|'+tutorialIndex+tutorialTour+freeCamera;
       if(key===tutorialLockKey)return;
       tutorialLockKey=key;

@@ -236,7 +236,9 @@ Model setup heading. The tours do not reset or change simulator settings.
 While a card is open, every simulator control it does not name is locked
 (inert and dimmed), and so are the top menu and the 3D camera's drag and zoom
 (except from "Now watch it happen" until Face-on is done on "Look down on the
-disk", where the camera moves as normal); when something is in the way, only
+disk", and on the sandbox tour's "Watch your galaxy" and "Two kinds of orbit",
+where the camera moves as normal and Reset, Face-on, Edge-on and Full halo are
+free too); when something is in the way, only
 the control that fixes it is free. Playback speed, the info (?) buttons and the
 halo-card explainers stay free. A box ring covers an opened info box only when
 the box opens right beside its control, and if an opened info box would sit
@@ -270,8 +272,10 @@ Each card has one or two short sentences of explanation and an
 "Instructions:" line asking for one action; a card with several actions
 ("1. … 2. …") shows one part at a time ("Part 1 of 2"), and each new part fades
 in. Controls to use get a blue box; the numbers or graph to watch while doing
-it (halo mass, scale radius, χ², M/L, tilt, the Ejected count) get yellow dashed
-boxes. A step, or one part of a many-part card, finished by dragging a slider
+it (χ², M/L, tilt, the graph, the Ejected count) get yellow dashed boxes; a
+slider's own value needs none, as the slider's blue box already holds it. On
+"Give both their best shot" the χ², M/L and tilt boxes stay after Best
+realistic fits is switched on, while those values change. A step, or one part of a many-part card, finished by dragging a slider
 only counts as done once the slider is let go, so no highlight moves on mid-drag.
 When a task is done the highlight turns green with one small ripple (every
 finished highlight holds green 1.4 s, then fades over 1.2 s), the card
