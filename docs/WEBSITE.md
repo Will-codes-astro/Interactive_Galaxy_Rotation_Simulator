@@ -32,7 +32,11 @@ radius where the visible matter's gravity is weaker than a₀, faint at the edge
 gravity here", in small gold text in the zone's empty bottom-right corner so it
 never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The
 sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
-until an unshaded centre opens up.
+until an unshaded centre opens up (MOND already chosen when the card opens counts
+as done). On that card and "Spread the stars out", a finished first part's ring
+turns green and fades before the second part and its ring appear. The halo shape
+monitor card only asks the visitor to look at the monitor; clicking it (or Next)
+moves on.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest

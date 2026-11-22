@@ -4104,7 +4104,7 @@ window.GALAXIES = {
         {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
          text:'The disk is the flat, spinning part where most stars are. Galaxies with more stars sit in bigger halos.',
          action:'Drag Disk mass up and down. Watch the cyan line and Halo mass.'},
-        {id:'sbSize',mode:'custom',target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
+        {id:'sbSize',mode:'custom',partPause:true,target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
          checks:{sbDiskScale:()=>sbVal('sbDiskScale')!==tutorialStart.sbDiskScale,sbTruncation:()=>sbVal('sbTruncation')!==tutorialStart.sbTruncation},doneText:'Disk reshaped and edge moved.',title:'Spread the stars out',
          text:'Scale length sets how quickly the disk fades outwards. Truncation radius is where it ends.',
          action:'1. Drag Scale length and watch the peak of the cyan line. 2. Drag Truncation radius and watch the 3D galaxy’s size.'},
@@ -4117,13 +4117,13 @@ window.GALAXIES = {
         {id:'sbSummary',mode:'custom',target:'sandboxSummary',gesture:'scan',watch:['sbHaloBaseline:Typical halo mass'],tag:'Watch the totals',also:['sbDiskMass:Drag this'],allow:['sandboxGroups'],title:'Check the totals',
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
-        {id:'sbMond',mode:'custom',target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
+        {id:'sbMond',mode:'custom',partPause:true,given:['optMond'],target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
          checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard near its centre, so there MOND barely changes gravity and the speeds stay close to Newton’s. MOND’s boost grows further out.',
          text:'MOND changes gravity mainly where it is very weak, below a tiny acceleration called a₀. The gold shading on the graph marks where your galaxy’s visible matter pulls that weakly, so MOND boosts it there. The deeper the gold, the bigger the boost.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until a clear, unshaded part opens up near the centre of the graph.'},
-        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Point at the gauge',title:'Meet the halo shape monitor',
+        {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'scan',tag:'Look at the gauge',title:'Meet the halo shape monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
-         action:'Point at the monitor (blue box) and find its marker. Is it inside the shaded band?'},
+         action:'Look at the monitor (blue box) and find its marker. Is it inside the shaded band? Then press Next.'},
         {id:'sbStability',mode:'custom',nfw:true,halo:true,target:'scaleSlider',cardSlider:{scaleSlider:'stabilityMonitor'},tag:'Drag to each end',watch:['stabilityMonitor:Watch the marker','stabilityChip:Warning shows here'],gesture:'adjust',title:'Break the halo',
          text:'A tiny or huge scale radius makes a halo unlike any real one. The monitor turns red, but it still runs.',
          action:'Drag Scale radius to one end until the monitor turns red.'},
@@ -4173,15 +4173,28 @@ window.GALAXIES = {
     // already in this card's end state), a part only counts once it has been undone and redone on this card, so a
     // skipped card never earns praise for nothing. Holds the ids seen false since the card opened (false = not stale).
     let tutorialFlags={},tutorialLatched={},tutorialStart={},tutorialCheckSig='',tutorialStale=null;
+    // step.given: parts that count as done when already true as the card opens (MOND already chosen), since the
+    // card locks the control that would undo them. step.partPause: when a part is done, its ring turns green and
+    // fades before the next part appears (tutorialPartHold holds the done part's id until then).
+    let tutorialPartHold=null,tutorialPartHoldTimer=0;
+    function holdTutorialPart(id){
+      clearTimeout(tutorialPartHoldTimer);tutorialPartHold=id;
+      if(id)tutorialPartHoldTimer=setTimeout(()=>{tutorialPartHold=null;refreshTutorialGuidance();},TUTORIAL_RING_FADE_MS);
+    }
     const sbVal=id=>{const el=document.getElementById(id);return el?Number(el.value):0;};
     function tutorialResetChecks(){
-      tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;
+      tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;holdTutorialPart(null);
       tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
     }
     function tutorialUpdateChecks(){
       const step=tutorialStep();
       if(!step.checks||tutorialCard.hidden||tutorialBlocker())return;
-      if(tutorialStale===null)tutorialStale=Object.keys(step.checks).every(id=>step.checks[id]())?{}:false;
+      if(tutorialStale===null){
+        (step.given||[]).forEach(id=>{if(step.checks[id]())tutorialLatched[id]=true;});
+        const rest=Object.keys(step.checks).filter(id=>!tutorialLatched[id]);
+        tutorialStale=rest.length&&rest.every(id=>step.checks[id]())?{}:false;
+      }
+      const before=step.partPause&&!tutorialPartHold?tutorialCurrentAim(step):null;
       for(const id in step.checks){
         const ok=step.checks[id]();
         if(tutorialStale&&!ok)tutorialStale[id]=true;
@@ -4192,13 +4205,15 @@ window.GALAXIES = {
       const sig=Object.keys(tutorialLatched).join();
       if(sig===tutorialCheckSig)return;
       tutorialCheckSig=sig;
-      if(!step.done&&Object.keys(step.checks).every(id=>tutorialLatched[id]))completeTutorialAction(step.id,step.doneText,!!step.fs||tutorialIsFullscreen());
+      const allDone=Object.keys(step.checks).every(id=>tutorialLatched[id]);
+      if(allDone)holdTutorialPart(null);else if(before&&tutorialLatched[before.id])holdTutorialPart(before.id);
+      if(!step.done&&allDone)completeTutorialAction(step.id,step.doneText,!!step.fs||tutorialIsFullscreen());
       renderTutorialTry();
       updateTutorialSpotlight();
     }
     // The control to point at now: the first part not yet done (null once every part is done).
     function tutorialCurrentAim(step){
-      if(tutorialCompleted[step.id]&&step.checks)return null;
+      if(tutorialCompleted[step.id]&&step.checks||tutorialPartHold)return null;
       // A predict-first card points at its answer buttons (on the card) before anything else.
       if(step.predict&&tutorialFlags.prediction==null)return{id:'tutorialChoices',label:'1 · Predict',gesture:'click'};
       const first={id:step.target,label:step.tag,gesture:step.gesture};
@@ -4217,7 +4232,7 @@ window.GALAXIES = {
     function tutorialCardSliderId(){
       const step=tutorialStep();
       if(tutorialCard.hidden||!step.cardSlider||tutorialBlocker())return null;
-      const aim=tutorialCurrentAim(step),id=aim?aim.id:Object.keys(step.cardSlider).pop(),real=step.cardSlider[id]&&document.getElementById(id);
+      const aim=tutorialCurrentAim(step),id=tutorialPartHold||(aim?aim.id:Object.keys(step.cardSlider).pop()),real=step.cardSlider[id]&&document.getElementById(id);
       if(!real||tutorialBar.contains(real)&&getComputedStyle(tutorialBar).position==='sticky')return null;
       return id;
     }
@@ -4332,7 +4347,7 @@ window.GALAXIES = {
     // Which numbered part of the action the viewer is on: the first part not yet done (the last part once all are).
     function tutorialPartIndex(step,count){
       if(tutorialCompleted[step.id])return count-1;
-      if(step.checks){const i=Object.keys(step.checks).findIndex(id=>!tutorialLatched[id]);return i<0?count-1:Math.min(i,count-1);}
+      if(step.checks){const i=tutorialPartHold?Object.keys(step.checks).indexOf(tutorialPartHold):Object.keys(step.checks).findIndex(id=>!tutorialLatched[id]);return i<0?count-1:Math.min(i,count-1);}
       if(step.id==='haloShape'){const[start,min]=tutorialScaleSeen;return min<start||start<=Number(scaleSlider.min)?1:0;}
       return 0;
     }
@@ -4492,10 +4507,10 @@ window.GALAXIES = {
     if(spotlightResize)spotlightResize.observe(document.body);
     // When a part of a card is done and the main ring moves on, a green copy stays where it was and fades slowly.
     // Each ghost is kept with its control, so it follows the control if the page shifts while it fades.
-    let tutorialGhosts=[];
+    let tutorialGhosts=[],tutorialAimId=null; // tutorialAimId: the part the main ring is on
     function leaveTutorialGhost(){
       const prev=tutorialAimTarget;
-      if(!prev||!prev.id||!tutorialLatched[prev.id]||tutorialSpotlight.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      if(!prev||!tutorialLatched[tutorialAimId]||tutorialSpotlight.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
       const ghost=document.createElement('div');
       ghost.className='tutorial-also is-leaving';ghost.setAttribute('aria-hidden','true');
       ['left','top','width','height','borderRadius','clipPath'].forEach(k=>{ghost.style[k]=tutorialSpotlight.style[k];});
@@ -4514,7 +4529,7 @@ window.GALAXIES = {
       // Every ringed part is done but the card still waits on something unringed (Score your fit's χ² goal): the last
       // part still turns green and fades like the others, then the main ring goes.
       if(!blocker&&!aim&&!finished){
-        if(tutorialAimTarget){leaveTutorialGhost();tutorialAimTarget=null;}
+        if(tutorialAimTarget){leaveTutorialGhost();tutorialAimTarget=null;tutorialAimId=null;}
         tutorialSpotlight.hidden=true;return;
       }
       let target=finished?tutorialAimTarget:blocker?blocker.target:aim.id===tutorialSliderId?tutorialSliderInput:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
@@ -4522,11 +4537,11 @@ window.GALAXIES = {
         target=document.getElementById('optMond');gesture='click';
       }
       // A new control to aim at brings the pointer back; it fades again once the user's mouse reaches it.
-      if(target!==tutorialAimTarget){
+      if(target!==tutorialAimTarget||!finished&&!blocker&&aim.id!==tutorialAimId){
         leaveTutorialGhost();
         if(spotlightResize){if(tutorialAimTarget)spotlightResize.unobserve(tutorialAimTarget);spotlightResize.observe(target);}
         const carried=target===tutorialCarryTarget;
-        tutorialAimTarget=target;
+        tutorialAimTarget=target;tutorialAimId=!blocker&&aim?aim.id:null;
         if(!carried){tutorialSpotlight.classList.remove('is-reached','is-arriving');void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');}
       }
       tutorialCarryTarget=null;
@@ -4727,7 +4742,7 @@ window.GALAXIES = {
     const tutorialDim=document.getElementById('tutorialDim'),tutorialDimHoles=document.getElementById('tutorialDimHoles');
     let tutorialDimLast='';
     function updateTutorialDim(){
-      const on=!tutorialCard.hidden&&!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-revisit')&&!tutorialIsFullscreen();
+      const on=!tutorialCard.hidden&&(!tutorialSpotlight.hidden||tutorialPartHold)&&!tutorialSpotlight.classList.contains('is-revisit')&&!tutorialIsFullscreen();
       tutorialDim.classList.toggle('is-on',on);
       tutorialDim.classList.toggle('is-done',tutorialSpotlight.classList.contains('is-complete'));
       if(!on)return;
@@ -4772,7 +4787,7 @@ window.GALAXIES = {
       tutorialDrag=null;
       // A box still showing on the control the new card starts on stays put instead of replaying its arrival.
       tutorialCarryTarget=!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-complete')?tutorialAimTarget:null;
-      tutorialAimTarget=null;
+      tutorialAimTarget=null;tutorialAimId=null;
       tutorialResetChecks();
       tutorialTarget=document.getElementById(step.target);
       if(pageOf(tutorialTarget))showPage(pageOf(tutorialTarget),{scroll:false});
@@ -4906,7 +4921,7 @@ window.GALAXIES = {
       tutorialSpotlight.classList.add('is-reached');
       // Spot the puzzle needs all three stretches of the graph's right half (where the gap is) to be visited.
       if(tutorialStep().id==='puzzle'&&x>r.left+r.width*.5)tutorialFlags['scan'+Math.min(2,Math.floor((x-r.left-r.width*.5)/(r.width/6)))]=true;
-      completeTutorialAction('sbMonitor','Found it. Next, push the marker out of the band.');
+      if(e.type==='pointerdown')completeTutorialAction('sbMonitor','Found it. Next, push the marker out of the band.');
     }
     window.addEventListener('pointermove',tutorialPointerReach,{capture:true,passive:true});
     window.addEventListener('pointerdown',tutorialPointerReach,{capture:true,passive:true});
