@@ -226,10 +226,18 @@ its render resolution in steps while frames run slow and raises it again when
 there is headroom (`trackFrameTime` in the generator); 4x antialiasing is used
 only on low-DPI screens at full resolution. The gear at the far right of the
 top bar opens Settings, whose "High-quality visuals" tick box overrides this:
-ticked fixes full resolution, unticked fixes the lowest level, and "Use
-automatic" hands control back. Until it is used, the box shows whether the
-automatic choice is at full resolution. The choice is kept in the browser's
-localStorage (`galaxySimQuality`) and the panel stays usable during the tour.
+ticked fixes full resolution, unticked fixes the lowest level and turns on
+lite visuals for the whole page (class `lite` on `<html>`): no animations,
+transitions, blur or glow (tutorial rings lose their pulse and shadow, the
+pointer rests where to act), near-solid panels over the 3D view, and no bloom
+in the 3D view. Page scripts test `calmMotion()`, which is true with lite
+visuals or the system's reduce-motion setting. "Use automatic" hands control
+back; in automatic mode lite visuals come on for the rest of the visit once
+the resolution has dropped to its lowest level. Until it is used, the box
+shows whether the automatic choice is at full quality. The choice is kept in
+the browser's localStorage (`galaxySimQuality`), applied before the page
+first draws, and the panel stays usable during the tour. The "Now watch it
+happen" card points to it for jerky computers.
 
 While a halo or sandbox slider moves, the rotation curve is redrawn every frame
 through Plotly's light transition path (`updateHalo(true)`); the speed axis only
@@ -329,7 +337,10 @@ input) then fades to the next card. Green only ever marks something done on that
 card: Next skips a card without a tick, a card that opens already in its end state
 (because an earlier card was skipped) only ticks once its part is undone and redone,
 leaving a card clears its rings at once, and going back to a finished card shows
-its message without replaying the glow. Back always returns to a skipped card so it
+its message without replaying the glow. Rings and the dim layer are placed in
+page coordinates, so they scroll with the page and stay locked to their
+controls; only a ring on something that stays put on screen (top menu, tour
+card, fullscreen) is fixed to the screen. Back always returns to a skipped card so it
 can be done. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On

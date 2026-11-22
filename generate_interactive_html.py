@@ -846,17 +846,21 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (hover:none) and (pointer:coarse) { .tutorial-keys { display:none; } }
     .tutorial-actions button { min-height:36px; }
     .tutorial-actions button:disabled { opacity:.45; cursor:not-allowed; }
-    .tutorial-spotlight { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:3px solid #a8ddff; border-radius:9px; box-shadow:0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); transition:opacity .45s ease; animation:tutorial-pulse 2.2s ease-in-out infinite; }
+    .tutorial-spotlight { position:absolute; z-index:9998; box-sizing:border-box; pointer-events:none; border:3px solid #a8ddff; border-radius:9px; box-shadow:0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); transition:opacity .45s ease; animation:tutorial-pulse 2.2s ease-in-out infinite; }
     /* Gentle pulse on the highlight ring (visual only). */
     @keyframes tutorial-pulse { 0%,100% { border-color:#a8ddff; box-shadow:0 0 14px 4px rgba(120,210,255,.75), inset 0 0 12px rgba(120,210,255,.35); } 50% { border-color:#ffffff; box-shadow:0 0 26px 9px rgba(120,210,255,.95), inset 0 0 16px rgba(120,210,255,.5); } }
     .tutorial-spotlight[hidden] { display:none; }
     /* One dim layer over the page with a hole for every highlighted control (main ring and the blue/yellow rings),
        so the things to use or watch stay at full brightness. No dim in full screen. */
-    .tutorial-dim { position:fixed; inset:0; z-index:9997; width:100%; height:100%; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
+    /* Rings and the dim layer are placed in page coordinates, so the browser scrolls them with the page and they stay
+       locked to their controls (re-placing screen-fixed rings after each scroll made them jitter). A ring on something
+       that does not scroll with the page (the top menu, the tour card, fullscreen) is fixed to the screen instead. */
+    .tutorial-spotlight.is-fixed, .tutorial-also.is-fixed { position:fixed; }
+    .tutorial-dim { position:absolute; top:0; left:0; z-index:9997; width:100%; height:100vh; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
     .tutorial-dim.is-on { opacity:1; }
     /* Every finished highlight (main ring, part rings, dim) holds green for 1.4 s then fades over 1.2 s. */
     .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.2s ease-in-out 1.4s; }
-    .tutorial-also { position:fixed; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
+    .tutorial-also { position:absolute; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
     .tutorial-also[hidden] { display:none; }
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
     .tutorial-locked { opacity:.38; filter:saturate(.4); transition:opacity .25s ease; }
@@ -980,6 +984,17 @@ HTML_TEMPLATE = r"""<!doctype html>
     .settings-note button:hover, .settings-note button:focus-visible { text-decoration:underline; outline:none; }
     @media (max-width:640px) { .settings { margin-right:-4px; } }
     @media (prefers-reduced-motion:reduce) { .settings-btn svg, .settings-row input, .settings-row input::after { transition:none; } }
+    /* Lite visuals (html.lite, see the first script): no animation, transition, blur or glow anywhere. Animations jump
+       straight to their end state (after any delay, so a ring still shows green before it goes), so anything that fades
+       out still ends hidden. Panels that relied on blur over the
+       3D view get a near-solid background so their text stays readable. */
+    html.lite { scroll-behavior:auto; }
+    html.lite *, html.lite *::before, html.lite *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+    html.lite .tutorial-spotlight, html.lite .tutorial-also, html.lite .tutorial-spotlight.is-complete { box-shadow:none; }
+    html.lite .tutorial-pointer { animation:none; transform:translate(var(--to-x),var(--to-y)); } /* as with reduce-motion: the pointer rests where to act */
+    html.lite .tutorial-spotlight.is-complete::after { display:none; }
+    html.lite .topbar { background:rgba(6,10,18,.97); }
+    html.lite .view-panel, html.lite .fs-sliders, html.lite .telemetry, html.lite .stability-chip, html.lite .star-mark span, html.lite .curve-hover .ch-box { background:rgba(9,14,24,.94); }
     a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
     header { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:28px 40px; max-width:1800px; margin:auto; padding:48px 28px 8px; border-bottom:0; background:none; }
     .eyebrow { color:var(--accent); font:500 11px/1.4 var(--f-mono); letter-spacing:.14em; }
@@ -1288,7 +1303,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
         <h2>Settings</h2>
-        <label class="settings-row"><input type="checkbox" id="qualityToggle" disabled><span><b>High-quality visuals</b><small>A sharper 3D galaxy view. Untick it if the simulation feels slow or jerky.</small></span></label>
+        <label class="settings-row"><input type="checkbox" id="qualityToggle" disabled><span><b>High-quality visuals</b><small>Glow, pulsing highlights, blur and motion, and a sharper 3D galaxy view. Untick it on a slow computer: everything gets simpler and runs smoother.</small></span></label>
         <p class="settings-note"><span id="qualityNote" aria-live="polite">The 3D view has not loaded.</span><button type="button" id="qualityAuto" hidden>Use automatic</button></p>
       </div>
     </div>
@@ -1694,6 +1709,12 @@ HTML_TEMPLATE = r"""<!doctype html>
 __GALAXIES_JS__
   </script>
   <script>
+    /* Lite visuals (Settings' "High-quality visuals" unticked, or chosen automatically on a slow device): the html
+       element gets the class "lite", which turns off the page's glows, pulsing highlights, blur and motion, and the 3D
+       view's bloom. Set here, before anything draws, from the choice remembered in this browser. calmMotion() is the
+       one test the page's scripts use for "skip the animation": lite visuals or the system's reduce-motion setting. */
+    try{if(localStorage.getItem('galaxySimQuality')==='low')document.documentElement.classList.add('lite');}catch(e){}
+    window.calmMotion=()=>document.documentElement.classList.contains('lite')||matchMedia('(prefers-reduced-motion: reduce)').matches;
     /* Runs before the simulator. If a library did not load (a network that blocks CDNs, or no internet) or the
        browser has WebGL turned off, say so plainly, show every page as one long scroll so the text still reads,
        and stop: the simulator below needs all of them. */
@@ -1733,7 +1754,7 @@ __GALAXIES_JS__
         }
         details.open=true;
         content.inert=!opening;
-        if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        if(calmMotion()){
           details.open=opening;
           content.inert=false;
           return;
@@ -2460,6 +2481,7 @@ __GALAXIES_JS__
         const camera=new THREE.PerspectiveCamera(40,1,1,3000);
         // Bloom (visual choice, like a camera exposure): bright light bleeds softly into its surroundings, then a soft
         // highlight shoulder stops piled-up light clipping to flat white. Falls back to a plain render if the add-ons fail to load.
+        let bloomPass=null; // switched off with lite visuals (Settings)
         const composer=(()=>{
             if(!BLOOM_AVAILABLE)return null;
             try{
@@ -2468,7 +2490,7 @@ __GALAXIES_JS__
                 const target=gl2&&THREE.WebGLMultisampleRenderTarget?new THREE.WebGLMultisampleRenderTarget(1,1,opts):new THREE.WebGLRenderTarget(1,1,opts);
                 const fx=new THREE.EffectComposer(renderer,target); // MSAA samples are set per resolution level in resizeOrbit
                 fx.addPass(new THREE.RenderPass(scene,camera));
-                fx.addPass(new THREE.UnrealBloomPass(new THREE.Vector2(256,256),0.55,0.45,0.62));
+                bloomPass=new THREE.UnrealBloomPass(new THREE.Vector2(256,256),0.55,0.45,0.62);fx.addPass(bloomPass);
                 fx.addPass(new THREE.ShaderPass({uniforms:{tDiffuse:{value:null}},
                     vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
                     fragmentShader:`uniform sampler2D tDiffuse;varying vec2 vUv;
@@ -3186,10 +3208,12 @@ __GALAXIES_JS__
         const RES_WINDOW_FRAMES=20,RES_SLOW_MS=1000/45,RES_FAST_MS=1000/55,RES_UPGRADE_WINDOWS=8,RES_IGNORE_MS=250;
         let resLevels=[],resLevel=0,resFrames=0,resSlow=0,resFastWindows=0,resUpgradeWindows=RES_UPGRADE_WINDOWS,resLastDowngradeFrom=-1;
         /* Settings' "High-quality visuals" tick box. Until the visitor uses it, quality is automatic (the adaptive steps above)
-           and the box shows whether the view is at full resolution. Ticking fixes level 0; unticking fixes the lowest level.
-           The choice is remembered in this browser (localStorage) so it can be set once before a presentation. */
+           and the box shows whether the view is at full resolution. Ticking fixes level 0; unticking fixes the lowest level
+           and lite visuals for the whole page (no glow, pulsing, blur or motion; no bloom in the 3D view). In automatic
+           mode, lite visuals also come on, for the rest of the visit, once the resolution has had to drop to its lowest
+           level. The choice is remembered in this browser (localStorage) so it can be set once before a presentation. */
         const QUALITY_STORAGE_KEY='galaxySimQuality';
-        let qualityChoice=null; // 'high', 'low' or null (automatic)
+        let qualityChoice=null,autoLite=false; // qualityChoice: 'high', 'low' or null (automatic)
         try{const saved=localStorage.getItem(QUALITY_STORAGE_KEY);if(saved==='high'||saved==='low')qualityChoice=saved;}catch(e){}
         function buildResolutionLevels(){
             const native=Math.min(window.devicePixelRatio||1,2);
@@ -3200,14 +3224,18 @@ __GALAXIES_JS__
         buildResolutionLevels();
         const qualityToggle=document.getElementById('qualityToggle'),qualityNote=document.getElementById('qualityNote'),qualityAuto=document.getElementById('qualityAuto');
         function syncQualitySetting(){
-            const full=resLevel===0;
+            if(!qualityChoice&&resLevel===resLevels.length-1&&resLevels.length>1)autoLite=true;
+            const lite=qualityChoice==='low'||!qualityChoice&&autoLite;
+            if(document.documentElement.classList.contains('lite')!==lite){document.documentElement.classList.toggle('lite',lite);needsRender=true;}
+            if(bloomPass)bloomPass.enabled=!lite;
+            const full=resLevel===0&&!lite;
             qualityToggle.checked=qualityChoice?qualityChoice==='high':full;
             qualityNote.textContent=qualityChoice?'Your choice, remembered on this device.'
                 :full?'Automatic: high quality on this device.':'Automatic: lowered to keep the 3D view smooth.';
             qualityAuto.hidden=!qualityChoice;
         }
         function setQualityChoice(choice){
-            qualityChoice=choice;
+            qualityChoice=choice;autoLite=false;
             try{if(choice)localStorage.setItem(QUALITY_STORAGE_KEY,choice);else localStorage.removeItem(QUALITY_STORAGE_KEY);}catch(e){}
             resUpgradeWindows=RES_UPGRADE_WINDOWS;resLastDowngradeFrom=-1; // automatic starts afresh
             setResolutionLevel(choice==='high'?0:choice==='low'?resLevels.length-1:resLevel);
@@ -3476,7 +3504,6 @@ __GALAXIES_JS__
       wrap.appendChild(layer);
       const line=layer.querySelector('.ch-line'),dotsEl=layer.querySelector('.ch-dots'),box=layer.querySelector('.ch-box');
       const rEl=layer.querySelector('.ch-r'),rowsEl=layer.querySelector('.ch-rows');
-      const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
       // [trace index, short label (null = 'Model' or 'MOND'), colour]; trace 4 (residual) is added as its own row.
       const ROWS=[[0,'Observed','#f4f7fb'],[3,null,'#ffae5c'],[1,'Visible','#5fd0e0'],[2,'Halo','#b39ae8'],[5,'Disk','#ffd166'],[6,'Bulge','#ff8fab'],[7,'Gas','#7bd88f']];
       const isOn=t=>!!t&&t.visible!==false&&t.visible!=='legendonly';
@@ -3532,7 +3559,7 @@ __GALAXIES_JS__
       function tick(now){
         raf=0;
         const dt=lastT?Math.min(0.1,(now-lastT)/1000):1/60;lastT=now;
-        const k=reduceMotion?1:1-Math.exp(-16*dt);
+        const k=calmMotion()?1:1-Math.exp(-16*dt);
         shown+=(target-shown)*k;if(Math.abs(target-shown)<0.002)shown=target;
         place(shown);
         boxX+=(boxGoal-boxX)*k;if(Math.abs(boxGoal-boxX)<0.3)boxX=boxGoal;
@@ -4589,7 +4616,7 @@ __GALAXIES_JS__
         // Watching the simulation: these steps run inside fullscreen (fs), where the tour card follows.
         {id:'fsEnter',given:['toggleFullscreen'],nfw:true,viewPanel:true,target:'toggleFullscreen',gesture:'click',tag:'1 · Fullscreen',also:['fsPlay:2 · Play'],freeCamera:true,title:'Now watch it happen',
          checks:{toggleFullscreen:tutorialIsFullscreen,fsPlay:()=>playing},doneText:'Fullscreen and playing: watch for as long as you like, then press Next.',
-         text:'The 3D view moves hundreds of test stars under the model’s gravity for a billion years.',
+         text:'The 3D view moves hundreds of test stars under the model’s gravity for a billion years. Jerky on this computer? Untick High-quality visuals in Settings (the gear, top right).',
          action:'1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space).'},
         {id:'fsClean',given:['toggleGas','toggleHalo'],fs:true,viewPanel:true,target:'toggleGas',tag:'1 · Gas off',also:['toggleHalo:2 · Halo off'],gesture:'click',freeCamera:true,title:'Clear the stage',
          text:'The blue haze is gas. The purple cloud is the halo, drawn so you can see it: real dark matter is invisible.',
@@ -5059,9 +5086,9 @@ __GALAXIES_JS__
     let tutorialGhosts=[],tutorialAimId=null; // tutorialAimId: the part the main ring is on
     function leaveTutorialGhost(){
       const prev=tutorialAimTarget;
-      if(!prev||!tutorialLatched[tutorialAimId]||tutorialSpotlight.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      if(!prev||!tutorialLatched[tutorialAimId]||tutorialSpotlight.hidden||calmMotion())return;
       const ghost=document.createElement('div');
-      ghost.className='tutorial-also is-leaving';ghost.setAttribute('aria-hidden','true');
+      ghost.className='tutorial-also is-leaving'+(tutorialSpotlight.classList.contains('is-fixed')?' is-fixed':'');ghost.setAttribute('aria-hidden','true');
       ['left','top','width','height','borderRadius','clipPath'].forEach(k=>{ghost.style[k]=tutorialSpotlight.style[k];});
       tutorialSpotlight.parentElement.appendChild(ghost);
       tutorialGhosts.push([ghost,prev]);
@@ -5178,13 +5205,17 @@ __GALAXIES_JS__
       if(tutorialIsFullscreen()||tutorialTopbar.contains(el))return 0;
       return tutorialTopbar.getBoundingClientRect().bottom;
     }
+    // Parts of the page that stay put on screen while it scrolls; a ring on them is fixed too (see .is-fixed).
+    const TUTORIAL_SCREEN_FIXED='.topbar,.tutorial-card,.tutorial-done,.fullscreen-active';
     // Fits a ring round its control (with any box the control has opened); false when the control is off screen.
     function fitTutorialRing(ring,el){
       const r=el&&el.getClientRects().length?tutorialSpotRect(el):null;
       if(!r||!r.width||r.bottom<0||r.top>innerHeight||r.right<0||r.left>innerWidth)return false;
       // The ring is border-box, so it sits exactly pad px outside the control on every side, with matching corners.
       const pad=4,radius=parseFloat(getComputedStyle(tutorialRingBox(el)).borderTopLeftRadius)||0;
-      ring.style.left=(r.left-pad)+'px';ring.style.top=(r.top-pad)+'px';
+      const fixed=tutorialIsFullscreen()||!!el.closest(TUTORIAL_SCREEN_FIXED),dx=fixed?0:scrollX,dy=fixed?0:scrollY;
+      ring.classList.toggle('is-fixed',fixed);
+      ring.style.left=(r.left-pad+dx)+'px';ring.style.top=(r.top-pad+dy)+'px';
       ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
       // Corners follow the control itself, not a box it has opened (a round ? button with its square info box).
       ring.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,el.getBoundingClientRect().height/2)+pad)+'px';
@@ -5205,7 +5236,7 @@ __GALAXIES_JS__
       const done=step&&tutorialCompleted[step.id];
       const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||done&&!step.keepWatch?[]:tutorialRingList(step).filter(r=>(done?r.watch:!tutorialLatched[r.id])&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
       const keep=new Set(ids.map(item=>item.id)),cardKey=tutorialTour+tutorialIndex;
-      const still=hideAll||tutorialCard.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const still=hideAll||tutorialCard.hidden||calmMotion();
       tutorialAlsoRings.forEach((ring,id)=>{
         if(keep.has(id))return;
         // Only a part actually done on this card turns green and fades where it is (earned), and the next part's ring
@@ -5294,8 +5325,11 @@ __GALAXIES_JS__
       tutorialDim.classList.toggle('is-done',tutorialSpotlight.classList.contains('is-complete'));
       if(!on)return;
       // Like the rings, a hole stops at the top menu when its control has scrolled under it.
+      // The dim layer covers the whole page and scrolls with it, so holes are in page coordinates too.
+      const pageHeight=Math.max(innerHeight,Math.ceil(document.body.getBoundingClientRect().bottom+scrollY))+'px';
+      if(tutorialDim.style.height!==pageHeight)tutorialDim.style.height=pageHeight;
       const holes=[],step=tutorialStep(),pad=4;
-      const cutHole=(el,r,k)=>{const cut=Math.max(0,tutorialCoverBottom(el)-r.top);if(cut<r.height)holes.push([{left:r.left,top:r.top+cut,width:r.width,height:r.height-cut},k]);};
+      const cutHole=(el,r,k)=>{const cut=Math.max(0,tutorialCoverBottom(el)-r.top);if(cut<r.height)holes.push([{left:r.left+scrollX,top:r.top+cut+scrollY,width:r.width,height:r.height-cut},k]);};
       cutHole(tutorialAimTarget,tutorialSpotlight.getBoundingClientRect(),parseFloat(tutorialSpotlight.style.borderRadius)||0);
       tutorialAlsoRings.forEach((ring,id)=>{if(!ring.hidden&&ring.isConnected)cutHole(document.getElementById(id),ring.getBoundingClientRect(),parseFloat(ring.style.borderRadius)||0);});
       if(!tutorialBlocker())[step.target,...tutorialRingList(step).map(r=>r.id)].forEach(id=>{
@@ -5472,7 +5506,7 @@ __GALAXIES_JS__
     function goTutorialStep(index,dir){
       if(index<0||index>=tutorialSteps.length||tutorialCard.hidden)return;
       stopTutorialAuto();clearTimeout(tutorialSwitchTimer);
-      if(matchMedia('(prefers-reduced-motion: reduce)').matches){tutorialIndex=index;showTutorialStep();return;}
+      if(calmMotion()){tutorialIndex=index;showTutorialStep();return;}
       const sideChange=!tutorialIsFullscreen()&&(innerWidth>960&&!tutorialSteps[index].cardRight)!==tutorialCard.classList.contains('on-left');
       tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
       tutorialCard.style.setProperty('--dir',dir);
@@ -5575,7 +5609,7 @@ __GALAXIES_JS__
     function fadeCurveGhost(to,ms,done){
       cancelAnimationFrame(curveGhostFadeFrame);
       const plot=document.getElementById('curvePlot'),from=curveGhost.fade,t0=performance.now();
-      if(matchMedia('(prefers-reduced-motion: reduce)').matches)ms=0;
+      if(calmMotion())ms=0;
       (function step(now){
         const t=ms?Math.min(1,(now-t0)/ms):1;
         curveGhost.fade=from+(to-from)*t*(2-t);
@@ -5729,7 +5763,7 @@ __GALAXIES_JS__
     function closeTutorialDone(){
       if(tutorialDone.hidden||tutorialDone.classList.contains('is-leaving'))return;
       clearTimeout(tutorialDoneTimer);tutorialDone.classList.add('is-leaving');
-      setTimeout(()=>{tutorialDone.hidden=true;tutorialDone.classList.remove('is-leaving');},matchMedia('(prefers-reduced-motion: reduce)').matches?0:400);
+      setTimeout(()=>{tutorialDone.hidden=true;tutorialDone.classList.remove('is-leaving');},calmMotion()?0:400);
     }
     document.getElementById('tutorialDoneClose').addEventListener('click',closeTutorialDone);
     tutorialDone.addEventListener('click',e=>{if(e.target===tutorialDone)closeTutorialDone();});
