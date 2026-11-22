@@ -439,4 +439,5 @@ live as the sliders move. Touch screens also get larger slider thumbs, tap-to-op
 it is let go (`CURVE_GHOST_HOLD_MS`), a faint wide band labelled "before" stays
 where the line it changes was: the cyan visible-matter line for the anatomy
 sliders, the orange total for the halo sliders. The speed axis keeps room for it.
-Changing galaxy, galaxy source or gravity model clears it. It is a visual aid only.
+It fades in over 0.3 s and out over 0.9 s.
+Changing galaxy, galaxy source or gravity model clears it at once. It is a visual aid only.
