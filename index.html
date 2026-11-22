@@ -3110,7 +3110,11 @@ window.GALAXIES = {
     }
     const curveConfig={responsive:true,displaylogo:false,displayModeBar:false,scrollZoom:false,doubleClick:false};
     // The sandbox has no residuals, so its velocity axis fills the whole plot.
-    const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y',range:[0,radii[radii.length-1]]},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:curveLayout),...mondZoneLayout()});
+    // A preset galaxy's axis starts at its first measured radius (nothing is drawn inside it, so nothing is extrapolated)
+    // and hugs the y axis: CURVE_X_PAD_FRACTION of the span either side keeps the end points and bars from being cut.
+    const CURVE_X_PAD_FRACTION=0.012;
+    const presetXRange=()=>{const a=radii[0],b=radii[radii.length-1],pad=(b-a)*CURVE_X_PAD_FRACTION;return[Math.max(0,a-pad),b+pad];};
+    const curveLayoutNow=()=>({...(customActive?{...curveLayout,xaxis:{...curveLayout.xaxis,anchor:'y',range:[0,radii[radii.length-1]]},yaxis:{...curveLayout.yaxis,domain:[0,1]},yaxis2:{...curveLayout.yaxis2,visible:false}}:{...curveLayout,xaxis:{...curveLayout.xaxis,range:presetXRange()}}),...mondZoneLayout()});
     // MOND boost shading (MOND mode, every galaxy). MOND has no switch-on point: it boosts gravity at every radius, by
     // an amount that grows as the visible matter's own pull g_N = V_bar²/R weakens (Milgrom 1983; the size of the
     // boost follows the interpolating function in mondVelocity, McGaugh, Lelli & Schombert 2016). So the gold's

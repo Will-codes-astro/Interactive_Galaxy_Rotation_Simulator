@@ -481,6 +481,11 @@ Method & sources ends with a Harvard reference list of every
 source cited on the page, each linked by DOI (checked against Crossref on
 14 Nov 2026).
 
+Rotation-curve axis: for a preset galaxy the radius axis starts at its first
+measured radius (no model is drawn inside it), padded by 1.2% of the span
+(`CURVE_X_PAD_FRACTION`), so the curves hug the y axis; the sandbox axis runs
+from 0.
+
 Rotation-curve readout: hovering over the graph (or, on a touch screen, tapping
 it or sliding a finger along it) shows a box with the speeds at the nearest
 measured SPARC radius. The box, guide line and dots glide smoothly between radii,
