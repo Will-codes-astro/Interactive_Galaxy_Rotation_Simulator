@@ -373,7 +373,11 @@ step the time by 50 Myr (hold to scrub). During the tutorial, the Visible matter
 the halo mass is first moved to zero; skipping the tutorial makes it available.
 In MOND mode the halo mass and scale radius sliders (and their fullscreen
 copies) are hidden, not greyed out, since MOND has no halo; on wide screens the
-remaining time and Track a star controls share the bar in two columns.
+remaining time and Track a star controls share the bar in two columns. The same
+rule holds everywhere: each model shows only its own controls. MOND also hides
+the View panel's Halo switch and Full halo button, the Halo r₂₀₀ readout and the
+"Your NFW halo" box; "Where MOND acts" shows only in MOND. Full halo also hides
+while the halo mass is zero.
 Best realistic fits switch (header, beside the M/L tile; presets only): off by
 default, so every model uses SPARC's standard M/L, distance and tilt and the
 cyan visible-matter curve is the same in NFW and MOND mode. On, the NFW and
