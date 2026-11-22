@@ -31,9 +31,13 @@ With MOND on, for every galaxy (preset or sandbox), the rotation curve's speed p
 in proportion to MOND's boost at each radius: invisible where the boost is tiny, fading in before a₀ and
 deepening outwards, so there is no hard start ("MOND boosts
 gravity here", in small gold text in the empty bottom-right corner of the widest stretch below a₀ so it
-never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The 3D view
-shows a matching glowing gold ring with a soft haze in the disk plane where the visible gravity drops
-below a₀ for the last time (hidden when it never crosses inside the data; a visual choice). The
+never covers a curve), with a faint dotted line where it crosses a₀ (see PHYSICS.md). The View panel's
+"Where MOND acts" switch (off by default, usable only in MOND mode) lays the same gold into the 3D
+disk plane: each radius gets the graph's shade, a thin brighter band marks where the visible gravity
+last drops below a₀, the gold fades softly to nothing beyond the data (to 1.6 × the last radius),
+and a haze of faint points just above and below the plane gives it depth (a visual choice). Both
+tours ask for it on the card after choosing MOND ("See where MOND acts"; sandbox: "MOND in your
+galaxy"); already on counts as done. The
 sandbox tour's "Where MOND steps in" card asks for MOND, then a heavier disk
 until an unshaded centre opens up (MOND already chosen when the card opens counts
 as done). On that card and "Spread the stars out", a finished first part's ring

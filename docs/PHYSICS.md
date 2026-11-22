@@ -179,8 +179,10 @@ median χ²/N barely moves (9.9 → 10.5).
   (0.3, 200% i.e. V_MOND = 3 V_bar at g_N ≈ 0.014 a₀, and 0.6, so small boosts still show), invisible
   for boosts below about 0.5%. Between radii ln g_N is interpolated
   linearly, as for the edges. This is a visual choice, not a model result. The 3D
-  view's gold ring (`setMondRing`) sits at the start of the outermost below-a₀ stretch,
-  if it starts inside the data; also display only. For the default sandbox galaxy g_N < a₀ at
+  view's gold plane (`setMondZone3D`, "Where MOND acts" switch) uses the same shade
+  (`mondZoneLevel`) at each radius, holds the last shade beyond the data and fades out by
+  1.6 × the last radius; its bright band sits at the start of the outermost below-a₀
+  stretch, if it starts inside the data. Display only. For the default sandbox galaxy g_N < a₀ at
   every radius; an 8 × 10¹⁰ M☉ disk moves the edge out to about 10 kpc, close to
   √(G M / a₀). At SPARC's standard values (M/L 0.5 disk, 0.7 bulge), g_N crosses
   a₀ at 0.80 kpc in NGC 3198 (of 44 kpc measured) and 12.2 kpc in NGC 7331 (of

@@ -311,6 +311,8 @@
     .view-panel [aria-checked=true] .sw { background:rgba(138,180,248,.45); border-color:var(--cyan); }
     .view-panel [aria-checked=true] .sw::after { transform:translateX(11px); background:#fff; }
     .view-panel .sw-eject[aria-checked=true] .sw { background:rgba(255,138,128,.45); border-color:#ff8a80; }
+    .view-panel .view-switches button:disabled { opacity:.45; cursor:not-allowed; }
+    .view-panel .sw-mond[aria-checked=true] .sw { background:rgba(242,200,121,.45); border-color:#f2c879; }
     /* Outside fullscreen the panel sits over a small plot, so it drops the section labels and tightens up. */
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) { min-width:0; width:172px; padding:7px; top:8px; right:8px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-label { display:none; }
@@ -1046,7 +1048,7 @@
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number"><p class="control-help">Rings one star and shows its laps, speed and distance. Star 1 starts nearest the centre, star <span id="trackLast">800</span> furthest out. Clear the box to stop.</p></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div></div>
+    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo (the halo is not drawn in MOND mode)"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button><button type="button" role="switch" id="toggleMondZone" class="sw-mond" aria-checked="false" aria-pressed="false" disabled aria-disabled="true" title="Show where MOND boosts gravity: the gold deepens where the boost is bigger, as on the graph (MOND only)"><span class="sw" aria-hidden="true"></span>Where MOND acts</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div></div>
       <section class="halo-info" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
@@ -2367,37 +2369,83 @@ window.GALAXIES = {
             new THREE.LineBasicMaterial({color:0xff8a80,transparent:true,opacity:0.55,depthWrite:false}));
         ejectionRing.frustumCulled=false;ejectionRing.visible=false;scene.add(ejectionRing);
         let ejectionLineShown=false;
-        // MOND ring (MOND mode only): a glowing gold band in the disk plane at the radius where the visible matter's
-        // gravity falls to a₀ for good, the 3D partner of the graph's gold zone (mondZoneLayout places it). The look is a
-        // visual choice: a soft glow (a shaded annulus) plus a haze of faint points spread a little in and out of the
-        // plane, so it sits in the galaxy like the stars rather than as a flat line. Sizes are fractions of the radius.
-        const MOND_RING_GLOW_WIDTH=0.025,MOND_RING_HAZE_WIDTH=0.09,MOND_RING_HAZE_POINTS=1400,MOND_RING_HAZE_THICKNESS=0.03;
-        const mondRing=new THREE.Group();mondRing.visible=false;scene.add(mondRing);
-        const mondRingGlow=new THREE.Mesh(new THREE.RingGeometry(0.7,1.3,256,1),new THREE.ShaderMaterial({
-            uniforms:{uCore:{value:MOND_RING_GLOW_WIDTH},uHaze:{value:MOND_RING_HAZE_WIDTH}},
-            transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
-            vertexShader:`varying float vR;void main(){vR=length(position.xy);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-            fragmentShader:`varying float vR;uniform float uCore;uniform float uHaze;void main(){float d=vR-1.0;
-                float core=exp(-d*d/(2.0*uCore*uCore)),haze=exp(-d*d/(2.0*uHaze*uHaze));
-                gl_FragColor=vec4(mix(vec3(1.0,0.55,0.2),vec3(1.0,0.8,0.45),core),0.5*core+0.14*haze);}`
+        // MOND zone in 3D (MOND mode, "Where MOND acts" switch): the graph's gold shading laid into the disk plane. Each
+        // radius glows with the same shade as the graph at that radius (mondZoneLayout hands over mondZoneLevel), so
+        // the gold fades in where MOND's boost starts and deepens outwards; past the last data radius it holds the last
+        // shade and fades softly to nothing by MOND_PLANE_EXTENT x that radius. A thin, brighter band marks where the
+        // visible matter's pull last drops below a0 (the graph's dotted line). A haze of faint points spread a little
+        // above and below the plane, brighter where the shade is deeper, gives it depth like the stars. All a visual
+        // choice: the plane and haze carry no physics beyond the graph's shading.
+        const MOND_PLANE_SAMPLES=256,MOND_PLANE_EXTENT=1.6,MOND_PLANE_STRENGTH=0.22,MOND_PLANE_EDGE_WIDTH=0.006;
+        const MOND_HAZE_POINTS=3000,MOND_HAZE_THICKNESS=0.012,MOND_HAZE_STRENGTH=0.85;
+        let mondZoneShown=false,mondZoneReady=false;
+        const mondZone=new THREE.Group();mondZone.visible=false;scene.add(mondZone);
+        const mondLevelData=new Uint8Array(MOND_PLANE_SAMPLES*4);
+        const mondLevelTexture=new THREE.DataTexture(mondLevelData,MOND_PLANE_SAMPLES,1,THREE.RGBAFormat);
+        mondLevelTexture.magFilter=mondLevelTexture.minFilter=THREE.LinearFilter;
+        const mondPlaneUniforms={uLevels:{value:mondLevelTexture},uDataEdge:{value:1/MOND_PLANE_EXTENT},uEdge:{value:-1},
+            uStrength:{value:MOND_PLANE_STRENGTH},uEdgeWidth:{value:MOND_PLANE_EDGE_WIDTH}};
+        const mondPlane=new THREE.Mesh(new THREE.CircleGeometry(1,256),new THREE.ShaderMaterial({
+            uniforms:mondPlaneUniforms,transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,
+            vertexShader:`varying float vU;void main(){vU=length(position.xy);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+            fragmentShader:`varying float vU;uniform sampler2D uLevels;uniform float uDataEdge;uniform float uEdge;uniform float uStrength;uniform float uEdgeWidth;
+                void main(){float level=texture2D(uLevels,vec2(min(vU,uDataEdge)/uDataEdge*(1.0-1.0/${MOND_PLANE_SAMPLES}.0)+0.5/${MOND_PLANE_SAMPLES}.0,0.5)).r;
+                float fade=1.0-smoothstep(uDataEdge,1.0,vU);
+                float d=vU-uEdge,band=uEdge>0.0?exp(-d*d/(2.0*uEdgeWidth*uEdgeWidth)):0.0;
+                float a=(uStrength*level+0.22*band)*fade;
+                gl_FragColor=vec4(mix(vec3(1.0,0.68,0.28),vec3(1.0,0.84,0.55),band),a);}`
         }));
-        mondRingGlow.frustumCulled=false;mondRingGlow.renderOrder=1;mondRing.add(mondRingGlow);
-        const mondRingHaze=new THREE.Points(new THREE.BufferGeometry().setAttribute('position',new THREE.BufferAttribute((()=>{
-            const rng=mulberry32(5310),a=new Float32Array(MOND_RING_HAZE_POINTS*3);
-            for(let i=0;i<MOND_RING_HAZE_POINTS;i++){
-                const R=1+MOND_RING_HAZE_WIDTH*0.6*boxMuller(0,1,rng),phi=2*Math.PI*rng();
-                a[3*i]=R*Math.cos(phi);a[3*i+1]=R*Math.sin(phi);a[3*i+2]=MOND_RING_HAZE_THICKNESS*boxMuller(0,1,rng);
+        mondPlane.frustumCulled=false;mondPlane.renderOrder=1;mondZone.add(mondPlane);
+        // Haze: fixed points spread evenly over the plane's area; their brightness is set from the shade where they sit.
+        const mondHazeU=new Float32Array(MOND_HAZE_POINTS),mondHazeGeom=new THREE.BufferGeometry();
+        (()=>{const rng=mulberry32(5310),pos=new Float32Array(MOND_HAZE_POINTS*3),tw=new Float32Array(MOND_HAZE_POINTS);
+            for(let i=0;i<MOND_HAZE_POINTS;i++){
+                const u=Math.sqrt(rng()),phi=2*Math.PI*rng();mondHazeU[i]=u;
+                pos[3*i]=u*Math.cos(phi);pos[3*i+1]=u*Math.sin(phi);pos[3*i+2]=MOND_HAZE_THICKNESS*boxMuller(0,1,rng);
+                tw[i]=0.4+0.6*rng();
             }
-            return a;})(),3)),
-            new THREE.PointsMaterial({map:createSoftTexture(),color:0xffb45a,size:0.6,sizeAttenuation:true,transparent:true,opacity:0.35,blending:THREE.AdditiveBlending,depthWrite:false}));
-        mondRingHaze.frustumCulled=false;mondRingHaze.renderOrder=1;mondRing.add(mondRingHaze);
-        // radiusKpc: where g_N crosses a₀ outwards for the last time; null hides the ring (no crossing, or not MOND mode).
-        function setMondRing(radiusKpc){
-            const show=radiusKpc!=null&&radiusKpc>0;
-            if(show){mondRing.scale.set(radiusKpc,radiusKpc,radiusKpc);mondRingHaze.material.size=Math.min(1.6,Math.max(0.25,0.05*radiusKpc));}
-            if(show!==mondRing.visible||show)requestRender();
-            mondRing.visible=show;
+            mondHazeGeom.setAttribute('position',new THREE.BufferAttribute(pos,3));
+            mondHazeGeom.setAttribute('aTwinkle',new THREE.BufferAttribute(tw,1));
+            mondHazeGeom.setAttribute('aAlpha',new THREE.BufferAttribute(new Float32Array(MOND_HAZE_POINTS),1));})();
+        const mondHazeUniforms={uSize:{value:1},uScale:{value:600}};
+        const mondHaze=new THREE.Points(mondHazeGeom,new THREE.ShaderMaterial({
+            uniforms:mondHazeUniforms,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+            vertexShader:`attribute float aAlpha;attribute float aTwinkle;uniform float uSize;uniform float uScale;varying float vA;
+                void main(){vA=aAlpha*aTwinkle;vec4 mv=modelViewMatrix*vec4(position,1.0);
+                gl_PointSize=clamp(uSize*uScale/max(-mv.z,1.0),1.5,9.0);gl_Position=projectionMatrix*mv;}`,
+            fragmentShader:`varying float vA;void main(){vec2 d=gl_PointCoord-0.5;float r2=dot(d,d)*4.0;if(r2>1.0)discard;
+                gl_FragColor=vec4(1.0,0.72,0.38,vA*exp(-3.0*r2));}`
+        }));
+        mondHaze.frustumCulled=false;mondHaze.renderOrder=1;mondZone.add(mondHaze);
+        const mondZoneToggle=document.getElementById('toggleMondZone');
+        const showMondZone=()=>{mondZone.visible=mondMode&&mondZoneShown&&mondZoneReady;requestRender();};
+        // levelAt(rKpc): the graph's shade at that radius, 0 to 1; lastKpc: the last data radius; edgeKpc: where the
+        // pull last drops below a0 inside the data (null if it doesn't). levelAt null clears it (NFW mode).
+        function setMondZone3D(levelAt,lastKpc,edgeKpc){
+            mondZoneToggle.disabled=!mondMode;mondZoneToggle.setAttribute('aria-disabled',String(!mondMode));
+            mondZoneReady=!!levelAt&&lastKpc>0;
+            if(mondZoneReady){
+                const extent=MOND_PLANE_EXTENT*lastKpc,levels=new Float32Array(MOND_PLANE_SAMPLES);
+                for(let i=0;i<MOND_PLANE_SAMPLES;i++){levels[i]=levelAt(lastKpc*i/(MOND_PLANE_SAMPLES-1));mondLevelData[4*i]=Math.round(255*levels[i]);}
+                mondLevelTexture.needsUpdate=true;
+                mondZone.scale.set(extent,extent,extent);
+                mondPlaneUniforms.uEdge.value=edgeKpc!=null?edgeKpc/extent:-1;
+                const alpha=mondHazeGeom.attributes.aAlpha.array,dataEdge=1/MOND_PLANE_EXTENT;
+                for(let i=0;i<MOND_HAZE_POINTS;i++){
+                    const u=mondHazeU[i],k=Math.min(1,u/dataEdge)*(MOND_PLANE_SAMPLES-1),j=Math.min(Math.floor(k),MOND_PLANE_SAMPLES-2);
+                    alpha[i]=MOND_HAZE_STRENGTH*(levels[j]+(levels[j+1]-levels[j])*(k-j))*(1-smoothStep(dataEdge,1,u));
+                }
+                mondHazeGeom.attributes.aAlpha.needsUpdate=true;
+                mondHazeUniforms.uSize.value=0.012*extent;
+            }
+            showMondZone();
         }
+        mondZoneToggle.addEventListener('click',()=>{
+            if(!mondMode)return;
+            mondZoneShown=!mondZoneShown;
+            setSwitch(mondZoneToggle,mondZoneShown);
+            showMondZone();
+        });
 
         // Cold gas: a faint, thicker, more extended exponential cloud (PhysicsEngine.GAS_SCALE_RATIO x the stellar scale
         // length, cut at R_max) drawn as soft points; its brightness follows the gas mass.
@@ -2915,7 +2963,7 @@ window.GALAXIES = {
             }
             if(needsRender&&drewLastFrame)trackFrameTime(frameMs); // only back-to-back frames measure the frame rate
             drewLastFrame=needsRender;
-            if(needsRender){needsRender=false;haloUniforms.uScale.value=starUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
+            if(needsRender){needsRender=false;haloUniforms.uScale.value=starUniforms.uScale.value=mondHazeUniforms.uScale.value=renderer.domElement.height/(2*Math.tan(camera.fov*Math.PI/360));
                 // Diffuse glow: dimmer close up so single stars stand out; the disk plane brightens edge-on (longer line of sight).
                 const glowZoom=0.35+0.65*smoothStep(20,GAS_RESET_RADIUS,controls.view.radius);
                 const tilt=Math.abs(Math.cos(controls.view.phi));
@@ -3045,12 +3093,15 @@ window.GALAXIES = {
       for(let i=1;i<pts.length;i++)if(r<=pts[i][0]){const[a,ga]=pts[i-1],[b,gb]=pts[i];return ga+(gb-ga)*(r-a)/(b-a);}
       return pts[pts.length-1][1];
     }
+    // The shade at radius r, 0 (no boost) to 1 (MOND_ZONE_FULL_BOOST or more); the graph and the 3D plane both use it.
+    function mondZoneLevel(logG,r){
+      const lg=mondLogGNAt(logG,r),boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):MOND_ZONE_FULL_BOOST;
+      return Math.min(1,Math.max(0,boost/MOND_ZONE_FULL_BOOST))**MOND_ZONE_GAMMA;
+    }
     function mondZoneStrips([x0,x1],logG){
       const width=(radii[radii.length-1]-radii[0])/MOND_ZONE_STRIPS,n=Math.max(1,Math.ceil((x1-x0)/width)),strips=[];
       for(let k=0;k<n;k++){
-        const a=x0+(x1-x0)*k/n,b=x0+(x1-x0)*(k+1)/n,lg=mondLogGNAt(logG,(a+b)/2);
-        const boost=isFinite(lg)?mondBoostOfGN(Math.exp(lg)):MOND_ZONE_FULL_BOOST;
-        const level=Math.round(Math.min(1,Math.max(0,boost/MOND_ZONE_FULL_BOOST))**MOND_ZONE_GAMMA*MOND_ZONE_LEVELS);
+        const a=x0+(x1-x0)*k/n,b=x0+(x1-x0)*(k+1)/n,level=Math.round(mondZoneLevel(logG,(a+b)/2)*MOND_ZONE_LEVELS);
         const last=strips[strips.length-1];
         if(last&&last.level===level)last.x1=b;else strips.push({x0:a,x1:b,level});
       }
@@ -3060,7 +3111,7 @@ window.GALAXIES = {
     const mondLogGN=()=>radii.map((r,i)=>r>0&&vBary[i]>0?Math.log((vBary[i]*fitFrame.s*1000)**2/(r*fitFrame.f*M_PER_KPC)):-Infinity);
     const mondNewtonianSomewhere=()=>mondLogGN().some(g=>g>=Math.log(MOND_A0));
     function mondZoneLayout(){
-      if(!mondMode){setMondRing(null);return{shapes:[],annotations:[]};}
+      if(!mondMode){setMondZone3D(null);return{shapes:[],annotations:[]};}
       const logG=mondLogGN(),cut=Math.log(MOND_A0);
       const runs=[];let start=null;
       const edge=i=>{const a=logG[i-1],b=logG[i];return isFinite(a)&&isFinite(b)&&a!==b?radii[i-1]+(radii[i]-radii[i-1])*(cut-a)/(b-a):radii[i];};
@@ -3073,9 +3124,10 @@ window.GALAXIES = {
       const widest=runs.reduce((w,r)=>!w||r[1]-r[0]>w[1]-w[0]?r:w,null),first=radii[0],last=radii[radii.length-1];
       // A dashed gold line marks each place inside the graph where visible gravity crosses a₀.
       const edges=runs.flat().filter(x=>x>first&&x<last);
-      // The 3D ring sits where the outermost zone (the one reaching the edge of the data) begins, if it begins inside.
+      // The 3D view's gold plane uses the same shade at every radius; its bright band sits where the outermost zone
+      // (the one reaching the edge of the data) begins, if it begins inside.
       const outer=runs[runs.length-1];
-      setMondRing(outer&&outer[1]>=last&&outer[0]>first?outer[0]:null);
+      setMondZone3D(r=>mondZoneLevel(logG,r),last,outer&&outer[1]>=last&&outer[0]>first?outer[0]:null);
       return{
         shapes:[...mondZoneStrips([first,last],logG),
           ...edges.map(x=>({type:'line',layer:'below',xref:'x',yref:'y domain',x0:x,x1:x,y0:0,y1:1,line:{color:MOND_ZONE_EDGE,width:1,dash:'dot'}}))],
@@ -4204,6 +4256,10 @@ window.GALAXIES = {
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity: far out, where gravity is very weak, it pulls harder than Newton’s law says. Gold shading on the graph marks where.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
+        {id:'mondZone3d',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
+         checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Faint gold means a small boost; deep gold means MOND is doing most of the work.',
+         text:'The same gold as the graph, laid on the galaxy itself. It fades in where MOND starts to boost gravity and deepens further out, where the visible matter pulls more weakly.',
+         action:'Switch on Where MOND acts in the View panel.'},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],keepWatch:true,title:'Give both their best shot',
          text:'Nobody knows exactly how heavy a galaxy’s stars are for their brightness (the mass-to-light ratio), how far away it is, or how tilted it is. This switch lets each model adjust them within realistic limits.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
@@ -4276,6 +4332,10 @@ window.GALAXIES = {
          checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondNewtonianSomewhere()},doneText:'A heavy disk pulls hard near its centre, so there MOND barely changes gravity and the speeds stay close to Newton’s. MOND’s boost grows further out.',
          text:'MOND changes gravity mainly where it is very weak, below a tiny acceleration called a₀. The gold shading on the graph marks where your galaxy’s visible matter pulls that weakly, so MOND boosts it there. The deeper the gold, the bigger the boost.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until a clear, unshaded part opens up near the centre of the graph.'},
+        {id:'sbMondZone3d',mode:'custom',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'MOND in your galaxy',
+         checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Dim in the middle, where your disk pulls hard, and deeper gold outwards, where MOND takes over.',
+         text:'The graph’s gold, laid on your galaxy: the deeper the gold, the more MOND boosts gravity there.',
+         action:'Switch on Where MOND acts in the View panel.'},
         {id:'sbMonitor',mode:'custom',nfw:true,halo:true,target:'stabilityMonitor',gesture:'look',tag:'Look at the gauge',title:'Meet the halo shape monitor',
          text:`This monitor checks your halo has a believable shape, using its concentration c. The shaded band is the realistic range, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}.`,
          action:'Look at the monitor (blue box) and find its marker. Is it inside the shaded band? Then press Next.'},
@@ -5288,7 +5348,7 @@ window.GALAXIES = {
     timeSlider.addEventListener('input',()=>{tutorialLastTime=Number(timeSlider.value);});
     // Opening View, or a layer or camera button, can clear what a step was waiting for.
     viewToggle.addEventListener('click',tutorialRecheck);
-    ['toggleGas','toggleHalo','toggleOrbits','toggleEjection','viewFaceOn','viewEdgeOn','viewReset'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{requestRender();refreshTutorialGuidance();}));
+    ['toggleGas','toggleHalo','toggleOrbits','toggleEjection','toggleMondZone','viewFaceOn','viewEdgeOn','viewReset'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{requestRender();refreshTutorialGuidance();}));
     fullHaloBtn.addEventListener('click',()=>{tutorialFlags.fullHalo=true;});
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{tutorialFlags[Number(massSlider.value)===0?'restart0':'restartHalo']=true;onSliderInput(0);setPlaying(true);});
