@@ -1338,6 +1338,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media (max-width:700px) { .evidence-grid.two { grid-template-columns:1fr; } }
     .learn .evidence-card p { margin:0; } .learn .evidence-card p + p { margin-top:8px; }
     .evidence-open-title { margin:4px 0 0; color:var(--accent); font:500 10.5px var(--f-mono) !important; letter-spacing:.14em; text-transform:uppercase; }
+    /* Small labels and minor headings: sentence case in the UI font, not tracked-out monospace capitals (visual only). */
+    :is(.eyebrow, .stat-label, .model-bar .model-label, .source-text small, .galaxy-type-kicker, .stability-title, .view-panel-title, .view-panel .view-label, .view-panel .view-head, .tutorial-eyebrow, .gp-stats dt, .panel-heading .fig) { font-family:var(--f-ui) !important; font-size:12px; font-weight:500; letter-spacing:.005em; text-transform:none; }
+    :is(.sandbox-group h3, .settings-panel h2, .score-notes-title, .refs h3, .evidence-open-title, .key summary) { font-family:var(--f-ui) !important; font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; }
     .maths, .fold { margin:0 0 12px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.16); }
     .maths summary, .fold summary { padding:9px 12px; color:var(--accent); font:500 12.5px var(--f-ui); cursor:pointer; }
     :is(.maths,.fold)[open] { padding:0 12px 2px; } :is(.maths,.fold)[open] summary { padding:9px 0; }
@@ -3883,7 +3886,7 @@ __GALAXIES_JS__
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
       yaxis2:{...AXIS,title:{text:'Obs − model',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
-      bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,tracegroupgap:4},
+      bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,entrywidth:196,tracegroupgap:4}, // fixed width: Plotly can measure the text before Inter loads, so entries overlapped
       hovermode:false,dragmode:false};
     // On a phone-width screen the legend sits two entries per row (with shorter names, see LEGEND_NAMES) and the
     // speed axis has a shorter title, leaving more height for the graph.
