@@ -159,7 +159,7 @@
     #orbitPlot:fullscreen .tm-chi:not([hidden]), #orbitPlot:-webkit-full-screen .tm-chi:not([hidden]), #orbitPlot.fullscreen-active .tm-chi:not([hidden]) { display:flex; }
     .tm-chi b.good { color:#93e3a0; } .tm-chi b.ok { color:#f2d675; } .tm-chi b.poor { color:#ff9d94; }
     .stability-chip { position:absolute; top:44px; left:12px; z-index:100; max-width:min(300px,calc(100% - 190px)); padding:5px 10px; border-radius:8px; border:1px solid rgba(255,138,128,0.6); background:rgba(40,10,10,0.6); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); color:#ffb4ac; font-size:11px; font-weight:600; line-height:1.35; pointer-events:none; }
-    @media (prefers-reduced-motion:reduce) { .c-marker { transition:none; } }
+    html.calm .c-marker { transition:none; }
     @media (max-width:960px) { .sandbox-groups { grid-template-columns:1fr 1fr; } }
     @media (max-width:560px) { .sandbox-groups { grid-template-columns:1fr; } .preset-picker { gap:10px; } }
     .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
@@ -278,7 +278,7 @@
     .star-mark::before { content:''; position:absolute; left:-13px; top:-13px; width:22px; height:22px; border:2px solid currentColor; border-radius:50%; box-shadow:0 0 12px currentColor; animation:star-mark-pulse 1.6s ease-in-out infinite; }
     .star-mark span { position:absolute; left:17px; top:-10px; white-space:nowrap; padding:2px 7px; border-radius:6px; background:rgba(8,14,22,.8); color:#eef8ff; border:1px solid currentColor; font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; }
     @keyframes star-mark-pulse { 0%,100% { transform:scale(1); opacity:1; } 50% { transform:scale(1.3); opacity:.6; } }
-    @media (prefers-reduced-motion:reduce) { .star-mark::before { animation:none; } }
+    html.calm .star-mark::before { animation:none; }
     /* Inside fullscreen the tutorial card stays bottom-right, clear of the corner controls. */
     #orbitPlot .tutorial-card, #orbitPlot .tutorial-card.on-left { left:auto; right:16px; bottom:16px; width:min(340px,calc(100% - 32px)); max-height:min(52vh,430px); }
     @media (max-width:700px) {
@@ -353,7 +353,7 @@
     .halo-metric button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px; }
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
-    @media (prefers-reduced-motion:reduce) { .view-panel .sw, .view-panel .sw::after { transition:none; } }
+    html.calm .view-panel .sw, html.calm .view-panel .sw::after { transition:none; }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
@@ -377,7 +377,7 @@
     @keyframes tutorial-done-pop { from { opacity:0; transform:scale(.6); } }
     @keyframes tutorial-done-in { from { opacity:0; } }
     @keyframes tutorial-done-out { to { opacity:0; } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-done, .tutorial-done-box, .tutorial-done-orbit b, .tutorial-done-orbit i { animation:none; } .tutorial-done-orbit i { transform:rotate(calc(var(--k,0)*120deg)) translateX(42px); } .tutorial-done-orbit i:nth-child(2) { --k:1; } .tutorial-done-orbit i:nth-child(3) { --k:2; } }
+    html.calm .tutorial-done, html.calm .tutorial-done-box, html.calm .tutorial-done-orbit b, html.calm .tutorial-done-orbit i { animation:none; } html.calm .tutorial-done-orbit i { transform:rotate(calc(var(--k,0)*120deg)) translateX(42px); } html.calm .tutorial-done-orbit i:nth-child(2) { --k:1; } html.calm .tutorial-done-orbit i:nth-child(3) { --k:2; }
     .tutorial-eyebrow { color:var(--cyan); text-transform:uppercase; letter-spacing:.1em; font-size:10px; font-weight:600; }
     .tutorial-welcome h2 { margin:8px 0; font-size:22px; }
     .tutorial-welcome p { color:#b5c5d5; margin:0 0 18px; }
@@ -511,7 +511,7 @@
     /* groups: the pointer rests on each group's heading in turn (no drag), then pops back to the first. */
     @keyframes tutorial-gesture { 0%,15% { transform:translate(var(--from-x),var(--from-y)); } 65%,85% { transform:translate(var(--to-x),var(--to-y)); } 100% { transform:translate(var(--from-x),var(--from-y)); } }
     @keyframes tutorial-click { 0%,35%,100% { transform:translate(var(--to-x),var(--to-y)) scale(1); } 50%,65% { transform:translate(var(--to-x),var(--to-y)) scale(.8); } }
-    @media (prefers-reduced-motion:reduce) { .tutorial-pointer, .tutorial-spotlight.is-click .tutorial-pointer, #visibleMatterOnly.tutorial-reveal { animation:none; } .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } .tutorial-progress-fill, .tutorial-spotlight, .tutorial-card, .tutorial-content, .tutorial-feedback { transition:none; } .tutorial-spotlight, .tutorial-spotlight.is-arriving, .tutorial-spotlight.is-complete, .tutorial-card.is-celebrating, #tutorialFeedbackText b, .tutorial-also, .tutorial-feedback,.tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), .tutorial-card.enter-side { animation:none; } .tutorial-spotlight.is-complete::after { display:none; } }
+    html.calm .tutorial-pointer, html.calm .tutorial-spotlight.is-click .tutorial-pointer, html.calm #visibleMatterOnly.tutorial-reveal { animation:none; } html.calm .tutorial-pointer { transform:translate(var(--to-x),var(--to-y)); } html.calm .tutorial-progress-fill, html.calm .tutorial-spotlight, html.calm .tutorial-card, html.calm .tutorial-content, html.calm .tutorial-feedback { transition:none; } html.calm .tutorial-spotlight, html.calm .tutorial-spotlight.is-arriving, html.calm .tutorial-spotlight.is-complete, html.calm .tutorial-card.is-celebrating, html.calm #tutorialFeedbackText b, html.calm .tutorial-also, html.calm .tutorial-feedback, html.calm .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry), html.calm .tutorial-card.enter-side { animation:none; } html.calm .tutorial-spotlight.is-complete::after { display:none; }
     #orbitPlot:fullscreen { touch-action:auto; }
     #orbitPlot:-webkit-full-screen { touch-action:auto; }
     #orbitPlot.fullscreen-active { touch-action:auto; }
@@ -530,7 +530,7 @@
     /* ===== Design system: tokens and component layer (visual only; no physics). ===== */
     :root { --bg:#060a12; --panel:#0c1322; --panel-2:#101929; --line:rgba(148,170,200,.14); --line-strong:rgba(148,170,200,.28); --ink:#e7edf6; --ink-2:#b8c4d6; --muted:#8392a8; --accent:#8ab4f8; --cyan:var(--accent); --gold:#e9c88a;
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
-    @media (prefers-reduced-motion:no-preference) { html { scroll-behavior:smooth; } }
+    html:not(.calm) { scroll-behavior:smooth; }
     body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
     .section-head[id], #curvePanel, #theoryGuide, #references { scroll-margin-top:72px; }
     .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
@@ -570,9 +570,10 @@
     .settings-row small { display:block; margin-top:2px; color:var(--muted); font-size:11.5px; line-height:1.45; }
     .settings-note { display:flex; align-items:center; justify-content:space-between; gap:8px; margin:6px 10px 0; color:var(--muted); font-size:11px; }
     .settings-note button { padding:0; border:0; background:none; color:var(--accent); font:inherit; cursor:pointer; white-space:nowrap; }
+    .settings-reset { justify-content:flex-end; margin-top:10px; padding-top:9px; border-top:1px solid var(--line); }
     .settings-note button:hover, .settings-note button:focus-visible { text-decoration:underline; outline:none; }
     @media (max-width:640px) { .settings { margin-right:-4px; } }
-    @media (prefers-reduced-motion:reduce) { .settings-btn svg, .settings-row input, .settings-row input::after { transition:none; } }
+    html.calm .settings-btn svg, html.calm .settings-row input, html.calm .settings-row input::after { transition:none; }
     /* Lite visuals (html.lite, see the first script): no animation, blur or glow anywhere, and no transition when chosen. Animations jump
        straight to their end state (after any delay, so a ring still shows green before it goes), so anything that fades
        out still ends hidden. Panels that relied on blur over the
@@ -696,7 +697,7 @@
     .gp-bar { display:flex; height:8px; overflow:hidden; border-radius:999px; background:rgba(138,180,248,.75); }
     .gp-bar span { background:var(--gold); transition:flex-basis .45s ease; }
     .gp-note { margin:8px 0 0; color:var(--muted); font-size:10.5px; line-height:1.4; }
-    @media (prefers-reduced-motion:reduce) { .gp-bar span { transition:none; } }
+    html.calm .gp-bar span { transition:none; }
     @media (min-width:1000px) { .gp-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); gap:0 30px; align-items:start; } .gp-summary { margin-bottom:0; } }
     @media (max-width:560px) { .galaxy-profile { grid-template-columns:1fr; } .gp-badge { width:48px; height:48px; font-size:16px; } .gp-stats { grid-template-columns:1fr 1fr; } }
     .switch .opt { font-size:13px; }
@@ -968,13 +969,34 @@
     details[open]::details-content { height:auto; opacity:1; }
     /* Lite visuals already make every transition instant (html.lite); the contents should not then arrive one by one. */
     html.lite:not(.lite-auto) :is(.ml-explainer > *, .settings-panel > *, .galaxy-menu-list li, .halo-metric dd > span > span, .view-panel > :not(.view-head)) { transition-delay:0s !important; }
-    @media (prefers-reduced-motion:reduce) {
-      .ml-explainer, .ml-explainer > *, .stat-q::after, .settings-panel, .settings-panel > *, .galaxy-menu-list, .galaxy-menu-list li, .halo-metric dd, .halo-metric dd > span > span,
-      .view-panel > :not(.view-head) { transform:none !important; transition-property:opacity, visibility, display !important; transition-delay:0s !important; }
-      .view-panel, .view-panel.collapsed, .halo-metric dd, details::details-content { transition:none !important; }
-      .ml-explainer::before, .settings-panel::before { display:none; }
-    }
+    html.calm .ml-explainer, html.calm .ml-explainer > *, html.calm .stat-q::after, html.calm .settings-panel, html.calm .settings-panel > *, html.calm .galaxy-menu-list, html.calm .galaxy-menu-list li, html.calm .halo-metric dd, html.calm .halo-metric dd > span > span, html.calm .view-panel > :not(.view-head) { transform:none !important; transition-property:opacity, visibility, display !important; transition-delay:0s !important; }
+    html.calm .view-panel, html.calm .view-panel.collapsed, html.calm .halo-metric dd, html.calm details::details-content { transition:none !important; }
+    html.calm .ml-explainer::before, html.calm .settings-panel::before { display:none; }
   </style>
+  <script>
+    /* Reduce motion (Settings). Until the visitor chooses, it follows the computer's own setting (prefers-reduced-motion),
+       live; a choice is remembered in this browser. It sets the html class "calm", which every motion rule in the CSS
+       above keys on, so the page and the setting can never disagree. Set here, in the head, before anything is drawn. */
+    (()=>{
+      const KEY='galaxySimMotion',system=matchMedia('(prefers-reduced-motion: reduce)');
+      const GLIDE_KEY='galaxySimGlide';
+      let choice=null,glide=null; // choice: 'reduce', 'full' or null (follow the computer); glide: 'on', 'off' or null (on unless motion is reduced)
+      try{const saved=localStorage.getItem(KEY);if(saved==='reduce'||saved==='full')choice=saved;}catch(e){}
+      try{const saved=localStorage.getItem(GLIDE_KEY);if(saved==='on'||saved==='off')glide=saved;}catch(e){}
+      const sync=()=>{document.documentElement.classList.toggle('calm',window.motionSetting.reduced());document.dispatchEvent(new Event('motionsettingchange'));};
+      window.motionSetting={
+        reduced:()=>choice==='reduce'||choice!=='full'&&system.matches,
+        choice:()=>choice,
+        set(next){choice=next;try{if(next)localStorage.setItem(KEY,next);else localStorage.removeItem(KEY);}catch(e){}sync();},
+        // Camera glide: the 3D view coasting to a stop after a drag is let go.
+        glide:()=>glide?glide==='on':!window.motionSetting.reduced(),
+        glideChoice:()=>glide,
+        setGlide(next){glide=next;try{if(next)localStorage.setItem(GLIDE_KEY,next);else localStorage.removeItem(GLIDE_KEY);}catch(e){}sync();}
+      };
+      if(system.addEventListener)system.addEventListener('change',sync);
+      sync();
+    })();
+  </script>
 </head>
 <body>
   <nav class="topbar" aria-label="Page sections">
@@ -986,6 +1008,11 @@
         <h2>Settings</h2>
         <label class="settings-row"><input type="checkbox" id="qualityToggle" disabled><span><b>High-quality visuals</b><small>Glow, pulsing highlights, blur and motion, and a sharper 3D galaxy view. Untick it on a slow computer: everything gets simpler and runs smoother.</small></span></label>
         <p class="settings-note"><span id="qualityNote" aria-live="polite">The 3D view has not loaded.</span><button type="button" id="qualityAuto" hidden>Use automatic</button></p>
+        <label class="settings-row"><input type="checkbox" id="motionToggle"><span><b>Reduce motion</b><small>Boxes open without sliding or growing, the tour's pointer rests where to act, and decorative animations stop. The galaxy still moves.</small></span></label>
+        <p class="settings-note"><span id="motionNote" aria-live="polite"></span><button type="button" id="motionAuto" hidden>Follow my computer</button></p>
+        <label class="settings-row"><input type="checkbox" id="glideToggle"><span><b>Camera glide</b><small>Let go mid-drag and the 3D view coasts to a smooth stop. Untick it to stop the view the moment you let go.</small></span></label>
+        <p class="settings-note"><span id="glideNote" aria-live="polite"></span><button type="button" id="glideAuto" hidden>Use default</button></p>
+        <p class="settings-note settings-reset"><button type="button" id="settingsReset">Reset all settings</button></p>
       </div>
     </div>
   </nav>
@@ -1147,7 +1174,7 @@
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, stronger gravity, faster orbits: the orange curve rises. 0 means visible matter only.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Fit halo to data</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible matter only</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="1000" step="1" value="0"></div><p class="control-help">Moves the stars through one billion years of orbits. Drag it to any moment, or press Play.</p></div>
-      <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number"><p class="control-help">Rings one star and shows its laps, speed and distance. Star 1 starts nearest the centre, star <span id="trackLast">800</span> furthest out. Clear the box to stop.</p></div>
+      <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number"><p class="control-help">Rings one star and shows its laps, speed and distance from the centre (seen edge-on, its height above or below the disk instead). Star 1 starts nearest the centre, star <span id="trackLast">800</span> furthest out. Clear the box to stop.</p></div>
     </section>
     <section class="panel-grid">
     <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional NGC 3198 star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row" id="tmHaloRow"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default NGC 3198 view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × R_max count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button><button type="button" role="switch" id="toggleMondZone" class="sw-mond" aria-checked="false" aria-pressed="false" hidden title="Show where MOND boosts gravity: the gold deepens where the boost is bigger, as on the graph (MOND only)"><span class="sw" aria-hidden="true"></span>Where MOND acts</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div></div>
@@ -1488,9 +1515,9 @@ window.GALAXIES = {
     /* Lite visuals (Settings' "High-quality visuals" unticked, or chosen automatically on a slow device): the html
        element gets the class "lite", which turns off the page's glows, pulsing highlights, blur and motion, and the 3D
        view's bloom. Set here, before anything draws, from the choice remembered in this browser. calmMotion() is the
-       one test the page's scripts use for "skip the animation": lite visuals or the system's reduce-motion setting. */
+       one test the page's scripts use for "skip the animation": lite visuals or Settings' Reduce motion. */
     try{if(localStorage.getItem('galaxySimQuality')==='low')document.documentElement.classList.add('lite');}catch(e){}
-    window.calmMotion=()=>document.documentElement.classList.contains('lite')||matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.calmMotion=()=>document.documentElement.classList.contains('lite')||motionSetting.reduced();
     /* Runs before the simulator. If a library did not load (a network that blocks CDNs, or no internet) or the
        browser has WebGL turned off, say so plainly, show every page as one long scroll so the text still reads,
        and stop: the simulator below needs all of them. */
@@ -2154,7 +2181,7 @@ window.GALAXIES = {
                 // friction: how fast a released fling dies away (1/s). flingWindowMs: how much recent motion the
                 // release speed is averaged over. stillMs: a pointer held still this long before lifting gives no fling.
                 this.o=Object.assign({damping:11,touchDamping:5,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,
-                    friction:4.5,flingWindowMs:90,stillMs:45,maxSpin:9,
+                    friction:4.5,flingWindowMs:90,stillMs:45,maxSpin:9,glide:()=>true,
                     minDistance:5,maxDistance:1000,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
                     initial:{theta:-0.82,phi:1.01,radius:72,target:[0,0,0]},onChange:()=>{}},options);
                 const i=this.o.initial;
@@ -2163,7 +2190,6 @@ window.GALAXIES = {
                 this.pointers=new Map();this.pinch=null;
                 // Recent goal positions (timestamped) for the release speed, and the glide that carries on after release.
                 this.samples=[];this.glide={theta:0,phi:0,target:new THREE.Vector3(),active:false};
-                this.reducedMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
                 this._right=new THREE.Vector3();this._up=new THREE.Vector3();
                 this.enabled=true; // false while the guided tour is open: the camera only moves when a card asks
                 this._bind();this._apply();
@@ -2267,7 +2293,7 @@ window.GALAXIES = {
             _startGlide(t) {
                 const s=this.samples,a=s[0],b=s[s.length-1];
                 this.samples=[];
-                if(this.reducedMotion||!a||b===a||t-b.t>this.o.stillMs)return;
+                if(!this.o.glide()||!a||b===a||t-b.t>this.o.stillMs)return;
                 const span=Math.max(b.t-a.t,16)/1000,G=this.glide,cap=this.o.maxSpin;
                 G.theta=Math.max(-cap,Math.min(cap,(b.theta-a.theta)/span));
                 G.phi=Math.max(-cap,Math.min(cap,(b.phi-a.phi)/span));
@@ -2925,7 +2951,7 @@ window.GALAXIES = {
         // Render loop: continuous delta-time playback spanning 0 to 1000 Myr (1 Gyr)
         let needsRender=true,lastTime=performance.now(),simTime=0.0,playing=false,lastReportedFrame=-1,playbackMultiplier=1.0;
         const PLAYBACK_SPEED_MYR_PER_SEC=25.0; // half of the nominal 50 Myr/s; UI labels stay 0.25x-2x
-        const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,onChange:()=>{needsRender=true;}});
+        const controls=new SmoothOrbitControls(camera,orbitPlot,{initial:GALAXY_VIEW,glide:motionSetting.glide,onChange:()=>{needsRender=true;}});
         function requestRender(){needsRender=true;}
         // Panel clicks must not reach the controls' drag / wheel / double-click handlers.
         const viewPanel=document.getElementById('viewPanel');
@@ -4337,6 +4363,27 @@ window.GALAXIES = {
     settingsBtn.addEventListener('click',()=>setSettingsOpen(settingsPanel.hidden));
     document.addEventListener('pointerdown',e=>{if(!settingsPanel.hidden&&!e.target.closest('.settings'))setSettingsOpen(false);});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!settingsPanel.hidden){setSettingsOpen(false);settingsBtn.focus();}});
+    // Reduce motion and Camera glide live in motionSetting (the head script), so they apply before the page draws.
+    const motionToggle=document.getElementById('motionToggle'),motionNote=document.getElementById('motionNote'),motionAuto=document.getElementById('motionAuto');
+    const glideToggle=document.getElementById('glideToggle'),glideNote=document.getElementById('glideNote'),glideAuto=document.getElementById('glideAuto');
+    function syncMotionSettings(){
+      const reduced=motionSetting.reduced();
+      motionToggle.checked=reduced;motionAuto.hidden=!motionSetting.choice();
+      motionNote.textContent=motionSetting.choice()?'Your choice, remembered on this device.':`Following your computer: ${reduced?'reduced':'full'} motion.`;
+      glideToggle.checked=motionSetting.glide();glideAuto.hidden=!motionSetting.glideChoice();
+      glideNote.textContent=motionSetting.glideChoice()?'Your choice, remembered on this device.':`Default: ${reduced?'off, as motion is reduced':'on'}.`;
+    }
+    motionToggle.addEventListener('change',()=>motionSetting.set(motionToggle.checked?'reduce':'full'));
+    motionAuto.addEventListener('click',()=>{motionSetting.set(null);motionToggle.focus();});
+    glideToggle.addEventListener('change',()=>motionSetting.setGlide(glideToggle.checked?'on':'off'));
+    glideAuto.addEventListener('click',()=>{motionSetting.setGlide(null);glideToggle.focus();});
+    document.getElementById('settingsReset').addEventListener('click',()=>{
+      const qualityAuto=document.getElementById('qualityAuto');
+      if(!qualityAuto.hidden)qualityAuto.click();
+      motionSetting.set(null);motionSetting.setGlide(null);
+    });
+    document.addEventListener('motionsettingchange',syncMotionSettings);
+    syncMotionSettings();
 
     /* ---------- Pages ----------
        The site is one file split into pages. The top menu, or any #link, shows one .page and hides the rest; a #link
@@ -4506,7 +4553,7 @@ window.GALAXIES = {
         {pick:()=>diskStarNear(0.1*currentAnatomy.rMax,false),label:idx=>lapText('Inner star',idx)},
         {pick:()=>diskStarNear(0.4*currentAnatomy.rMax,false),warm:true,label:idx=>lapText('Outer star',idx)}
       ],
-      tilt:[{pick:()=>diskStarNear(0.4*currentAnatomy.rMax,true),label:idx=>{const z=starPositionAt(idx,simTime)[2];return `Height ${z>=0?'+':'−'}${Math.abs(z).toFixed(2)} kpc`;}}],
+      tilt:[{pick:()=>diskStarNear(0.4*currentAnatomy.rMax,true),label:idx=>{const h=heightText(starPositionAt(idx,simTime)[2]);return h[0].toUpperCase()+h.slice(1);}}],
       escaper:[{pick:firstEscaper,warm:true,label:idx=>{
         const out=escapeTimeByStar[idx];
         return simTime<out?`First to leave · ${Math.round(out)} Myr`:`Ejected · ${Math.hypot(...starPositionAt(idx,simTime)).toFixed(0)} kpc out`;
@@ -4516,9 +4563,15 @@ window.GALAXIES = {
     // Star tracker (main view): the viewer types a star number; it gets its own ring alongside any tutorial marks.
     let trackedStar=-1;
     const trackInputs=['trackInput','fsTrack'].map(id=>document.getElementById(id));
+    // Seen edge-on (within EDGE_ON_RAD of the disk plane), the tracked star's height above or below the disk, its bob,
+    // replaces its distance from the centre: from the side the bob is what the eye sees and distance is hard to judge.
+    const EDGE_ON_RAD=0.2;
+    const edgeOn=phi=>Math.abs(phi-Math.PI/2)<EDGE_ON_RAD;
+    const heightText=z=>`height ${z>=0?'+':'−'}${Math.abs(z).toFixed(2)} kpc`;
     const trackMark={track:true,pick:()=>trackedStar<starCount?trackedStar:-1,label:idx=>{
-      const r=Math.hypot(...starPositionAt(idx,simTime));
-      return `Star ${idx+1} · ${lapsAt(idx,simTime).toFixed(1)} laps · ${starSpeedAt(idx,simTime).toFixed(0)} km/s · ${r.toFixed(1)} kpc`;
+      const pos=starPositionAt(idx,simTime);
+      const where=edgeOn(controls.view.phi)?heightText(pos[2]):`${Math.hypot(...pos).toFixed(1)} kpc`;
+      return `Star ${idx+1} · ${lapsAt(idx,simTime).toFixed(1)} laps · ${starSpeedAt(idx,simTime).toFixed(0)} km/s · ${where}`;
     }};
     function syncTrackLimits(){
       trackInputs.forEach(el=>el.max=starCount);
@@ -4635,7 +4688,7 @@ window.GALAXIES = {
         {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',tag:'1 · Edge-on',also:['fsPlay:2 · Keep playing'],gesture:'click',title:'Turn it on its side',
          text:'Edge-on, the disk is a thin line. The ringed star bobs above and below it once a lap.',
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
-         checks:{viewEdgeOn:()=>Math.abs(controls.goal.phi-Math.PI/2)<0.2,fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap.'},
+         checks:{viewEdgeOn:()=>edgeOn(controls.goal.phi),fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap.'},
         {id:'fsTrack',fs:true,target:'fsTrack',gesture:'click',tag:'Type a number',title:'Follow any star',
          checks:{fsTrack:()=>trackedStar>=0},doneText:'Tracked: its ring shows its laps, speed and distance.',
          text:'Every star has a number: 1 starts nearest the centre.',

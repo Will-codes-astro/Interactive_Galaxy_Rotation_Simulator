@@ -234,7 +234,7 @@ lite visuals for the whole page (class `lite` on `<html>`): no animations,
 transitions, blur or glow (tutorial rings lose their pulse and shadow, the
 pointer rests where to act), near-solid panels over the 3D view, and no bloom
 in the 3D view. Page scripts test `calmMotion()`, which is true with lite
-visuals or the system's reduce-motion setting. "Use automatic" hands control
+visuals or Reduce motion (below). "Use automatic" hands control
 back; in automatic mode lite visuals come on for the rest of the visit once
 the resolution has dropped to its lowest level, but keep CSS transitions such
 as boxes opening, which cost almost nothing (class `lite-auto`). Until it is used, the box
@@ -242,6 +242,19 @@ shows whether the automatic choice is at full quality. The choice is kept in
 the browser's localStorage (`galaxySimQuality`), applied before the page
 first draws, and the panel stays usable during the tour. The "Now watch it
 happen" card points to it for jerky computers.
+
+Settings also holds **Reduce motion** and **Camera glide** (`motionSetting`
+in a script in the page head, so they apply before anything draws). Reduce
+motion follows the computer's own setting (`prefers-reduced-motion`, live)
+until the visitor ticks or unticks it; it sets class `calm` on `<html>`,
+which every reduce-motion rule in the CSS keys on (no slide-and-grow boxes,
+no decorative animation, the tour pointer rests where to act; the galaxy
+still moves). Camera glide is the 3D view coasting to a stop after a drag
+is let go (`SmoothOrbitControls`: the release speed, from the last 90 ms of
+pointer events, decays at 4.5 /s); it is on by default and off when motion
+is reduced. "Follow my computer" / "Use default" hand each back, and "Reset
+all settings" clears all three choices. Kept in localStorage
+(`galaxySimMotion`, `galaxySimGlide`).
 
 While a halo or sandbox slider moves, the rotation curve is redrawn every frame
 through Plotly's light transition path (`updateHalo(true)`); the speed axis only
@@ -283,7 +296,9 @@ uses shorter names there ("Observed", "Visible matter") so two fit on each row.
 
 Next to the orbit timeline, "Track a star" takes a star number and rings that
 star in the 3D view with its laps round the centre since 0 Myr, speed and
-distance (also in the fullscreen corner panel, beside the round Play and
+distance from the centre; with the view within 0.2 rad (about 11°) of edge-on,
+the distance is replaced by the star's height above or below the disk, its
+bob, as in the tour's edge-on card (also in the fullscreen corner panel, beside the round Play and
 Restart buttons). It only reads the computed orbits.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
