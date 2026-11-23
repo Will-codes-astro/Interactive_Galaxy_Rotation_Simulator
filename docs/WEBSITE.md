@@ -358,9 +358,12 @@ tutorial in the full guided tour, or starts from the Sandbox tutorial button on
 the simulator tutorial's last step (which opens the Custom Sandbox), or from the
 Simulator tutorial button, which reads "Sandbox tutorial" while the sandbox is
 open. On the slider steps whose result shows far from the slider, the card
-carries a copy of the one slider the current part asks for (`cardSlider` on the
-step), linked to the real one, and the page scrolls to the graph, 3D view or
-shape monitor it changes.
+carries a copy of every slider the step uses (`cardSlider` on the step), each
+linked to the real one, and the page scrolls to the graph, 3D view or shape
+monitor the current part's slider changes. Both the card's copy and the real
+slider are ringed, with the same part number; when every slider part is done
+but the step still waits (Score your fit's "fine-tune both"), all its sliders
+stay ringed.
 If a step needs a different mode (NFW or MOND, a halo above
 zero, the other galaxy source, fullscreen or leaving it), the card says so and points at the control. Each halo and
 time slider has a plain-language description underneath it, and the galaxy

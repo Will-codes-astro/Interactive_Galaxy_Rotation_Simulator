@@ -476,7 +476,9 @@
     .tutorial-slider label { display:flex; justify-content:space-between; gap:10px; font-size:12px; color:var(--ink); }
     .tutorial-slider output { font-variant-numeric:tabular-nums; color:var(--cyan); }
     .tutorial-slider input { width:100%; margin:6px 0 0; }
-    .tutorial-spotlight.in-card { z-index:10001; }
+    .tutorial-sliders { flex:none; }
+    .tutorial-sliders[hidden] { display:none; }
+    .tutorial-spotlight.in-card, .tutorial-also.in-card { z-index:10001; }
     .tutorial-try li { margin:2px 0; }
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
@@ -1302,7 +1304,7 @@
     <div class="tutorial-top"><span class="tutorial-eyebrow" id="tutorialProgress"></span><button type="button" class="tutorial-skip" id="tutorialSkip">Skip tutorial</button></div>
     <div class="tutorial-progress-track" aria-hidden="true"><div class="tutorial-progress-fill" id="tutorialProgressFill"></div></div>
     <div class="tutorial-content" id="tutorialContent" tabindex="0"><div aria-live="polite" aria-atomic="true"><h2 id="tutorialTitle" tabindex="-1"></h2><p id="tutorialText"></p><p class="tutorial-try" id="tutorialTry"></p></div></div>
-    <div class="tutorial-slider" id="tutorialSlider" hidden><label for="tutorialSliderInput"><span id="tutorialSliderName"></span><output id="tutorialSliderValue" for="tutorialSliderInput"></output></label><input id="tutorialSliderInput" type="range" autocomplete="off"></div>
+    <div class="tutorial-sliders" id="tutorialSliders" hidden></div>
     <div class="tutorial-readout" id="tutorialReadout" aria-live="polite" hidden></div>
     <div class="tutorial-feedback" id="tutorialFeedback" hidden><span id="tutorialFeedbackText" role="status" aria-live="polite"></span><button type="button" class="tutorial-auto" id="tutorialAuto" aria-label="Go to the next slide now" title="Moving on in a few seconds. Press to go now." hidden>Next slide<span class="tutorial-clock" aria-hidden="true"><svg viewBox="0 0 20 20"><circle class="track" cx="10" cy="10" r="7"/><circle class="ring" id="tutorialAutoRing" cx="10" cy="10" r="7"/></svg><b id="tutorialAutoNum">5</b></span></button></div>
     <div class="tutorial-actions"><span class="tutorial-keys">← → to navigate</span><button type="button" id="tutorialBack">Back</button><button type="button" id="tutorialMore" hidden>Sandbox tutorial</button><button type="button" class="tutorial-primary" id="tutorialNext">Next</button></div>
@@ -4472,14 +4474,17 @@ window.GALAXIES = {
       return parts.find(p=>!tutorialLatched[p.id])||null;
     }
     // Slider steps whose result shows far from the slider (the sandbox sliders sit above the plots): the card carries a
-    // copy of the one slider the current part asks for, and the page scrolls to what it changes. step.cardSlider maps
-    // a slider id to the id of the view to watch.
-    const tutorialSlider=document.getElementById('tutorialSlider'),tutorialSliderInput=document.getElementById('tutorialSliderInput');
-    let tutorialSliderId=null;
+    // copy of every slider the card uses, and the page scrolls to what the current part's slider changes.
+    // step.cardSlider maps a slider id to the id of the view to watch. tutorialSliderId: the current part's slider.
+    const tutorialSliders=document.getElementById('tutorialSliders');
+    let tutorialSliderId=null,tutorialSliderSig='';
+    // The card's copy of a real slider (null when the card does not carry one).
+    const tutorialCopy=id=>id&&!tutorialSliders.hidden?tutorialSliders.querySelector(`input[data-real="${id}"]`):null;
+    // cardSliderPhone: the copy is only needed on a phone, where the slider and what it changes are far apart.
+    const tutorialCarriesSliders=step=>!tutorialCard.hidden&&!!step.cardSlider&&!tutorialBlocker()&&!(step.cardSliderPhone&&!tutorialPhone());
     function tutorialCardSliderId(){
       const step=tutorialStep();
-      // cardSliderPhone: the copy is only needed on a phone, where the slider and what it changes are far apart.
-      if(tutorialCard.hidden||!step.cardSlider||tutorialBlocker()||step.cardSliderPhone&&!tutorialPhone())return null;
+      if(!tutorialCarriesSliders(step))return null;
       // A card with no parts whose ring is on something else (the totals) still carries its slider.
       const aim=tutorialCurrentAim(step),keys=Object.keys(step.cardSlider);
       const id=tutorialPartHold||(aim?(step.cardSlider[aim.id]||step.checks?aim.id:keys[0]):keys.pop()),real=step.cardSlider[id]&&document.getElementById(id);
@@ -4488,30 +4493,38 @@ window.GALAXIES = {
     }
     // scroll: glide to the new view when the part (and so the slider) changes.
     function syncTutorialSlider(scroll){
+      const step=tutorialStep(),ids=tutorialCarriesSliders(step)?Object.keys(step.cardSlider).filter(id=>document.getElementById(id)):[];
+      // The copies are rebuilt only when the card's set of sliders changes, and never mid-drag.
+      if(ids.join()!==tutorialSliderSig&&!(tutorialHolding&&tutorialSliderSig)){
+        tutorialSliderSig=ids.join();tutorialSliders.hidden=!ids.length;
+        tutorialSliders.replaceChildren(...ids.map(id=>{
+          const real=document.getElementById(id),box=document.createElement('div');
+          box.className='tutorial-slider';
+          box.innerHTML=`<label for="tutorialCopy-${id}"><span>${real.labels[0].querySelector('span').innerHTML}</span><output for="tutorialCopy-${id}"></output></label><input id="tutorialCopy-${id}" type="range" autocomplete="off" data-real="${id}">`;
+          const input=box.querySelector('input');['max','min','step'].forEach(k=>{input[k]=real[k];});
+          return box;
+        }));
+      }
       const id=tutorialCardSliderId();
-      if(id!==tutorialSliderId){
-        if(tutorialHolding&&tutorialSliderId)return; // never swap the slider mid-drag
-        tutorialSliderId=id;tutorialSlider.hidden=!id;
-        if(id){
-          const real=document.getElementById(id);
-          ['max','min','step'].forEach(k=>{tutorialSliderInput[k]=real[k];});
-          document.getElementById('tutorialSliderName').innerHTML=real.labels[0].querySelector('span').innerHTML;
-        }
+      if(id!==tutorialSliderId&&!(tutorialHolding&&tutorialSliderId)){
+        tutorialSliderId=id; // never swap mid-drag
         if(scroll)scrollTutorialTarget(true);
       }
-      if(!id)return;
-      const real=document.getElementById(id),shown=real.labels[0].querySelector('output').textContent,out=document.getElementById('tutorialSliderValue');
-      if(tutorialSliderInput.value!==real.value)tutorialSliderInput.value=real.value;
-      if(out.textContent!==shown)out.textContent=shown;
+      tutorialSliders.querySelectorAll('input').forEach(copy=>{
+        const real=document.getElementById(copy.dataset.real),shown=real.labels[0].querySelector('output').textContent,out=copy.labels[0].querySelector('output');
+        if(copy.value!==real.value)copy.value=real.value;
+        if(out.textContent!==shown)out.textContent=shown;
+      });
     }
-    // The copy drives the real slider, so every listener (the model, the tour's checks) runs as if it moved itself.
-    tutorialSliderInput.addEventListener('input',()=>{
-      const real=document.getElementById(tutorialSliderId);
-      real.value=tutorialSliderInput.value;real.dispatchEvent(new Event('input',{bubbles:true}));
+    // A copy drives its real slider, so every listener (the model, the tour's checks) runs as if it moved itself.
+    const tutorialRealOf=copy=>copy&&copy.dataset&&copy.dataset.real?document.getElementById(copy.dataset.real):null;
+    tutorialSliders.addEventListener('input',e=>{
+      const real=tutorialRealOf(e.target);if(!real)return;
+      real.value=e.target.value;real.dispatchEvent(new Event('input',{bubbles:true}));
       syncTutorialSlider();
     });
-    tutorialSliderInput.addEventListener('change',()=>document.getElementById(tutorialSliderId).dispatchEvent(new Event('change',{bubbles:true})));
-    tutorialSliderInput.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
+    tutorialSliders.addEventListener('change',e=>{const real=tutorialRealOf(e.target);if(real)real.dispatchEvent(new Event('change',{bubbles:true}));});
+    tutorialSliders.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
     // Watch steps finish by themselves: each render checks the step's done() test (camera angle, layers, play time).
     let tutorialPlayedMyr=0,tutorialWatchLast=0,tutorialScaleSeen=[0,0,0];
     function tutorialWatchTick(){
@@ -4790,7 +4803,7 @@ window.GALAXIES = {
         if(tutorialAimTarget){leaveTutorialGhost();tutorialAimTarget=null;tutorialAimId=null;}
         tutorialSpotlight.hidden=true;return;
       }
-      let target=finished?tutorialAimTarget:blocker?blocker.target:aim.id===tutorialSliderId?tutorialSliderInput:document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
+      let target=finished?tutorialAimTarget:blocker?blocker.target:tutorialCopy(aim.id)||document.getElementById(aim.id),gesture=finished?'click':blocker?blocker.gesture:aim.gesture;
       if(gesture==='switch'&&!finished){
         target=document.getElementById('optMond');gesture='click';
       }
@@ -4940,14 +4953,24 @@ window.GALAXIES = {
       const aim=step&&!hideAll&&!tutorialCard.hidden?tutorialCurrentAim(step):null;
       // Rings go once their part is done, or once the whole card is done; the part being pointed at has the main ring.
       // A watched value inside the main ring (the number in the slider's own label row) needs no ring of its own.
-      const aimLabel=aim&&aim.id!==tutorialSliderId&&document.getElementById(aim.id)?tutorialSliderLabel(document.getElementById(aim.id)):null;
+      const aimLabel=aim&&!tutorialCopy(aim.id)&&document.getElementById(aim.id)?tutorialSliderLabel(document.getElementById(aim.id)):null;
       // step.keepWatch: the watch rings stay after the card is done, as the values they ring change only then.
-      const done=step&&tutorialCompleted[step.id];
-      const ids=hideAll||tutorialCard.hidden||!step||tutorialBlocker()||done&&!step.keepWatch?[]:tutorialRingList(step).filter(r=>(done?r.watch:!tutorialLatched[r.id])&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
-      const keep=new Set(ids.map(item=>item.id)),cardKey=tutorialTour+tutorialIndex;
+      const done=step&&tutorialCompleted[step.id],off=hideAll||tutorialCard.hidden||!step||tutorialBlocker();
+      const list=off||done&&!step.keepWatch?[]:tutorialRingList(step).filter(r=>(done?r.watch:!tutorialLatched[r.id])&&!(aim&&aim.id===r.id)&&!(r.watch&&aimLabel&&aimLabel.contains(document.getElementById(r.id))));
+      // A slider the card carries is ringed twice, on the card's copy and on the real slider, so it is clear they are
+      // the same control. Each ring has a key (the real one's is 'real:' + its id) and remembers its part (id) and element.
+      const ids=[],withReal=(r,key)=>{const copy=tutorialCopy(r.id),real=document.getElementById(r.id);
+        ids.push({...r,key:key+r.id,el:copy||real});if(copy)ids.push({...r,key:'real:'+key+r.id,el:real});};
+      list.forEach(r=>withReal(r,''));
+      if(aim&&tutorialCopy(aim.id))ids.push({id:aim.id,key:'real:'+aim.id,el:document.getElementById(aim.id),label:tutorialTagNumber(aim.label),watch:false});
+      // Every slider part done but the card still waits (Score your fit's 'fine-tune both'): all its sliders stay ringed.
+      if(!off&&!done&&step.cardSlider&&step.checks&&!tutorialPartHold&&Object.keys(step.cardSlider).every(id=>tutorialLatched[id]))
+        Object.keys(step.cardSlider).forEach(id=>withReal({id,label:'',watch:false},'tune:'));
+      const keep=new Set(ids.map(item=>item.key)),cardKey=tutorialTour+tutorialIndex;
       const still=hideAll||tutorialCard.hidden||calmMotion();
-      tutorialAlsoRings.forEach((ring,id)=>{
-        if(keep.has(id))return;
+      tutorialAlsoRings.forEach((ring,key)=>{
+        if(keep.has(key))return;
+        const id=ring.dataset.part;
         // Only a part actually done on this card turns green and fades where it is (earned), and the next part's ring
         // cross-fades into the main ring (handover). Anything else (a new card, a skipped card, something in the way,
         // the tour ending) clears at once, so no ring is left floating over a spot the page has scrolled away from.
@@ -4955,9 +4978,9 @@ window.GALAXIES = {
         const handover=!earned&&aim&&aim.id===id&&ring.dataset.card===cardKey;
         // A ring on its way out still follows its control, so it never hangs where the control used to be when the
         // page shifts under it (the slider bar shrinking in MOND mode, a heading wrapping).
-        if(!(earned||handover)||still||ring.hidden||!fitTutorialRing(ring,document.getElementById(id))){ring.remove();tutorialAlsoRings.delete(id);return;}
+        if(!(earned||handover)||still||ring.hidden||!fitTutorialRing(ring,ring.tutorialEl)){ring.remove();tutorialAlsoRings.delete(key);return;}
         const cls=handover?'is-handover':'is-leaving';
-        if(!ring.classList.contains(cls)){ring.classList.add(cls);setTimeout(()=>{ring.remove();if(tutorialAlsoRings.get(id)===ring)tutorialAlsoRings.delete(id);},handover?TUTORIAL_HANDOVER_MS:TUTORIAL_RING_FADE_MS);}
+        if(!ring.classList.contains(cls)){ring.classList.add(cls);setTimeout(()=>{ring.remove();if(tutorialAlsoRings.get(key)===ring)tutorialAlsoRings.delete(key);},handover?TUTORIAL_HANDOVER_MS:TUTORIAL_RING_FADE_MS);}
       });
       tutorialGhosts=tutorialGhosts.filter(([ghost,el])=>ghost.isConnected&&(!still&&fitTutorialRing(ghost,el)||(ghost.remove(),false)));
       // While the control being pointed at has a box open over the page (the Galaxy menu's list), rings on anything
@@ -4966,13 +4989,14 @@ window.GALAXIES = {
       const box=open&&(open.width>shut.width+1||open.height>shut.height+1)?open:null;
       const underBox=el=>{if(!box||aimEl.contains(el))return false;const r=el.getBoundingClientRect();return r.left<box.right&&r.right>box.left&&r.top<box.bottom&&r.bottom>box.top;};
       ids.forEach(item=>{
-        let ring=tutorialAlsoRings.get(item.id);
-        const el=document.getElementById(item.id);
+        let ring=tutorialAlsoRings.get(item.key);
+        const el=item.el;
         // A box the last card also had on this control carries over as it is (no restart); one already fading
         // green from that card is replaced by a fresh one.
         if(ring&&ring.dataset.card!==cardKey){if(/is-leaving|is-handover/.test(ring.className)){ring.remove();ring=null;}else ring.dataset.card=cardKey;}
-        if(!ring){ring=document.createElement('div');ring.dataset.card=cardKey;ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.id,ring);if(spotlightResize&&el)spotlightResize.observe(el);}
-        const cls='tutorial-also'+(item.watch?' is-watch':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;
+        if(!ring){ring=document.createElement('div');ring.dataset.card=cardKey;ring.setAttribute('aria-hidden','true');ring.appendChild(document.createElement('span')).className='tutorial-tag';tutorialAlsoRings.set(item.key,ring);if(spotlightResize&&el)spotlightResize.observe(el);}
+        ring.dataset.part=item.id;ring.tutorialEl=el;
+        const cls='tutorial-also'+(item.watch?' is-watch':'')+(el&&tutorialCard.contains(el)?' in-card':'');if(ring.className!==cls)ring.className=cls;if(ring.firstChild.textContent!==item.label)ring.firstChild.textContent=item.label;
         if(ring.parentElement!==tutorialSpotlight.parentElement)tutorialSpotlight.parentElement.appendChild(ring);
         ring.hidden=!fitTutorialRing(ring,el)||underBox(el);
       });
@@ -5040,7 +5064,7 @@ window.GALAXIES = {
       const holes=[],step=tutorialStep(),pad=4;
       const cutHole=(el,r,k)=>{const cut=Math.max(0,tutorialCoverBottom(el)-r.top);if(cut<r.height)holes.push([{left:r.left+scrollX,top:r.top+cut+scrollY,width:r.width,height:r.height-cut},k]);};
       cutHole(tutorialAimTarget,tutorialSpotlight.getBoundingClientRect(),parseFloat(tutorialSpotlight.style.borderRadius)||0);
-      tutorialAlsoRings.forEach((ring,id)=>{if(!ring.hidden&&ring.isConnected)cutHole(document.getElementById(id),ring.getBoundingClientRect(),parseFloat(ring.style.borderRadius)||0);});
+      tutorialAlsoRings.forEach(ring=>{if(!ring.hidden&&ring.isConnected&&ring.tutorialEl)cutHole(ring.tutorialEl,ring.getBoundingClientRect(),parseFloat(ring.style.borderRadius)||0);});
       if(!tutorialBlocker())[step.target,...tutorialRingList(step).map(r=>r.id)].forEach(id=>{
         const el=document.getElementById(id);
         if(!el||!el.getClientRects().length)return;
@@ -5209,7 +5233,7 @@ window.GALAXIES = {
       tutorialAutoFrame=requestAnimationFrame(tickTutorialAuto);
     }
     tutorialAuto.addEventListener('click',()=>goTutorialStep(tutorialIndex+1,1));
-    window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target)||e.target===tutorialSliderInput;},{capture:true,passive:true});
+    window.addEventListener('pointerdown',e=>{tutorialHolding=!tutorialCard.contains(e.target)||!!tutorialRealOf(e.target);},{capture:true,passive:true});
     // Still using the controls (another drag, a key press on a slider): the countdown starts again from 10 s,
     // so a card never moves on while the viewer is mid-experiment.
     ['pointerdown','input'].forEach(type=>window.addEventListener(type,e=>{
@@ -5351,7 +5375,7 @@ window.GALAXIES = {
       else setCurveGhost(false);
     }
     function armCurveGhost(e){
-      const slider=e.target===tutorialSliderInput?document.getElementById(tutorialSliderId):e.target;
+      const slider=tutorialRealOf(e.target)||e.target;
       if(!curveGhostSliders.includes(slider)||e.type==='keydown'&&curveGhost.visible&&!curveGhost.leaving)return;
       const halo=slider===massSlider||slider===scaleSlider,line=document.getElementById('curvePlot').data[halo?3:1];
       curveGhost.x=line.x.slice();curveGhost.y=line.y.slice();curveGhost.rgb=halo?'255,174,92':'95,208,224';
