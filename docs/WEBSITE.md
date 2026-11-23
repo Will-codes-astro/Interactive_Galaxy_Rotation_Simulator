@@ -406,8 +406,18 @@ or keyboard.
 
 Hover explainers (the halo value cards and the M/L, Tilt and Test stars "?"
 boxes) open only after the mouse rests on them for 0.35 s, so sweeping past
-does not open them, and fade in over 0.45 s. Opening one halo card closes
-the others. In the tutorial, an explainer counts as read only once it has
+does not open them. Opening one halo card closes the others.
+
+Pull-outs share one opening motion (a visual choice): the "?" boxes and tips,
+the halo cards' notes, the View panel, Settings, the Galaxy menu and the
+fold-out sections grow out of the control that opened them. Each fades in
+while easing from slightly small, the "?" boxes and Settings get a soft
+sheen, and their contents arrive one after another. Closing is quicker. A
+halo card's note pulls out below the card like a drawer, over the content
+beneath, so the page never reflows. The collapsed View panel is its open
+panel clipped down to the "View" pill, so opening grows the pill into the
+panel. Only opacity, transform and clip-path animate. Lite visuals and
+reduced motion make it a plain, instant show and hide. In the tutorial, an explainer counts as read only once it has
 stayed open for 1.5 s (`HOVER_OPEN_DELAY_MS`, `EXPLAINER_READ_MS`). While a
 tutorial card is up, the page is dimmed except for every control the card
 names and any explainer it has opened.

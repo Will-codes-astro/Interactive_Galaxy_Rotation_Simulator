@@ -56,7 +56,6 @@
     .stat.ml.off { display:none; }
     [data-preset-only][hidden], .stability[hidden] { display:none !important; }
     .ml-explainer { position:absolute; top:calc(100% + 8px); right:0; z-index:40; width:340px; max-width:calc(100vw - 32px); padding:14px 16px; border:1px solid rgba(242,200,121,0.35); border-radius:8px; background:#0c1520; box-shadow:0 12px 32px rgba(0,0,0,0.55); font-size:12.5px; line-height:1.5; color:var(--ink); white-space:normal; }
-    .ml-explainer { opacity:0; visibility:hidden; transform:translateY(-4px); pointer-events:none; transition:opacity .45s ease, transform .45s ease, visibility 0s linear .45s; }
     /* While the explainer is open, lift its section above the slider bar below it so the bar can't cover it. */
     .stats-row:has(.ml-explainer.open) { position:relative; z-index:160; }
     .stats-row { margin-bottom:14px; }
@@ -64,8 +63,6 @@
     .stats-row .fit-toggle { align-self:center; padding:9px 14px; font-size:12px; }
     .sim-head .tutorial-launch { justify-self:end; }
     @media (max-width:900px) { .sim-head .tutorial-launch { justify-self:start; } }
-    .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; transition:opacity .45s ease, transform .45s ease, visibility 0s; }
-    @media (prefers-reduced-motion:reduce) { .ml-explainer, .ml-explainer.open { transform:none; transition:opacity .01s, visibility 0s; } }
     .ml-explainer h3 { margin:0 0 6px; font-size:13px; color:var(--gold); }
     .ml-explainer p { margin:0 0 8px; }
     .ml-explainer ul { margin:0 0 8px; padding-left:18px; }
@@ -131,8 +128,7 @@
     .sandbox-stats-title { margin:10px 0 5px; }
     .sandbox-summary dt { color:var(--muted); white-space:nowrap; }
     .stat-q { position:relative; display:inline-grid; place-items:center; margin-left:5px; vertical-align:1px; width:14px; height:14px; flex:none; border:1px solid rgba(138,180,248,0.45); border-radius:3px; color:var(--cyan); font-size:9px; font-weight:600; line-height:1; cursor:help; }
-    .stat-q::after { content:attr(data-tip); position:absolute; left:-4px; bottom:calc(100% + 6px); z-index:20; width:210px; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:#0d1825; color:var(--ink); font-size:11px; font-weight:400; line-height:1.4; text-align:left; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,0.5); opacity:0; visibility:hidden; pointer-events:none; transition:opacity .12s; }
-    .stat-q:hover::after,.stat-q:focus-visible::after { opacity:1; visibility:visible; transition:opacity .3s ease .35s; }
+    .stat-q::after { content:attr(data-tip); position:absolute; left:-4px; bottom:calc(100% + 6px); z-index:20; width:210px; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:#0d1825; color:var(--ink); font-size:11px; font-weight:400; line-height:1.4; text-align:left; white-space:normal; box-shadow:0 6px 18px rgba(0,0,0,0.5); pointer-events:none; }
     .sandbox-summary dd { margin:0; color:var(--ink); text-align:right; font-variant-numeric:tabular-nums; }
     .sandbox-footer { display:flex; align-items:center; justify-content:space-between; gap:10px 16px; flex-wrap:wrap; margin-top:12px; color:var(--muted); font-size:11px; }
     .sandbox-footer p { margin:0; }
@@ -318,9 +314,9 @@
     /* With the 3D MOND zone on, the panels over the view go solid, so the gold behind never tints them or their text. */
     .mond-zone-on .view-panel, .mond-zone-on .fs-sliders, .mond-zone-on .telemetry, .mond-zone-on .stability-chip, .mond-zone-on .star-mark span { background:rgba(9,14,24,.94); -webkit-backdrop-filter:none; backdrop-filter:none; }
     /* Outside fullscreen the panel sits over a small plot, so it drops the section labels and tightens up. */
-    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) { min-width:0; width:172px; padding:7px; top:8px; right:8px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel { min-width:0; width:172px; padding:7px; top:8px; right:8px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-label { display:none; }
-    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel:not(.collapsed) > :not(.view-head) { margin-top:5px; }
+    #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel > :not(.view-head) { margin-top:5px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row { gap:5px; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel .view-row button { padding:4px 4px; font-size:11px; white-space:nowrap; }
     #orbitPlot:not(.fullscreen-active):not(:fullscreen) .view-panel :is(.view-seg,.speed-toggle,.mode-toggle) button { padding:3px 2px; font-size:10.5px; }
@@ -338,13 +334,10 @@
     .view-panel .speed-toggle button[aria-checked=true] { background:rgba(138,180,248,.22); color:var(--ink); box-shadow:inset 0 0 0 1px rgba(138,180,248,.5); }
     #orbitPlot.pan-mode { cursor:move; }
     #orbitPlot.pan-mode.dragging { cursor:grabbing; }
-    .view-panel .view-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
+    .view-panel .view-head { display:flex; align-items:center; justify-content:flex-end; margin-left:auto; gap:10px; padding:0 2px 2px; background:transparent; border:0; border-radius:6px; color:var(--muted); font-size:10px; letter-spacing:.12em; text-transform:uppercase; }
     .view-panel .view-head:hover, .view-panel .view-head:focus-visible { background:transparent; color:var(--ink); }
     .view-panel .chev { display:inline-block; font-size:12px; transition:transform .2s; }
-    .view-panel.collapsed { min-width:0; padding:0; border-radius:999px; }
-    .view-panel > :not(.view-head) { max-height:120px; margin-top:6px; opacity:1; visibility:visible; overflow:hidden; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s; }
-    .view-panel.collapsed > :not(.view-head) { width:0; min-width:0; max-height:0; margin-top:0; padding:0; border-width:0; opacity:0; visibility:hidden; pointer-events:none; transition:max-height .2s ease, margin-top .2s ease, opacity .2s ease, visibility 0s linear .2s; }
-    .view-panel.collapsed .view-head { padding:7px 10px; border-radius:999px; }
+    .view-panel > :not(.view-head) { margin-top:6px; }
     .view-panel.collapsed .chev { transform:rotate(90deg); }
     @media (hover:none) and (pointer:coarse) { .view-panel .mode-toggle { display:none; } .view-panel button { padding:9px 12px; font-size:13px; } .view-panel .speed-toggle button { padding:7px 4px; font-size:12px; } }
     button { background:#102130; color:var(--ink); border:1px solid #294255; border-radius:4px; padding:7px 12px; cursor:pointer; }
@@ -360,15 +353,7 @@
     .halo-metric button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px; }
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
-    /* Opening: the card takes its full height in one step, then the text fades and slides in. Closing: the text fades
-       out first and the card shrinks once it has gone. Animating the height itself re-laid out the page every frame,
-       which stuttered while the 3D view was drawing; opacity and transform run off the main thread. */
-    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:opacity .25s ease, grid-template-rows 0s linear .25s, visibility 0s linear .25s; }
-    .halo-metric dd > span { min-height:0; overflow:hidden; }
-    .halo-metric dd > span > span { display:block; padding-top:5px; transform:translateY(-4px); transition:transform .25s ease; }
-    .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition:opacity .35s ease, grid-template-rows 0s, visibility 0s; }
-    .halo-metric.expanded dd > span > span, .halo-metric.hovered dd > span > span { transform:none; transition-duration:.35s; }
-    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .halo-metric dd > span > span, .view-panel .sw, .view-panel .sw::after, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
+    @media (prefers-reduced-motion:reduce) { .view-panel .sw, .view-panel .sw::after { transition:none; } }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
@@ -899,6 +884,93 @@
     .maths { margin:0 0 12px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.16); }
     .maths summary { padding:9px 12px; color:var(--accent); font:500 12.5px var(--f-ui); cursor:pointer; }
     .maths[open] { padding:0 12px 2px; } .maths[open] summary { padding:9px 0; }
+    /* ---------- Pull-outs: one shared opening motion ----------
+       Everything that opens from a control (the ? boxes and tips, the halo cards' notes, the View panel, Settings, the
+       galaxy menu and the fold-out sections) grows out of the control that opened it: it fades in while easing from a
+       little smaller and tucked towards that control, a soft sheen crosses it, and its contents follow a beat later, one
+       after another. Closing is quicker and simpler. Only opacity, transform and clip-path move (layout never changes
+       mid-animation), so it stays smooth while the 3D view is drawing. A visual choice only. */
+    :root { --pop-ease:cubic-bezier(.16,1,.3,1); --pop-in:.5s; --pop-fade:.28s; --pop-out:.18s; }
+    @keyframes pop-sheen { from { transform:translateX(-110%); } to { transform:translateX(110%); } }
+    /* ? boxes */
+    .ml-explainer { overflow:clip; transform-origin:top right; opacity:0; visibility:hidden; transform:translateY(-8px) scale(.95); pointer-events:none;
+      transition:opacity var(--pop-out) ease, transform var(--pop-out) ease, visibility 0s linear var(--pop-out); }
+    .ml-explainer.open { opacity:1; visibility:visible; transform:none; pointer-events:auto; box-shadow:0 18px 44px rgba(0,0,0,.6), 0 0 0 1px rgba(138,180,248,.08);
+      transition:opacity var(--pop-fade) ease, transform var(--pop-in) var(--pop-ease), visibility 0s; }
+    .ml-explainer::before, .settings-panel::before { content:""; position:absolute; inset:0; z-index:1; pointer-events:none; transform:translateX(-110%);
+      background:linear-gradient(105deg,transparent 30%,rgba(190,215,255,.09) 50%,transparent 70%); }
+    .ml-explainer.open::before { animation:pop-sheen .9s ease-out .08s both; }
+    .ml-explainer > *, .settings-panel > * { opacity:0; transform:translateY(6px); transition:opacity .1s, transform .1s; }
+    .ml-explainer.open > *, .settings-panel > * { opacity:1; transform:none; transition:opacity .35s ease, transform .55s var(--pop-ease); }
+    .ml-explainer.open > :nth-child(2), .settings-panel > :nth-child(2) { transition-delay:.05s; }
+    .ml-explainer.open > :nth-child(3), .settings-panel > :nth-child(3) { transition-delay:.09s; }
+    .ml-explainer.open > :nth-child(4), .settings-panel > :nth-child(4) { transition-delay:.13s; }
+    .ml-explainer.open > :nth-child(5), .settings-panel > :nth-child(5) { transition-delay:.17s; }
+    .ml-explainer.open > :nth-child(n+6), .settings-panel > :nth-child(n+6) { transition-delay:.21s; }
+    /* Small ? tips */
+    .stat-q::after { opacity:0; visibility:hidden; transform-origin:10px 100%; transform:translateY(5px) scale(.94);
+      transition:opacity .12s ease, transform .12s ease, visibility 0s linear .12s; }
+    @media not ((hover:none) and (pointer:coarse)) { /* a touch screen opens tips by tap only (.open) */
+      .stat-q:hover::after, .stat-q:focus-visible::after { opacity:1; visibility:visible; transform:none;
+        transition:opacity var(--pop-fade) ease .35s, transform var(--pop-in) var(--pop-ease) .35s, visibility 0s .35s; }
+    }
+    .stat-q.open::after { opacity:1; visibility:visible; transform:none; transition:opacity var(--pop-fade) ease, transform var(--pop-in) var(--pop-ease), visibility 0s; }
+    /* Settings and the galaxy menu use [hidden]: they animate in from their first frame (@starting-style), and out while
+       display waits for them (allow-discrete). Browsers without these simply show and hide them. */
+    .settings-panel { overflow:clip; transform-origin:top right; }
+    .galaxy-menu-list { transform-origin:top left; }
+    .settings-panel, .galaxy-menu-list { opacity:1; transform:none; transition:opacity var(--pop-fade) ease, transform var(--pop-in) var(--pop-ease), display var(--pop-in) allow-discrete; }
+    .settings-panel:not([hidden])::before { animation:pop-sheen .9s ease-out .08s both; }
+    .settings-panel[hidden], .galaxy-menu-list[hidden] { display:none; pointer-events:none; opacity:0; transform:translateY(-6px) scale(.97); transition-duration:var(--pop-out); }
+    .galaxy-menu-list li { transition:opacity .3s ease, transform .5s var(--pop-ease); }
+    .galaxy-menu-list li:nth-child(2) { transition-delay:.03s; } .galaxy-menu-list li:nth-child(3) { transition-delay:.06s; }
+    .galaxy-menu-list li:nth-child(4) { transition-delay:.09s; } .galaxy-menu-list li:nth-child(5) { transition-delay:.12s; }
+    .galaxy-menu-list li:nth-child(n+6) { transition-delay:.15s; }
+    @starting-style {
+      .settings-panel:not([hidden]), .galaxy-menu-list:not([hidden]) { opacity:0; transform:translateY(-8px) scale(.95); }
+      .settings-panel:not([hidden]) > *, .galaxy-menu-list:not([hidden]) li { opacity:0; transform:translateY(6px); }
+    }
+    /* Halo cards: the note pulls out of the bottom of the card like a drawer, over whatever is below it, so the page
+       never reflows. The card and drawer join into one box while it is open. */
+    .halo-metric { position:relative; transition:border-color .3s ease, background-color .3s ease, border-radius .2s ease; }
+    .halo-metric.expanded, .halo-metric.hovered { z-index:45; /* above the sticky rotation-curve panel (z 40) stacked below on narrow screens */ border-color:rgba(179,154,232,.42); background-color:#0e1424; border-bottom-left-radius:0; border-bottom-right-radius:0; }
+    .panel:has(.halo-metric.expanded, .halo-metric.hovered) { overflow:visible; } /* the drawer may reach past the panel's edge */
+    .halo-metric dd { position:absolute; top:100%; left:-1px; right:-1px; margin:0; padding:1px 10px 11px; border:1px solid rgba(179,154,232,.42); border-top:0;
+      border-radius:0 0 6px 6px; background:#0e1424; box-shadow:0 22px 36px rgba(0,0,0,.5); color:var(--muted); font-size:11px; line-height:1.45;
+      clip-path:inset(0 -40px 100% -40px); opacity:0; visibility:hidden; transform:translateY(-6px);
+      transition:clip-path var(--pop-out) ease, opacity var(--pop-out) ease, transform var(--pop-out) ease, visibility 0s linear var(--pop-out); }
+    .halo-metric.expanded dd, .halo-metric.hovered dd { clip-path:inset(0 -40px -60px -40px); opacity:1; visibility:visible; transform:none;
+      transition:clip-path var(--pop-in) var(--pop-ease), opacity .2s ease, transform var(--pop-in) var(--pop-ease), visibility 0s; }
+    .halo-metric dd > span > span { display:block; padding-top:5px; opacity:0; transform:translateY(-5px); transition:opacity .1s, transform .1s; }
+    .halo-metric.expanded dd > span > span, .halo-metric.hovered dd > span > span { opacity:1; transform:none; transition:opacity .35s ease .1s, transform .55s var(--pop-ease) .06s; }
+    /* View panel: it keeps its open size and, collapsed, is clipped down to the "View" pill in its corner, so opening
+       grows the pill into the panel (pill size measured by fitViewPill). Its rows then slide in one after another. */
+    .view-panel { clip-path:inset(0 round 12px); transition:clip-path .55s var(--pop-ease); }
+    .view-panel.collapsed { pointer-events:none; clip-path:inset(0 0 calc(100% - var(--pill-h,32px)) calc(100% - var(--pill-w,84px)) round 999px);
+      transition:clip-path .34s cubic-bezier(.5,0,.25,1) .06s; }
+    .view-panel.collapsed .view-head { pointer-events:auto; }
+    .view-panel::after { content:""; position:absolute; top:-1px; right:-1px; width:var(--pill-w,84px); height:var(--pill-h,32px); border:1px solid rgba(255,255,255,.16);
+      border-radius:999px; pointer-events:none; opacity:0; transition:opacity .2s ease; }
+    .view-panel.collapsed::after { opacity:1; transition:opacity .2s ease .25s; }
+    .view-panel > :not(.view-head) { transform-origin:top right; transition:opacity .3s ease, transform .55s var(--pop-ease), visibility 0s; }
+    .view-panel.collapsed > :not(.view-head) { opacity:0; visibility:hidden; transform:translateY(-8px) scale(.97);
+      transition:opacity .12s ease, transform .2s ease, visibility 0s linear .4s; }
+    .view-panel:not(.collapsed) > :nth-child(3) { transition-delay:.04s; } .view-panel:not(.collapsed) > :nth-child(4) { transition-delay:.08s; }
+    .view-panel:not(.collapsed) > :nth-child(5) { transition-delay:.12s; } .view-panel:not(.collapsed) > :nth-child(6) { transition-delay:.16s; }
+    .view-panel:not(.collapsed) > :nth-child(n+7) { transition-delay:.2s; }
+    .view-panel .chev { transition:transform .45s var(--pop-ease); }
+    /* Fold-out sections (<details>): the height eases open where the browser supports animating to auto. */
+    details { interpolate-size:allow-keywords; }
+    details::details-content { height:0; overflow:clip; opacity:0; transition:height .5s var(--pop-ease), opacity .3s ease, content-visibility .5s allow-discrete; }
+    details[open]::details-content { height:auto; opacity:1; }
+    /* Lite visuals already make every transition instant (html.lite); the contents should not then arrive one by one. */
+    html.lite :is(.ml-explainer > *, .settings-panel > *, .galaxy-menu-list li, .halo-metric dd > span > span, .view-panel > :not(.view-head)) { transition-delay:0s !important; }
+    @media (prefers-reduced-motion:reduce) {
+      .ml-explainer, .ml-explainer > *, .stat-q::after, .settings-panel, .settings-panel > *, .galaxy-menu-list, .galaxy-menu-list li, .halo-metric dd, .halo-metric dd > span > span,
+      .view-panel > :not(.view-head) { transform:none !important; transition-property:opacity, visibility, display !important; transition-delay:0s !important; }
+      .view-panel, .view-panel.collapsed, .halo-metric dd, details::details-content { transition:none !important; }
+      .ml-explainer::before, .settings-panel::before { display:none; }
+    }
   </style>
 </head>
 <body>
@@ -2824,6 +2896,15 @@ window.GALAXIES = {
         function setSwitch(btn,on){btn.setAttribute('aria-checked',String(on));btn.setAttribute('aria-pressed',String(on));}
         ['pointerdown','pointermove','pointerup','wheel','dblclick','contextmenu'].forEach(type=>viewPanel.addEventListener(type,e=>e.stopPropagation(),{passive:true}));
         const viewToggle=document.getElementById('viewToggle');
+        // Collapsed, the panel is clipped down to a pill around its "View" heading (CSS); this measures that pill, keeping
+        // the panel's own padding around the heading.
+        function fitViewPill(){
+            const panel=viewPanel.getBoundingClientRect(),label=viewToggle.firstElementChild.getBoundingClientRect(),chev=viewToggle.lastElementChild.getBoundingClientRect();
+            const padX=panel.right-chev.right,padY=label.top-panel.top;
+            viewPanel.style.setProperty('--pill-w',`${Math.ceil(panel.right-label.left+padX)}px`);
+            viewPanel.style.setProperty('--pill-h',`${Math.ceil(label.bottom-panel.top+padY)}px`);
+        }
+        new ResizeObserver(fitViewPill).observe(viewPanel);
         viewPanel.classList.add('collapsed');
         viewToggle.setAttribute('aria-expanded','false');
         viewToggle.addEventListener('click',()=>{
@@ -3806,8 +3887,8 @@ window.GALAXIES = {
         const open=hover||pinned;
         if(open&&!isOpen()){
           // Right-aligned under the tile by default; flip to left-aligned if that would run off a narrow screen.
-          box.style.left='';box.style.right='';
-          if(box.getBoundingClientRect().left<16){box.style.left='0';box.style.right='auto';}
+          box.style.left='';box.style.right='';box.style.transformOrigin='';
+          if(box.getBoundingClientRect().left<16){box.style.left='0';box.style.right='auto';box.style.transformOrigin='top left';} // it grows out of the ? either way
         }
         box.classList.toggle('open',open);
         box.setAttribute('aria-hidden',String(!open));
