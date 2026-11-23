@@ -1568,24 +1568,55 @@ window.GALAXIES = {
                 const root=Math.sqrt(s);
                 return -(2/Math.PI)*(dK*dm/root-ellipK*(a+R)/(s*root));
             }
+            // Composite Gauss-Legendre nodes on [lo, hi]: visit(a, weight) for each, with panels that shrink geometrically
+            // towards sharpEnd, where the ring kernel is sharpest.
+            function forEachRingNode(lo,hi,sharpEnd,visit){
+                let far=hi-lo;
+                for(let p=0;p<PANELS;p++){
+                    const near=p===PANELS-1?0:far/2;
+                    const from=sharpEnd==='high'?hi-far:lo+near,to=sharpEnd==='high'?hi-near:lo+far;
+                    const mid=(from+to)/2,half=(to-from)/2;
+                    for(let i=0;i<GL.x.length;i++)visit(mid+half*GL.x[i],GL.w[i]*half);
+                    far=near;
+                }
+            }
+            // Outside a disk, its ring kernels at radius R depend only on R, the disk's edge and the softening, not on its
+            // mass or scale length, so they are kept: dragging the disk size (or the gas, which shares the edge) reuses
+            // them instead of recomputing the elliptic integrals. Same numbers, several times faster.
+            const OUTER_KERNEL_CACHE_MAX=8192;
+            const outerKernels={key:'',byR:new Map()};
+            function outerKernel(R,rMax,eps2){
+                const key=rMax+'|'+eps2;
+                if(outerKernels.key!==key||outerKernels.byR.size>=OUTER_KERNEL_CACHE_MAX){outerKernels.key=key;outerKernels.byR.clear();}
+                let kernel=outerKernels.byR.get(R);
+                if(!kernel){
+                    kernel=new Float64Array(PANELS*GL.x.length);let n=0;
+                    forEachRingNode(0,rMax,'high',a=>{kernel[n++]=ringGradient(a,R,eps2);});
+                    outerKernels.byR.set(R,kernel);
+                }
+                return kernel;
+            }
             // Exponential disk of the given mass inside r_max (so the slider is the mass actually present).
             function exponentialDisk(mass,scale,rMax,eps){
                 const xm=rMax/scale,sigma0=mass/(TWO_PI*scale*scale*(1-(1+xm)*Math.exp(-xm)));
                 const eps2=eps*eps;
-                // integral of 2 pi a Sigma(a) (dPhi_ring/dR)/G over [lo, hi]: composite Gauss-Legendre whose panels
-                // shrink geometrically towards the end nearest R, where the ring kernel is sharpest.
+                // integral of 2 pi a Sigma(a) (dPhi_ring/dR)/G over [lo, hi] (forEachRingNode)
                 function ringSum(R,lo,hi,sharpEnd){
-                    let sum=0,far=hi-lo;
-                    for(let p=0;p<PANELS;p++){
-                        const near=p===PANELS-1?0:far/2;
-                        const from=sharpEnd==='high'?hi-far:lo+near,to=sharpEnd==='high'?hi-near:lo+far;
-                        const mid=(from+to)/2,half=(to-from)/2;
-                        for(let i=0;i<GL.x.length;i++){
-                            const a=mid+half*GL.x[i];
-                            sum+=GL.w[i]*half*a*Math.exp(-a/scale)*ringGradient(a,R,eps2);
-                        }
-                        far=near;
+                    let sum=0;
+                    forEachRingNode(lo,hi,sharpEnd,(a,weight)=>{sum+=weight*a*Math.exp(-a/scale)*ringGradient(a,R,eps2);});
+                    return TWO_PI*sigma0*sum;
+                }
+                // The same sum over the whole disk, seen from outside it: the nodes, and so these weight x a x exp(-a/R_s)
+                // terms, are the same for every R, and the ring kernels come from outerKernel.
+                let outerTerms=null;
+                function outerRingSum(R){
+                    if(!outerTerms){
+                        outerTerms=new Float64Array(PANELS*GL.x.length);let n=0;
+                        forEachRingNode(0,rMax,'high',(a,weight)=>{outerTerms[n++]=weight*a*Math.exp(-a/scale);});
                     }
+                    const kernel=outerKernel(R,rMax,eps2);
+                    let sum=0;
+                    for(let n=0;n<kernel.length;n++)sum+=outerTerms[n]*kernel[n];
                     return TWO_PI*sigma0*sum;
                 }
                 function vSq(R){
@@ -1595,7 +1626,7 @@ window.GALAXIES = {
                         const freeman=4*Math.PI*G*sigma0*scale*y*y*(besselI0(y)*besselK0(y)-besselI1(y)*besselK1(y));
                         return Math.max(0,freeman-G*R*ringSum(R,rMax,rMax+16*scale,'low'));
                     }
-                    return Math.max(0,G*R*ringSum(R,0,rMax,'high'));
+                    return Math.max(0,G*R*outerRingSum(R));
                 }
                 return{sigma0,vSq};
             }
