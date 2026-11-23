@@ -2235,33 +2235,55 @@ __GALAXIES_JS__
         let sortedEscapeTimes = [], escapeTimeByStar = new Float64Array(0);
         let activeHaloMassT = DEFAULTS.massT;
 
-        // One shared buffer holds every star's 1 Gyr path (frameCount x 3 floats each); it only grows.
-        let trajectoryBuffer = null, trajectoryViews = [];
-        function trajectoryViewsFor(count) {
-            if (trajectoryViews.length < count) {
+        // Each buffer holds every star's 1 Gyr path (frameCount x 3 floats each) and only grows. Slot activeSlot is the
+        // one on screen; a gradual recalculation (refreshOrbits) fills the other, so the view never shows a half-done set.
+        const trajectorySlots = [{buffer: null, views: []}, {buffer: null, views: []}];
+        let activeSlot = 0;
+        function trajectoryViewsFor(count, slot) {
+            const s = trajectorySlots[slot];
+            if (s.views.length < count) {
                 const stride = frameCount * 3;
-                trajectoryBuffer = new Float32Array(count * stride);
-                trajectoryViews = Array.from({length: count}, (_, k) => trajectoryBuffer.subarray(k * stride, (k + 1) * stride));
+                s.buffer = new Float32Array(count * stride);
+                s.views = Array.from({length: count}, (_, k) => s.buffer.subarray(k * stride, (k + 1) * stride));
             }
-            return trajectoryViews;
+            return s.views;
         }
 
-        // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline
-        function integrateTrajectories(massT, scaleRadius) {
+        // Sets up an orbit calculation for the current stars: fills the force table and picks the buffer to write.
+        // gradual: write into the buffer that is not on screen, because the stars keep moving while it runs.
+        function startIntegration(massT, scaleRadius, gradual) {
             const haloVelocity = extraVelocityModel(massT * 1e12, scaleRadius, baryonicVelocity);
             fillForceTable(forceTable, r => {
                 const vb = baryonicVelocity(r), vh = haloVelocity(r);
                 return vb * vb + vh * vh;
             });
-            const count = particles.length, trajectories = trajectoryViewsFor(count);
+            const count = particles.length, slot = gradual ? 1 - activeSlot : activeSlot;
+            return {massT, count, slot, trajectories: trajectoryViewsFor(count, slot), escapeTimes: [], escapeByStar: new Float64Array(count), next: 0};
+        }
+        // Makes a finished calculation the one shown and used (escape counter, tutorial).
+        function finishIntegration(job) {
+            activeSlot = job.slot;
+            escapeTimeByStar = job.escapeByStar;
+            sortedEscapeTimes = job.escapeTimes.sort((a, b) => a - b);
+            activeHaloMassT = mondMode ? 0 : job.massT;
+            return job.trajectories;
+        }
+        // All stars at once (start-up, galaxy changes and the physics checks).
+        function integrateTrajectories(massT, scaleRadius) {
+            const job = startIntegration(massT, scaleRadius, false);
+            integrateStars(job, job.count);
+            return finishIntegration(job);
+        }
+
+        // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline, for stars job.next to end - 1.
+        function integrateStars(job, end) {
+            const trajectories = job.trajectories, escapeTimes = job.escapeTimes, escapeByStar = job.escapeByStar;
             const dtSub = DT_SUB;
             const dtSub2Half = 0.5 * dtSub * dtSub;
             const dtSubHalf = 0.5 * dtSub;
             const limit = ejectionRadius, limit2 = limit * limit;
-            const escapeTimes = [];
-            if (escapeTimeByStar.length < count) escapeTimeByStar = new Float64Array(count);
 
-            for (let p = 0; p < count; p++) {
+            for (let p = job.next; p < end; p++) {
                 const particle = particles[p], positions = trajectories[p];
                 let x = particle.position[0], y = particle.position[1], z = particle.position[2];
                 let vx = particle.velocity[0], vy = particle.velocity[1], vz = particle.velocity[2];
@@ -2303,15 +2325,12 @@ __GALAXIES_JS__
                     positions[idx] = x; positions[idx + 1] = y; positions[idx + 2] = z;
                 }
 
-                escapeTimeByStar[p] = escTime; // kept per star so the tutorial can follow the first one out
+                escapeByStar[p] = escTime; // kept per star so the tutorial can follow the first one out
                 if (escTime < Infinity) {
                     escapeTimes.push(escTime);
                 }
             }
-
-            sortedEscapeTimes = escapeTimes.sort((a, b) => a - b);
-            activeHaloMassT = mondMode ? 0 : massT;
-            return trajectories;
+            job.next = end;
         }
         setPopulation(presetAnatomy(activeGalaxy), starCountFor(visibleMassOf(presetAnatomy(activeGalaxy)), PRESET_TEMPLATE_MASS));
         let activeTrajectories = integrateTrajectories(DEFAULTS.massT, DEFAULTS.scaleRadius);
@@ -3615,19 +3634,35 @@ __GALAXIES_JS__
     }
     configureHaloSliders();
     const haloMassText=massT=>customActive?formatMass(massT*1e12):`${massT.toFixed(2)} × 10¹² M☉`;
-    function refreshOrbits(){
-      clearTimeout(orbitModelTimer);
-      if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
-      activeTrajectories=integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value));
+    // Recalculating every orbit takes ~80 ms (longer on slower machines), which froze the 3D view for several frames
+    // after a slider was let go. With gradual set, the same calculation runs in slices of at most ORBIT_SLICE_MS per
+    // frame while the old orbits keep playing, and the new set is swapped in once every star is done.
+    const ORBIT_SLICE_MS=6,ORBIT_SLICE_STARS=16; // stars per time check
+    let orbitJob=null;
+    function showOrbits(){
       fillOrbitLines();
       updateStarTransforms(simTime);
       updateEscapeCounter(simTime);
       requestRender();
     }
-    function scheduleOrbitUpdate(){
+    function refreshOrbits(gradual){
       clearTimeout(orbitModelTimer);
+      if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
+      const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
+      if(gradual!==true){orbitJob=null;activeTrajectories=integrateTrajectories(massT,rs);showOrbits();return;}
+      const job=orbitJob=startIntegration(massT,rs,true);
+      (function slice(){
+        if(orbitJob!==job)return; // replaced by a newer calculation (another release, a new galaxy)
+        const t0=performance.now();
+        while(job.next<job.count&&performance.now()-t0<ORBIT_SLICE_MS)integrateStars(job,Math.min(job.count,job.next+ORBIT_SLICE_STARS));
+        if(job.next<job.count){requestAnimationFrame(slice);return;}
+        orbitJob=null;activeTrajectories=finishIntegration(job);showOrbits();
+      })();
+    }
+    function scheduleOrbitUpdate(){
+      clearTimeout(orbitModelTimer);orbitJob=null; // a calculation for the old settings is no longer wanted
       if(sliderDragging)return;
-      orbitModelTimer=setTimeout(refreshOrbits,120);
+      orbitModelTimer=setTimeout(()=>refreshOrbits(true),120);
     }
     function syncFsSliders(){
       fsMass.value=massSlider.value;fsScale.value=scaleSlider.value;
