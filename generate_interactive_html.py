@@ -2461,13 +2461,19 @@ __GALAXIES_JS__
             // with a frame-rate independent exponential filter, so nothing ever snaps.
             constructor(camera,element,options={}) {
                 this.camera=camera;this.element=element;this.dragMode='rotate';
-                this.o=Object.assign({damping:11,touchDamping:5,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,inertia:0.14,
+                // friction: how fast a released fling dies away (1/s). flingWindowMs: how much recent motion the
+                // release speed is averaged over. stillMs: a pointer held still this long before lifting gives no fling.
+                this.o=Object.assign({damping:11,touchDamping:5,rotateSpeed:1,panSpeed:1,zoomSpeed:0.0016,
+                    friction:4.5,flingWindowMs:90,stillMs:45,maxSpin:9,
                     minDistance:5,maxDistance:1000,minPhi:0.04,maxPhi:Math.PI-0.04,panLimit:80,
                     initial:{theta:-0.82,phi:1.01,radius:72,target:[0,0,0]},onChange:()=>{}},options);
                 const i=this.o.initial;
                 this.goal={theta:i.theta,phi:i.phi,radius:i.radius,target:new THREE.Vector3(...i.target)};
                 this.view={theta:i.theta,phi:i.phi,radius:i.radius,target:this.goal.target.clone()};
-                this.pointers=new Map();this.pinch=null;this.lastMove=0;this.velocity={theta:0,phi:0};
+                this.pointers=new Map();this.pinch=null;
+                // Recent goal positions (timestamped) for the release speed, and the glide that carries on after release.
+                this.samples=[];this.glide={theta:0,phi:0,target:new THREE.Vector3(),active:false};
+                this.reducedMotion=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
                 this._right=new THREE.Vector3();this._up=new THREE.Vector3();
                 this.enabled=true; // false while the guided tour is open: the camera only moves when a card asks
                 this._bind();this._apply();
@@ -2505,7 +2511,7 @@ __GALAXIES_JS__
                 if(phi!==undefined)g.phi=this._clampPhi(phi);
                 if(radius!==undefined)g.radius=this._clampRadius(radius);
                 if(target)g.target.set(...target);
-                this.velocity.theta=this.velocity.phi=0;
+                this._stopGlide();
                 this.o.onChange();
             }
             reset() {this.flyTo(Object.assign({rate:this.view.radius>200?3:0},this.o.initial));}
@@ -2515,7 +2521,8 @@ __GALAXIES_JS__
                 this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:e.button,shift:e.shiftKey||e.ctrlKey||e.metaKey,type:e.pointerType});
                 this.touchActive=e.pointerType==='touch';
                 this.flyRate=0;
-                this.velocity.theta=this.velocity.phi=0;
+                this._stopGlide(); // grabbing a spinning galaxy catches it
+                this.samples.length=0;this._sample(e.timeStamp);
                 if(this.pointers.size===2)this.pinch=this._pinchState();
                 this.element.classList.add('dragging');
                 this.o.onChange();
@@ -2535,46 +2542,72 @@ __GALAXIES_JS__
                     if(this.pointers.size===1) {
                         const mousePan=p.type!=='touch'&&p.button===0&&this.dragMode==='pan';
                         if(p.button===2||p.button===1||p.shift||mousePan)this._pan(dx,dy);
-                        else this._rotate(dx,dy,ev.timeStamp);
+                        else this._rotate(dx,dy);
                     } else if(this.pointers.size===2&&this.pinch) {
                         const s=this._pinchState();
                         this.goal.radius=this._clampRadius(this.goal.radius*this.pinch.dist/s.dist);
                         this._pan(s.x-this.pinch.x,s.y-this.pinch.y);
                         this.pinch=s;
                     }
+                    this._sample(ev.timeStamp);
                 }
             }
             _up_(e) {
                 if(!this.pointers.delete(e.pointerId))return;
                 try{this.element.releasePointerCapture(e.pointerId);}catch(_){}
                 this.pinch=null;
-                if(this.pointers.size===1)this.pinch=null;
                 if(this.pointers.size===0) {
                     this.element.classList.remove('dragging');
-                    // Release momentum: only if the pointer was still moving when lifted.
-                    if(performance.now()-this.lastMove<80) {
-                        const k=this.o.inertia*1000;
-                        this.goal.theta+=this.velocity.theta*k;
-                        this.goal.phi=this._clampPhi(this.goal.phi+this.velocity.phi*k);
-                    }
-                    this.velocity.theta=this.velocity.phi=0;
-                } else if(this.pointers.size===1&&this.pinch===null) {
-                    // Remaining finger continues as a rotate without a jump.
+                    this._startGlide(e.timeStamp);
+                } else if(this.pointers.size===1) {
+                    // Remaining finger continues as a rotate from where it is, without a jump or a pinch fling.
                     const rest=[...this.pointers.values()][0];rest.button=0;rest.shift=false;
+                    this.samples.length=0;
                 }
                 this.o.onChange();
             }
+            // Event timestamps (not the time the handler runs), so coalesced samples get their true spacing.
+            _sample(t) {
+                const g=this.goal,s=this.samples;
+                s.push({t,theta:g.theta,phi:g.phi,x:g.target.x,y:g.target.y,z:g.target.z});
+                while(s.length>2&&t-s[0].t>this.o.flingWindowMs)s.shift();
+            }
+            // On release the goal keeps moving at the pointer's last speed and slows smoothly, so the
+            // camera's speed is continuous through the release instead of lurching or stopping dead.
+            _startGlide(t) {
+                const s=this.samples,a=s[0],b=s[s.length-1];
+                this.samples=[];
+                if(this.reducedMotion||!a||b===a||t-b.t>this.o.stillMs)return;
+                const span=Math.max(b.t-a.t,16)/1000,G=this.glide,cap=this.o.maxSpin;
+                G.theta=Math.max(-cap,Math.min(cap,(b.theta-a.theta)/span));
+                G.phi=Math.max(-cap,Math.min(cap,(b.phi-a.phi)/span));
+                G.target.set(b.x-a.x,b.y-a.y,b.z-a.z).divideScalar(span).clampLength(0,this.goal.radius*3);
+                G.active=Math.abs(G.theta)+Math.abs(G.phi)>0.05||G.target.length()>0.02*this.goal.radius;
+            }
+            _stopGlide() {const G=this.glide;G.active=false;G.theta=G.phi=0;G.target.set(0,0,0);}
+            _stepGlide(dt) {
+                const G=this.glide,g=this.goal;
+                if(!G.active)return;
+                g.theta+=G.theta*dt;
+                const phi=g.phi+G.phi*dt;
+                g.phi=this._clampPhi(phi);
+                if(g.phi!==phi)G.phi=0; // ease off at the poles rather than pushing into them
+                g.target.addScaledVector(G.target,dt);
+                this._clampTarget();
+                const decay=Math.exp(-this.o.friction*dt);
+                G.theta*=decay;G.phi*=decay;G.target.multiplyScalar(decay);
+                if(Math.abs(G.theta)+Math.abs(G.phi)<0.002&&G.target.length()<0.001*g.radius)this._stopGlide();
+            }
             _height() {return this.element.clientHeight||1;}
-            _rotate(dx,dy,t) {
+            _rotate(dx,dy) {
                 const f=2*Math.PI*this.o.rotateSpeed/this._height();
-                const dTheta=-dx*f,dPhi=-dy*f;
-                this.goal.theta+=dTheta;
-                this.goal.phi=this._clampPhi(this.goal.phi+dPhi);
-                const now=performance.now(),dt=Math.max(now-this.lastMove,1);
-                this.velocity.theta=0.6*this.velocity.theta+0.4*dTheta/dt;
-                this.velocity.phi=0.6*this.velocity.phi+0.4*dPhi/dt;
-                this.lastMove=now;
+                this.goal.theta-=dx*f;
+                this.goal.phi=this._clampPhi(this.goal.phi-dy*f);
                 this.o.onChange();
+            }
+            _clampTarget() {
+                const L=this.o.panLimit,t=this.goal.target;
+                t.set(Math.max(-L,Math.min(L,t.x)),Math.max(-L,Math.min(L,t.y)),Math.max(-L,Math.min(L,t.z)));
             }
             _pan(dx,dy) {
                 const cam=this.camera,k=2*this.goal.radius*Math.tan(THREE.MathUtils.degToRad(cam.fov)/2)/this._height()*this.o.panSpeed;
@@ -2582,8 +2615,7 @@ __GALAXIES_JS__
                 this._right.setFromMatrixColumn(cam.matrixWorld,0);
                 this._up.setFromMatrixColumn(cam.matrixWorld,1);
                 this.goal.target.addScaledVector(this._right,-dx*k).addScaledVector(this._up,dy*k);
-                const L=this.o.panLimit;
-                this.goal.target.set(...this.goal.target.toArray().map(v=>Math.max(-L,Math.min(L,v))));
+                this._clampTarget();
                 this.o.onChange();
             }
             _wheel(e) {
@@ -2598,10 +2630,11 @@ __GALAXIES_JS__
             _clampRadius(v) {return Math.max(this.o.minDistance,Math.min(this.o.maxDistance,v));}
             // Returns true while the view is still easing toward the goal (caller keeps rendering).
             update(dt) {
+                this._stepGlide(Math.min(dt,0.1));
                 const g=this.goal,v=this.view,rate=this.flyRate||(this.touchActive?this.o.touchDamping:this.o.damping),a=1-Math.exp(-rate*Math.min(dt,0.1));
                 const dTheta=g.theta-v.theta,dPhi=g.phi-v.phi,dR=g.radius-v.radius;
                 const dT=g.target.distanceTo(v.target);
-                if(Math.abs(dTheta)<1e-5&&Math.abs(dPhi)<1e-5&&Math.abs(dR)<1e-3&&dT<1e-3) {
+                if(!this.glide.active&&Math.abs(dTheta)<1e-5&&Math.abs(dPhi)<1e-5&&Math.abs(dR)<1e-3&&dT<1e-3) {
                     this.flyRate=0;
                     if(dTheta||dPhi||dR||dT){v.theta=g.theta;v.phi=g.phi;v.radius=g.radius;v.target.copy(g.target);this._apply();return true;}
                     return false;
