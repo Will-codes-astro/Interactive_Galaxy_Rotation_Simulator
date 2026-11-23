@@ -4,7 +4,8 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 (the page's HTML, CSS and JavaScript are in `HTML_TEMPLATE`). The equations are
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
-The site is one file (`index.html`) split into five pages: The puzzle,
+The site is one file (`index.html`) split into five pages: The missing mass problem (page id `puzzle`, menu
+"Missing mass", "Problem" on narrow screens),
 Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "Dark
 matter or MOND?"; page id `background`, menu label "Ideas" on narrow screens),
 and Method & sources. The top menu shows one page at a time (`showPage`); each page ends with
@@ -12,10 +13,10 @@ a "Next" button, the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
 correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
-WebGL is off, a red note at the top says which, and the page shows The puzzle,
+WebGL is off, a red note at the top says which, and the page shows The missing mass problem,
 The two ideas and Method as one long scroll; the Simulator and Scorecard, which need
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
-("Puzzle", "Method") in one row (below 420 px the logo is hidden to make room); on
+("Problem", "Ideas", "Method") in one row (below 420 px the logo is hidden to make room); on
 narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
@@ -74,7 +75,7 @@ nothing is stored between visits). Each tour step opens the page its control is 
 open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
-The puzzle page opens the site, before any control. Its eyebrow reads "An
+The missing mass problem page opens the site, before any control. Its eyebrow reads "An
 interactive guide to the missing mass problem". Four numbered steps explain
 what a rotation curve is (and that orbit speed works like a scale for mass),
 what astronomers expected (with the Solar System as the comparison), what they
@@ -293,7 +294,7 @@ never during a tutorial. In MOND only the halo sliders leave the box.
 Between 961 and 1279 px the gravity model takes its own row above the four
 slider columns, so readouts such as the orbit time have room, and Play shows
 its icon only. Below 1200 px on laptops (and on phones) the curve's legend uses
-the short names. Below 900 px the top menu uses short labels ("Puzzle",
+the short names. Below 900 px the top menu uses short labels ("Problem",
 "Method") so the settings gear fits.
 On phones (640 px or narrower) the order is 3D view, rotation curve, sliders, and
 the rotation curve stays pinned under the menu while the sliders scroll beneath it,
@@ -323,7 +324,7 @@ the box opens right beside its control, and if an opened info box would sit
 under the tutorial card, the card moves to the other side. Ending or
 skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
-The main tutorial's 19 steps start from the puzzle in the rotation curve
+The main tutorial's 19 steps start from the mass discrepancy in the rotation curve ("Spot the mass discrepancy")
 (measured speeds stay above the visible-matter prediction; the pointer must
 cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
@@ -346,7 +347,8 @@ already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
 highlighted control, and comes back only when the step points somewhere new.
-Each card has one or two short sentences of explanation and an
+Each card has one or two sentences of explanation, academic in its terms
+(error bar, concentration, differential rotation) but defined as it goes, and an
 "Instructions:" line asking for one action; a card with several actions
 ("1. … 2. …") shows one part at a time ("Part 1 of 2"), and each new part fades
 in. Controls to use get a blue box; the numbers or graph to watch while doing
