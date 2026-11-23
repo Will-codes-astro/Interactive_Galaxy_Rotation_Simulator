@@ -360,11 +360,15 @@
     .halo-metric button:focus-visible { outline:2px solid var(--cyan); outline-offset:3px; border-radius:2px; }
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
-    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:grid-template-rows .45s ease, opacity .45s ease, visibility 0s linear .45s; }
+    /* Opening: the card takes its full height in one step, then the text fades and slides in. Closing: the text fades
+       out first and the card shrinks once it has gone. Animating the height itself re-laid out the page every frame,
+       which stuttered while the 3D view was drawing; opacity and transform run off the main thread. */
+    .halo-metric dd { display:grid; grid-template-rows:0fr; margin:0; color:var(--muted); font-size:11px; line-height:1.45; opacity:0; visibility:hidden; transition:opacity .25s ease, grid-template-rows 0s linear .25s, visibility 0s linear .25s; }
     .halo-metric dd > span { min-height:0; overflow:hidden; }
-    .halo-metric dd > span > span { display:block; padding-top:5px; }
-    .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition-delay:0s; }
-    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .view-panel .sw, .view-panel .sw::after, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
+    .halo-metric dd > span > span { display:block; padding-top:5px; transform:translateY(-4px); transition:transform .25s ease; }
+    .halo-metric.expanded dd, .halo-metric.hovered dd { grid-template-rows:1fr; opacity:1; visibility:visible; transition:opacity .35s ease, grid-template-rows 0s, visibility 0s; }
+    .halo-metric.expanded dd > span > span, .halo-metric.hovered dd > span > span { transform:none; transition-duration:.35s; }
+    @media (prefers-reduced-motion:reduce) { .halo-metric dd, .halo-metric dd > span > span, .view-panel .sw, .view-panel .sw::after, .view-panel > :not(.view-head), .view-panel.collapsed > :not(.view-head) { transition:none; } }
     footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
     footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
     footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
@@ -3082,7 +3086,7 @@ window.GALAXIES = {
     // Anatomy sliders leave the cyan visible-matter line behind; the halo sliders leave the orange total.
     const CURVE_GHOST_HOLD_MS=4000,CURVE_GHOST_FADE_IN_MS=300,CURVE_GHOST_FADE_OUT_MS=900; // it fades in and out, never pops
     const curveGhost={x:[],y:[],rgb:'95,208,224',visible:false,fade:0,leaving:false};
-    const curveGhostTrace=()=>({type:'scatter',mode:'lines+text',name:'Before',showlegend:false,hoverinfo:'skip',visible:curveGhost.visible,opacity:curveGhost.fade,x:curveGhost.x,y:curveGhost.y,
+    const curveGhostTrace=()=>({type:'scatter',mode:'lines+text',name:'Before',uid:'curveGhost',showlegend:false,hoverinfo:'skip',visible:curveGhost.visible,opacity:curveGhost.fade,x:curveGhost.x,y:curveGhost.y,
       text:curveGhost.y.map((_,i,a)=>i===a.length-1?'before':''),textposition:'top left',textfont:{size:11,color:`rgba(${curveGhost.rgb},0.8)`},
       line:{color:`rgba(${curveGhost.rgb},0.2)`,width:7,shape:'spline',smoothing:0.6}});
     const buildCurveData=(halo,total)=>[
@@ -5348,25 +5352,33 @@ window.GALAXIES = {
     // moves, and cleared CURVE_GHOST_HOLD_MS after it is let go, or at once when the galaxy or model changes.
     const curveGhostSliders=[massSlider,scaleSlider,...sandboxInputs];
     let curveGhostArmed=false,curveGhostTimer=0,curveGhostFadeFrame=0;
-    // Eases the band's opacity to `to` over ms, then calls done.
+    // Eases the band's opacity to `to` over ms, then calls done. A Plotly.restyle per frame redrew the whole chart
+    // (15-25 ms each), which made slider drags stutter, so each frame sets the band's SVG group opacity directly and
+    // keeps the trace's own opacity in step for the chart's next full redraw.
     function fadeCurveGhost(to,ms,done){
       cancelAnimationFrame(curveGhostFadeFrame);
-      const plot=document.getElementById('curvePlot'),from=curveGhost.fade,t0=performance.now();
+      const plot=document.getElementById('curvePlot'),trace=plot.data[plot.data.length-1],from=curveGhost.fade,t0=performance.now();
       if(calmMotion())ms=0;
       (function step(now){
         const t=ms?Math.min(1,(now-t0)/ms):1;
-        curveGhost.fade=from+(to-from)*t*(2-t);
-        Plotly.restyle(plot,{opacity:curveGhost.fade},[plot.data.length-1]);
+        curveGhost.fade=trace.opacity=from+(to-from)*t*(2-t);
+        const group=plot.querySelector('.tracecurveGhost'); // Plotly names each trace's group 'trace' + its uid
+        if(group)group.style.opacity=curveGhost.fade;
         if(t<1)curveGhostFadeFrame=requestAnimationFrame(step);else if(done)done();
       })(t0);
     }
-    function setCurveGhost(on){
-      const plot=document.getElementById('curvePlot');
-      curveGhost.leaving=false;
-      if(!on){cancelAnimationFrame(curveGhostFadeFrame);curveGhost.visible=false;curveGhost.fade=0;Plotly.restyle(plot,{visible:false,opacity:0},[plot.data.length-1]);return;}
-      curveGhost.visible=true;
-      const t=curveGhostTrace(); // restyle reads an array as one value per trace, so each data array is wrapped
+    // Puts the copied line into the band's trace, still transparent. This full restyle costs ~30 ms, so it runs as the
+    // slider is grabbed, before anything moves, rather than on the first step of the drag.
+    function loadCurveGhost(){
+      const plot=document.getElementById('curvePlot'),t=curveGhostTrace(); // restyle reads an array as one value per trace, so each data array is wrapped
       Plotly.restyle(plot,{visible:true,opacity:curveGhost.fade,x:[t.x],y:[t.y],text:[t.text],'line.color':t.line.color,'textfont.color':t.textfont.color},[plot.data.length-1]);
+    }
+    function setCurveGhost(on){
+      const plot=document.getElementById('curvePlot'),ghost=plot.data[plot.data.length-1];
+      if(!on){cancelAnimationFrame(curveGhostFadeFrame);curveGhost.leaving=false;curveGhost.visible=false;curveGhost.fade=0;Plotly.restyle(plot,{visible:false,opacity:0},[plot.data.length-1]);return;}
+      // Not loaded on grab: re-grabbed while the old band was fading out, or the chart was rebuilt since.
+      if(curveGhost.leaving||ghost.visible!==true)loadCurveGhost();
+      curveGhost.leaving=false;curveGhost.visible=true;
       fadeCurveGhost(1,CURVE_GHOST_FADE_IN_MS);
     }
     // gently: fade out (after the hold); otherwise (new galaxy or model) clear at once.
@@ -5382,6 +5394,7 @@ window.GALAXIES = {
       const halo=slider===massSlider||slider===scaleSlider,line=document.getElementById('curvePlot').data[halo?3:1];
       curveGhost.x=line.x.slice();curveGhost.y=line.y.slice();curveGhost.rgb=halo?'255,174,92':'95,208,224';
       clearTimeout(curveGhostTimer);curveGhostArmed=true;
+      if(!curveGhost.visible){curveGhost.fade=0;loadCurveGhost();}
     }
     window.addEventListener('pointerdown',armCurveGhost,{capture:true,passive:true});
     window.addEventListener('keydown',armCurveGhost,{capture:true,passive:true});
