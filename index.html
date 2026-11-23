@@ -890,6 +890,24 @@
     body.sim-unavailable :is(.page[data-page="simulator"], .page[data-page="scorecard"], .page-next, .topnav a[href="#simulator"], .topnav a[href="#scorecard"]) { display:none; }
     .topnav a[aria-current="page"] { color:var(--ink); background:rgba(138,180,248,.16); }
     .page header { max-width:none; margin:0; padding:36px 0 4px; display:block; }
+    /* Opening hero: the title beside a face-on galaxy turning at the default galaxy's real speeds (startHeroGalaxy). */
+    .page header.hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,min(44vw,540px)); align-items:center; gap:20px 56px; padding:20px 0 4px; }
+    .hero .eyebrow { color:var(--accent); font:500 13px/1.4 var(--f-ui); letter-spacing:.01em; text-transform:none; }
+    .hero h1 { max-width:12ch; margin:14px 0 20px; font-size:clamp(36px,4.6vw,62px); line-height:1.02; letter-spacing:-.024em; text-wrap:balance; }
+    .hero .lead { max-width:50ch; font-size:16.5px; }
+    .hero-galaxy { display:flex; flex-direction:column; align-items:center; gap:12px; margin:0; }
+    .hero-galaxy canvas { display:block; width:100%; aspect-ratio:1; }
+    .hero-switch { display:inline-flex; padding:3px; border:1px solid var(--line-strong); border-radius:999px; background:rgba(12,19,34,.72); }
+    .hero-switch button { display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border:0; border-radius:999px; background:none; color:var(--muted); font:500 13px var(--f-ui); cursor:pointer; transition:color .15s,background .15s; }
+    .hero-switch button::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.45; }
+    .hero-switch button:hover { color:var(--ink); }
+    .hero-switch button[data-speeds="observed"][aria-pressed="true"] { color:#f4f7fb; background:rgba(244,247,251,.1); }
+    .hero-switch button[data-speeds="visible"][aria-pressed="true"] { color:#5fd0e0; background:rgba(95,208,224,.13); }
+    .hero-switch button[aria-pressed="true"]::before { opacity:1; }
+    .hero-switch button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+    .hero-galaxy figcaption { max-width:46ch; min-height:6.4em; color:var(--ink-2); font-size:13.5px; line-height:1.55; text-align:center; }
+    .hero-galaxy figcaption small { display:block; margin-top:6px; color:var(--muted); font-size:11.5px; }
+    @media (max-width:900px) { .page header.hero { grid-template-columns:1fr; } .hero-galaxy canvas { max-width:460px; } }
     .page > .section-head:first-child, .sim-head > .section-head { margin-top:20px; padding-top:8px; border-top:0; }
     .sim-head { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:8px 40px; margin-bottom:14px; }
     .sim-head > .section-head { margin-bottom:0; }
@@ -1050,8 +1068,16 @@
   </nav>
   <main>
     <div class="page active" data-page="puzzle">
-    <header id="top">
-    <div class="intro"><div class="eyebrow">An interactive guide to the missing mass problem</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Far from a galaxy’s centre, stars and gas orbit much faster than the gravity of everything we can see should allow. Something is missing. Test two explanations against real measurements: an unseen halo of dark matter, or a change to how gravity works.</p></div>
+    <header id="top" class="hero">
+    <div class="intro"><div class="eyebrow">Interactive Galaxy Rotation Simulator</div><h1>Galaxies spin too fast for what we can see</h1><p class="lead">Far from a galaxy’s centre, stars and gas orbit much faster than the gravity of everything we can see should allow. Something is missing. Test two explanations against real measurements: an unseen halo of dark matter, or a change to how gravity works.</p></div>
+    <figure class="hero-galaxy">
+      <canvas id="heroGalaxy" role="img" aria-label="NGC 3198 seen face-on, turning at its measured speeds"></canvas>
+      <div class="hero-switch" role="group" aria-label="Speeds to show">
+        <button type="button" data-speeds="observed" aria-pressed="true">Measured speeds</button>
+        <button type="button" data-speeds="visible" aria-pressed="false">Visible matter only</button>
+      </div>
+      <figcaption><span id="heroCaption"></span><small id="heroNote"></small></figcaption>
+    </figure>
     </header>
     <div class="section-head" id="puzzle"><span class="kicker">01</span><h2>The missing mass problem</h2><p>Why galaxies appear to contain far more mass than we can see.</p></div>
     <section class="puzzle" aria-label="The missing mass problem">
@@ -4534,6 +4560,137 @@ window.GALAXIES = {
       document.getElementById('puzzleRatio').textContent=ratio<3?ratio.toFixed(1):String(Math.round(ratio));
     }
     drawPuzzleFigure();
+
+    /* ---------- Opening hero galaxy ----------
+       The default galaxy seen face-on, every point moving on a circle at the speed SPARC measured at its radius (straight
+       lines between SPARC radii, rising from zero at the centre, held beyond the last). The switch eases every speed to the
+       speed its visible matter alone predicts, the puzzle figure's dashed line. Each marked star's trail is the distance it
+       covers in HERO_TRAIL_SECONDS, so equal trails mean equal speeds. The speeds are real; where the points sit (stars in
+       an exponential disk of the galaxy's own scale length; gas spread out to the last measured radius, since SPARC's
+       outer speeds come from gas), the spiral pattern and the colours are visual choices. */
+    const HERO_MYR_PER_SECOND=40,HERO_TRAIL_SECONDS=1.6,HERO_STARS=1300,HERO_GAS=900,HERO_BLEND_SECONDS=1.1,HERO_ARM_PITCH_DEG=18;
+    const KMS_PER_KPC_IN_RAD_PER_MYR=1.0227e-3; // 1 km/s at 1 kpc turns 1.0227e-3 radians per million years
+    function startHeroGalaxy(){
+      const canvas=document.getElementById('heroGalaxy');
+      if(!canvas||!canvas.getContext)return;
+      const ctx=canvas.getContext('2d'),caption=document.getElementById('heroCaption'),buttons=[...document.querySelectorAll('.hero-switch button')];
+      const galaxy=GALAXIES[DATA.default_galaxy_id],rows=sparcRowsOf(galaxy),vBarRows=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
+      const radii=rows.map(p=>p.radius_kpc),vObsRows=rows.map(p=>p.observed_kms),n=rows.length,rEdge=radii[n-1];
+      const speedAt=(list,r)=>{
+        if(r<=radii[0])return list[0]*r/radii[0];
+        let i=1;
+        while(i<n-1&&radii[i]<r)i++;
+        return list[i-1]+(list[i]-list[i-1])*Math.min(1,(r-radii[i-1])/(radii[i]-radii[i-1]));
+      };
+      let peak=0;
+      rows.forEach((p,i)=>{if(p.disk_kms>rows[peak].disk_kms)peak=i;});
+      const scaleLength=radii[peak]/2.16; // an exponential disk's speed peaks at 2.16 scale lengths (Freeman 1970)
+      let seed=7;
+      const random=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+      const exponentialRadius=h=>{let r;do{r=-h*Math.log(random()*random()+1e-12);}while(r>rEdge);return r;};
+      const makePoint=(r,extra)=>Object.assign({r,a:random()*2*Math.PI,vo:speedAt(vObsRows,r),vb:speedAt(vBarRows,r)},extra);
+      const points=[];
+      const gasScale=Math.max(3*scaleLength,rEdge/3.5);
+      for(let i=0;i<HERO_GAS;i++)points.push(makePoint(exponentialRadius(gasScale),{gas:true,s:4+random()*9,alpha:.08+random()*.16}));
+      for(let i=0;i<HERO_STARS;i++){
+        const r=exponentialRadius(scaleLength),blue=Math.min(1,r/(4*scaleLength))*(.6+.4*random()); // bluer outwards
+        points.push(makePoint(r,{s:.5+random()**4*1.6,alpha:.35+random()*.65,
+          color:`rgb(${Math.round(255-70*blue)},${Math.round(222-8*blue)},${Math.round(178+77*blue)})`}));
+      }
+      const nearestRow=r=>radii.reduce((best,x,i)=>Math.abs(x-r)<Math.abs(radii[best]-r)?i:best,0);
+      const tracerRows=[...new Set([nearestRow(2.2*scaleLength),nearestRow(.55*rEdge),n-1])]; // where the disk pulls hardest, halfway, the edge
+      const tracers=tracerRows.map((i,k)=>({r:radii[i],a:-1.1+k*2.35,vo:vObsRows[i],vb:vBarRows[i]}));
+      const armTan=Math.tan(HERO_ARM_PITCH_DEG*Math.PI/180);
+      const angularSpeed=(v,r)=>v/Math.max(r,1e-3)*KMS_PER_KPC_IN_RAD_PER_MYR*HERO_MYR_PER_SECOND; // radians per screen second
+      const patternSpeed=angularSpeed(speedAt(vObsRows,3.5*scaleLength),3.5*scaleLength);
+      const gasSprite=document.createElement('canvas');
+      gasSprite.width=gasSprite.height=32;
+      {const g=gasSprite.getContext('2d'),grad=g.createRadialGradient(16,16,0,16,16,16);
+        grad.addColorStop(0,'rgba(120,170,255,1)');grad.addColorStop(1,'rgba(120,170,255,0)');g.fillStyle=grad;g.fillRect(0,0,32,32);}
+      let target=0,blend=0,pattern=0,size=0,dpr=1,scale=1,onScreen=true,raf=0,last=0;
+      const labelFont=`600 12px ${getComputedStyle(document.body).getPropertyValue('--f-ui').trim()||'sans-serif'}`,page=canvas.closest('.page');
+      const mixed=(vo,vb)=>{const e=blend*blend*(3-2*blend);return vo+(vb-vo)*e;};
+      function setCaption(){
+        const outer=tracers[tracers.length-1],speeds=tracers.map(t=>Math.round(t.vo)),lo=Math.min(...speeds),hi=Math.max(...speeds);
+        caption.textContent=target
+          ?`If only its stars and gas pulled, the edge star could orbit at only ${Math.round(outer.vb)} km/s, and its trail shrinks. The real one keeps ${Math.round(outer.vo)} km/s: that gap is the missing mass problem.`
+          :`${galaxy.name}, turning at its measured speeds. Near the centre or out at the edge, the marked stars all move at ${lo===hi?`about ${lo}`:`${lo} to ${hi}`} km/s, so their trails are the same length.`;
+        canvas.setAttribute('aria-label',`${galaxy.name} seen face-on. ${caption.textContent}`);
+      }
+      document.getElementById('heroNote').textContent=`Sped up: 1 second here is ${HERO_MYR_PER_SECOND} million years. Speeds from SPARC (Lelli, McGaugh & Schombert 2016); where the stars sit, the spiral arms and the colours are illustrative.`;
+      function resize(){
+        size=canvas.clientWidth;
+        if(!size)return;
+        dpr=Math.min(2,window.devicePixelRatio||1);
+        canvas.width=Math.round(size*dpr);canvas.height=Math.round(size*dpr);
+        scale=size/2*.84/rEdge; // leaves a margin for the speed labels
+        draw();
+      }
+      function draw(){
+        if(!size)return;
+        const c=size/2,toX=(r,a)=>c+Math.cos(a)*r*scale,toY=(r,a)=>c+Math.sin(a)*r*scale;
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+        ctx.clearRect(0,0,size,size);
+        ctx.globalCompositeOperation='lighter';
+        const glow=ctx.createRadialGradient(c,c,0,c,c,6*scaleLength*scale);
+        glow.addColorStop(0,'rgba(255,232,204,.75)');glow.addColorStop(.08,'rgba(255,214,176,.3)');glow.addColorStop(.35,'rgba(150,172,232,.08)');glow.addColorStop(1,'rgba(120,150,232,0)');
+        ctx.globalAlpha=1;ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);
+        for(const p of points){
+          // Two trailing arms: a logarithmic spiral turning at one rate while the points move through it.
+          const arm=(.5+.5*Math.cos(2*(p.a+Math.log(Math.max(p.r,.3*scaleLength)/scaleLength)/armTan-pattern)))**4;
+          const x=toX(p.r,p.a),y=toY(p.r,p.a);
+          if(p.gas){ctx.globalAlpha=p.alpha*(.15+.85*arm);ctx.drawImage(gasSprite,x-p.s,y-p.s,2*p.s,2*p.s);continue;}
+          ctx.globalAlpha=p.alpha*(.4+.6*arm);ctx.fillStyle=p.color;
+          ctx.beginPath();ctx.arc(x,y,p.s,0,2*Math.PI);ctx.fill();
+        }
+        ctx.globalCompositeOperation='source-over';
+        const e=blend*blend*(3-2*blend),rgb=[244+(95-244)*e,247+(208-247)*e,251+(224-251)*e].map(Math.round).join(',');
+        ctx.font=labelFont;
+        ctx.textAlign='center';
+        for(const t of tracers){
+          const v=mixed(t.vo,t.vb),span=angularSpeed(v,t.r)*HERO_TRAIL_SECONDS,rad=t.r*scale,x=toX(t.r,t.a),y=toY(t.r,t.a);
+          ctx.globalAlpha=.09;ctx.strokeStyle=`rgb(${rgb})`;ctx.lineWidth=1;
+          ctx.beginPath();ctx.arc(c,c,rad,0,2*Math.PI);ctx.stroke();
+          ctx.lineWidth=2.4;ctx.lineCap='round';
+          for(let k=0;k<20;k++){
+            ctx.globalAlpha=.85*(k+1)/20;
+            ctx.beginPath();ctx.arc(c,c,rad,t.a-span*(1-k/20),t.a-span*(1-(k+1)/20));ctx.stroke();
+          }
+          ctx.globalAlpha=1;ctx.fillStyle=`rgb(${rgb})`;
+          ctx.beginPath();ctx.arc(x,y,3.6,0,2*Math.PI);ctx.fill();
+          ctx.globalAlpha=.5;ctx.beginPath();ctx.arc(x,y,7.5,0,2*Math.PI);ctx.stroke();
+          ctx.globalAlpha=1;ctx.fillText(`${Math.round(v)} km/s`,x,y-14);
+        }
+      }
+      const moving=()=>onScreen&&!document.hidden&&(!page||page.classList.contains('active'))&&!calmMotion();
+      function frame(now){
+        raf=0;
+        const dt=last?Math.min(.05,(now-last)/1000):0;
+        last=now;
+        blend=Math.max(0,Math.min(1,blend+(target?1:-1)*dt/HERO_BLEND_SECONDS));
+        pattern+=patternSpeed*dt;
+        for(const p of points)p.a+=angularSpeed(mixed(p.vo,p.vb),p.r)*dt;
+        for(const t of tracers)t.a+=angularSpeed(mixed(t.vo,t.vb),t.r)*dt;
+        draw();
+        if(moving())raf=requestAnimationFrame(frame);
+      }
+      function wake(){
+        if(!moving()){if(calmMotion()){blend=target;draw();}return;}
+        if(!raf){last=0;raf=requestAnimationFrame(frame);}
+      }
+      buttons.forEach(button=>button.addEventListener('click',()=>{
+        target=button.dataset.speeds==='visible'?1:0;
+        buttons.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+        setCaption();wake();
+      }));
+      if('IntersectionObserver' in window)new IntersectionObserver(entries=>{onScreen=entries[entries.length-1].isIntersecting;wake();}).observe(canvas);
+      if('ResizeObserver' in window)new ResizeObserver(resize).observe(canvas);else window.addEventListener('resize',resize);
+      document.addEventListener('visibilitychange',wake);
+      document.addEventListener('pagechange',wake);
+      document.addEventListener('change',wake); // Settings: Reduce motion or lite visuals switched
+      setCaption();resize();wake();
+    }
+    startHeroGalaxy();
 
     /* ---------- Settings panel ----------
        The gear opens it; a click outside, Escape or the gear again closes it. The settings themselves are wired where they act

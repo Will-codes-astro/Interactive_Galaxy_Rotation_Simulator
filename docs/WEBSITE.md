@@ -75,8 +75,23 @@ nothing is stored between visits). Each tour step opens the page its control is 
 open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
-The missing mass problem page opens the site, before any control. Its eyebrow reads "An
-interactive guide to the missing mass problem". Four numbered steps explain
+The missing mass problem page opens the site, before any control. Its hero pairs the
+title, "Galaxies spin too fast for what we can see" (under the site name), with a
+face-on galaxy drawn on a canvas (`startHeroGalaxy`): the default galaxy, every point
+moving on a circle at the speed SPARC measured at its radius (straight lines between
+SPARC radii). Three marked stars (where the disk pulls hardest, at 2.2 scale lengths;
+halfway out; the last measured radius) carry their speed and a trail as long as the
+distance they cover in 1.6 s, so equal trails mean equal speeds. A switch,
+"Measured speeds" / "Visible matter only", eases every speed to the visible-matter
+prediction (the puzzle figure's dashed line, standard M/L) and turns the marks cyan;
+the caption, built from the data, names the edge star's two speeds. Time runs at 40 Myr
+per second (`HERO_MYR_PER_SECOND`). The speeds are real; where the points sit (stars
+in an exponential disk of the galaxy's scale length, peak of V_disk ÷ 2.16; gas out to
+the last measured radius, since SPARC's outer speeds come from gas), the two spiral
+arms (a pattern turning at one rate) and the colours are visual choices, and the note
+under the caption says so. It animates only while on screen on the open page, and
+shows a still frame with reduced motion or lite visuals. Below 900 px the galaxy
+sits under the title. Four numbered steps explain
 what a rotation curve is (and that orbit speed works like a scale for mass),
 what astronomers expected (with the Solar System as the comparison), what they
 measured (Rubin, Ford & Thonnard 1980; the step ends "That gap is the missing
