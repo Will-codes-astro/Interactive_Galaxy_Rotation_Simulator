@@ -3670,9 +3670,13 @@ window.GALAXIES = {
     // and the speed axis only grows if a curve would leave it. Once the slider settles, a full update tidies everything
     // (axis fit, names), CURVE_SETTLE_MS after the last move or at once when it is let go.
     const CURVE_SETTLE_MS=150;
+    const Y_RANGE_SLACK=1.15; // a paused drag keeps the y range while the curves still reach this close to its top
     const LIVE_CURVE_ANIMATION={transition:{duration:0},frame:{duration:0,redraw:false},mode:'immediate'};
     function updateHalo(live){
-      live=live===true; // event listeners pass an Event here
+      // live: true during a drag, 'settle' once it pauses (event listeners pass an Event here). MOND's gold zone follows
+      // the baryons, so a pause there still takes the full update below.
+      const settle=live==='settle'&&!mondMode;
+      live=live===true||settle;
       if(activeFit()!==appliedFit)applyBaryonState(); // the halo slider reached or left zero
       syncFsSliders();
       updateStability();
@@ -3691,11 +3695,17 @@ window.GALAXIES = {
       const curvePlot=document.getElementById('curvePlot'),visible=[true,!mondMode,true,!customActive,...COMPONENT_STYLE.map((_,i)=>componentVisible(i))];
       // A line appearing or vanishing (e.g. the bulge set to zero) needs the full update even mid-drag.
       if(live&&visible.every((v,k)=>curvePlot.data[k+1].visible===v)){
-        const range=curvePlot.layout.yaxis.range;
-        Plotly.animate(curvePlot,{data:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())].map(y=>({y})),
-          traces:[1,2,3,4,5,6,7],layout:yMax>range[1]?{yaxis:{range:[0,yMax]}}:{}},LIVE_CURVE_ANIMATION).catch(()=>{}); // a newer move interrupts it
-        curveSettleTimer=setTimeout(updateHalo,CURVE_SETTLE_MS);
+        const range=curvePlot.layout.yaxis.range,xEnd=radii[radii.length-1];
+        // The custom galaxy's edge moved, so its curves sit on new radii: the lines move rather than the graph being rebuilt.
+        const gridMoved=customActive&&Math.abs(curvePlot.layout.xaxis.range[1]-xEnd)>1e-9;
+        // A drag only grows the y range; a pause also shrinks it, unless it is already within Y_RANGE_SLACK of the curves
+        // (each range change redraws the axes, ~20 ms).
+        const fitY=yMax>range[1]||(settle&&range[1]>yMax*Y_RANGE_SLACK);
+        Plotly.animate(curvePlot,{data:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())].map(y=>gridMoved?{x:radii,y}:{y}),
+          traces:[1,2,3,4,5,6,7],layout:{...(fitY?{yaxis:{range:[0,yMax]}}:{}),...(gridMoved?{xaxis:{range:[0,xEnd]}}:{})}},LIVE_CURVE_ANIMATION).catch(()=>{}); // a newer move interrupts it
         updateHaloVisual(massT,rs);
+        if(settle)return; // the drag already asked for these orbits
+        curveSettleTimer=setTimeout(()=>updateHalo('settle'),CURVE_SETTLE_MS);
         requestOrbits(); // the orbits follow the drag (several updates a second, from the worker)
         return;
       }
@@ -4013,7 +4023,7 @@ window.GALAXIES = {
     }
     function rebuildCustomGalaxy({replot=false,live=false}={}){
       const anatomy={diskMass:sandbox.diskMass,diskScale:sandbox.diskScale,rMax:sandbox.truncation,bulgeMass:sandbox.bulgeMass,bulgeRadius:sandbox.bulgeRadius,gasMass:sandbox.gasMass};
-      if(anatomy.rMax!==customGridRmax){loadCustomGrid(anatomy.rMax);customGridRmax=anatomy.rMax;replot=true;}
+      if(anatomy.rMax!==customGridRmax){loadCustomGrid(anatomy.rMax);customGridRmax=anatomy.rMax;if(!live)replot=true;} // live: updateHalo moves the lines (a rebuild takes ~80 ms)
       // Rotation curve: the baryonic speed of the new anatomy on the force-table grid and at the data radii.
       customModel=PhysicsEngine.buildGalaxy(anatomy,PM.softening_kpc[0]);
       const shapeKey=`${anatomy.diskScale}|${anatomy.rMax}`;
