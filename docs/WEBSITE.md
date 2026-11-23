@@ -5,14 +5,15 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
 The site is one file (`index.html`) split into five pages: The puzzle,
-Simulator (Model setup and Simulation), Scorecard, Background, and Method &
-sources. The top menu shows one page at a time (`showPage`); each page ends with
+Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "Dark
+matter or MOND?"; page id `background`, menu label "Ideas" on narrow screens),
+and Method & sources. The top menu shows one page at a time (`showPage`); each page ends with
 a "Next" button, the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
 correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
 WebGL is off, a red note at the top says which, and the page shows The puzzle,
-Background and Method as one long scroll; the Simulator and Scorecard, which need
+The two ideas and Method as one long scroll; the Simulator and Scorecard, which need
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
 ("Puzzle", "Method") in one row (below 420 px the logo is hidden to make room); on
 narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
@@ -32,7 +33,7 @@ with opacity in proportion to MOND's boost at each radius (a 1% boost is all but
 faint near the centre and deepens outwards and covers the whole graph in every preset galaxy
 ("Deeper gold = bigger MOND boost", in small gold text in the empty bottom-right corner so it never
 covers a curve). There is no a₀ line or ring: MOND has no switch-on point (see PHYSICS.md); the
-MOND note under the model cards and the Background's "What is MOND?" say MOND boosts gravity
+MOND note under the model cards and the two ideas page's "What is MOND?" say MOND boosts gravity
 everywhere and explain what a₀ is and where it comes from. The View panel's
 "Where MOND acts" switch (off by default, shown only in MOND mode) lays the same gold into the 3D
 disk plane in the graph's gold (#f2c879): each radius gets the graph's shade, the gold fades softly
@@ -70,19 +71,23 @@ The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
 of that page load; a refresh or a new tab offers it again (Will's choice:
 nothing is stored between visits). Each tour step opens the page its control is on (the last two
-open the Scorecard, then Background); if the visitor moves to another page mid-tour, the card asks
+open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
-The puzzle page opens the site, before any control. Four numbered steps
-explain what a rotation curve is, what astronomers expected (with the Solar
-System as the comparison), what they measured, and the two possible answers.
+The puzzle page opens the site, before any control. Its eyebrow reads "An
+interactive guide to the missing mass problem". Four numbered steps explain
+what a rotation curve is (and that orbit speed works like a scale for mass),
+what astronomers expected (with the Solar System as the comparison), what they
+measured (Rubin, Ford & Thonnard 1980; the step ends "That gap is the missing
+mass problem", with a fold-out on how the Doppler shift and radio maps of
+hydrogen give the speeds), and the two possible answers.
 Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
 speeds against the speed its visible matter predicts, with the gap between them
 shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
 visual aid only. "Take the full guided tour" runs the simulator tutorial and
 then, straight on, the sandbox tutorial and a short "Wrapping up" part ("Part 1 of 3" to
-"Part 3 of 3"). The simulator tutorial's two closing cards (Scorecard, Background) are held back
+"Part 3 of 3"). The simulator tutorial's two closing cards (Scorecard, The two ideas) are held back
 for that last part, so the full tour ends on them. "Open
 the simulator" instead brings up the welcome offer, whose "Start simulator
 tutorial" runs the simulator tutorial alone.
@@ -182,8 +187,9 @@ fit's with SPARC's in brackets) and has the same kind of "?" explainer: what
 inclination is, that telescopes only see line-of-sight motion so true speed =
 measured ÷ sin i, that near face-on galaxies are the most sensitive, and that
 Best realistic fits may move it within twice SPARC's error (Lelli, McGaugh &
-Schombert 2016; Li et al. 2018). Method has a matching "Tilt (inclination)"
-card with the s = sin i_SPARC / sin i factor and a worked example.
+Schombert 2016; Li et al. 2018). Method's first step has a matching "Correcting
+for tilt" box, with the s = sin i_SPARC / sin i factor and a worked example in a
+fold-out.
 
 Test stars:
 
@@ -213,9 +219,10 @@ Test stars:
 - The orbit integrator uses a cubic-spline gravitational softening of
   0.5–1.0 kpc (`SOFTENING_RANGE_KPC`; 0.5 kpc for a pure disk, following the
   bulge's scale radius when there is one), exactly Newtonian beyond 2.8 ε, so
-  dense centres never meet a force singularity. Method's Simulation card names
-  both simplifications (spherical pull; softening, Springel 2005) and why
-  velocity-Verlet keeps the energy error from building up.
+  dense centres never meet a force singularity. Method's "What this model
+  leaves out" card names both simplifications (spherical pull; softening,
+  Springel 2005), and its fifth step says why velocity-Verlet keeps the energy
+  error from building up.
 
 Each simulated star is drawn as a point of light whose colour and brightness
 come from a mass drawn from the Kroupa (2001) IMF (L ∝ M^3.5, T ∝ M^0.475,
@@ -489,27 +496,39 @@ scores badly here": tiny error bars, hard limits, and Li et al. 2018's acceptabl
 fits for most SPARC galaxies with soft limits) state
 what limits the comparison; they do not say which idea wins.
 
-Background has a third, full-width box, "Beyond rotation curves: the wider
+The two ideas page has a third, full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with a tag for the idea it points
 to and two short lines, "Seen:" (the observation, with its source) and "Why it
 matters:". Two "Still open" cards follow: no confirmed dark matter
 particle (including the single LZ candidate event of September 2026, a 2.6σ
-preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box folds a
-three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
+preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box gives the
+speed boost at five strengths of Newton's pull (10 a₀ to a₀ ÷ 100) as a small
+table, and folds a three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
 v⁴ = GMa₀) under "Show the maths"; the full interpolating formula (the RAR
 function, McGaugh, Lelli & Schombert 2016) appears only in Method, with a "Why this
-formula?" note and a small table of plain MOND's χ²ᵣ for each galaxy with the
+formula?" fold-out and a small table of plain MOND's χ²ᵣ for each galaxy with the
 standard and RAR formulas (generated by `mond_formula_table`), and a line that the RAR
 formula was itself fitted to SPARC data, while the halo is fitted per galaxy. The dark matter box has its own "Show the maths": v = √(GM(r)/r)
 with the shell theorem, why visible matter alone gives falling speeds, why a flat
 curve needs density ∝ 1/r², and the NFW density profile (1/r inside r_s, 1/r³
 far outside, about 1/r² near r_s; halo speed peaks near 2.2 r_s), followed by a short "A known weakness" note on the cusp–core problem (de Blok 2010). It also has a matching schematic (not real data) in the simulator's colours:
-the visible matter's share of the speed falls, the halo's grows, and together they stay level. Method's
-cards flow in two columns (read down the left, then the right; one column at 900 px or narrower).
-Method & sources ends with a Harvard reference list of every
-source cited on the page, each linked by DOI (checked against Crossref on
-14 Nov 2026).
+the visible matter's share of the speed falls, the halo's grows, and together they stay level. 
+Method & sources opens with a five-step flow (Measure, Weigh, Explain, Score,
+Animate), each linking to its card below. Each card has a number, a title and a
+one-line summary, then the plain explanation on the left and the maths on the
+right (stacked at 900 px or narrower), with deeper detail in fold-outs: 1, SPARC's
+data and the tilt correction; 2, the visible-matter formula (live M/L values, and
+the sandbox's own formula in the sandbox; `visiblePreset`, `visibleCustom`);
+3, the two answers side by side, the NFW halo (purple) and MOND (orange); 4, χ²,
+χ²ᵣ, k, the verdict cut-offs and a table of the best fits' realistic limits
+(written by the generator from the fit constants); 5, test stars and
+velocity-Verlet. A "What this model leaves out" card lists the main
+simplifications, including what is drawn but not calculated. Then "Sources", a
+Harvard reference list of every source cited on the site, each linked by DOI
+(checked against Crossref on 14 Nov 2026), and a "Check the numbers yourself" box
+with the CSV export button. The Scorecard's "Only realistic values" note links to
+step 4.
 
 Rotation-curve axis: for a preset galaxy the radius axis starts at its first
 measured radius (no model is drawn inside it), padded by 1.2% of the span

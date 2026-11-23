@@ -354,9 +354,6 @@
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
     html.calm .view-panel .sw, html.calm .view-panel .sw::after { transition:none; }
-    footer { margin:14px 2px 0; color:var(--muted); font-size:11px; display:flex; justify-content:space-between; gap:16px; }
-    footer .export-btn { padding:0; border:0; background:none; color:var(--muted); font-size:11px; text-decoration:underline; text-underline-offset:3px; white-space:nowrap; }
-    footer .export-btn:hover, footer .export-btn:focus-visible { color:var(--ink); }
     .tutorial-launch { margin-left:auto; background:transparent; color:var(--muted); font-size:12px; }
     .tutorial-launch:hover, .tutorial-launch:focus-visible { color:var(--ink); }
     .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(138,180,248,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
@@ -526,7 +523,7 @@
       body.tutorial-active main { padding-bottom:calc(45vh + 20px); }
     }
     @media(max-width:960px) { .panel-grid { grid-template-columns:1fr; } .plot { height:62vh; } .controls { grid-template-columns:1fr 1fr; } .control:last-child { grid-column:1/-1; } }
-    @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } footer { flex-direction:column; } }
+    @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } }
     /* ===== Design system: tokens and component layer (visual only; no physics). ===== */
     :root { --bg:#060a12; --panel:#0c1322; --panel-2:#101929; --line:rgba(148,170,200,.14); --line-strong:rgba(148,170,200,.28); --ink:#e7edf6; --ink-2:#b8c4d6; --muted:#8392a8; --accent:#8ab4f8; --cyan:var(--accent); --gold:#e9c88a;
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
@@ -730,34 +727,68 @@
     .schematic figcaption { margin-top:6px; font-size:11.5px; line-height:1.5; }
     .eq { display:block; margin:8px 0 12px; padding:10px 12px; border-left:2px solid var(--line-strong); border-radius:var(--r); background:rgba(0,0,0,.22); overflow-x:auto; color:var(--ink); }
     .eq math { font-family:"STIX Two Math","Cambria Math","Latin Modern Math",math,serif; font-size:1.25em; margin:0; }
-    .method-grid .eq { margin:6px 0; padding:6px 10px; }
     .mini-table { border-collapse:collapse; margin:6px 0 12px; font-size:.92em; font-variant-numeric:tabular-nums; }
     .mini-table th, .mini-table td { padding:3px 12px 3px 0; text-align:left; border-bottom:1px solid var(--line); }
     .mini-table th { color:var(--muted); font-weight:500; }
-    .method-grid .eq math { font-size:1.1em; }
-    footer { flex-wrap:wrap; align-items:baseline; gap:8px 24px; margin:28px 0 0; padding:18px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); font-size:12px; }
-    .footer-title { flex-basis:100%; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
-    footer { display:block; margin-top:0; }
-    /* Two flowing columns (read down the left, then the right), so a short card leaves no hole beside a long one. */
-    .method-grid { columns:2; column-gap:32px; margin:0 0 16px; }
-    @media (max-width:900px) { .method-grid { columns:1; } }
-    .method-grid > div { min-width:0; margin:0 0 22px; break-inside:avoid; } .method-grid dd p { margin:6px 0 0; } .method-grid dd ul { margin:6px 0 0; padding-left:18px; } .method-grid dd li { margin:3px 0; }
-    .method-grid dt { margin-bottom:4px; color:var(--accent); font:500 10.5px var(--f-mono); letter-spacing:.14em; text-transform:uppercase; }
-    .method-grid dd { margin:0; color:var(--ink-2); font-size:13.5px; line-height:1.6; }
+    /* Method & sources: a five-step flow, then one card per step with the words on the left and the maths on the
+       right; extra depth folds away. */
+    .method { display:grid; gap:16px; }
+    .method-flow { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin:0 0 2px; padding:0; list-style:none; }
+    .method-flow li { position:relative; min-width:0; }
+    .method-flow li:not(:last-child)::after { content:"→"; position:absolute; top:50%; right:-6px; transform:translate(50%,-50%); color:var(--muted); font-size:12px; }
+    .method-flow a { display:flex; flex-direction:column; gap:2px; height:100%; padding:11px 14px 12px; border:1px solid var(--line); border-radius:var(--r); background:var(--panel); color:var(--ink-2); font-size:12.5px; line-height:1.4; text-decoration:none; transition:border-color .2s ease, background .2s ease; }
+    .method-flow a:hover, .method-flow a:focus-visible { border-color:rgba(138,180,248,.5); background:rgba(138,180,248,.06); }
+    .method-flow b { color:var(--ink); font:600 15px/1.3 var(--f-serif); }
+    .mf-n { color:var(--accent); font:500 11px var(--f-mono); }
+    .method-step { min-width:0; padding:18px 22px 16px; border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); scroll-margin-top:72px; }
+    .ms-head { display:grid; grid-template-columns:30px minmax(0,1fr); gap:14px; align-items:start; margin-bottom:14px; }
+    .ms-n { width:30px; height:30px; border:1px solid var(--line-strong); border-radius:50%; color:var(--accent); font:500 13px/28px var(--f-mono); text-align:center; }
+    .ms-head h3 { margin:2px 0 4px; color:var(--ink); font:600 18px/1.3 var(--f-serif); }
+    .ms-head p { max-width:80ch; margin:0; color:var(--ink); font-size:14px; line-height:1.6; }
+    .ms-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 28px; padding-left:44px; }
+    .ms-body[hidden] { display:none; }
+    .ms-body p, .ms-body li, .limits-grid li { color:var(--ink-2); font-size:13.5px; line-height:1.65; }
+    .ms-body p { margin:0 0 10px; }
+    .ms-body ul, .ms-body ol { margin:0 0 10px; padding-left:18px; } .ms-body li { margin:0 0 6px; }
+    .ms-body b, .limits-grid b { color:var(--ink); font-weight:600; }
+    .ms-words { min-width:0; }
+    .ms-maths, .ms-option { min-width:0; padding:14px 16px 4px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.18); }
+    .ms-maths h4, .ms-option h4 { margin:0 0 8px; color:var(--ink); font:600 14.5px/1.3 var(--f-serif); }
+    .ms-maths h4:not(:first-child) { margin-top:16px; }
+    .ms-option { border-top:2px solid; }
+    .ms-option.nfw { border-top-color:#b39ae8; } .ms-option.nfw h4 { color:#b39ae8; }
+    .ms-option.mond { border-top-color:#ffae5c; } .ms-option.mond h4 { color:#ffae5c; }
+    .method .eq { margin:6px 0 10px; padding:6px 10px; } .method .eq math { font-size:1.1em; }
+    .ms-steps .eq { margin-bottom:4px; }
+    .limits-table th { color:var(--ink-2); padding-right:16px; }
+    .limits-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px 28px; margin:0; padding:0 0 4px 44px; list-style:none; }
+    .limits-grid b { display:block; margin-bottom:2px; font:600 14px var(--f-serif); }
+    .ms-limits .ms-n { border-color:rgba(236,204,96,.55); color:#f2d675; }
+    .refs-intro { margin:-6px 0 14px !important; }
+    .method-data { display:flex; align-items:center; justify-content:space-between; gap:12px 24px; flex-wrap:wrap; margin:16px 0 0; padding:16px 22px; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--panel); }
+    .method-data p { max-width:70ch; margin:0; color:var(--ink-2); font-size:13px; line-height:1.6; }
+    .method-data b { display:block; color:var(--ink); font:600 15px/1.4 var(--f-serif); }
+    .export-btn { padding:9px 16px; border:1px solid rgba(138,180,248,.5); border-radius:8px; background:rgba(138,180,248,.08); color:#dbe7ff; font:500 13px/1.2 var(--f-ui); white-space:nowrap; cursor:pointer; }
+    .export-btn:hover, .export-btn:focus-visible { background:rgba(138,180,248,.16); }
+    @media (max-width:900px) {
+      .method-flow { grid-template-columns:1fr; gap:6px; } .method-flow li::after { display:none; }
+      .method-flow a { flex-direction:row; align-items:baseline; gap:10px; padding:9px 14px; }
+      .ms-body, .limits-grid { grid-template-columns:1fr; padding-left:0; }
+    }
+    @media (max-width:640px) { .method-step { padding:16px 14px 12px; } .ms-head h3 { font-size:17px; } .method-data { padding:16px; } }
     .tutorial-welcome, .tutorial-card { border-color:rgba(138,180,248,.24); background:linear-gradient(155deg,#121b2e,#0a101c 70%); }
     .tutorial-welcome h2, .tutorial-card h2 { font-family:var(--f-serif); }
     .tutorial-eyebrow { font-family:var(--f-mono); }
     .stat-q::after { background:var(--panel-2); border-color:var(--line-strong); }
     .telemetry { font-family:var(--f-mono); }
     @media (max-width:900px) { header { grid-template-columns:1fr; padding-top:36px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } }
-    @media (max-width:640px) { .topbar { padding:6px 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 6px; font-size:12px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } footer { padding:16px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
+    @media (max-width:640px) { .topbar { padding:6px 12px; gap:8px; } .brand span { display:none; } .topnav a { padding:6px 6px; font-size:12px; } header { padding:28px 16px 4px; } main { padding:0 12px 32px; } .section-head { margin-top:28px; } .section-head h2 { font-size:19px; } .controls { padding:16px; } .learn article { padding:0 16px 6px; } .stat { flex:1 1 140px; } .panel-heading > span:not(#chiBadge) { display:none; } }
     .key summary::before { content:""; display:inline-block; width:4px; }
     /* Small text: sizes and contrast raised for readability (visual only). */
     :root { --muted:#96a5ba; }
     .stat-label { font-size:10.5px; }
     .sim-stage .control-help { font-size:12px; }
     .schematic figcaption { font-size:12px; }
-    footer .export-btn { font-size:12px; }
     /* The puzzle: the story before the controls. */
     .puzzle, .scorecard { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
     .puzzle { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:8px 36px; align-items:center; padding:22px 24px; }
@@ -769,12 +800,13 @@
     .puzzle-steps h3 { margin:0 0 3px; padding-top:2px; color:var(--ink); font:600 16px/1.3 var(--f-serif); }
     .puzzle-steps p { margin:0; color:var(--ink-2); font-size:13.5px; line-height:1.6; }
     .puzzle-steps b { color:var(--ink); font-weight:600; }
+    .puzzle-steps .fold { margin:10px 0 0; } .puzzle-steps .fold p { margin-bottom:10px; }
     .puzzle-fig { margin:0; }
     .puzzle-fig svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:13px var(--f-ui); }
     .puzzle-fig figcaption { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; }
     .puzzle-cta { grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:10px; padding-top:16px; border-top:1px solid var(--line); }
     .puzzle-cta button { padding:9px 16px; font-size:13px; }
-    .puzzle-cta a, .refs a, .evidence-source a { color:var(--accent); text-underline-offset:3px; }
+    .puzzle-cta a, .refs a, .evidence-source a, .score-notes a { color:var(--accent); text-underline-offset:3px; }
     .puzzle-cta a { font-size:13px; }
     @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } }
     /* Fit badge: a plain-language verdict in front of the numbers. */
@@ -885,9 +917,9 @@
     @media (max-width:700px) { .evidence-grid.two { grid-template-columns:1fr; } }
     .learn .evidence-card p { margin:0; } .learn .evidence-card p + p { margin-top:8px; }
     .evidence-open-title { margin:4px 0 0; color:var(--accent); font:500 10.5px var(--f-mono) !important; letter-spacing:.14em; text-transform:uppercase; }
-    .maths { margin:0 0 12px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.16); }
-    .maths summary { padding:9px 12px; color:var(--accent); font:500 12.5px var(--f-ui); cursor:pointer; }
-    .maths[open] { padding:0 12px 2px; } .maths[open] summary { padding:9px 0; }
+    .maths, .fold { margin:0 0 12px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.16); }
+    .maths summary, .fold summary { padding:9px 12px; color:var(--accent); font:500 12.5px var(--f-ui); cursor:pointer; }
+    :is(.maths,.fold)[open] { padding:0 12px 2px; } :is(.maths,.fold)[open] summary { padding:9px 0; }
     /* ---------- Pull-outs: one shared opening motion ----------
        Everything that opens from a control (the ? boxes and tips, the halo cards' notes, the View panel, Settings, the
        galaxy menu and the fold-out sections) grows out of the control that opened it: it fades in while easing from a
@@ -1001,7 +1033,7 @@
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
-    <div class="topnav"><a href="#puzzle" aria-current="page"><span class="nav-long">The puzzle</span><span class="nav-short">Puzzle</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background">Background</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
+    <div class="topnav"><a href="#puzzle" aria-current="page"><span class="nav-long">The puzzle</span><span class="nav-short">Puzzle</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
     <div class="settings">
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
@@ -1019,15 +1051,16 @@
   <main>
     <div class="page active" data-page="puzzle">
     <header id="top">
-    <div class="intro"><div class="eyebrow">SPARC galaxy dynamics · interactive model</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Far from a galaxy’s centre, stars and gas orbit much faster than the gravity of everything we can see could explain. Test two explanations against real measurements: an unseen halo of dark matter, or a change to how gravity works.</p></div>
+    <div class="intro"><div class="eyebrow">An interactive guide to the missing mass problem</div><h1>Interactive Galaxy Rotation Simulator</h1><p class="lead">Far from a galaxy’s centre, stars and gas orbit much faster than the gravity of everything we can see should allow. Something is missing. Test two explanations against real measurements: an unseen halo of dark matter, or a change to how gravity works.</p></div>
     </header>
     <div class="section-head" id="puzzle"><span class="kicker">01</span><h2>The puzzle</h2><p>Why galaxies seem to hold far more matter than we can see.</p></div>
     <section class="puzzle" aria-label="The missing mass problem">
       <ol class="puzzle-steps">
-        <li><h3>A rotation curve is a speed chart</h3><p>Stars and gas circle the centre of their galaxy. Plot how fast they move against how far out they are, and you have a rotation curve.</p></li>
-        <li><h3>What astronomers expected</h3><p>Gravity weakens with distance: Mercury orbits the Sun at 47 km/s, distant Neptune at only 5 km/s (Williams 2024). Most of a galaxy’s visible matter sits near its centre, so its outer stars and gas should be slow too: the dashed line.</p></li>
-        <li><h3>What they measured</h3><p>The speeds stay high (Rubin, Ford &amp; Thonnard 1980). At the edge of NGC 3198, gas orbits at <b id="puzzleObs">–</b>. The gravity of the stars and gas we can see could only hold it in orbit at about <b id="puzzleBar">–</b>: any faster and it should fly away. To keep it circling that fast takes about <b id="puzzleRatio">–</b> times as much pull as the visible matter supplies.</p></li>
-        <li><h3>Two possible answers</h3>
+        <li><h3>A rotation curve is a speed chart</h3><p>Stars and gas circle the centre of their galaxy. Plot how fast they move against how far out they are, and you have a rotation curve. It works like a scale: the faster something orbits, the more mass must be pulling it inwards.</p></li>
+        <li><h3>What astronomers expected</h3><p>Gravity weakens with distance: Mercury orbits the Sun at 47 km/s, distant Neptune at only 5 km/s (Williams 2024). Most of a galaxy’s visible matter sits near its centre, so its outer stars and gas should slow down too, like the planets: the dashed line on the graph.</p></li>
+        <li><h3>What they measured</h3><p>By 1980, Vera Rubin and her colleagues had shown that the speeds stay high, galaxy after galaxy (Rubin, Ford &amp; Thonnard 1980). At the edge of NGC 3198, gas orbits at <b id="puzzleObs">–</b>. The gravity of the stars and gas we can see could only hold it in orbit at about <b id="puzzleBar">–</b>: any faster and it should fly away. To keep it circling that fast takes about <b id="puzzleRatio">–</b> times as much pull as the visible matter supplies. <b>That gap is the missing mass problem.</b></p>
+          <details class="fold"><summary>How can anyone measure the speed of gas that far away?</summary><p>From its light. Gas moving towards us looks very slightly bluer, and gas moving away slightly redder: the Doppler shift. Radio telescopes pick up the faint glow of cold hydrogen gas, which stretches far beyond the stars, so the speeds can be measured further out than the starlight reaches (Lelli, McGaugh &amp; Schombert 2016).</p></details></li>
+        <li><h3>Two possible answers</h3><p>Either there is far more mass than we can see, or gravity does not behave the way Newton said when it is very weak.</p>
           <div class="answers">
             <div class="answer dm"><b>Dark matter</b><span>The galaxy sits inside a huge cloud of unseen mass.</span></div>
             <div class="answer mond"><b>MOND</b><span>Gravity itself works differently when it is very weak.</span></div>
@@ -1036,14 +1069,14 @@
       </ol>
       <figure class="puzzle-fig">
         <div id="puzzleChart"></div>
-        <figcaption>Real measurements of NGC 3198 (SPARC; Lelli, McGaugh &amp; Schombert 2016). The dashed line is Newton’s gravity acting on the galaxy’s stars and gas alone.</figcaption>
+        <figcaption>Real measurements of NGC 3198 from SPARC, a catalogue of 175 galaxies (Lelli, McGaugh &amp; Schombert 2016). The dashed line is the speed Newton’s gravity predicts from the galaxy’s stars and gas alone.</figcaption>
       </figure>
       <div class="puzzle-cta"><span>Test both answers against real measurements:</span><button type="button" class="tutorial-primary" id="puzzleTour" title="The simulator tutorial, then the sandbox tutorial">Take the full guided tour</button><a class="next-link" href="#simulator">Open the simulator →</a></div>
     </section>
     </div>
     <div class="page" data-page="simulator">
     <div class="sim-head">
-    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a galaxy to model.</p></div>
+    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a real galaxy, or build your own.</p></div>
     <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
@@ -1104,7 +1137,7 @@
         <div class="ml-explainer" id="mlExplainer" role="dialog" aria-labelledby="mlExplainerTitle" aria-hidden="true">
           <button type="button" class="ml-close" id="mlExplainerClose" aria-label="Close">×</button>
           <h3 id="mlExplainerTitle">What is a mass-to-light ratio?</h3>
-          <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L, or Υ) converts one into the other: Suns' worth of mass per Sun's worth of light.</p>
+          <p>Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L) converts one into the other: Suns' worth of mass per Sun's worth of light.</p>
           <ul>
             <li><b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass.</li>
             <li><b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light.</li>
@@ -1182,8 +1215,8 @@
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">The halo's size and shape update with the sliders. 1 kpc is about 3,260 light-years. <span class="on-mouse">Hover over a value to learn more.</span><span class="on-touch">Tap a value to learn more.</span></p>
         <dl class="halo-metrics" id="haloMetrics">
-          <div class="halo-metric" id="haloRadiusCard"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>Where the halo's average density falls to 200 times the Universe's critical density. A convention, not a sharp edge.</span></span></dd></div>
-          <div class="halo-metric" id="haloScaleCard"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Sets how the halo's density changes with distance from the centre.</span></span></dd></div>
+          <div class="halo-metric" id="haloRadiusCard"><dt><button type="button" aria-expanded="false" aria-controls="haloRadiusHelp">Halo radius, r<sub>200</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloRadius">—</span></button></dt><dd id="haloRadiusHelp"><span><span>The usual way to mark a halo’s edge, since halos fade out gradually: inside it, the dark matter’s average density is 200 times the Universe’s critical density.</span></span></dd></div>
+          <div class="halo-metric" id="haloScaleCard"><dt><button type="button" aria-expanded="false" aria-controls="haloScaleHelp">Scale radius, r<sub>s</sub><span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloScale">—</span></button></dt><dd id="haloScaleHelp"><span><span>Where the halo changes from its dense middle to its thinning outskirts. A small r<sub>s</sub> packs the dark matter towards the centre.</span></span></dd></div>
           <div class="halo-metric" id="haloConcentrationCard"><dt><button type="button" aria-expanded="false" aria-controls="haloConcentrationHelp">Concentration, c<span class="info-icon" aria-hidden="true">ⓘ</span><span class="metric-value" id="haloConcentration">—</span></button></dt><dd id="haloConcentrationHelp"><span><span>Halo radius ÷ scale radius. Higher c means the dark matter is packed more towards the centre.</span></span></dd></div>
         </dl>
         <p class="halo-empty" id="haloEmpty" hidden></p>
@@ -1203,7 +1236,7 @@
         <details class="key">
           <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#5fd0e0"></i><i class="sw bar" style="background:#ff8a80"></i><b>Residual bars:</b> grey bars show the gap at each point: up = model too slow, down = model too fast, no bar = perfect match.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close fit (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough fit (2 to 10), <span class="r">red</span> poor fit (above 10). These cut-offs are this site’s own rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#aab8cc"></i><b>Grey bars</b> show the gap at each point: up means the model is too slow there, down too fast, and no bar a perfect match.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close fit (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough fit (2 to 10), <span class="r">red</span> poor fit (above 10). These cut-offs are this site’s own rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
             <div data-preset-only>
             <h3>What do χ² and χ<sup>2</sup><sub>r</sub> mean?</h3>
             <p>For each point, take the gap between model and measurement, divide by that point’s error bar and square it. χ² is the total. χ<sup>2</sup><sub>r</sub> (reduced chi-squared) divides it by the number of points minus the values tuned to this galaxy, so galaxies and models compare fairly. Missing every point by one error bar gives about 1; by three, about 9.</p>
@@ -1222,7 +1255,7 @@
     <div class="page" data-page="scorecard">
     <div class="section-head" id="scorecard"><span class="kicker">04</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
-      <p>Each fit gets a score, χ<sup>2</sup><sub>r</sub> (reduced chi-squared), which compares how far the model’s curve misses the measured points with the size of their error bars. Lower is better. About 1 means the misses are no bigger than the measurements’ own uncertainty: as close as the data allow.</p>
+      <p>Every galaxy, every idea, one score. The score, χ<sup>2</sup><sub>r</sub> (reduced chi-squared), compares how far a model’s curve misses the measured points with the size of their error bars. Lower is better: about 1 means the misses are no bigger than the measurements’ own uncertainty, as close as the data allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
       <p class="score-notes-title">At a glance</p>
       <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard summary">
@@ -1243,18 +1276,18 @@
       </details>
       <p class="score-notes-title">Before drawing conclusions</p>
       <ul class="score-notes">
-        <li><b>A fair test</b>With standard values, all three models start from the same visible matter: SPARC’s mass-to-light ratio (M/L, how much mass the stars have for each unit of their light), distance and tilt. Only the explanation for the extra pull differs. Best realistic fits let both models adjust those same values. The score allows for how many values each model tuned (listed in the full scores), so extra freedom does not come for free.</li>
-        <li><b>Only realistic values</b>Best fits stay inside believable ranges: M/L values that models of stars allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s quoted errors, and a halo about as dense as is typical for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> hit the edge of its range: the model could only have fitted that galaxy better with an unrealistic value.</li>
-        <li><b>MOND’s constant</b>In best fits, MOND may also adjust a<sub>0</sub>, from 1.16 to 1.24 × 10⁻¹⁰ m/s² (within 2× its measured error, like every other limit; McGaugh, Lelli &amp; Schombert 2016). Their quoted ±0.24 is wider because it includes the stars’ M/L, which the fits already vary. MOND says a<sub>0</sub> is the same in every galaxy (Milgrom 1983), so if galaxies need clearly different values, that is a warning sign even when the scores look good.</li>
-        <li><b>Why MOND scores badly here</b>Plain MOND tunes nothing to each galaxy, and some of SPARC’s error bars are tiny (under 1 km/s across much of UGC 128), so a small but steady miss adds up to a large χ². The best fits here also use hard edges for M/L, distance, tilt and a<sub>0</sub>. Li et al. (2018) fitted the same formula to all 175 SPARC galaxies with soft limits, which let a value stray further at a cost, and found acceptable fits for most of them. A poor score here is a result for these galaxies under these limits, not a verdict on MOND.</li>
-        <li><b>What the error bars cover</b>Scores use SPARC’s error bar on each measured speed. A wrong distance or tilt would shift the whole curve at once, not single points, so the best fits let distance and tilt vary instead.</li>
+        <li><b>A fair test</b>With standard values, every model starts from the same stars and gas, using SPARC’s mass-to-light ratio (how much mass the stars have for their light), distance and tilt. Only the explanation for the extra pull differs. Best realistic fits let each model adjust those same values, and the score counts every value tuned, so extra freedom is not free.</li>
+        <li><b>Only realistic values</b>Best fits must stay inside believable ranges: star masses that models of stars allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a halo about as concentrated as is typical for its mass (Dutton &amp; Macciò 2014). A value marked <span class="at-limit">at limit</span> hit the edge of its range, so that galaxy would only fit better with an unrealistic value. <a href="#mScore">See every limit in Method.</a></li>
+        <li><b>MOND’s constant</b>In best fits, MOND may also nudge a<sub>0</sub>, between 1.16 and 1.24 × 10⁻¹⁰ m/s² (2× its measured error, like every other limit; McGaugh, Lelli &amp; Schombert 2016). MOND says a<sub>0</sub> is the same in every galaxy (Milgrom 1983), so if different galaxies need clearly different values, that is a warning sign even when the scores look good.</li>
+        <li><b>Why MOND scores badly here</b>Plain MOND tunes nothing to each galaxy, and some of SPARC’s error bars are tiny (under 1 km/s across much of UGC 128), so a small but steady miss adds up to a large χ². The best fits here also stop at hard limits. Li et al. (2018), fitting the same formula to all 175 SPARC galaxies with softer limits that let a value stray further at a cost, found acceptable fits for most of them. A poor score here is a result for these galaxies under these limits, not a verdict on MOND.</li>
+        <li><b>What the error bars cover</b>Scores use SPARC’s error bar on each measured speed. A wrong distance or tilt would shift the whole curve at once rather than single points, which is why the best fits vary distance and tilt separately.</li>
         <li><b>A small sample</b>These are <span id="scoreCount">a few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show how the method works, not to decide between the models.</li>
       </ul>
     </section>
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#background">Next: the two ideas and the wider evidence →</a></nav>
     </div>
     <div class="page" data-page="background">
-    <div class="section-head" id="background"><span class="kicker">05</span><h2>Background</h2><p>The two explanations this simulator tests, and the wider evidence.</p></div>
+    <div class="section-head" id="background"><span class="kicker">05</span><h2>Dark matter or MOND?</h2><p>How each idea explains the fast orbits, and what the rest of the evidence says.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <article class="nfw"><h3>What is a dark matter halo?</h3>
         <div class="learn-content">
@@ -1292,7 +1325,9 @@
         <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity itself behaves differently when it is extremely weak.</p>
         <p>Mordehai Milgrom proposed it in 1983. MOND boosts gravity everywhere, but by how much depends on how strong gravity already is. Near a galaxy’s centre, where gravity is strong, the boost is small. The weaker gravity gets, the bigger the boost, so the outer stars keep moving fast.</p>
-        <p><b>What a<sub>0</sub> is.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (about 10¹¹ times weaker than gravity at Earth’s surface), is a turning point, not a switch. Well above it the boost dies away fast; below it the boost keeps climbing. With the simulator’s formula, a star’s speed is boosted by about 2% where gravity is 10 × a<sub>0</sub>, 10% at 3 × a<sub>0</sub>, 26% at a<sub>0</sub>, 92% at a<sub>0</sub> ÷ 10 and 224% at a<sub>0</sub> ÷ 100. Even where gravity is strongest in the four galaxies here, MOND adds at least 4%.</p>
+        <p><b>What a<sub>0</sub> is.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², is about 10¹¹ times weaker than gravity at Earth’s surface. It is a turning point, not a switch: well above it the boost fades away fast, and below it the boost keeps climbing. How much MOND speeds up a star, with the simulator’s formula:</p>
+        <table class="mini-table boost-table"><thead><tr><th scope="col">Newton’s pull</th><th scope="col">Speed boost</th></tr></thead><tbody><tr><td>10 × a<sub>0</sub></td><td>+2%</td></tr><tr><td>3 × a<sub>0</sub></td><td>+10%</td></tr><tr><td>a<sub>0</sub></td><td>+26%</td></tr><tr><td>a<sub>0</sub> ÷ 10</td><td>+92%</td></tr><tr><td>a<sub>0</sub> ÷ 100</td><td>+224%</td></tr></tbody></table>
+        <p>Even where gravity is strongest in the four galaxies here, MOND adds at least 4%.</p>
         <p><b>Where a<sub>0</sub> comes from.</b> It is not worked out from theory: it is measured from galaxies. Milgrom set it to match the galaxies known in 1983, and today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). Their study found that how much extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy.</p>
         <p>There is no halo to adjust: once the visible matter is known, MOND predicts the whole rotation curve with one constant, a<sub>0</sub>, shared by every galaxy.</p>
         <figure class="schematic">
@@ -1344,20 +1379,168 @@
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#method">Next: method and sources →</a></nav>
     </div>
     <div class="page" data-page="method">
-    <div class="section-head" id="method"><span class="kicker">06</span><h2>Method &amp; sources</h2><p>What the simulator calculates, and where the numbers and ideas come from.</p></div>
-    <footer>
-      <dl class="method-grid">
-        <div data-preset-only><dt>Data</dt><dd><p>SPARC (Lelli, McGaugh &amp; Schombert 2016) gives, at each radius r of each galaxy:</p><ul><li><b>V<sub>obs</sub> ± σ</b>: the measured orbital speed and its uncertainty (error bar).</li><li><b>V<sub>gas</sub>, V<sub>disk</sub>, V<sub>bulge</sub></b>: the speed the gas, the stellar disk or the bulge would give on its own, worked out from infrared images of the stars and radio maps of the hydrogen gas.</li></ul><p>Read from the project’s copy of SPARC’s table2.dat.</p></dd></div>
-        <div data-preset-only><dt>Tilt (inclination)</dt><dd><p>We see each disk at a tilt i: 0° face-on, 90° edge-on. A telescope only measures motion along our line of sight (the Doppler shift), so it sees just part of each star’s orbital speed:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>obs</mi></msub><mo>=</mo><mfrac><msub><mi>V</mi><mi>line of sight</mi></msub><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>In words:</b> divide the speed we see by sin i to get the true speed. SPARC has already done this using its own tilt, i<sub>SPARC</sub>, which has an error of a few degrees.</p><p><b>If the true tilt is different</b>, every point moves by the same factor (Li et al. 2018, eq. 5):</p><span class="eq"><math display="block"><mi>s</mi><mo>=</mo><mfrac><mrow><mi>sin</mi><msub><mi>i</mi><mi>SPARC</mi></msub></mrow><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span><p><b>Example:</b> SPARC says 60° but the truth is 55°: s = 0.866 / 0.819 ≈ 1.06, so the real speeds are 6% higher. At 30° instead of 25°, s ≈ 1.18: nearly face-on galaxies are far more sensitive.</p><p><b>On the page,</b> Best realistic fits may change i within 2× SPARC’s error (at most 90°). The points stay where SPARC put them and the model is divided by s instead, which gives the same χ². Tilt and distance can partly make up for each other, so the fitted tilt is less certain than the score.</p></dd></div>
-        <div><dt>Visible matter</dt><dd><div id="footerModel"><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="ftDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="ftBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed a star would orbit at if only the visible matter pulled on it.</p><p><b>Why add squares?</b> For a circular orbit, the pull g = V²/r, so V² = gr. Pulls from different masses add, so V² values add; then take the square root.</p><p><b>The numbers</b> are mass-to-light ratios (in use: <b id="ftMlSource">standard SPARC values</b>; the standard 0.50 and 0.70 come from McGaugh &amp; Schombert 2014). SPARC gives V<sub>disk</sub> and V<sub>bulge</sub> for a ratio of 1, and V² is proportional to mass, so scaling the mass scales V².</p><p><b>Why V<sub>gas</sub>|V<sub>gas</sub>|?</b> Much of a galaxy’s gas lies in a ring further out. The shell theorem (only the mass inside you pulls) holds for a round cloud, not a flat disk: inside a flat ring, the nearer side of the ring pulls harder than the far side, so its overall pull points outwards and SPARC lists V<sub>gas</sub> as negative. V<sub>gas</sub>|V<sub>gas</sub>| keeps that minus sign (squaring would lose it), so the gas then lowers the total.</p></div><div id="footerCustom" hidden><span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the speed from your sandbox galaxy’s visible matter alone, added as squares for the same reason as in a real galaxy (V² = gr, and pulls add).</p><p>Each speed comes from the masses you set: an exponential disk (density fading steadily outwards) for the stars and the gas, and a Hernquist bulge (a standard ball-shaped profile).</p></div></dd></div>
-        <div><dt>Dark matter (NFW halo)</dt><dd><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></msqrt></math></span><p><b>In words:</b> the model’s speed is visible matter plus the halo, added as squares like the parts above.</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>halo</mi></msub><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt><mo>,</mo><mspace width="1em"/><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>200</mn></msub><mfrac><mrow><mi>f</mi><mo>(</mo><mi>r</mi><mo>/</mo><msub><mi>r</mi><mi>s</mi></msub><mo>)</mo></mrow><mrow><mi>f</mi><mo>(</mo><mi>c</mi><mo>)</mo></mrow></mfrac></math></span><span class="eq"><math display="block"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>x</mi><mo>)</mo><mo>−</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>+</mo><mi>x</mi></mrow></mfrac><mo>,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mfrac><msub><mi>r</mi><mn>200</mn></msub><msub><mi>r</mi><mi>s</mi></msub></mfrac></math></span><p><b>The halo’s speed</b> is the A-level orbit speed V = √(GM/r). For a round cloud, only the mass inside the orbit pulls overall (Newton’s shell theorem), so M<sub>halo</sub>(r) is the dark matter inside radius r.</p><p><b>f</b> describes how that mass builds up with radius in an NFW halo (Navarro, Frenk &amp; White 1996); dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>. <b>r<sub>200</sub></b> is the halo’s conventional edge, where its average density falls to 200 times the Universe’s critical density; the model adds no mass beyond it. <b>r<sub>s</sub></b> (the scale radius slider) sets how concentrated the halo is.</p></dd></div>
-        <div><dt>MOND</dt><dd><p>No halo (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p><p><b>1. Newton’s pull</b> from the visible matter:</p><span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span><p><b>2. MOND’s boost.</b> Divide by a switch-on factor:</p><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msub><mi>g</mi><mi>N</mi></msub><mrow><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><mo>/</mo><msub><mi>a</mi><mn>0</mn></msub></msqrt></mrow></msup></mrow></mfrac></math></span><p>When g<sub>N</sub> is much bigger than a<sub>0</sub>, e<sup>−…</sup> is almost 0, so g = g<sub>N</sub>: plain Newton. When g<sub>N</sub> is much smaller, 1 − e<sup>−x</sup> ≈ x, which gives g ≈ √(g<sub>N</sub>a<sub>0</sub>), the stronger pull that flattens the curve. This is the radial acceleration relation’s formula (McGaugh, Lelli &amp; Schombert 2016, eq. 4).</p><p><b>Why this formula?</b> MOND fixes the two limits but not how gravity switches between them. Older work often used the “standard” formula, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012). This site uses the RAR formula because a<sub>0</sub> was measured with it, from the same SPARC data, and the realistic best fits follow Li et al. (2018), who use it too. So MOND’s formula has already been fitted to SPARC data (one curve shared by 153 galaxies, not tuned to each), while the NFW halo is fitted to each galaxy on its own: neither model meets this data completely fresh. The choice of formula matters for single galaxies. χ<sup>2</sup><sub>r</sub> for MOND at standard values:</p><table class="mini-table"><thead><tr><th>Galaxy</th><th>Standard</th><th>RAR (used)</th></tr></thead><tbody><tr><td>NGC 3198</td><td>21.3</td><td>13.4</td></tr><tr><td>NGC 2403</td><td>338</td><td>75.6</td></tr><tr><td>NGC 7331</td><td>4.7</td><td>35.8</td></tr><tr><td>UGC 128</td><td>115</td><td>97</td></tr></tbody></table><p><b>3. Back to a speed</b>, since g = V²/r:</p><span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></dd></div>
-        <div><dt>Simulation</dt><dd><p>The 3D view follows massless <b>test stars</b> (800 for NGC 3198, scaled with each galaxy’s visible mass from 200 to 2400): they feel the model’s gravity but do not pull on each other, so each moves on its own. Disk stars start on circular orbits, bulge stars with random motions. Each star’s acceleration is a = V<sub>model</sub>(r)²/r, towards the centre.</p><p><b>Simplifications.</b> The pull is worked out as if the galaxy’s mass were a round ball, although the disk is flat, so a star’s up-and-down bobbing through the disk is only approximate. Very near the centre the pull is softened over 0.5–1 kpc (the spline softening of the GADGET-2 code; Springel 2005), so a star passing close to the centre is not flung out by an unrealistically huge pull.</p><p>An orbit cannot be solved in one go, so the computer moves each star in small time steps, Δt = 0.5 Myr, 2000 times over 1 Gyr. Each step uses the <b>Velocity-Verlet method</b>:</p><span class="eq"><math display="block"><msub><mi>x</mi><mi>new</mi></msub><mo>=</mo><mi>x</mi><mo>+</mo><mi>v</mi><mi>Δ</mi><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>a</mi><msup><mrow><mi>Δ</mi><mi>t</mi></mrow><mn>2</mn></msup></math></span><p>This is SUVAT’s s = ut + ½at². Next, it finds the new acceleration a<sub>new</sub> at the new position, then updates the velocity with the <i>average</i> of the old and new accelerations:</p><span class="eq"><math display="block"><msub><mi>v</mi><mi>new</mi></msub><mo>=</mo><mi>v</mi><mo>+</mo><mfrac><mrow><mi>a</mi><mo>+</mo><msub><mi>a</mi><mi>new</mi></msub></mrow><mn>2</mn></mfrac><mi>Δ</mi><mi>t</mi></math></span><p><b>Why this method?</b> Using only the old acceleration would make each step slightly too big or small, and the error would build up, slowly spiralling stars in or out. Averaging keeps the energy error small and stops it building up over time, so a star that leaves does so because of the physics, not the size of the time step.</p></dd></div>
-        <div data-preset-only><dt>Goodness of fit</dt><dd><span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math></span><p><b>In words:</b> for each measured point, find how far the model misses, divide by that point’s error bar σ, square it, then add them all up. Squaring makes misses above and below both count, and big misses count much more.</p><span class="eq"><math display="block"><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span><p><b>N</b> is the number of points and <b>k</b> the number of values tuned to fit this galaxy, so χ<sup>2</sup><sub>r</sub> is roughly the squared miss per point. About 1 means misses the size of the error bars.</p><p>With standard values: k = 0 for visible matter only and MOND, and k = 2 for the halo (M<sub>200</sub> and r<sub>s</sub>, also when set by hand). Best realistic fits also tune disk M/L (and bulge M/L), plus distance and tilt within 2× SPARC’s errors: k = 5 (6 for NGC 7331) for NFW and 4 (5 for NGC 7331) for MOND (which adds a<sub>0</sub>).</p></dd></div>
-      </dl>
-      <section class="refs" id="references" aria-labelledby="refsTitle">
-        <h3 id="refsTitle">References</h3>
-        <ul>
+    <div class="section-head" id="method"><span class="kicker">06</span><h2>Method &amp; sources</h2><p>How the simulator gets from a telescope’s measurements to a score, and where every number comes from.</p></div>
+    <section class="method" aria-label="How the simulator works">
+      <ol class="method-flow" aria-label="The method in five steps">
+        <li><a href="#mMeasure"><span class="mf-n">1</span><b>Measure</b><span>Real orbit speeds</span></a></li>
+        <li><a href="#mVisible"><span class="mf-n">2</span><b>Weigh</b><span>Add up what we can see</span></a></li>
+        <li><a href="#mExplain"><span class="mf-n">3</span><b>Explain</b><span>A halo, or new gravity</span></a></li>
+        <li><a href="#mScore"><span class="mf-n">4</span><b>Score</b><span>How big is the miss?</span></a></li>
+        <li><a href="#mOrbits"><span class="mf-n">5</span><b>Animate</b><span>Stars under that gravity</span></a></li>
+      </ol>
+      <article class="method-step" id="mMeasure">
+        <div class="ms-head"><span class="ms-n">1</span><div><h3>Start from real measurements</h3><p>Every speed on the Simulator comes from SPARC, a public catalogue of 175 disk galaxies (Lelli, McGaugh &amp; Schombert 2016).</p></div></div>
+        <div class="ms-body">
+          <div class="ms-words">
+            <p>For each galaxy, SPARC picks a series of distances from the centre, r, and lists at each one:</p>
+            <ul>
+              <li><b>The measured orbit speed</b>, V<sub>obs</sub>, with its error bar, ±σ, which shows how uncertain that speed is.</li>
+              <li><b>The speed each visible part would give on its own</b>: the gas (V<sub>gas</sub>), the disk of stars (V<sub>disk</sub>) and the central bulge (V<sub>bulge</sub>). SPARC works these out from radio maps of the hydrogen gas and infrared images of the starlight.</li>
+            </ul>
+            <p>The site reads SPARC’s published table as it is, for NGC 3198, NGC 2403, NGC 7331 and UGC 128. No speed is typed in or adjusted by hand. (The Custom Sandbox is the exception: its galaxy is imaginary, so it has no measurements.)</p>
+          </div>
+          <div class="ms-maths">
+            <h4>Correcting for tilt</h4>
+            <p>A telescope only sees motion towards or away from us (the Doppler shift), so a tilted disk looks slower than it really spins. SPARC divides by sin i, where the tilt i is 0° face-on and 90° edge-on:</p>
+            <span class="eq"><math display="block"><msub><mi>V</mi><mi>obs</mi></msub><mo>=</mo><mfrac><msub><mi>V</mi><mi>line of sight</mi></msub><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span>
+            <details class="fold"><summary>What if SPARC’s tilt is slightly off?</summary>
+              <p>SPARC’s tilt, i<sub>SPARC</sub>, has an error of a few degrees. If the true tilt is i, every speed changes by the same factor (Li et al. 2018, eq. 5):</p>
+              <span class="eq"><math display="block"><mi>s</mi><mo>=</mo><mfrac><mrow><mi>sin</mi><msub><mi>i</mi><mi>SPARC</mi></msub></mrow><mrow><mi>sin</mi><mi>i</mi></mrow></mfrac></math></span>
+              <p><b>Example:</b> SPARC says 60° but the truth is 55°: s = 0.866 / 0.819 ≈ 1.06, so the real speeds are 6% higher. At 30° instead of 25°, s ≈ 1.18. Nearly face-on galaxies are far more sensitive.</p>
+              <p>With Best realistic fits on, each model may change i by up to 2× SPARC’s error (never past 90°). The page leaves the points where SPARC put them and divides the model by s instead, which gives the same score.</p>
+            </details>
+          </div>
+        </div>
+      </article>
+      <article class="method-step" id="mVisible">
+        <div class="ms-head"><span class="ms-n">2</span><div><h3>Add up the visible matter</h3><p>Next, work out how fast things would orbit if only the stars and gas we can see were pulling. This is the cyan dashed line on the rotation curve.</p></div></div>
+        <div class="ms-body" id="visiblePreset">
+          <div class="ms-words">
+            <p><b>Why add squares?</b> For a circular orbit, the pull is g = V²/r, so V² = gr. The pulls of the gas, disk and bulge add up, so their V² values add too. The square root at the end turns the total back into a speed.</p>
+            <p><b>Turning starlight into mass.</b> Telescopes measure the stars’ light, not their mass. The two numbers in the formula are mass-to-light ratios: Suns’ worth of mass for each Sun’s worth of infrared light. SPARC’s standard values, 0.50 for the disk and 0.70 for the older bulge, come from models of how stars age (McGaugh &amp; Schombert 2014). In use now: <b id="methodMlSource">standard SPARC values</b>.</p>
+          </div>
+          <div class="ms-maths">
+            <span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><msub><mi>V</mi><mi>gas</mi></msub><mo stretchy="false" lspace="0" rspace="0">|</mo><mo>+</mo><mn id="methodDisk">0.50</mn><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><mn id="methodBulge">0.70</mn><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup></msqrt></math></span>
+            <p>V<sub>bar</sub> is the speed a star would have if only the visible matter pulled on it.</p>
+            <details class="fold"><summary>Why multiply by the mass-to-light ratio?</summary>
+              <p>SPARC gives V<sub>disk</sub> and V<sub>bulge</sub> for a ratio of 1. V² is proportional to mass, so doubling the ratio doubles the stars’ mass and doubles their V².</p>
+            </details>
+            <details class="fold"><summary>Why V<sub>gas</sub>|V<sub>gas</sub>| instead of V<sub>gas</sub>²?</summary>
+              <p>Much of a galaxy’s gas lies in a ring further out. Inside a flat ring, the near side pulls harder than the far side, so near the centre the gas pulls outwards overall and SPARC lists V<sub>gas</sub> as negative. (Newton’s shell theorem, that only the mass inside you pulls, holds for a round cloud but not for a flat disk.) V<sub>gas</sub>|V<sub>gas</sub>| keeps the minus sign that squaring would lose, so there the gas lowers the total.</p>
+            </details>
+          </div>
+        </div>
+        <div class="ms-body" id="visibleCustom" hidden>
+          <div class="ms-words">
+            <p>In the Custom Sandbox you set the masses yourself, so nothing needs converting from light. The stars and the gas are flat disks that fade steadily outwards (exponential disks), and the bulge is a ball of stars (a Hernquist profile).</p>
+            <p>Their speeds add as squares, for the same reason as in a real galaxy: V² = gr, and pulls add.</p>
+          </div>
+          <div class="ms-maths">
+            <span class="eq"><math display="block"><msub><mi>V</mi><mi>bar</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>disk</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>bulge</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>gas</mi><mn>2</mn></msubsup></msqrt></math></span>
+            <p>The thin dotted lines on the rotation curve show each part on its own.</p>
+          </div>
+        </div>
+      </article>
+      <article class="method-step" id="mExplain">
+        <div class="ms-head"><span class="ms-n">3</span><div><h3>Supply the missing pull</h3><p>The measured speeds sit above the cyan line, so something must pull harder than the visible matter can. Each idea gives a different answer; the orange line shows the result.</p></div></div>
+        <div class="ms-body">
+          <section class="ms-option nfw" aria-labelledby="mNfwTitle">
+            <h4 id="mNfwTitle">Answer A: a dark matter halo</h4>
+            <p>Keep Newton’s gravity and add unseen mass. The halo’s speed is worked out like any orbit, from the mass inside it, then added to the visible matter’s as squares:</p>
+            <span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mo>+</mo><msubsup><mi>V</mi><mi>halo</mi><mn>2</mn></msubsup></msqrt></math></span>
+            <span class="eq"><math display="block"><msub><mi>V</mi><mi>halo</mi></msub><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt></math></span>
+            <p>M<sub>halo</sub>(r) is the dark matter inside radius r. For a round cloud, only that mass pulls overall (Newton’s shell theorem). The two halo sliders set the halo’s mass, M<sub>200</sub>, and its scale radius, r<sub>s</sub>.</p>
+            <details class="fold"><summary>The NFW mass formula</summary>
+              <span class="eq"><math display="block"><msub><mi>M</mi><mi>halo</mi></msub><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><msub><mi>M</mi><mn>200</mn></msub><mfrac><mrow><mi>f</mi><mo>(</mo><mi>r</mi><mo>/</mo><msub><mi>r</mi><mi>s</mi></msub><mo>)</mo></mrow><mrow><mi>f</mi><mo>(</mo><mi>c</mi><mo>)</mo></mrow></mfrac></math></span>
+              <span class="eq"><math display="block"><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mi>ln</mi><mo>(</mo><mn>1</mn><mo>+</mo><mi>x</mi><mo>)</mo><mo>−</mo><mfrac><mi>x</mi><mrow><mn>1</mn><mo>+</mo><mi>x</mi></mrow></mfrac><mo>,</mo><mspace width="1em"/><mi>c</mi><mo>=</mo><mfrac><msub><mi>r</mi><mn>200</mn></msub><msub><mi>r</mi><mi>s</mi></msub></mfrac></math></span>
+              <p>f describes how the mass builds up with radius in an NFW halo, the shape that computer simulations of dark matter produce (Navarro, Frenk &amp; White 1996). Dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>.</p>
+              <p><b>r<sub>200</sub></b> is the halo’s conventional edge: inside it, the average density is 200 times the Universe’s critical density (with H<sub>0</sub> = 70 km/s/Mpc, about five hydrogen atoms’ worth per cubic metre). The model adds no dark matter beyond it.</p>
+            </details>
+          </section>
+          <section class="ms-option mond" aria-labelledby="mMondTitle">
+            <h4 id="mMondTitle">Answer B: MOND</h4>
+            <p>Keep only the visible matter and change the law of gravity instead (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:</p>
+            <ol class="ms-steps">
+              <li><b>Newton’s pull</b> from the visible matter:<span class="eq"><math display="block"><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><msubsup><mi>V</mi><mi>bar</mi><mn>2</mn></msubsup><mi>r</mi></mfrac></math></span></li>
+              <li><b>MOND’s boost:</b><span class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msub><mi>g</mi><mi>N</mi></msub><mrow><mn>1</mn><mo>−</mo><msup><mi>e</mi><mrow><mo>−</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><mo>/</mo><msub><mi>a</mi><mn>0</mn></msub></msqrt></mrow></msup></mrow></mfrac></math></span></li>
+              <li><b>Back to a speed</b>, since g = V²/r:<span class="eq"><math display="block"><msub><mi>V</mi><mi>model</mi></msub><mo>=</mo><msqrt><mi>g</mi><mi>r</mi></msqrt></math></span></li>
+            </ol>
+            <p><b>What the boost does.</b> When g<sub>N</sub> is much bigger than a<sub>0</sub>, the bottom of the fraction is almost 1, so gravity is plain Newton. When g<sub>N</sub> is much smaller, writing x = √(g<sub>N</sub>/a<sub>0</sub>), 1 − e<sup>−x</sup> ≈ x, which gives g ≈ √(g<sub>N</sub>a<sub>0</sub>): a stronger pull that keeps the curve flat.</p>
+            <details class="fold"><summary>Why this formula?</summary>
+              <p>MOND fixes how gravity behaves when it is strong and when it is very weak, but not the blend in between. This site uses the radial acceleration relation’s formula (McGaugh, Lelli &amp; Schombert 2016, eq. 4), because a<sub>0</sub> was measured with it from the same SPARC data, and Li et al. (2018), whose fit limits the site follows, use it too. Older work often used the “standard” formula, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012).</p>
+              <p>The choice matters for single galaxies. Plain MOND’s χ<sup>2</sup><sub>r</sub> with each formula:</p>
+              <table class="mini-table"><thead><tr><th>Galaxy</th><th>Standard</th><th>RAR (used)</th></tr></thead><tbody><tr><td>NGC 3198</td><td>21.3</td><td>13.4</td></tr><tr><td>NGC 2403</td><td>338</td><td>75.6</td></tr><tr><td>NGC 7331</td><td>4.7</td><td>35.8</td></tr><tr><td>UGC 128</td><td>115</td><td>97</td></tr></tbody></table>
+              <p>So MOND’s formula was itself fitted to SPARC (one curve shared by 153 galaxies, not tuned to each), while the halo is fitted to each galaxy separately. Neither model meets this data completely fresh.</p>
+            </details>
+          </section>
+        </div>
+      </article>
+      <article class="method-step" id="mScore">
+        <div class="ms-head"><span class="ms-n">4</span><div><h3>Score the fit</h3><p>To compare the ideas fairly, the site measures how far each orange line misses the measured points, using their error bars as the ruler.</p></div></div>
+        <div class="ms-body">
+          <div class="ms-words">
+            <p><b>For each point,</b> find the gap between the model and the measurement, divide it by that point’s error bar and square it. Add these up to get χ² (“chi-squared”). Squaring means misses above and below both count, and big misses count far more than small ones.</p>
+            <p><b>Then divide by N − k,</b> the number of points minus the number of values tuned to fit this galaxy. The result, χ<sup>2</sup><sub>r</sub>, is roughly the squared miss per point. About 1 means the curve misses by about one error bar: as close as the measurements allow.</p>
+            <p><b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND, and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = 5 (6 for NGC 7331) for the halo and 4 (5 for NGC 7331) for MOND.</p>
+            <p><b>Close, rough or poor.</b> The fit badge says Close fit below 2, Rough fit from 2 to 10 and Poor fit above 10. These cut-offs are this site’s own rule of thumb, not a published standard.</p>
+          </div>
+          <div class="ms-maths">
+            <span class="eq"><math display="block"><msup><mi>χ</mi><mn>2</mn></msup><mo>=</mo><mo>∑</mo><msup><mrow><mo>(</mo><mfrac><mrow><msub><mi>V</mi><mi>obs</mi></msub><mo>−</mo><msub><mi>V</mi><mi>model</mi></msub></mrow><mi>σ</mi></mfrac><mo>)</mo></mrow><mn>2</mn></msup></math></span>
+            <span class="eq"><math display="block"><msubsup><mi>χ</mi><mi>r</mi><mn>2</mn></msubsup><mo>=</mo><mfrac><msup><mi>χ</mi><mn>2</mn></msup><mrow><mi>N</mi><mo>−</mo><mi>k</mi></mrow></mfrac></math></span>
+            <h4>Best realistic fits</h4>
+            <p>Some inputs are uncertain for every galaxy. With the switch on, each model may adjust them for its lowest χ², within the same limits, each twice the published uncertainty:</p>
+            <table class="mini-table limits-table"><tbody>
+              <tr><th scope="row">Disk mass-to-light</th><td>0.32 to 0.79</td></tr>
+              <tr><th scope="row">Bulge mass-to-light</th><td>0.44 to 1.11</td></tr>
+              <tr><th scope="row">Distance and tilt</th><td>SPARC’s value ± 2 errors</td></tr>
+              <tr><th scope="row">MOND’s a<sub>0</sub></th><td>1.16 to 1.24 ×10⁻¹⁰ m/s²</td></tr>
+              <tr><th scope="row">Halo concentration</th><td>0.6 to 1.7 × typical for its mass</td></tr>
+            </tbody></table>
+            <details class="fold"><summary>Where the limits come from</summary>
+              <p><b>Mass-to-light:</b> 0.1 dex of scatter around SPARC’s standard values (McGaugh &amp; Schombert 2014; Li et al. 2018). <b>Distance and tilt:</b> SPARC’s own errors. <b>Concentration:</b> the scatter of simulated halos (Dutton &amp; Macciò 2014).</p>
+              <p><b>a<sub>0</sub>:</b> measured as 1.20 ± 0.02 (McGaugh, Lelli &amp; Schombert 2016). They also quote a wider ±0.24, but that comes from the stars’ mass-to-light ratio, which the fits already vary, so using it would count the same uncertainty twice.</p>
+              <p><b>Distance</b> matters because a galaxy twice as far away as thought must be twice as wide and four times as bright to look the same, so every radius and every visible-matter V² changes with it.</p>
+            </details>
+          </div>
+        </div>
+      </article>
+      <article class="method-step" id="mOrbits">
+        <div class="ms-head"><span class="ms-n">5</span><div><h3>Watch stars move under that gravity</h3><p>The 3D view shows what the orange line means for real orbits: it moves test stars under the model’s gravity for a billion years.</p></div></div>
+        <div class="ms-body">
+          <div class="ms-words">
+            <p><b>Test stars</b> feel the model’s gravity but do not pull on each other, so each one shows what that gravity alone does to a star. There are 800 for NGC 3198, scaled with each galaxy’s visible mass (200 to 2400). The number is a display choice: a real galaxy has billions.</p>
+            <p><b>They start in balance.</b> Disk stars start on circular orbits at the measured speeds; bulge stars start with random motions, which is what holds a bulge up. Change the gravity and they are no longer balanced: with too little pull they drift outwards, and beyond 1.5 × the galaxy’s visible edge they count as ejected.</p>
+            <p><b>The pull on each star</b> gives it an acceleration a = V<sub>model</sub>(r)²/r towards the centre.</p>
+          </div>
+          <div class="ms-maths">
+            <h4>One small step at a time</h4>
+            <p>An orbit cannot be solved in one go, so the computer moves each star in small steps of Δt = 0.5 Myr, 2000 times over 1 Gyr (the velocity-Verlet method). First the position, as in SUVAT’s s = ut + ½at²:</p>
+            <span class="eq"><math display="block"><msub><mi>x</mi><mi>new</mi></msub><mo>=</mo><mi>x</mi><mo>+</mo><mi>v</mi><mi>Δ</mi><mi>t</mi><mo>+</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mi>a</mi><msup><mrow><mi>Δ</mi><mi>t</mi></mrow><mn>2</mn></msup></math></span>
+            <p>Then it finds the acceleration at the new position, a<sub>new</sub>, and updates the velocity with the average of the old and new accelerations:</p>
+            <span class="eq"><math display="block"><msub><mi>v</mi><mi>new</mi></msub><mo>=</mo><mi>v</mi><mo>+</mo><mfrac><mrow><mi>a</mi><mo>+</mo><msub><mi>a</mi><mi>new</mi></msub></mrow><mn>2</mn></mfrac><mi>Δ</mi><mi>t</mi></math></span>
+            <details class="fold"><summary>Why this method?</summary>
+              <p>Using only the old acceleration makes each step slightly wrong, and the error builds up step after step, so stars slowly spiral in or out. Averaging keeps the energy error small and stops it building up, so a star that leaves does so because of the physics, not the size of the step.</p>
+            </details>
+          </div>
+        </div>
+      </article>
+      <article class="method-step ms-limits" id="mLimits">
+        <div class="ms-head"><span class="ms-n" aria-hidden="true">!</span><div><h3>What this model leaves out</h3><p>Every model simplifies. These are the simplifications that matter most here, so you can judge the results for yourself.</p></div></div>
+        <ul class="limits-grid">
+          <li><b>A round pull</b>In the 3D view, the pull on each star is worked out as if the galaxy’s mass were a ball, although the disk is flat. The rotation curve uses SPARC’s own disk calculations, so it is unaffected, but the stars’ bobbing up and down in the 3D view is only approximate.</li>
+          <li><b>A softened centre</b>Within about 1 kpc of the centre the pull is smoothed out (the softening used in the GADGET-2 code; Springel 2005), so a star passing close by is not flung out by an unrealistically huge pull.</li>
+          <li><b>A smooth, round halo</b>The halo is perfectly smooth and stops at r<sub>200</sub>. In many small, faint galaxies, the speeds near the centre suggest a flatter middle than NFW’s (the cusp–core problem; de Blok 2010).</li>
+          <li><b>Estimated star masses</b>The mass-to-light ratios are averages, not measured for each galaxy. Best realistic fits let them vary within limits.</li>
+          <li><b>Hard limits</b>Best fits stop sharply at the edge of each realistic range. Li et al. (2018) used softer limits, which let a value stray further at a cost, and found acceptable MOND fits for most SPARC galaxies.</li>
+          <li><b>Four galaxies</b>SPARC has 175. Four are enough to show how the method works, not to decide between the ideas.</li>
+          <li><b>Drawn, not calculated</b>The glow, the star spikes, the purple halo cloud and MOND’s gold shading help you see what is happening. They change no numbers.</li>
+        </ul>
+      </article>
+    </section>
+    <section class="refs" id="references" aria-labelledby="refsTitle">
+      <h3 id="refsTitle">Sources</h3>
+      <p class="refs-intro">Every source cited on this site, in Harvard style. Each link opens the published paper or page in a new tab.</p>
+      <ul>
           <li>Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href="https://doi.org/10.1103/RevModPhys.90.045002" target="_blank" rel="noopener">doi:10.1103/RevModPhys.90.045002</a></li>
           <li>Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href="https://doi.org/10.1086/508162" target="_blank" rel="noopener">doi:10.1086/508162</a></li>
           <li>de Blok, W.J.G. (2010) ‘The core-cusp problem’, <i>Advances in Astronomy</i>, 2010, 789293. <a href="https://doi.org/10.1155/2010/789293" target="_blank" rel="noopener">doi:10.1155/2010/789293</a></li>
@@ -1380,11 +1563,12 @@
           <li>Springel, V. (2005) ‘The cosmological simulation code GADGET-2’, <i>Monthly Notices of the Royal Astronomical Society</i>, 364(4), pp. 1105–1134. <a href="https://doi.org/10.1111/j.1365-2966.2005.09655.x" target="_blank" rel="noopener">doi:10.1111/j.1365-2966.2005.09655.x</a></li>
           <li>Williams, D.R. (2024) <i>Planetary fact sheet</i>. NASA Goddard Space Flight Center. <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener">nssdc.gsfc.nasa.gov/planetary/factsheet</a></li>
           <li>Zwicky, F. (1933) ‘Die Rotverschiebung von extragalaktischen Nebeln’, <i>Helvetica Physica Acta</i>, 6, pp. 110–127. English translation (2009): ‘The redshift of extragalactic nebulae’, <i>General Relativity and Gravitation</i>, 41(1), pp. 207–224. <a href="https://doi.org/10.1007/s10714-008-0707-4" target="_blank" rel="noopener">doi:10.1007/s10714-008-0707-4</a></li>
-        </ul>
-        <p>Each link opens the published source in a new tab.</p>
-      </section>
+      </ul>
+    </section>
+    <div class="method-data">
+      <p><b>Check the numbers yourself</b>Download the model on screen as two CSV files, the rotation curve and the stars’ time series, to open in a spreadsheet.</p>
       <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
-    </footer>
+    </div>
     </div>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
@@ -3906,11 +4090,11 @@ window.GALAXIES = {
       document.getElementById('tiltStat').classList.toggle('off',customActive); // a sandbox galaxy has no measured tilt
       document.getElementById('mlDisk').textContent=mlState.disk.toFixed(2);
       document.getElementById('mlBulge').textContent=mlState.bulge.toFixed(2);
-      document.getElementById('ftDisk').textContent=mlState.disk.toFixed(2);
-      document.getElementById('ftBulge').textContent=mlState.bulge.toFixed(2);
+      document.getElementById('methodDisk').textContent=mlState.disk.toFixed(2);
+      document.getElementById('methodBulge').textContent=mlState.bulge.toFixed(2);
       const mlSource=fit&&bestFits?(mondMode?'MOND best fit':'NFW best fit'):'standard SPARC values';
       document.getElementById('mlSource').textContent=mlSource;
-      document.getElementById('ftMlSource').textContent=mlSource;
+      document.getElementById('methodMlSource').textContent=mlSource;
       mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). Best realistic fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
       document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
       if(!customActive){
@@ -4138,8 +4322,8 @@ window.GALAXIES = {
         :'How spread out the halo is, for the same mass. Small packs it near the centre and speeds up the inner stars; large spreads it out.';
       fitButton.textContent=custom?'Typical halo':'Fit halo to data';
       if(custom)fitButton.title='Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)';else fitButton.removeAttribute('title');
-      document.getElementById('footerModel').hidden=custom;
-      document.getElementById('footerCustom').hidden=!custom;
+      document.getElementById('visiblePreset').hidden=custom;
+      document.getElementById('visibleCustom').hidden=!custom;
       document.getElementById('componentKey').hidden=!custom;
       applyGalaxyLabels(activeGalaxy);
     }
@@ -4709,7 +4893,7 @@ window.GALAXIES = {
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and it is an estimate.',
          action:'Hover over (or tap) the ? in the blue box.'},
         {id:'scorecard',closing:true,target:'glanceTable',gesture:'look',tag:'Read along the rows',title:'How both ideas score',
-         text:'Each row is a galaxy, scored under each idea: close (blue), rough (orange) or poor (red). An arrow goes from the standard values to the best realistic fit; a † means that fit needed a value at the edge of what is realistic.',
+         text:'Each row is a galaxy, scored under each idea: close (green), rough (yellow) or poor (red). An arrow goes from the standard values to the best realistic fit; a † means that fit needed a value at the edge of what is realistic.',
          action:'Read along the rows in the blue box, then press Next.'},
         {id:'finish',closing:true,noRing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
          text:'A close fit does not prove either idea: both models are simplified and the measurements have errors.',
@@ -4785,7 +4969,7 @@ window.GALAXIES = {
     const tutorialTopbar=document.querySelector('.topbar'),tutorialBar=document.querySelector('.sim-stage .controls'),tutorialPlots=document.querySelector('.sim-stage .panel-grid');
     let tutorialTour='main',tutorialSteps=TOURS.main.steps,tutorialIndex=0,tutorialTarget=null,tutorialCompleted={};
     // The full guided tour (from the puzzle page) runs every tour in this order, one after the other.
-    // Its closing cards (Scorecard, then Background) are held back until after the sandbox tour, so it ends on them.
+    // Its closing cards (Scorecard, then The two ideas) are held back until after the sandbox tour, so it ends on them.
     TOURS.closing={label:'Wrapping up',steps:TOURS.main.steps.filter(s=>s.closing)};
     const FULL_TOUR=['main','sandbox','closing'];let tutorialFull=false;
     const tourSteps=(tour,full)=>full&&tour==='main'?TOURS.main.steps.filter(s=>!s.closing):TOURS[tour].steps;
