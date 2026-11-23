@@ -236,7 +236,8 @@ pointer rests where to act), near-solid panels over the 3D view, and no bloom
 in the 3D view. Page scripts test `calmMotion()`, which is true with lite
 visuals or the system's reduce-motion setting. "Use automatic" hands control
 back; in automatic mode lite visuals come on for the rest of the visit once
-the resolution has dropped to its lowest level. Until it is used, the box
+the resolution has dropped to its lowest level, but keep CSS transitions such
+as boxes opening, which cost almost nothing (class `lite-auto`). Until it is used, the box
 shows whether the automatic choice is at full quality. The choice is kept in
 the browser's localStorage (`galaxySimQuality`), applied before the page
 first draws, and the panel stays usable during the tour. The "Now watch it
@@ -416,8 +417,8 @@ sheen, and their contents arrive one after another. Closing is quicker. A
 halo card's note pulls out below the card like a drawer, over the content
 beneath, so the page never reflows. The collapsed View panel is its open
 panel clipped down to the "View" pill, so opening grows the pill into the
-panel. Only opacity, transform and clip-path animate. Lite visuals and
-reduced motion make it a plain, instant show and hide. In the tutorial, an explainer counts as read only once it has
+panel. Only opacity, transform and clip-path animate. Lite visuals chosen
+in Settings and reduced motion make it a plain, instant show and hide. In the tutorial, an explainer counts as read only once it has
 stayed open for 1.5 s (`HOVER_OPEN_DELAY_MS`, `EXPLAINER_READ_MS`). While a
 tutorial card is up, the page is dimmed except for every control the card
 names and any explainer it has opened.

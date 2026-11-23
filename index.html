@@ -573,12 +573,15 @@
     .settings-note button:hover, .settings-note button:focus-visible { text-decoration:underline; outline:none; }
     @media (max-width:640px) { .settings { margin-right:-4px; } }
     @media (prefers-reduced-motion:reduce) { .settings-btn svg, .settings-row input, .settings-row input::after { transition:none; } }
-    /* Lite visuals (html.lite, see the first script): no animation, transition, blur or glow anywhere. Animations jump
+    /* Lite visuals (html.lite, see the first script): no animation, blur or glow anywhere, and no transition when chosen. Animations jump
        straight to their end state (after any delay, so a ring still shows green before it goes), so anything that fades
        out still ends hidden. Panels that relied on blur over the
        3D view get a near-solid background so their text stays readable. */
     html.lite { scroll-behavior:auto; }
-    html.lite *, html.lite *::before, html.lite *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+    html.lite *, html.lite *::before, html.lite *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+    /* Transitions (boxes opening, buttons) cost almost nothing, so lite visuals that came on by themselves (html.lite-auto,
+       a slow 3D view) keep them; only lite visuals the visitor chose in Settings make them instant too. */
+    html.lite:not(.lite-auto) *, html.lite:not(.lite-auto) *::before, html.lite:not(.lite-auto) *::after { transition-duration:.01ms !important; }
     html.lite .tutorial-spotlight, html.lite .tutorial-also, html.lite .tutorial-spotlight.is-complete { box-shadow:none; }
     html.lite .tutorial-pointer { animation:none; transform:translate(var(--to-x),var(--to-y)); } /* as with reduce-motion: the pointer rests where to act */
     html.lite .tutorial-spotlight.is-complete::after { display:none; }
@@ -964,7 +967,7 @@
     details::details-content { height:0; overflow:clip; opacity:0; transition:height .5s var(--pop-ease), opacity .3s ease, content-visibility .5s allow-discrete; }
     details[open]::details-content { height:auto; opacity:1; }
     /* Lite visuals already make every transition instant (html.lite); the contents should not then arrive one by one. */
-    html.lite :is(.ml-explainer > *, .settings-panel > *, .galaxy-menu-list li, .halo-metric dd > span > span, .view-panel > :not(.view-head)) { transition-delay:0s !important; }
+    html.lite:not(.lite-auto) :is(.ml-explainer > *, .settings-panel > *, .galaxy-menu-list li, .halo-metric dd > span > span, .view-panel > :not(.view-head)) { transition-delay:0s !important; }
     @media (prefers-reduced-motion:reduce) {
       .ml-explainer, .ml-explainer > *, .stat-q::after, .settings-panel, .settings-panel > *, .galaxy-menu-list, .galaxy-menu-list li, .halo-metric dd, .halo-metric dd > span > span,
       .view-panel > :not(.view-head) { transform:none !important; transition-property:opacity, visibility, display !important; transition-delay:0s !important; }
@@ -3112,6 +3115,7 @@ window.GALAXIES = {
             if(!qualityChoice&&resLevel===resLevels.length-1&&resLevels.length>1)autoLite=true;
             const lite=qualityChoice==='low'||!qualityChoice&&autoLite;
             if(document.documentElement.classList.contains('lite')!==lite){document.documentElement.classList.toggle('lite',lite);needsRender=true;}
+            document.documentElement.classList.toggle('lite-auto',lite&&!qualityChoice); // automatic lite keeps CSS transitions
             if(bloomPass)bloomPass.enabled=!lite;
             const full=resLevel===0&&!lite;
             qualityToggle.checked=qualityChoice?qualityChoice==='high':full;
