@@ -247,7 +247,18 @@ a few red giants) and the disk gets bluer outwards (de Jong 1996). Underneath,
 a diffuse glow shows the unresolved starlight: an exponential disk with the
 galaxy's own scale length (Freeman 1970) and a de Vaucouleurs bulge, weighted
 by their masses. Colour saturation, diffraction spikes and bloom are visual
-choices only. To stay smooth on large or high-DPI screens, the 3D view lowers
+choices only. Spiral arms are drawn, not simulated (the test stars do not pull on
+each other, so the model cannot form them): two trailing logarithmic arms (pitch
+18°, `SPIRAL_PITCH_DEG`) turn at one pattern speed, corotating at 3.5 disk scale
+lengths with the galaxy's own speed there, while the stars move through them, as in
+density-wave theory (Lin & Shu 1964). They only change brightness: disk stars above
+about 3 M☉ (short-lived, so still near their arm) respond fully, lighter old stars
+by about ±20% (`SPIRAL_OLD_RESPONSE`), bulge stars not at all; the disk glow, being
+visible light that young stars dominate, at 0.6 strength (`SPIRAL_GLOW_RESPONSE`).
+Arms fade out when gas is under 1–5% of the visible mass (`SPIRAL_GAS_FRACTION`),
+since gas-poor lenticular disks have none. The opening-page galaxy follows the same
+rule (gas and its few large points trace the arms strongly). Pitch, arm count and
+pattern speed are visual choices; Method's "Spiral arms are drawn on" card says so. To stay smooth on large or high-DPI screens, the 3D view lowers
 its render resolution in steps while frames run slow and raises it again when
 there is headroom (`trackFrameTime` in the generator); 4x antialiasing is used
 only on low-DPI screens at full resolution. The gear at the far right of the
