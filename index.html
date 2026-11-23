@@ -3393,6 +3393,7 @@ window.GALAXIES = {
     // second during a drag. The worker runs the page's own integrateStars and accelFactor, so the numbers are the same
     // as the main-thread path (integrateTrajectories), which start-up, galaxy switches and the physics checks use.
     let pendingCustomStars=null; // a custom galaxy's new anatomy, waiting for its stars (rebuildCustomGalaxy)
+    const ORBIT_SEND_FALLBACK_MS=100;
     let orbitWorker=null,orbitInFlight=null,orbitSendQueued=false,orbitRequests=0,orbitGeneration=0,spareOrbitBuffer=null,workerOrbitBuffer=null;
     function getOrbitWorker(){
       if(orbitWorker===null){
@@ -3432,7 +3433,9 @@ window.GALAXIES = {
     function queueOrbitJob(){
       if(orbitInFlight||orbitSendQueued)return;
       orbitSendQueued=true;
-      requestAnimationFrame(()=>setTimeout(()=>{orbitSendQueued=false;if(!orbitInFlight)sendOrbitJob();}));
+      const send=()=>{if(!orbitSendQueued)return;orbitSendQueued=false;if(!orbitInFlight&&orbitWorker)sendOrbitJob();}; // the worker may have failed since
+      requestAnimationFrame(()=>setTimeout(send));
+      setTimeout(send,ORBIT_SEND_FALLBACK_MS); // no frames come in a background tab; the counter and tutorial still need the orbits
     }
     function sendOrbitJob(){
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
