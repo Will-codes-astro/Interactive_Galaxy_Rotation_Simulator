@@ -4283,7 +4283,7 @@ window.GALAXIES = {
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: the halo now matches the measured speeds.',
          text:'χ² (yellow box) scores the fit: it adds up the gaps between the orange line and the white points. Lower is better.',
          action:'1. Drag Halo mass until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ². 3. Fine-tune both until it reads Close fit again.'},
-        {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],title:'Test a rival idea',
+        {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],keepWatch:true,title:'Test a rival idea',
          text:'MOND has no dark matter. Instead, it changes the law of gravity, so it pulls harder than Newton’s law says: a little where gravity is strong, much more where it is weak. The deeper the gold on the graph, the bigger the boost.',
          action:'Click the MOND card in the blue box. Compare χ² in the yellow box.'},
         {id:'mondZone3d',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
@@ -4329,7 +4329,7 @@ window.GALAXIES = {
          checks:{fsRestart:()=>tutorialFlags.restartHalo,viewFullHalo:()=>tutorialFlags.fullHalo},doneText:'Zoomed out: the whole visible galaxy is that bright speck.',
          text:'With the halo back, the stars stay. The sphere marks the halo’s edge, r₂₀₀; the bright speck is the whole visible galaxy.',
          action:'1. Press Restart: the stars stay put. 2. Press Full halo to zoom out.'},
-        {id:'galaxies',mode:'preset',target:'galaxyMenu',gesture:'click',tag:'Choose a galaxy',watch:['galaxyProfile:Its profile'],title:'Try another galaxy',
+        {id:'galaxies',mode:'preset',target:'galaxyMenu',gesture:'click',tag:'Choose a galaxy',watch:['galaxyProfile:Its profile'],keepWatch:true,title:'Try another galaxy',
          text:'Each galaxy has its own measured speeds. The card in the yellow box says what kind of galaxy it is.',
          action:'Open the Galaxy menu (blue box) and pick another galaxy.'},
         {id:'ml',mode:'preset',cardRight:true,target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
@@ -4363,7 +4363,9 @@ window.GALAXIES = {
          text:'You never set the dark matter directly: your galaxy gets the halo typical for its stars (Moster et al. 2013).',
          action:'Drag Disk mass and watch Typical halo mass change.'},
         {id:'sbMond',mode:'custom',partPause:true,given:['optMond'],target:'optMond',gesture:'click',tag:'1 · Choose MOND',also:['sbDiskMass:2 · Drag right'],cardSlider:{sbDiskMass:'curvePlot'},watch:['curvePlot:Watch the gold zone'],title:'Where MOND steps in',
-         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondFaintSomewhere()},doneText:'Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out.',
+         // The default disk is already heavy enough for faint gold, so the part also needs a real drag to the right
+         // (or the slider already at its top end).
+         checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondFaintSomewhere()&&(sbVal('sbDiskMass')>tutorialStart.sbDiskMass||sbVal('sbDiskMass')>=Number(document.getElementById('sbDiskMass').max))},doneText:'Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out.',
          text:'MOND boosts gravity everywhere, but only a little where gravity is strong. The weaker it gets, the bigger the boost, and the deeper the gold on the graph.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until the gold near the centre of the graph turns very faint.'},
         {id:'sbMondZone3d',mode:'custom',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'MOND in your galaxy',
