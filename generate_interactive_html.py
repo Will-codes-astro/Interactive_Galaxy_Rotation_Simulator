@@ -2015,13 +2015,14 @@ __GALAXIES_JS__
                 if(k<bulgeCount){
                     const r=hernquistRadius(u[4*k],anatomy.bulgeRadius,GALAXY.bulgeMin,bulgeCut);
                     const cosT=2*u[4*k+2]-1,sinT=Math.sqrt(1-cosT*cosT);
-                    list[k]={kind:'bulge',position:[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT],radius:r,kick,colorSeed:u[4*k+3]};
+                    list[k]={kind:'bulge',seed:k,position:[r*sinT*Math.cos(phi),r*sinT*Math.sin(phi),r*cosT],radius:r,kick,colorSeed:u[4*k+3]};
                 }else{
                     const R=diskRadius(u[4*k],anatomy.diskScale,GALAXY.diskMin,anatomy.rMax);
-                    list[k]={kind:'disk',position:[R*Math.cos(phi),R*Math.sin(phi),g[4*k]*GALAXY.scaleHeight],radius:R,kick,colorSeed:u[4*k+3]};
+                    list[k]={kind:'disk',seed:k,position:[R*Math.cos(phi),R*Math.sin(phi),g[4*k]*GALAXY.scaleHeight],radius:R,kick,colorSeed:u[4*k+3]};
                 }
             }
             // Number the stars from the centre outwards (by starting distance), so star 1 is innermost and the last is outermost.
+            // seed keeps each star's draw number, so the orbit blend (swapOrbits) can follow a star when the order changes.
             list.sort((a,b)=>Math.hypot(...a.position)-Math.hypot(...b.position));
             return{particles:list,bulgeCount,bulgeCut};
         }
@@ -2231,63 +2232,75 @@ __GALAXIES_JS__
             starCount = particles.length;
             assignInitialVelocities();
         }
+        // The population as one object, so a background orbit calculation can build a custom galaxy's next stars
+        // without showing them before their orbits are ready (requestOrbits).
+        const populationState = () => ({currentAnatomy, softening, ejectionRadius, particles, bulgeStarCount, bulgeCutRadius, starCount});
+        function restorePopulation(s) {
+            ({currentAnatomy, softening, ejectionRadius, particles, bulgeStarCount, bulgeCutRadius, starCount} = s);
+        }
 
         let sortedEscapeTimes = [], escapeTimeByStar = new Float64Array(0);
         let activeHaloMassT = DEFAULTS.massT;
 
-        // Each buffer holds every star's 1 Gyr path (frameCount x 3 floats each) and only grows. Slot activeSlot is the
-        // one on screen; a gradual recalculation (refreshOrbits) fills the other, so the view never shows a half-done set.
-        const trajectorySlots = [{buffer: null, views: []}, {buffer: null, views: []}];
-        let activeSlot = 0;
-        function trajectoryViewsFor(count, slot) {
-            const s = trajectorySlots[slot];
-            if (s.views.length < count) {
-                const stride = frameCount * 3;
-                s.buffer = new Float32Array(count * stride);
-                s.views = Array.from({length: count}, (_, k) => s.buffer.subarray(k * stride, (k + 1) * stride));
+        // The main thread's star paths (frameCount x 3 floats per star) share one buffer, which only grows. The
+        // background worker (requestOrbits) fills buffers of its own.
+        let trajectoryBuffer = null, trajectoryViews = [];
+        const trajectoryViewsOf = (buffer, count) => {
+            const stride = frameCount * 3;
+            return Array.from({length: count}, (_, k) => buffer.subarray(k * stride, (k + 1) * stride));
+        };
+        function trajectoryViewsFor(count) {
+            if (trajectoryViews.length < count) {
+                trajectoryBuffer = new Float32Array(count * frameCount * 3);
+                trajectoryViews = trajectoryViewsOf(trajectoryBuffer, count);
             }
-            return s.views;
+            return trajectoryViews;
         }
 
-        // Sets up an orbit calculation for the current stars: fills the force table and picks the buffer to write.
-        // gradual: write into the buffer that is not on screen, because the stars keep moving while it runs.
-        function startIntegration(massT, scaleRadius, gradual) {
+        // Everything one orbit calculation needs for the current stars: the gravity (force table) of this halo,
+        // each star's starting position and velocity (6 numbers per star) and the ejection radius.
+        function orbitJobFor(massT, scaleRadius) {
             const haloVelocity = extraVelocityModel(massT * 1e12, scaleRadius, baryonicVelocity);
             fillForceTable(forceTable, r => {
                 const vb = baryonicVelocity(r), vh = haloVelocity(r);
                 return vb * vb + vh * vh;
             });
-            const count = particles.length, slot = gradual ? 1 - activeSlot : activeSlot;
-            return {massT, count, slot, trajectories: trajectoryViewsFor(count, slot), escapeTimes: [], escapeByStar: new Float64Array(count), next: 0};
+            const count = particles.length, initial = new Float64Array(count * 6);
+            for (let p = 0; p < count; p++) {
+                initial.set(particles[p].position, p * 6);
+                initial.set(particles[p].velocity, p * 6 + 3);
+            }
+            return {massT, mond: mondMode, count, table: forceTable, initial, limit: ejectionRadius};
         }
-        // Makes a finished calculation the one shown and used (escape counter, tutorial).
-        function finishIntegration(job) {
-            activeSlot = job.slot;
-            escapeTimeByStar = job.escapeByStar;
-            sortedEscapeTimes = job.escapeTimes.sort((a, b) => a - b);
-            activeHaloMassT = mondMode ? 0 : job.massT;
-            return job.trajectories;
+        // Makes a finished calculation's escapes the ones the counter and the tutorial use.
+        function applyEscapes(job, escapeByStar, escapeTimes) {
+            escapeTimeByStar = escapeByStar;
+            sortedEscapeTimes = escapeTimes.sort((a, b) => a - b);
+            activeHaloMassT = job.mond ? 0 : job.massT;
         }
-        // All stars at once (start-up, galaxy changes and the physics checks).
+        // All stars at once on the main thread (start-up, galaxy changes, the physics checks, and browsers without workers).
         function integrateTrajectories(massT, scaleRadius) {
-            const job = startIntegration(massT, scaleRadius, false);
-            integrateStars(job, job.count);
-            return finishIntegration(job);
+            const job = orbitJobFor(massT, scaleRadius), trajectories = trajectoryViewsFor(job.count);
+            const escapeByStar = new Float64Array(job.count), escapeTimes = [];
+            integrateStars(job, trajectories, escapeByStar, escapeTimes);
+            applyEscapes(job, escapeByStar, escapeTimes);
+            return trajectories;
         }
 
-        // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline, for stars job.next to end - 1.
-        function integrateStars(job, end) {
-            const trajectories = job.trajectories, escapeTimes = job.escapeTimes, escapeByStar = job.escapeByStar;
+        // Velocity-Verlet symplectic integration loop across the 1 Gyr (1000 Myr) timeline. It uses only its arguments,
+        // accelFactor and numeric constants, because the background worker runs this same function's source.
+        function integrateStars(job, trajectories, escapeByStar, escapeTimes) {
+            const table = job.table, initial = job.initial;
             const dtSub = DT_SUB;
             const dtSub2Half = 0.5 * dtSub * dtSub;
             const dtSubHalf = 0.5 * dtSub;
-            const limit = ejectionRadius, limit2 = limit * limit;
+            const limit = job.limit, limit2 = limit * limit;
 
-            for (let p = job.next; p < end; p++) {
-                const particle = particles[p], positions = trajectories[p];
-                let x = particle.position[0], y = particle.position[1], z = particle.position[2];
-                let vx = particle.velocity[0], vy = particle.velocity[1], vz = particle.velocity[2];
-                let k = accelFactor(forceTable, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
+            for (let p = 0; p < job.count; p++) {
+                const positions = trajectories[p], o = p * 6;
+                let x = initial[o], y = initial[o + 1], z = initial[o + 2];
+                let vx = initial[o + 3], vy = initial[o + 4], vz = initial[o + 5];
+                let k = accelFactor(table, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
                 let ax = -k * x, ay = -k * y, az = -k * z;
                 positions[0] = x; positions[1] = y; positions[2] = z;
 
@@ -2303,7 +2316,7 @@ __GALAXIES_JS__
                         z += vz * dtSub + az * dtSub2Half;
 
                         // Velocity-Verlet step 2: evaluate acceleration at new position
-                        k = accelFactor(forceTable, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
+                        k = accelFactor(table, Math.max(Math.sqrt(x * x + y * y + z * z), 1e-4));
                         const nax = -k * x, nay = -k * y, naz = -k * z;
 
                         // Velocity-Verlet step 3: advance velocity
@@ -2330,7 +2343,6 @@ __GALAXIES_JS__
                     escapeTimes.push(escTime);
                 }
             }
-            job.next = end;
         }
         setPopulation(presetAnatomy(activeGalaxy), starCountFor(visibleMassOf(presetAnatomy(activeGalaxy)), PRESET_TEMPLATE_MASS));
         let activeTrajectories = integrateTrajectories(DEFAULTS.massT, DEFAULTS.scaleRadius);
@@ -2983,7 +2995,53 @@ __GALAXIES_JS__
                     a[o++]=t[i1];a[o++]=t[i1+1];a[o++]=t[i1+2];
                 }
             }
+            if(orbitBlendWeight>0)for(let i=0;i<o;i++)a[i]+=lineBlend[i]*orbitBlendWeight;
             orbitLineGeom.attributes.position.needsUpdate=true;
+        }
+        // Orbit blend (a visual choice, not physics): when a new set of orbits replaces the old one because a slider
+        // moved, each star and orbit line eases from where it was drawn onto its new path over ORBIT_BLEND_MS instead of
+        // jumping. starBlend / lineBlend hold old drawing minus new path; orbitBlendWeight falls from 1 to 0.
+        const ORBIT_BLEND_MS=250;
+        const starBlend=new Float32Array(starGeometry.attributes.position.array.length);
+        const lineBlend=new Float32Array(orbitLineGeom.attributes.position.array.length);
+        let orbitBlendStart=-1,orbitBlendWeight=0;
+        // Advances the blend; true while the stars and lines need redrawing for it (including its last step).
+        function orbitBlendStep(now){
+            if(orbitBlendStart<0)return false;
+            const t=Math.min(1,Math.max(0,(now-orbitBlendStart)/ORBIT_BLEND_MS));
+            orbitBlendWeight=(1-t)**3; // ease-out: most of the move happens early, so the stars follow a drag closely
+            if(t>=1)orbitBlendStart=-1;
+            return true;
+        }
+        // Shows a new set of orbits. blend: ease in from the current drawing. beforeShow runs after the current drawing is
+        // copied and before the new orbits are drawn (a custom galaxy swaps in its new stars there, which may change their
+        // number and order), so each star and orbit line is matched to its old drawing by its seed; a new star has none
+        // and appears on its path at once.
+        function swapOrbits(trajectories,blend,beforeShow){
+            const pos=starGeometry.attributes.position.array,line=orbitLineGeom.attributes.position.array;
+            blend=blend&&!calmMotion();
+            let oldPos=null,oldLine=null,oldStar=null,oldLineSlot=null;
+            if(blend){ // what is on screen now, any earlier blend included
+                oldPos=pos.slice(0,starCount*3);oldLine=line.slice(0,orbitLineIdx.length*orbitSegs*6);
+                oldStar=new Map();for(let k=0;k<starCount;k++)oldStar.set(particles[k].seed,k);
+                oldLineSlot=new Map(orbitLineIdx.map((k,j)=>[particles[k].seed,j]));
+            }
+            if(beforeShow)beforeShow();
+            activeTrajectories=trajectories;orbitBlendWeight=0;orbitBlendStart=-1;
+            updateStarTransforms(simTime);fillOrbitLines();
+            if(!blend){requestRender();return;}
+            starBlend.fill(0);lineBlend.fill(0);
+            for(let k=0;k<starCount;k++){
+                const j=oldStar.get(particles[k].seed);
+                if(j!==undefined)for(let c=0;c<3;c++)starBlend[k*3+c]=oldPos[j*3+c]-pos[k*3+c];
+            }
+            const perLine=orbitSegs*6;
+            orbitLineIdx.forEach((k,j)=>{
+                const old=oldLineSlot.get(particles[k].seed);
+                if(old!==undefined)for(let i=0;i<perLine;i++)lineBlend[j*perLine+i]=oldLine[old*perLine+i]-line[j*perLine+i];
+            });
+            orbitBlendStart=performance.now(); // the render loop draws the blend from its next frame
+            requestRender();
         }
         syncStarMeshes();
         fillOrbitLines();
@@ -3031,6 +3089,7 @@ __GALAXIES_JS__
                 posArray[k*3+1]=t[i0+1]+(t[i1+1]-t[i0+1])*alpha;
                 posArray[k*3+2]=t[i0+2]+(t[i1+2]-t[i0+2])*alpha;
             }
+            if(orbitBlendWeight>0)for(let i=0,n=starCount*3;i<n;i++)posArray[i]+=starBlend[i]*orbitBlendWeight;
             starGeometry.attributes.position.needsUpdate=true;
         }
 
@@ -3321,6 +3380,10 @@ __GALAXIES_JS__
             const frameMs=now-lastTime,dt=Math.min(frameMs/1000,0.1);
             lastTime=now;
             if(controls.update(dt))needsRender=true;
+            if(orbitBlendStep(now)){
+                if(!playing)updateStarTransforms(simTime); // while playing, the step below moves the stars
+                fillOrbitLines();needsRender=true;
+            }
             if(playing){
                 simTime+=dt*PLAYBACK_SPEED_MYR_PER_SEC*playbackMultiplier;
                 if(simTime>=SIM_TOTAL_TIME_MYR){
@@ -3634,35 +3697,92 @@ __GALAXIES_JS__
     }
     configureHaloSliders();
     const haloMassText=massT=>customActive?formatMass(massT*1e12):`${massT.toFixed(2)} × 10¹² M☉`;
-    // Recalculating every orbit takes ~80 ms (longer on slower machines), which froze the 3D view for several frames
-    // after a slider was let go. With gradual set, the same calculation runs in slices of at most ORBIT_SLICE_MS per
-    // frame while the old orbits keep playing, and the new set is swapped in once every star is done.
-    const ORBIT_SLICE_MS=6,ORBIT_SLICE_STARS=16; // stars per time check
-    let orbitJob=null;
-    function showOrbits(){
-      fillOrbitLines();
-      updateStarTransforms(simTime);
-      updateEscapeCounter(simTime);
-      requestRender();
+    // Orbits follow the sliders live. Recalculating every star's 1 Gyr orbit takes ~80 ms (longer on slower machines),
+    // so it runs in a background worker and the page never freezes. While a slider moves, each finished set is shown
+    // (eased in by swapOrbits) and, if the settings changed meanwhile, the next one starts at once: several updates a
+    // second during a drag. The worker runs the page's own integrateStars and accelFactor, so the numbers are the same
+    // as the main-thread path (integrateTrajectories), which start-up, galaxy switches and the physics checks use.
+    let pendingCustomStars=null; // a custom galaxy's new anatomy, waiting for its stars (rebuildCustomGalaxy)
+    let orbitWorker=null,orbitInFlight=null,orbitSendQueued=false,orbitRequests=0,orbitGeneration=0,spareOrbitBuffer=null,workerOrbitBuffer=null;
+    function getOrbitWorker(){
+      if(orbitWorker===null){
+        try{
+          const constants={DT_SUB,SUBSTEPS,SIM_DT_MYR,frameCount,ACCEL_TABLE_SIZE,R_MAX_TABLE,INV_DR_TABLE};
+          const source=Object.entries(constants).map(([k,v])=>`const ${k}=${v};`).join('')+accelFactor+integrateStars+'('+orbitWorkerMain+')();';
+          orbitWorker=new Worker(URL.createObjectURL(new Blob([source],{type:'text/javascript'})));
+          orbitWorker.onmessage=onOrbitResult;
+          orbitWorker.onerror=()=>{orbitWorker=false;orbitInFlight=null;refreshOrbits();}; // fall back to the main thread
+        }catch(e){orbitWorker=false;}
+      }
+      return orbitWorker||null;
     }
-    function refreshOrbits(gradual){
-      clearTimeout(orbitModelTimer);
-      if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
+    // Runs inside the worker: one calculation per message, written into the buffer it was lent (or a new one).
+    function orbitWorkerMain(){
+      onmessage=e=>{
+        const job=e.data,stride=frameCount*3;
+        const buffer=job.buffer&&job.buffer.length>=job.count*stride?job.buffer:new Float32Array(job.count*stride);
+        const trajectories=Array.from({length:job.count},(_,k)=>buffer.subarray(k*stride,(k+1)*stride));
+        const escapeByStar=new Float64Array(job.count),escapeTimes=[];
+        integrateStars(job,trajectories,escapeByStar,escapeTimes);
+        postMessage({buffer,escapeByStar,escapeTimes},[buffer.buffer,escapeByStar.buffer]);
+      };
+    }
+    // Asks for the orbits of the current settings. Without a worker, the main thread recalculates once the slider is let go.
+    function requestOrbits(){
+      orbitRequests++;
+      if(!getOrbitWorker()){
+        clearTimeout(orbitModelTimer);
+        if(!sliderDragging)orbitModelTimer=setTimeout(refreshOrbits,120);
+        return;
+      }
+      queueOrbitJob();
+    }
+    // Builds and sends the next calculation just after the coming frame is drawn, so building it (a few ms) and showing
+    // the last one never land in the same frame.
+    function queueOrbitJob(){
+      if(orbitInFlight||orbitSendQueued)return;
+      orbitSendQueued=true;
+      requestAnimationFrame(()=>setTimeout(()=>{orbitSendQueued=false;if(!orbitInFlight)sendOrbitJob();}));
+    }
+    function sendOrbitJob(){
       const massT=Number(massSlider.value),rs=Number(scaleSlider.value);
-      if(gradual!==true){orbitJob=null;activeTrajectories=integrateTrajectories(massT,rs);showOrbits();return;}
-      const job=orbitJob=startIntegration(massT,rs,true);
-      (function slice(){
-        if(orbitJob!==job)return; // replaced by a newer calculation (another release, a new galaxy)
-        const t0=performance.now();
-        while(job.next<job.count&&performance.now()-t0<ORBIT_SLICE_MS)integrateStars(job,Math.min(job.count,job.next+ORBIT_SLICE_STARS));
-        if(job.next<job.count){requestAnimationFrame(slice);return;}
-        orbitJob=null;activeTrajectories=finishIntegration(job);showOrbits();
-      })();
+      let job,population=null;
+      if(pendingCustomStars&&customActive){
+        // A custom galaxy's new stars are built now but only shown with their orbits (onOrbitResult).
+        const{anatomy,baseline}=pendingCustomStars,shown=populationState();pendingCustomStars=null;
+        setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));
+        job=orbitJobFor(massT,rs);population={state:populationState(),baseline};
+        restorePopulation(shown);
+      }else{
+        pendingCustomStars=null;
+        job=orbitJobFor(massT,rs);
+      }
+      const buffer=spareOrbitBuffer;spareOrbitBuffer=null;
+      orbitInFlight={massT:job.massT,mond:job.mond,population,request:orbitRequests,generation:orbitGeneration};
+      orbitWorker.postMessage({count:job.count,table:job.table,initial:job.initial,limit:job.limit,buffer},
+        buffer?[job.initial.buffer,buffer.buffer]:[job.initial.buffer]);
     }
-    function scheduleOrbitUpdate(){
-      clearTimeout(orbitModelTimer);orbitJob=null; // a calculation for the old settings is no longer wanted
-      if(sliderDragging)return;
-      orbitModelTimer=setTimeout(()=>refreshOrbits(true),120);
+    function onOrbitResult(e){
+      const sent=orbitInFlight,{buffer,escapeByStar,escapeTimes}=e.data;orbitInFlight=null;
+      if(sent.generation===orbitGeneration){
+        const count=sent.population?sent.population.state.starCount:starCount;
+        swapOrbits(trajectoryViewsOf(buffer,count),true,sent.population&&(()=>{
+          restorePopulation(sent.population.state);
+          syncStarMeshes();updateStarTelemetry();updateCustomSummary(sent.population.baseline);
+        }));
+        applyEscapes(sent,escapeByStar,escapeTimes);updateEscapeCounter(simTime);
+        spareOrbitBuffer=workerOrbitBuffer;workerOrbitBuffer=buffer; // the set no longer shown is lent out next time
+      }else spareOrbitBuffer=buffer; // a galaxy switch since: these orbits are for the old one
+      if(sent.request!==orbitRequests)queueOrbitJob();
+    }
+    // All at once on the main thread (galaxy switches, and without a worker); a calculation still in the worker is dropped.
+    function refreshOrbits(){
+      clearTimeout(orbitModelTimer);
+      orbitGeneration++;
+      if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
+      swapOrbits(integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value)),false);
+      if(workerOrbitBuffer){spareOrbitBuffer=spareOrbitBuffer||workerOrbitBuffer;workerOrbitBuffer=null;}
+      updateEscapeCounter(simTime);
     }
     function syncFsSliders(){
       fsMass.value=massSlider.value;fsScale.value=scaleSlider.value;
@@ -3883,12 +4003,12 @@ __GALAXIES_JS__
           traces:[1,2,3,4,5,6,7],layout:yMax>range[1]?{yaxis:{range:[0,yMax]}}:{}},LIVE_CURVE_ANIMATION).catch(()=>{}); // a newer move interrupts it
         curveSettleTimer=setTimeout(updateHalo,CURVE_SETTLE_MS);
         updateHaloVisual(massT,rs);
-        clearTimeout(orbitModelTimer); // the settling full update schedules the orbits once
+        requestOrbits(); // the orbits follow the drag (several updates a second, from the worker)
         return;
       }
       Plotly.update('curvePlot',{y:[vBary.slice(),halo,total,res,...componentCurves.map(c=>c.slice())],name:[LEGEND_NAMES.visible,mondMode?LEGEND_NAMES.noHalo:'Dark matter halo',mondMode?'MOND model':'Total model','Residual',...COMPONENT_STYLE.map(([name])=>name)],visible},{'yaxis.range':[0,yMax],...mondZoneLayout()},[1,2,3,4,5,6,7]);
       updateHaloVisual(massT,rs);
-      scheduleOrbitUpdate();
+      requestOrbits();
     }
     const mondToggle=document.getElementById('mondToggle'),bestFitToggle=document.getElementById('bestFitToggle');
     const formatA0=a0=>{const e=Math.floor(Math.log10(a0));return `${(a0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;};
@@ -4014,7 +4134,7 @@ __GALAXIES_JS__
     function finishSliderDrag(){
       if(!sliderDragging)return;
       sliderDragging=false;
-      scheduleOrbitUpdate();
+      requestOrbits();
     }
     // Capture phase: the fullscreen panel stops pointer events bubbling (so drags don't spin the camera), and a
     // bubbling listener here never heard its sliders being released, so the orbits were never rebuilt.
@@ -4191,9 +4311,8 @@ __GALAXIES_JS__
         }
       }
     }
-    // New test stars (and their 1 Gyr orbits, ~100 ms) are too slow to rebuild on every slider move, so a live rebuild
-    // only records the anatomy here; refreshOrbits builds the stars from it once the slider pauses (scheduleOrbitUpdate).
-    let pendingCustomStars=null;
+    // A live rebuild only records the new anatomy here; requestOrbits builds the stars from it and shows them together
+    // with their orbits, and refreshOrbits builds them at once (galaxy switches).
     function rebuildCustomStars(){
       const{anatomy,baseline}=pendingCustomStars;pendingCustomStars=null;
       setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));

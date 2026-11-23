@@ -226,10 +226,15 @@ site, not a published standard, and the page says so.
   Springel (2005).
 - **Integrator:** velocity-Verlet (symplectic), 2 substeps per 1 Myr frame,
   over 1000 Myr (`integrateTrajectories`). A star counts as ejected beyond
-  1.5 × R_max (`EJECTION_RADIUS_FACTOR`). After a slider is released the same
-  calculation runs in slices of a few ms per frame (`refreshOrbits(true)`,
-  `integrateStars`) into a second buffer, and the finished set replaces the old
-  one in one step; the numbers are identical to the all-at-once path.
+  1.5 × R_max (`EJECTION_RADIUS_FACTOR`). While a slider moves, the orbits are
+  recalculated in a background worker (`requestOrbits`), which runs the page's
+  own `integrateStars` and `accelFactor`, so its numbers are identical to the
+  main-thread path that start-up, galaxy switches and the physics checks use.
+- **Orbit blend (visual choice, not physics):** each new set of orbits eases in
+  over 0.25 s from where the stars and orbit lines were drawn
+  (`ORBIT_BLEND_MS`, `swapOrbits`), matched star by star through each star's
+  seed number. During the blend a star is between its old and new computed
+  paths; once it ends, every star is exactly on its computed orbit.
 - **Initial conditions:** disk stars start on circular orbits in the *reference*
   gravity (the observed V_obs for a preset). Bulge stars are drawn from a Hernquist
   profile, with an isotropic velocity dispersion from the Jeans equation plus

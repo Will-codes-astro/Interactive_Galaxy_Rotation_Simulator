@@ -137,9 +137,10 @@ badge (otherwise "✓ Typical halo shape") (also over the 3D view) whenever c fa
 (`STABLE_CONCENTRATION` in the generator).
 
 In the sandbox the anatomy sliders drive the rotation curve and the halo live,
-every frame; the 3D stars and their orbits (about 0.1 s of work) are rebuilt
-once the slider pauses (`PhysicsEngine`, `rebuildCustomGalaxy` and
-`rebuildCustomStars` in the generator's page script). A sandbox galaxy is imaginary, so it has no measured speeds: the
+every frame. The 3D stars and their orbits follow during the drag too: a
+background worker recalculates them several times a second and each new set
+eases in (`PhysicsEngine`, `rebuildCustomGalaxy`, `requestOrbits` and
+`swapOrbits` in the generator's page script). The halo sliders work the same way. A sandbox galaxy is imaginary, so it has no measured speeds: the
 Galaxy menu and profile card, the observed SPARC points, the residual bars and the χ² badge
 are hidden, and the curves are drawn on an even grid of 60 radii out to
 1.25 × the truncation radius, plus four radii inside the first step so every
