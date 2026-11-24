@@ -1004,14 +1004,12 @@
     .a0-graph { margin:8px 0 14px; padding:12px 14px 10px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); color:var(--muted); }
     .a0-graph svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:11px var(--f-ui); touch-action:pan-y; cursor:crosshair; }
     .a0-graph svg text { fill:currentColor; }
-    .a0-graph svg .a0-mond { fill:#ffae5c; } .a0-graph svg .a0-mark-text { fill:#ffe2c2; font-weight:600; }
+    .a0-graph svg .a0-mond { fill:#ffae5c; } .a0-graph svg .a0-newton { fill:#8ab4f8; } .a0-graph svg .a0-mark-text { fill:#ffe2c2; font-weight:600; }
     .a0-controls { display:flex; align-items:center; gap:14px; max-width:520px; margin:6px auto 0; }
     .a0-controls input[type=range] { flex:1; min-width:0; accent-color:#ffae5c; }
     .a0-toggle { display:flex; align-items:center; gap:5px; font-size:12px; white-space:nowrap; cursor:pointer; }
-    .learn .a0-readout { max-width:520px; margin:8px auto 0; min-height:3em; color:var(--ink); font-size:13.5px; line-height:1.5; }
-    .learn .a0-readout b { color:#ffc48a; } .a0-readout span { display:block; color:var(--muted); font-size:12.5px; }
-    .a0-legend { display:flex; flex-wrap:wrap; gap:4px 14px; max-width:520px; margin:6px auto 0; font-size:12px; }
-    .a0-legend i { display:inline-block; width:8px; height:8px; margin-right:5px; border-radius:50%; }
+    .learn .a0-readout { max-width:520px; margin:8px auto 0; color:var(--ink); font-size:13.5px; line-height:1.5; }
+    .learn .a0-readout b { color:#ffc48a; }
     .a0-graph figcaption { max-width:520px; margin:8px auto 0; font-size:11.5px; line-height:1.5; }
     .a0-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
     .learn .a0-facts p { margin:0; padding:10px 12px; border-left:3px solid rgba(255,174,92,.5); border-radius:0 var(--r) var(--r) 0; background:rgba(255,174,92,.06); font-size:13.5px; }
@@ -1342,19 +1340,16 @@
         <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
         <p>It is measured, not derived. Milgrom set it to match the galaxies known in 1983; today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). That study found that the extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy. Even where gravity is strongest in the galaxies here, MOND adds at least 4%.</p>
         <h4 class="a0-head">What a<sub>0</sub> does: the MOND boost</h4>
-        <p>The graph shows how much MOND multiplies gravity. Moving left, the visible matter’s own pull gets weaker; moving up, MOND multiplies it more. Slide along the curve to read it off.</p>
+        <p>MOND has two rules. Strong gravity is left alone (×1). Weak gravity is multiplied by √(a<sub>0</sub> ÷ g<sub>N</sub>), so the weaker it is, the bigger the boost. a<sub>0</sub> is where the two rules meet. Slide along the curve to read off the boost.</p>
         <figure class="a0-graph">
-          <svg id="a0Plot" viewBox="0 0 400 262" role="img" aria-label="Graph of MOND’s gravity boost against the strength of Newtonian gravity. The boost is about 1 when gravity is stronger than a0, bends upward at a0, and reaches about 10 at a0 divided by 100. Dots from four real SPARC galaxies follow the same curve."></svg>
+          <svg id="a0Plot" viewBox="0 0 400 250" role="img" aria-label="Log-log graph of MOND’s gravity boost against the strength of Newtonian gravity. A flat Newton rule at ×1 and a rising MOND rule cross at a0; the real curve rounds that corner at about ×1.6. Dots from four real SPARC galaxies follow the curve."></svg>
           <div class="a0-controls"><input type="range" id="a0Slider" min="-2.3" max="2" step="0.01" value="0" aria-label="Strength of Newtonian gravity, compared with a0"><label class="a0-toggle"><input type="checkbox" id="a0Dots" checked> Real galaxies</label></div>
           <p class="a0-readout" id="a0Readout" aria-live="polite"></p>
-          <div class="a0-legend" id="a0Legend"></div>
-          <figcaption>Curve: the simulator’s MOND formula at a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (McGaugh, Lelli &amp; Schombert 2016). Dots: every measured radius in the four SPARC galaxies on this site, using SPARC’s standard mass-to-light ratios (Lelli, McGaugh &amp; Schombert 2016). For a dot, boost = the pull the measured speed needs ÷ the visible matter’s pull.</figcaption>
+          <figcaption>Curve: the simulator’s MOND formula (McGaugh, Lelli &amp; Schombert 2016). Dots: every measured radius of the four SPARC galaxies here, with SPARC’s standard mass-to-light ratios; boost = the pull the measured speed needs ÷ the visible matter’s pull (Lelli, McGaugh &amp; Schombert 2016). One inner NGC 3198 point (×0.3) lies below the graph.</figcaption>
         </figure>
         <div class="a0-facts">
-          <p><b>a<sub>0</sub> is where the curve bends.</b> Above it, Newton is almost right: at 10 a<sub>0</sub> gravity is boosted only ×1.04. Below it the boost grows fast: ×1.6 at a<sub>0</sub>, ×10.5 at a<sub>0</sub> ÷ 100. Far below, gravity ten times weaker gets about three times (√10) more boost.</p>
-          <p><b>The same bend in every galaxy.</b> The massive spiral NGC 7331 and the faint, diffuse UGC 128 differ hugely in size and mass, yet their dots sit close to the same curve. The boost a galaxy needs depends on its acceleration, not its size (McGaugh, Lelli &amp; Schombert 2016).</p>
-          <p><b>Why Earth never notices.</b> Gravity at Earth’s surface is about 8×10¹⁰ a<sub>0</sub>, and the Sun’s pull on Earth about 5×10⁷ a<sub>0</sub>: far off the right-hand edge, where this formula’s boost is far too small to detect.</p>
-          <p><b>An unexplained coincidence.</b> a<sub>0</sub> is close to c·H<sub>0</sub>/2π ≈ 1.1×10⁻¹⁰ m/s², built from the speed of light and the Universe’s expansion rate (Famaey &amp; McGaugh 2012). Nobody knows if this is a clue or chance; MOND itself does not explain it.</p>
+          <p><b>Why ×1.6 at a<sub>0</sub>, not ×1?</b> Both rules give ×1 at a<sub>0</sub>, but gravity doesn’t switch suddenly from one to the other: the real curve rounds the corner, so it sits a little above both. Away from a<sub>0</sub> it follows one rule: ×1.04 at 10 a<sub>0</sub>, ×10.5 at a<sub>0</sub> ÷ 100. Other MOND formulas round the corner at ×1.3 to ×1.6 (Famaey &amp; McGaugh 2012).</p>
+          <p><b>The same corner in every galaxy.</b> The dots come from four very different galaxies, from the massive spiral NGC 7331 to the faint, diffuse UGC 128, yet all sit close to the one curve. The boost a galaxy needs depends on its acceleration, not its size (McGaugh, Lelli &amp; Schombert 2016).</p>
         </div>
         </details>
         <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
@@ -3870,60 +3865,56 @@ window.GALAXIES = {
     updateChi(totalCurve);
     setupCurveReadout();
     /* ---------- a₀ explainer (Background page, "Where does a₀ come from?") ----------
-       Plots MOND's gravity boost g/g_N against the visible matter's own pull g_N, in units of a₀ on a log axis, with
-       the simulator's own formula (mondVelocity: McGaugh, Lelli & Schombert 2016, eq. 4) at the standard a₀. The dots
-       are every SPARC radius of the presets: g_N = V_bar²/R with SPARC's standard mass-to-light ratios, and the boost
-       the measured speed asks for, V_obs²/V_bar². The slider (or the pointer on the graph) reads the curve off. */
-    const A0_PLOT={w:400,h:262,l:42,r:10,t:22,b:42,xMin:-2.3,xMax:2,yMax:15,yTicks:[1,2,5,10,15]};
-    const A0_DOT_COLOURS=['#5fd0e0','#c9b8f0','#8fd694','#f28fb0'];
+       Log-log plot of MOND's gravity boost g/g_N against the visible matter's own pull g_N (in units of a₀), from the
+       simulator's own formula (mondVelocity: McGaugh, Lelli & Schombert 2016, eq. 4) at the standard a₀. Two dashed
+       lines show MOND's limits, Newton's ×1 and the deep-MOND ×√(a₀/g_N) (Milgrom 1983); on log axes they are straight
+       and cross exactly at a₀, which is what makes a₀ the scale. The dots are every SPARC radius of the presets:
+       g_N = V_bar²/R with SPARC's standard mass-to-light ratios, and the boost the measured speed asks for, V_obs²/V_bar²
+       (points outside the axes are left out; the caption names the one that is). The slider or pointer reads the curve. */
+    const A0_PLOT={w:400,h:250,l:40,r:12,t:16,b:38,xMin:-2.3,xMax:2,yMin:Math.log10(0.6),yMax:Math.log10(20),yTicks:[1,3,10]};
     const a0GravityBoost=x=>{const vb=Math.sqrt(x*MOND_A0_DEFAULT*M_PER_KPC)/1000;return(mondVelocity(vb,1,MOND_A0_DEFAULT)/vb)**2;};
     function setupA0Explainer(){
       const svg=document.getElementById('a0Plot'),slider=document.getElementById('a0Slider'),readout=document.getElementById('a0Readout');
       if(!svg)return;
-      const P=A0_PLOT,plotW=P.w-P.l-P.r,X=lx=>P.l+(lx-P.xMin)/(P.xMax-P.xMin)*plotW,Y=b=>P.h-P.b-Math.min(b,P.yMax)/P.yMax*(P.h-P.t-P.b);
-      const x0=X(P.xMin),xa=X(0),x1=X(P.xMax),yTop=Y(P.yMax),yBot=Y(0);
+      const P=A0_PLOT,plotW=P.w-P.l-P.r,plotH=P.h-P.t-P.b;
+      const X=lx=>P.l+(lx-P.xMin)/(P.xMax-P.xMin)*plotW,Y=b=>P.t+(P.yMax-Math.log10(b))/(P.yMax-P.yMin)*plotH;
+      const x0=X(P.xMin),xa=X(0),x1=X(P.xMax),yTop=P.t,yBot=P.t+plotH,yOne=Y(1);
       const curve=Array.from({length:201},(_,i)=>{const lx=P.xMin+(P.xMax-P.xMin)*i/200;return`${i?'L':'M'}${X(lx).toFixed(1)} ${Y(a0GravityBoost(10**lx)).toFixed(1)}`;}).join('');
+      const MOND_RULE_END=0.3; // the deep-MOND line runs just past a₀, so the crossing shows
       const xTicks=[[-2,'a₀ ÷ 100'],[-1,'a₀ ÷ 10'],[0,'a₀'],[1,'10 a₀'],[2,'100 a₀']];
-      const galaxies=Object.values(GALAXIES);
-      const dots=galaxies.map((galaxy,k)=>{
+      const dots=Object.values(GALAXIES).map(galaxy=>{
         const rows=sparcRowsOf(galaxy),vBar=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
         return rows.map((p,i)=>{
           if(!(vBar[i]>0&&p.radius_kpc>0))return'';
-          const lx=Math.log10((vBar[i]*1000)**2/(p.radius_kpc*M_PER_KPC)/MOND_A0_DEFAULT);
-          return lx<P.xMin||lx>P.xMax?'':`<circle cx="${X(lx).toFixed(1)}" cy="${Y((p.observed_kms/vBar[i])**2).toFixed(1)}" r="2.3" fill="${A0_DOT_COLOURS[k%A0_DOT_COLOURS.length]}" fill-opacity=".75"/>`;
+          const lx=Math.log10((vBar[i]*1000)**2/(p.radius_kpc*M_PER_KPC)/MOND_A0_DEFAULT),ly=Math.log10((p.observed_kms/vBar[i])**2);
+          return lx<P.xMin||lx>P.xMax||ly<P.yMin||ly>P.yMax?'':`<circle cx="${X(lx).toFixed(1)}" cy="${Y(10**ly).toFixed(1)}" r="2"/>`;
         }).join('');
       }).join('');
-      svg.innerHTML=`<rect x="${x0}" y="${yTop}" width="${xa-x0}" height="${yBot-yTop}" fill="rgba(242,200,121,.07)"/>`
-        +`<rect x="${xa}" y="${yTop}" width="${x1-xa}" height="${yBot-yTop}" fill="rgba(138,180,248,.05)"/>`
-        +P.yTicks.map(b=>`<path d="M${x0} ${Y(b)}H${x1}" stroke="currentColor" stroke-opacity="${b===1?.5:.12}"${b===1?' stroke-dasharray="4 3"':''}/><text x="${x0-5}" y="${Y(b)+3.5}" text-anchor="end">×${b}</text>`).join('')
+      svg.innerHTML=P.yTicks.map(b=>`<path d="M${x0} ${Y(b)}H${x1}" stroke="currentColor" stroke-opacity=".1"/><text x="${x0-5}" y="${Y(b)+3.5}" text-anchor="end">×${b}</text>`).join('')
         +xTicks.map(([lx,t])=>`<path d="M${X(lx)} ${yBot}v4" stroke="currentColor" stroke-opacity=".5"/><text x="${X(lx)}" y="${yBot+15}" text-anchor="${lx===P.xMax?'end':'middle'}">${t}</text>`).join('')
         +`<path d="M${x0} ${yTop}V${yBot}H${x1}" fill="none" stroke="currentColor" stroke-opacity=".35"/>`
-        +`<path d="M${xa} ${yTop}V${yBot}" stroke="#ffae5c" stroke-opacity=".6" stroke-dasharray="2 3"/>`
-        +`<text x="${(x0+xa)/2}" y="${yTop-8}" text-anchor="middle" class="a0-mond">MOND zone: big boost</text>`
-        +`<text x="${(xa+x1)/2}" y="${yTop-8}" text-anchor="middle">Newton zone: ≈ no boost</text>`
-        +`<text x="${x1-4}" y="${Y(1)-5}" text-anchor="end">×1 = plain Newton</text>`
-        +`<g id="a0DotLayer">${dots}</g>`
+        +`<path d="M${xa} ${yTop}V${yBot}" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="2 3"/>`
+        +`<g id="a0DotLayer" fill="#cfdcf0" fill-opacity=".35">${dots}</g>`
+        +`<path d="M${x0} ${yOne}H${x1}" stroke="#8ab4f8" stroke-width="1.4" stroke-dasharray="5 4"/>`
+        +`<path d="M${x0} ${Y(10**(-P.xMin/2))}L${X(MOND_RULE_END)} ${Y(10**(-MOND_RULE_END/2))}" stroke="#ffae5c" stroke-opacity=".75" stroke-width="1.4" stroke-dasharray="5 4"/>`
+        +`<text x="${x1-4}" y="${yOne-6}" text-anchor="end" class="a0-newton">Newton rule: ×1</text>`
+        +`<text x="${X(-1.75)}" y="${Y(16)}" class="a0-mond">MOND rule: ×√(a₀/g)</text>`
         +`<path d="${curve}" fill="none" stroke="#ffae5c" stroke-width="2.6"/>`
+        +`<circle cx="${xa}" cy="${yOne}" r="3.5" fill="none" stroke="#f4f7fb" stroke-width="1.4"/>`
+        +`<text x="${xa-7}" y="${yOne+15}" text-anchor="end">the rules cross at a₀</text>`
         +`<g id="a0Marker"><path d="" stroke="#ffe2c2" stroke-opacity=".5" stroke-dasharray="3 3"/><circle r="5.5" fill="#ffae5c" stroke="#fff" stroke-width="1.5"/><text class="a0-mark-text"></text></g>`
-        +`<text x="${(x0+x1)/2}" y="${P.h-6}" text-anchor="middle">← weaker   Newton’s pull from the visible matter   stronger →</text>`
-        +`<text x="11" y="${(yTop+yBot)/2}" text-anchor="middle" transform="rotate(-90 11 ${(yTop+yBot)/2})">Gravity boost (multiplier)</text>`;
-      document.getElementById('a0Legend').innerHTML=galaxies.map((g,k)=>`<span><i style="background:${A0_DOT_COLOURS[k%A0_DOT_COLOURS.length]}"></i>${g.name}</span>`).join('');
+        +`<text x="${(x0+x1)/2}" y="${P.h-4}" text-anchor="middle">Newton’s pull from the visible matter →</text>`
+        +`<text x="11" y="${(yTop+yBot)/2}" text-anchor="middle" transform="rotate(-90 11 ${(yTop+yBot)/2})">Gravity boost</text>`;
       document.getElementById('a0Dots').addEventListener('change',e=>{document.getElementById('a0DotLayer').style.display=e.target.checked?'':'none';});
       const marker=svg.querySelector('#a0Marker'),[guide,dot,label]=marker.children;
-      const sup=n=>String(n).replace(/[-0-9]/g,c=>'⁻⁰¹²³⁴⁵⁶⁷⁸⁹'['-0123456789'.indexOf(c)]);
-      const si=v=>{const e=Math.floor(Math.log10(v));return`${(v/10**e).toFixed(1)}×10${sup(e)} m/s²`;};
       const ratio=x=>x>=1?(x<1.05?'a₀':`${x<10?x.toFixed(1):Math.round(x)} × a₀`):(x>0.95?'a₀':`a₀ ÷ ${1/x<10?(1/x).toFixed(1):Math.round(1/x)}`);
-      const zone=x=>x>=10?'Newton zone: MOND changes almost nothing here.'
-        :x>=1?'Near a₀: the boost is just starting to grow.'
-        :x>=0.1?'MOND zone: the boost is now large.'
-        :'Deep MOND: ten times weaker gravity gets about three times more boost.';
       function update(){
         const lx=+slider.value,x=10**lx,b=a0GravityBoost(x),cx=X(lx),cy=Y(b),right=cx>P.l+plotW*0.7;
         guide.setAttribute('d',`M${cx} ${yBot}V${cy}`);
         dot.setAttribute('cx',cx);dot.setAttribute('cy',cy);
         label.setAttribute('x',cx+(right?-9:9));label.setAttribute('y',cy-9);label.setAttribute('text-anchor',right?'end':'start');
         label.textContent=`×${b<10?b.toFixed(2):b.toFixed(1)}`;
-        readout.innerHTML=`<b>Newton’s pull: ${ratio(x)}</b> (${si(x*MOND_A0_DEFAULT)}) → MOND multiplies gravity by <b>×${b<10?b.toFixed(2):b.toFixed(1)}</b>, so stars orbit <b>${Math.round((Math.sqrt(b)-1)*100)}% faster</b>.<span>${zone(x)}</span>`;
+        readout.innerHTML=`At a pull of ${ratio(x)}, MOND multiplies gravity by <b>×${b<10?b.toFixed(2):b.toFixed(1)}</b>, so stars orbit <b>${Math.round((Math.sqrt(b)-1)*100)}% faster</b>.`;
       }
       const fromPointer=e=>{
         const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;

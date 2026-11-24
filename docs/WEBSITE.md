@@ -579,15 +579,14 @@ changes, values tuned to each galaxy here (2 for the halo, 0 for MOND), best evi
 biggest open problem, each cited. In each idea's card the schematic comes straight after the one-line
 summary, before the text (picture first); the MOND card's a₀ explanation sits beside the boost table,
 and "Where does a₀ come from?" is a fold-out that works as the a₀ explainer. Under the origin paragraph
-it has an interactive MOND boost graph (`#a0Plot`, drawn by `setupA0Explainer`): gravity boost g/g_N
-(linear, ×1 to ×15) against the visible matter's pull g_N in units of a₀ (log, a₀ ÷ 200 to 100 a₀), from
-the page's own `mondVelocity` at the standard a₀. The a₀ line splits a gold "MOND zone" from a "Newton
-zone". Dots are every radius of the SPARC presets (V_bar with SPARC's standard mass-to-light ratios,
-boost = V_obs²/V_bar²; a "Real galaxies" box hides them, a legend names them). A slider, or the pointer
-on the graph, moves a marker along the curve; the readout gives g_N as a ratio of a₀ and in m/s², the
-gravity multiplier, the speed boost and a one-line zone note. Four short cards follow: where the curve
-bends, the same bend in every galaxy, why Earth never notices, and the c·H₀/2π coincidence (Famaey &
-McGaugh 2012). The cards align to the top, so the shorter one no longer
+it has an interactive log-log MOND boost graph (`#a0Plot`, drawn by `setupA0Explainer`): gravity boost
+g/g_N (×0.6 to ×20) against the visible matter's pull g_N in units of a₀ (a₀ ÷ 200 to 100 a₀), from the
+page's own `mondVelocity` at the standard a₀. Dashed lines show the two rules, Newton's ×1 and deep
+MOND's ×√(a₀/g), crossing at a₀; the curve rounds that corner at ×1.58. Faint dots are every radius of
+the SPARC presets (V_bar with SPARC's standard mass-to-light ratios, boost = V_obs²/V_bar²; a "Real
+galaxies" box hides them). A slider, or the pointer on the graph, moves a marker along the curve, with a
+one-line readout (gravity multiplier and speed boost). Two short cards follow: why ×1.6 at a₀ rather than
+×1, and the same corner in every galaxy. The cards align to the top, so the shorter one no longer
 stretches. Below them is a full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with a tag for the idea it points
