@@ -844,10 +844,92 @@
   "text": "It is measured, not derived. Milgrom set it to match the galaxies known in 1983; today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). That study found that the extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy. Even where gravity is strongest in the galaxies here, MOND adds at least 4%."
  },
  {
+  "id": "7c4b9e6b0c",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Heading",
+  "text": "What a<sub>0</sub> does: the MOND boost"
+ },
+ {
+  "id": "08c59c2480",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Paragraph",
+  "text": "The graph shows how much MOND multiplies gravity. Moving left, the visible matter’s own pull gets weaker; moving up, MOND multiplies it more. Slide along the curve to read it off."
+ },
+ {
+  "id": "71263525e8",
+  "kind": "attr",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "where": "A0plot",
+  "text": "Graph of MOND’s gravity boost against the strength of Newtonian gravity. The boost is about 1 when gravity is stronger than a0, bends upward at a0, and reaches about 10 at a0 divided by 100. Dots from four real SPARC galaxies follow the same curve."
+ },
+ {
+  "id": "868a81971d",
+  "kind": "attr",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "where": "A0slider",
+  "text": "Strength of Newtonian gravity, compared with a0"
+ },
+ {
+  "id": "86732b8dc9",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Text",
+  "text": "Real galaxies"
+ },
+ {
+  "id": "d6a3fc082b",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Figure caption",
+  "text": "Curve: the simulator’s MOND formula at a<sub>0</sub> = 1.2×10⁻¹⁰ m/s² (McGaugh, Lelli &amp; Schombert 2016). Dots: every measured radius in the four SPARC galaxies on this site, using SPARC’s standard mass-to-light ratios (Lelli, McGaugh &amp; Schombert 2016). For a dot, boost = the pull the measured speed needs ÷ the visible matter’s pull."
+ },
+ {
+  "id": "b4639bc6f5",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Paragraph",
+  "text": "<b>a<sub>0</sub> is where the curve bends.</b> Above it, Newton is almost right: at 10 a<sub>0</sub> gravity is boosted only ×1.04. Below it the boost grows fast: ×1.6 at a<sub>0</sub>, ×10.5 at a<sub>0</sub> ÷ 100. Far below, gravity ten times weaker gets about three times (√10) more boost."
+ },
+ {
+  "id": "0f6383b87e",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Paragraph",
+  "text": "<b>The same bend in every galaxy.</b> The massive spiral NGC 7331 and the faint, diffuse UGC 128 differ hugely in size and mass, yet their dots sit close to the same curve. The boost a galaxy needs depends on its acceleration, not its size (McGaugh, Lelli &amp; Schombert 2016)."
+ },
+ {
+  "id": "748c744fb0",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Paragraph",
+  "text": "<b>Why Earth never notices.</b> Gravity at Earth’s surface is about 8×10¹⁰ a<sub>0</sub>, and the Sun’s pull on Earth about 5×10⁷ a<sub>0</sub>: far off the right-hand edge, where this formula’s boost is far too small to detect."
+ },
+ {
+  "id": "9f1fce1742",
+  "kind": "html",
+  "page": "background",
+  "section": "What a0 does: the MOND boost",
+  "label": "Paragraph",
+  "text": "<b>An unexplained coincidence.</b> a<sub>0</sub> is close to c·H<sub>0</sub>/2π ≈ 1.1×10⁻¹⁰ m/s², built from the speed of light and the Universe’s expansion rate (Famaey &amp; McGaugh 2012). Nobody knows if this is a clue or chance; MOND itself does not explain it."
+ },
+ {
   "id": "9f2c2c950f",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Click-to-open heading",
   "text": "Show the maths (A-level circular motion)"
  },
@@ -855,7 +937,7 @@
   "id": "2bda72e11c",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Paragraph",
   "text": "<b>1. Orbits.</b> Gravity supplies the centripetal acceleration, and Newton gives the pull g<sub>N</sub> of the visible mass M:"
  },
@@ -863,7 +945,7 @@
   "id": "74e70f5dbc",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Paragraph",
   "text": "<b>2. MOND’s rule.</b> Strong gravity is almost unchanged; weak gravity is boosted:"
  },
@@ -871,7 +953,7 @@
   "id": "d4eebc6d23",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Text",
   "text": "&#8195;if&#8194;"
  },
@@ -879,7 +961,7 @@
   "id": "88e554256a",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Text",
   "text": "&#8195;if&#8194;"
  },
@@ -887,7 +969,7 @@
   "id": "f8c55b6eb6",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Paragraph",
   "text": "<b>3. Far out,</b> put the weak rule into step 1:"
  },
@@ -895,7 +977,7 @@
   "id": "744cf58d72",
   "kind": "html",
   "page": "background",
-  "section": "What is MOND?",
+  "section": "What a0 does: the MOND boost",
   "label": "Paragraph",
   "text": "r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method)."
  },
@@ -4377,6 +4459,78 @@
   "section": "Mond zone layout",
   "label": "Card explanation",
   "text": "Deeper gold = bigger MOND boost"
+ },
+ {
+  "id": "f76c5769ca",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "<text x=\"${(x0+xa)/2}\" y=\"${yTop-8}\" text-anchor=\"middle\" class=\"a0-mond\">MOND zone: big boost</text>"
+ },
+ {
+  "id": "68709d85db",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "<text x=\"${(xa+x1)/2}\" y=\"${yTop-8}\" text-anchor=\"middle\">Newton zone: ≈ no boost</text>"
+ },
+ {
+  "id": "8104340551",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "<text x=\"${(x0+x1)/2}\" y=\"${P.h-6}\" text-anchor=\"middle\">← weaker   Newton’s pull from the visible matter   stronger →</text>"
+ },
+ {
+  "id": "ca6fb39608",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "<text x=\"11\" y=\"${(yTop+yBot)/2}\" text-anchor=\"middle\" transform=\"rotate(-90 11 ${(yTop+yBot)/2})\">Gravity boost (multiplier)</text>"
+ },
+ {
+  "id": "4c4bda4ba1",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "Newton zone: MOND changes almost nothing here."
+ },
+ {
+  "id": "998964c93a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "Near a₀: the boost is just starting to grow."
+ },
+ {
+  "id": "d4bcff047c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "MOND zone: the boost is now large."
+ },
+ {
+  "id": "4a3941c545",
+  "kind": "js",
+  "page": "messages",
+  "section": "Setup a0explainer",
+  "label": "Message",
+  "text": "Deep MOND: ten times weaker gravity gets about three times more boost."
+ },
+ {
+  "id": "38a6eaa06c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Update",
+  "label": "Message",
+  "text": "<b>Newton’s pull: ${ratio(x)}</b> (${si(x*MOND_A0_DEFAULT)}) → MOND multiplies gravity by <b>×${b<10?b.toFixed(2):b.toFixed(1)}</b>, so stars orbit <b>${Math.round((Math.sqrt(b)-1)*100)}% faster</b>.<span>${zone(x)}</span>"
  },
  {
   "id": "df9089bca2",
