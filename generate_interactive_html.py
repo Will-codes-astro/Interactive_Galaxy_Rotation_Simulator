@@ -815,7 +815,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* Moving between cards: the old text slides out the way you are going, the new text follows in, line by line. */
     .tutorial-card { transition:opacity .38s ease, transform .38s ease; }
     .tutorial-content, .tutorial-feedback { transition:opacity .42s ease, transform .42s ease, filter .42s ease; }
-    .tutorial-try.part-in { animation:tutorial-pop .5s ease both; }
+    /* Fades and settles in place: sliding up from below briefly overflowed the text box and flashed its scrollbar. */
+    .tutorial-try.part-in { animation:tutorial-part-in .5s ease both; }
+    @keyframes tutorial-part-in { from { opacity:0; transform:scale(.98); } }
     .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { opacity:0; transform:translateX(calc(var(--dir,1) * -12px)); }
     /* The title takes focus only so screen readers read the new card; it is not a control, so no focus box. */
     #tutorialTitle:focus { outline:none; }
@@ -849,6 +851,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-spotlight.is-fixed, .tutorial-also.is-fixed { position:fixed; }
     .tutorial-dim { position:absolute; top:0; left:0; z-index:9997; width:100%; height:100vh; pointer-events:none; fill:rgba(2,7,14,.42); opacity:0; transition:opacity .45s ease; }
     .tutorial-dim.is-on { opacity:1; }
+    /* Between cards the rings and dim fade out with the old text and come back once the page has scrolled to the new
+       control (is-kept: the ring stays when the next card uses the same control). */
+    body.tutorial-swapping :is(.tutorial-also,.tutorial-dim,.tutorial-spotlight:not(.is-kept)) { opacity:0 !important; transition:opacity .25s ease !important; }
     /* Every finished highlight (main ring, part rings, dim) holds green for 1.4 s then fades over 1.2 s. */
     .tutorial-dim.is-on.is-done { opacity:0; transition:opacity 1.2s ease-in-out 1.4s; }
     .tutorial-also { position:absolute; z-index:9998; box-sizing:border-box; pointer-events:none; border:2px solid #a8ddff; border-radius:9px; box-shadow:0 0 12px 3px rgba(120,210,255,.6); animation:tutorial-also-pulse 2.2s ease-in-out infinite; transition:opacity .3s ease; }
@@ -5549,6 +5554,7 @@ __GALAXIES_JS__
        is locked (see tutorialAllowed). A guided tour from the puzzle page runs the main tour, then the sandbox tour. */
     // Leave (~0.45 s) plus the staggered enter animation (~0.85 s): the card's scrollbar stays hidden for this long.
     const TUTORIAL_SWITCH_MS=1350;let tutorialScrollTimer=0;
+    const TUTORIAL_REVEAL_MIN_MS=300,TUTORIAL_REVEAL_MAX_MS=1300; // new card's highlights: after its text starts, once the page stops gliding
     const TUTORIAL_RING_MIN_RADIUS_PX=8;  // softest corner any highlight ring gets
     const TUTORIAL_BESIDE_PX=16;          // an opened box this close to its control is drawn inside the control's ring
     const TUTORIAL_RING_FADE_MS=2650;     // a done part's green ring holds, then fades (matches tutorial-ring-done)
@@ -6442,6 +6448,8 @@ __GALAXIES_JS__
     };
     const tutorialReadout=document.getElementById('tutorialReadout');let tutorialReadoutKey='';
     function syncTutorialReadout(){
+      // Not while the page glides to a new card: a watched value scrolling past would flash its copy on and off.
+      if(document.body.classList.contains('tutorial-swapping'))return;
       const step=tutorialStep(),card=tutorialCard.getBoundingClientRect(),top=tutorialCoverBottom(tutorialCard);
       const offScreen=el=>{if(!el.getClientRects().length)return false;const r=el.getBoundingClientRect();
         return r.top<top||r.bottom>innerHeight||r.bottom>card.top&&r.top<card.bottom&&r.right>card.left&&r.left<card.right;};
@@ -6523,7 +6531,10 @@ __GALAXIES_JS__
       if(!tutorialIsFullscreen()){
         scrollTutorialTarget();
       }
+      // The old card's live copies go with it; the new card's are added once the page settles.
+      tutorialReadout.hidden=true;tutorialReadoutKey='';
       updateTutorialSpotlight();
+      fitTutorialCard(); // sized now, so the card doesn't widen a frame after it starts to slide in
     }
     // full: run every tour in FULL_TOUR from this one on (the guided tour from the puzzle page).
     function startTutorial(tour,full){
@@ -6533,7 +6544,7 @@ __GALAXIES_JS__
       tutorialFull=!!full;
       if(tutorialTour==='sandbox'&&galaxyMode!=='custom')setGalaxyMode('custom');
       tutorialSteps=tourSteps(tutorialTour,tutorialFull);
-      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('leave','leave-side');
+      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('leave','leave-side');endTutorialSwap();
       tutorialIndex=0;
       tutorialCompleted={};
       // In the main tour the Visible matter only shortcut is revealed by the step that sets the halo to zero.
@@ -6582,21 +6593,41 @@ __GALAXIES_JS__
     function goTutorialStep(index,dir){
       if(index<0||index>=tutorialSteps.length||tutorialCard.hidden)return;
       stopTutorialAuto();clearTimeout(tutorialSwitchTimer);
-      if(calmMotion()){tutorialIndex=index;showTutorialStep();return;}
+      if(calmMotion()){endTutorialSwap();tutorialIndex=index;showTutorialStep();return;}
       const sideChange=!tutorialIsFullscreen()&&(innerWidth>960&&!tutorialSteps[index].cardRight)!==tutorialCard.classList.contains('on-left');
       tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
       tutorialCard.style.setProperty('--dir',dir);
       tutorialCard.classList.add(sideChange?'leave-side':'leave','is-switching');
       clearTimeout(tutorialScrollTimer);tutorialScrollTimer=setTimeout(()=>tutorialCard.classList.remove('is-switching'),TUTORIAL_SWITCH_MS);
+      // The old card's highlights fade out with its text (a ring the next card keeps on the same control stays).
+      const next=tutorialSteps[index],nextIds=[next.target,...Object.keys(next.cardSlider||{})];
+      tutorialSpotlight.classList.toggle('is-kept',!!tutorialAimTarget&&nextIds.some(id=>tutorialAimTarget===document.getElementById(id)||tutorialAimTarget===tutorialCopy(id)));
+      document.body.classList.add('tutorial-swapping');
+      const token=++tutorialSwapToken;
       tutorialSwitchTimer=setTimeout(()=>{
         tutorialCard.classList.remove('leave','leave-side');
         tutorialIndex=index;showTutorialStep();
         void tutorialCard.offsetWidth;
         tutorialCard.classList.add(sideChange?'enter-side':'enter');
+        revealTutorialHighlights(token);
       },sideChange?460:440);
     }
+    // The new card's highlights arrive once the page has finished gliding to them, not while it is still moving.
+    let tutorialSwapToken=0;
+    function revealTutorialHighlights(token){
+      const t0=performance.now();let lastY=scrollY,still=0;
+      (function wait(now){
+        if(token!==tutorialSwapToken)return;
+        still=scrollY===lastY?still+1:0;lastY=scrollY;
+        if(now-t0<TUTORIAL_REVEAL_MIN_MS||still<3&&now-t0<TUTORIAL_REVEAL_MAX_MS){requestAnimationFrame(wait);return;}
+        endTutorialSwap();
+        if(!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-kept')){tutorialSpotlight.classList.remove('is-arriving');void tutorialSpotlight.offsetWidth;tutorialSpotlight.classList.add('is-arriving');}
+        tutorialSpotlight.classList.remove('is-kept');
+      })(t0);
+    }
+    function endTutorialSwap(){tutorialSwapToken++;document.body.classList.remove('tutorial-swapping');}
     function endTutorial(){
-      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('enter','enter-side','leave','leave-side');
+      stopTutorialAuto();clearTimeout(tutorialSwitchTimer);tutorialCard.classList.remove('enter','enter-side','leave','leave-side');endTutorialSwap();
       tutorialTarget=null;
       tutorialCard.hidden=true;
       syncTutorialSlider();
