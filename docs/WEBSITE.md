@@ -359,7 +359,7 @@ the box opens right beside its control, and if an opened info box would sit
 under the tutorial card, the card moves to the other side. Ending or
 skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
-The main tutorial's 19 steps start from the mass discrepancy in the rotation curve ("Spot the mass discrepancy")
+The main tutorial's 21 steps start from the mass discrepancy in the rotation curve ("Spot the mass discrepancy")
 (measured speeds stay above the visible-matter prediction; the pointer must
 cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
@@ -410,7 +410,7 @@ panel or the fullscreen slider box covers it (open info boxes are not dimmed). B
 can be done. On screens wider than 700 px every card shows all its text without
 scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
-phones the card keeps its full-width layout and scrolls if it must. A second, 12-step Sandbox tutorial covers
+phones the card keeps its full-width layout and scrolls if it must. A second, 14-step Sandbox tutorial covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
 halo shape monitor (what it reads, then pushing a halo out of range), the
 halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
@@ -481,9 +481,13 @@ Motion (all visual choices; Reduce motion and lite visuals turn every part off a
   `arrive`, `revealInView`). Whatever is on screen when a page opens arrives at once.
 - On load the homepage title's words rise in one after another ("missing mass" in a blue-to-gold gradient),
   then the lead, the abstract and the galaxy.
-- The homepage figure draws itself when it scrolls in: measured points pop in left to right, the
-  visible-matter line sweeps across, then the gap and labels fade in; the 149 km/s, 65 km/s and "5 times"
-  figures count up (`setCountable`, `countUp`). The final values are always in the page first.
+- The homepage figure builds up in the order of the story (`stagePuzzleFigure`). On screens wider than
+  900 px it stays beside the steps as they scroll (sticky), its axes show from the start, the
+  visible-matter line sweeps across once the Prediction step passes 65% of the screen height, and the
+  measured points, the gap and their labels follow once the Observation step does (never less than 0.8 s
+  apart). At 900 px or narrower, where it sits under the steps, both play in turn when it scrolls in. The
+  149 km/s, 65 km/s and "5 times" figures count up (`setCountable`, `countUp`). The final values are always
+  in the page first.
 - A faint two-layer starfield drifts very slowly behind every page (`body::before`, `body::after`).
 - Cards on the reading pages catch a soft light that follows the pointer (`.glow`), and small cards lift a
   little on hover.

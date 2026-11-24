@@ -1196,7 +1196,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .schematic figcaption { font-size:12px; }
     /* The puzzle: the story before the controls. */
     .puzzle, .scorecard { border:1px solid var(--line); border-radius:var(--r-lg); background:linear-gradient(180deg,var(--panel-2),var(--panel)); box-shadow:var(--shadow); }
-    .puzzle { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:8px 36px; align-items:center; padding:22px 24px; }
+    .puzzle { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:8px 36px; align-items:start; padding:22px 24px; }
     .puzzle-steps { margin:0; padding:0; list-style:none; counter-reset:puzzle; }
     .puzzle-steps li { position:relative; padding:0 0 14px 40px; counter-increment:puzzle; }
     .puzzle-steps li:last-child { padding-bottom:0; }
@@ -1206,14 +1206,15 @@ HTML_TEMPLATE = r"""<!doctype html>
     .puzzle-steps p { margin:0; color:var(--ink-2); font-size:13.5px; line-height:1.6; }
     .puzzle-steps b { color:var(--ink); font-weight:600; }
     .puzzle-steps .fold { margin:10px 0 0; } .puzzle-steps .fold p { margin-bottom:10px; }
-    .puzzle-fig { margin:0; }
+    /* On wide screens the figure stays beside the steps as they are read, and builds up with them (stagePuzzleFigure). */
+    .puzzle-fig { margin:0; position:sticky; top:76px; }
     .puzzle-fig svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:13px var(--f-ui); }
     .puzzle-fig figcaption { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; }
     .puzzle-cta { grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:10px; padding-top:16px; border-top:1px solid var(--line); }
     .puzzle-cta button { padding:9px 16px; font-size:13px; }
     .puzzle-cta a, .refs a, .evidence-source a, .score-notes a { color:var(--accent); text-underline-offset:3px; }
     .puzzle-cta a { font-size:13px; }
-    @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } }
+    @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } .puzzle-fig { position:static; } }
     /* Fit badge: a plain-language verdict in front of the numbers. */
     #chiBadge sub { font-size:.82em; }
     .chi-wrap { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:4px 8px; }
@@ -1506,15 +1507,17 @@ HTML_TEMPLATE = r"""<!doctype html>
     @keyframes rise { from { opacity:0; transform:translateY(16px); filter:blur(6px); } }
     @keyframes galaxy-in { from { opacity:0; transform:scale(.86) rotate(-14deg); filter:blur(14px) brightness(1.8); } }
     /* Scroll reveal: marked by revealOnScroll(); the class is removed once the element has arrived. */
-    html:not(.calm):not(.lite) .reveal { opacity:0; transform:translateY(26px) scale(.985); filter:blur(6px); transition:opacity .75s ease,transform .95s cubic-bezier(.16,1,.3,1),filter .75s ease; transition-delay:calc(var(--i,0) * 75ms); }
+    html:not(.calm):not(.lite) .reveal { opacity:0; transform:translateY(22px) scale(.985); filter:blur(5px); transition:opacity .6s ease,transform .8s cubic-bezier(.16,1,.3,1),filter .6s ease; transition-delay:calc(var(--i,0) * 60ms); }
     html:not(.calm):not(.lite) .reveal.in { opacity:1; transform:none; filter:none; }
-    /* The homepage figure draws itself: measured points pop in left to right, then the prediction line sweeps across
-       and the gap fills in. */
-    html:not(.calm):not(.lite) .puzzle-fig:not(.play) :is(.pf-pt,.pf-pred,.pf-gap,.pf-label) { opacity:0; }
-    html:not(.calm):not(.lite) .puzzle-fig.play .pf-pt { transform-box:fill-box; transform-origin:center; animation:pt-in .55s cubic-bezier(.34,1.56,.64,1) both; animation-delay:calc(.1s + var(--i,0) * 24ms); }
-    html:not(.calm):not(.lite) .puzzle-fig.play .pf-pred { animation:draw-x 1.6s cubic-bezier(.65,0,.35,1) .55s both; }
-    html:not(.calm):not(.lite) .puzzle-fig.play .pf-gap { animation:fade-in 1.1s ease 1.9s both; }
-    html:not(.calm):not(.lite) .puzzle-fig.play .pf-label { animation:fade-in .8s ease 2.3s both; }
+    /* The homepage figure draws itself in the order of the story: the prediction line sweeps across (stage s-pred),
+       then the measured points pop in left to right and the gap fills in (stage s-obs). */
+    html:not(.calm):not(.lite) .puzzle-fig:not(.s-pred) :is(.pf-pred,.pf-l-pred), html:not(.calm):not(.lite) .puzzle-fig:not(.s-obs) :is(.pf-pt,.pf-gap,.pf-l-obs,.pf-l-gap) { opacity:0; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-pred .pf-pred { animation:draw-x .95s cubic-bezier(.65,0,.35,1) both; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-pred .pf-l-pred { animation:fade-in .5s ease .6s both; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-pt { transform-box:fill-box; transform-origin:center; animation:pt-in .45s cubic-bezier(.34,1.56,.64,1) both; animation-delay:calc(var(--i,0) * 14ms); }
+    html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-l-obs { animation:fade-in .5s ease .5s both; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-gap { animation:fade-in .8s ease .65s both; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-l-gap { animation:fade-in .5s ease .9s both; }
     @keyframes pt-in { from { opacity:0; transform:translateY(-10px) scale(.2); } }
     @keyframes draw-x { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
     @keyframes fade-in { from { opacity:0; } }
@@ -5014,9 +5017,9 @@ __GALAXIES_JS__
       svg+=`<polyline class="pf-pred" points="${rows.map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[i]))}`).join(' ')}" fill="none" stroke="${cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
       rows.forEach((p,i)=>{svg+=`<g class="pf-pt" style="--i:${i}"><path d="M${f(x(p.radius_kpc))} ${f(y(p.observed_kms-p.error_kms))}V${f(y(p.observed_kms+p.error_kms))}" stroke="${white}" stroke-opacity=".55"/><circle cx="${f(x(p.radius_kpc))}" cy="${f(y(p.observed_kms))}" r="2.4" fill="${white}"/></g>`;});
       const mid=rows[Math.max(from,Math.round(0.7*(n-1)))],midBar=vBar[rows.indexOf(mid)];
-      svg+=`<text class="pf-label" x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
-      svg+=`<text class="pf-label" x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
-      svg+=`<text class="pf-label" x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
+      svg+=`<text class="pf-label pf-l-gap" x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
+      svg+=`<text class="pf-label pf-l-obs" x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
+      svg+=`<text class="pf-label pf-l-pred" x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
       document.getElementById('puzzleChart').innerHTML=svg;
       const ratio=(outer.observed_kms/vBar[n-1])**2;
       setCountable('puzzleObs',Math.round(outer.observed_kms),0,' km/s');
@@ -5274,7 +5277,7 @@ __GALAXIES_JS__
     function arrive(el){
       revealObserver?.unobserve(el);
       el.classList.add('in');
-      if(el.matches('.puzzle-fig'))el.classList.add('play');
+      if(el.matches('.puzzle-fig')&&!PUZZLE_FIG_BESIDE.matches)stagePuzzleFigure(PUZZLE_STAGES.length);
       el.querySelectorAll('[data-count-to]').forEach(countUp);
       setTimeout(()=>el.classList.remove('reveal','in'),REVEAL_CLEAR_MS);
     }
@@ -5284,8 +5287,36 @@ __GALAXIES_JS__
         el.classList.remove('reveal');arrive(el);
       });
     }
+    /* The homepage figure builds up with the story (visual only). Beside the steps (wide screens) its prediction line
+       draws once the Prediction step is being read and the measured points and gap once the Observation step is;
+       under the steps (900 px or narrower) both play in turn when it scrolls in. Stages never come closer together
+       than PUZZLE_STAGE_GAP_MS, so a fast scroll still shows the prediction before the measurements. */
+    const PUZZLE_STAGES=['s-pred','s-obs'],PUZZLE_STAGE_GAP_MS=800,PUZZLE_READ_LINE=.65;
+    const PUZZLE_FIG_BESIDE=matchMedia('(min-width:901px)');
+    let puzzleStageWanted=0,puzzleStageShown=0,puzzleStageTimer=0;
+    function stagePuzzleFigure(stage){
+      puzzleStageWanted=Math.max(puzzleStageWanted,stage);
+      if(puzzleStageTimer)return;
+      (function next(){
+        puzzleStageTimer=0;
+        if(puzzleStageShown>=puzzleStageWanted)return;
+        document.querySelector('.puzzle-fig').classList.add(PUZZLE_STAGES[puzzleStageShown++]);
+        puzzleStageTimer=setTimeout(next,PUZZLE_STAGE_GAP_MS);
+      })();
+    }
+    function watchPuzzleSteps(){ // stage = how many of the Prediction and Observation steps have passed the reading line
+      const steps=[...document.querySelectorAll('.puzzle-steps > li')],home=document.querySelector('.page[data-page="puzzle"]');
+      const check=()=>{
+        if(!PUZZLE_FIG_BESIDE.matches||!home.classList.contains('active'))return;
+        const read=steps.filter(li=>li.getBoundingClientRect().top<innerHeight*PUZZLE_READ_LINE).length;
+        stagePuzzleFigure(Math.max(0,Math.min(PUZZLE_STAGES.length,read-1)));
+      };
+      const watcher=new IntersectionObserver(check,{rootMargin:`0px 0px -${Math.round((1-PUZZLE_READ_LINE)*100)}% 0px`});
+      steps.concat(document.querySelector('.puzzle-cta')).forEach(el=>watcher.observe(el));
+    }
     (function setupReveal(){
-      if(calmMotion()||!('IntersectionObserver' in window)){document.querySelectorAll('.puzzle-fig').forEach(fig=>fig.classList.add('play'));return;}
+      if(calmMotion()||!('IntersectionObserver' in window)){document.querySelector('.puzzle-fig').classList.add(...PUZZLE_STAGES);return;}
+      watchPuzzleSteps();
       revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)arrive(entry.target);}),{rootMargin:'0px 0px -8% 0px',threshold:.06});
       document.querySelectorAll(REVEAL_SELECTOR).forEach(el=>{
         const siblings=[...el.parentElement.children].filter(child=>child.matches(REVEAL_SELECTOR));
@@ -5536,7 +5567,7 @@ __GALAXIES_JS__
         {id:'fit',nfw:true,mode:'preset',target:'massSlider',cardSlider:{massSlider:'curvePlot',scaleSlider:'curvePlot'},gesture:'adjust',tag:'1 · Drag',also:['scaleSlider:2 · Drag'],watch:['chiBadge:χ² (lower is better)'],title:'Score your fit',
          checks:{massSlider:()=>Number(massSlider.value)!==tutorialStart.mass&&shownRedChi>=tutorialChiGoal(),scaleSlider:()=>Number(scaleSlider.value)!==tutorialStart.scale,
            chiGoal:()=>tutorialLatched.massSlider&&tutorialLatched.scaleSlider&&shownRedChi<tutorialChiGoal()},doneText:'Fitted by hand: your halo now reproduces the measured speeds closely.',
-         text:'χ² (yellow box) scores the fit: it adds up the squared gaps between the orange line and the white points, each measured in error bars. Lower is better.',
+         text:'χ² (yellow box) scores the fit: it adds up the squared gaps between the orange line and the white points, each measured in error bars. The badge shows χ²ᵣ, roughly that total per point. Lower is better.',
          action:'1. Drag Halo mass until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ² respond. 3. Fine-tune both until it reads Close fit again.'},
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],keepWatch:true,title:'Test a rival idea',
          text:'MOND (Modified Newtonian Dynamics) removes the dark matter and changes the law of gravity instead. Its boost is small where gravity is strong and grows as gravity weakens; deeper gold on the graph means a bigger boost.',
