@@ -817,6 +817,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-content, .tutorial-feedback { transition:opacity .42s ease, transform .42s ease, filter .42s ease; }
     .tutorial-try.part-in { animation:tutorial-pop .5s ease both; }
     .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { opacity:0; transform:translateX(calc(var(--dir,1) * -12px)); }
+    /* The title takes focus only so screen readers read the new card; it is not a control, so no focus box. */
+    #tutorialTitle:focus { outline:none; }
     .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry) { animation:tutorial-in .7s cubic-bezier(.2,.8,.2,1) both; }
     .tutorial-card.enter #tutorialText { animation-delay:.08s; }
     .tutorial-card.enter #tutorialTry { animation-delay:.16s; }
@@ -854,7 +856,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* Controls the current tour card does not use are locked (inert) and dimmed. */
     .tutorial-locked { opacity:.38; filter:saturate(.4); transition:opacity .25s ease; }
     /* Blue boxes = controls to use; yellow dashed boxes = things to watch. */
-    /* Phones: live copies of watched values that are off screen, boxed like the yellow watch rings. */
+    /* Live copies of watched values that are off screen or under the card, boxed like the yellow watch rings. */
     .tutorial-readout { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .tutorial-readout span { padding:4px 9px; border:1.5px dashed #ffcf7a; border-radius:8px; color:var(--ink); font-size:12px; font-variant-numeric:tabular-nums; }
     .tutorial-readout b { margin-right:5px; color:#ffcf7a; font-weight:600; }
@@ -1924,8 +1926,8 @@ HTML_TEMPLATE = r"""<!doctype html>
         </table>
       </div>
       </details>
-      <p class="score-notes-title">Before drawing conclusions</p>
-      <ul class="score-notes" id="scoreNotes">
+      <p class="score-notes-title" id="scoreNotes">Before drawing conclusions</p>
+      <ul class="score-notes">
         <li><b>A fair test</b>Every model starts from the same stars and gas, with SPARC’s mass-to-light ratio, distance and tilt. Best realistic fits let each model adjust those, and the score counts every value tuned, so extra freedom costs something.</li>
         <li><b>Only realistic values</b>Star masses that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a typical halo concentration (Dutton &amp; Macciò 2014). <span class="at-limit">at limit</span> means a better fit needed an unrealistic value. <a href="#mScore">All limits</a></li>
         <li><b>MOND’s constant</b>Best fits may nudge a<sub>0</sub> between __A0_MIN__ and __A0_MAX__ × 10⁻¹⁰ m/s² (McGaugh, Lelli &amp; Schombert 2016). MOND says a<sub>0</sub> is universal (Milgrom 1983), so galaxies needing clearly different values would be a warning sign.</li>
@@ -3273,7 +3275,7 @@ __GALAXIES_JS__
         orbitLines.frustumCulled=false;orbitLines.visible=false;orbitLines.renderOrder=0;scene.add(orbitLines);
         // A faint circle in the disk plane at the ejection radius (1.5 x R_max), shown by the Ejection line switch or the tutorial.
         const ejectionRing=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({length:128},(_,i)=>new THREE.Vector3(Math.cos(i*Math.PI/64),Math.sin(i*Math.PI/64),0))),
-            new THREE.LineBasicMaterial({color:0xff8a80,transparent:true,opacity:0.55,depthWrite:false}));
+            new THREE.LineBasicMaterial({color:0xff5a4f,transparent:true,opacity:0.85,depthWrite:false}));
         ejectionRing.frustumCulled=false;ejectionRing.visible=false;scene.add(ejectionRing);
         let ejectionLineShown=false;
         // MOND boost in 3D (MOND mode, "Where MOND acts" switch): the graph's gold shading laid into the disk plane. Each
@@ -5543,6 +5545,9 @@ __GALAXIES_JS__
     const TUTORIAL_RING_FADE_MS=2650;     // a done part's green ring holds, then fades (matches tutorial-ring-done)
     const TUTORIAL_HANDOVER_MS=700;       // the next part's ring cross-fades into the main ring (matches tutorial-handover)
     const TUTORIAL_NEAR_PX=160;           // a ringed thing this close above the control is scrolled into view with it
+    const TOUR_RACE_MYR=400; // how long the 'Which star laps more?' race runs
+    const TOUR_HALO_BACK_FRACTION=0.9; // 'Put the halo back' wants at least this share of the fitted halo mass
+    const TOUR_BOB_WATCH_MYR=200; // 'Turn it on its side' ticks only after this much playing, so its result has been seen
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
         {id:'puzzle',mode:'preset',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the mass discrepancy',
@@ -5572,7 +5577,7 @@ __GALAXIES_JS__
         {id:'mond',target:'modelBar',gesture:'switch',tag:'Choose MOND',watch:['chiBadge:Compare χ²'],keepWatch:true,title:'Test a rival idea',
          text:'MOND (Modified Newtonian Dynamics) removes the dark matter and changes the law of gravity instead. Its boost is small where gravity is strong and grows as gravity weakens; deeper gold on the graph means a bigger boost.',
          action:'Click the MOND card (blue box), then compare χ² in the yellow box with the halo’s.'},
-        {id:'mondZone3d',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
+        {id:'mondZone3d',mond:true,viewPanel:true,cardRight:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'See where MOND acts',
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Faint gold means a small boost; deep gold means MOND supplies most of the pull there.',
          text:'The graph’s gold, laid on the galaxy itself: faint near the centre, where gravity is strong and MOND changes little, and deeper further out, always in proportion to the boost.',
          action:'Switch on Where MOND acts in the View panel.'},
@@ -5593,17 +5598,17 @@ __GALAXIES_JS__
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: gravity and orbital speed are in balance.'},
         {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'2 · Play',checks:{fsPlay:()=>tutorialFlags.prediction!=null&&playing},title:'Which star laps more?',
-         predict:{question:'Predict first: over the next 400 million years, which ringed star will finish more laps?',options:['Inner star','Outer star','About the same'],answer:0},
+         predict:{question:`Predict first: over the next ${TOUR_RACE_MYR} million years, which ringed star will finish more laps?`,options:['Inner star','Outer star','About the same'],answer:0},
          text:'The two ringed stars orbit at similar speeds, but the outer one is about four times further from the centre.',
          action:'Press ▶ Play and watch the lap counts on the two ringed stars.',
-         done:()=>tutorialFlags.prediction!=null&&tutorialPlayedMyr>=400,
+         done:()=>tutorialFlags.prediction!=null&&tutorialPlayedMyr>=TOUR_RACE_MYR,
          doneText:()=>tutorialFlags.prediction===0?'You called it: at similar speeds, the inner star’s much shorter lap means it laps far more often. This is differential rotation.':'The inner star wins. At similar speeds, the outer star’s lap (2πr) is about four times longer, so the inner star finishes several laps for each of the outer star’s. This is differential rotation.'},
         {id:'fsTilt',fs:true,viewPanel:true,marks:['tilt'],target:'viewEdgeOn',tag:'1 · Edge-on',also:['fsPlay:2 · Keep playing'],gesture:'click',title:'Turn it on its side',
          text:'Edge-on, the disk is a thin line. The ringed star bobs above and below it as it orbits.',
          action:'1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height.',
-         checks:{viewEdgeOn:()=>edgeOn(controls.goal.phi),fsPlay:()=>playing},doneText:'Up, down, up: one bob per lap here, because this model’s pull is spherical. In a real, flat disk, the disk’s own pull makes stars bob faster than they orbit.'},
+         checks:{viewEdgeOn:()=>edgeOn(controls.goal.phi),fsPlay:()=>playing&&tutorialPlayedMyr>=TOUR_BOB_WATCH_MYR},doneText:'Up, down, up: one bob per lap here, because this model’s pull is spherical. In a real, flat disk, the disk’s own pull makes stars bob faster than they orbit.'},
         {id:'fsTrack',fs:true,target:'fsTrack',gesture:'click',tag:'Type a number',title:'Follow any star',
-         checks:{fsTrack:()=>trackedStar>=0},doneText:'Tracked: its ring shows its laps, speed and distance.',
+         checks:{fsTrack:()=>trackedStar>=0},doneText:'Tracked: its label shows its laps, its speed, and its distance from the centre (its height above the disk when edge-on).',
          text:'Every star has a number: star 1 starts nearest the centre.',
          action:'Type a star number in the Star # box.'},
         {id:'fsEscape',given:['toggleEjection'],fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
@@ -5618,7 +5623,7 @@ __GALAXIES_JS__
         {id:'galaxies',mode:'preset',target:'galaxyMenu',gesture:'click',tag:'Choose a galaxy',watch:['galaxyProfile:Its profile'],keepWatch:true,title:'Try another galaxy',
          text:'Each galaxy has its own measured speeds and mass model. The profile card (yellow box) gives its type, its distance and how its visible mass splits between stars and gas.',
          action:'Open the Galaxy menu (blue box) and pick another galaxy.'},
-        {id:'ml',mode:'preset',cardRight:true,target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
+        {id:'ml',mode:'preset',target:'mlInfoBtn',gesture:'click',tag:'Hover or tap',title:'How heavy are the stars?',
          text:'Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and its real uncertainty is why the best fits may vary it.',
          action:'Hover over (or tap) the ? in the blue box.'},
         {id:'scorecard',closing:true,target:'glanceTable',gesture:'look',tag:'Read along the rows',title:'How both ideas score',
@@ -5635,7 +5640,7 @@ __GALAXIES_JS__
         {id:'sbDisk',mode:'custom',target:'sbDiskMass',cardSlider:{sbDiskMass:'curvePlot'},gesture:'adjust',tag:'Drag both ways',watch:['massValue:Halo mass','curvePlot:Watch the cyan line'],title:'Make the disk heavier or lighter',
          text:'The disk is the flat, rotating part that holds most of the stars. Galaxies with more stars tend to sit in more massive halos (Moster et al. 2013), so the halo mass follows.',
          action:'Drag Disk mass up and down. Watch the cyan line and Halo mass.'},
-        {id:'sbSize',mode:'custom',partPause:true,target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
+        {id:'sbSize',mode:'custom',partPause:true,cardRight:true,target:'sbDiskScale',cardSlider:{sbDiskScale:'curvePlot',sbTruncation:'orbitPlot'},tag:'1 · Drag',also:['sbTruncation:2 · Drag'],gesture:'adjust',
          checks:{sbDiskScale:()=>sbVal('sbDiskScale')!==tutorialStart.sbDiskScale,sbTruncation:()=>sbVal('sbTruncation')!==tutorialStart.sbTruncation},doneText:'Disk reshaped and edge moved.',title:'Spread the stars out',
          text:'The scale length sets how quickly the disk’s density fades outwards; the truncation radius is where it ends.',
          action:'1. Drag Scale length and watch the peak of the cyan line. 2. Drag Truncation radius and watch the 3D galaxy’s size.'},
@@ -5654,7 +5659,7 @@ __GALAXIES_JS__
          checks:{optMond:()=>mondMode,sbDiskMass:()=>mondMode&&mondFaintSomewhere()&&(sbVal('sbDiskMass')>tutorialStart.sbDiskMass||sbVal('sbDiskMass')>=Number(document.getElementById('sbDiskMass').max))},doneText:'Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out.',
          text:'MOND boosts gravity everywhere, but only a little where gravity is strong. The weaker it gets, the bigger the boost, and the deeper the gold on the graph.',
          action:'1. Choose MOND. 2. Drag Disk mass to the right until the gold near the centre of the graph turns very faint.'},
-        {id:'sbMondZone3d',mode:'custom',mond:true,viewPanel:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'MOND in your galaxy',
+        {id:'sbMondZone3d',mode:'custom',mond:true,viewPanel:true,cardRight:true,given:['toggleMondZone'],target:'toggleMondZone',gesture:'click',tag:'Switch on',title:'MOND in your galaxy',
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Dim in the middle, where your disk pulls hard, and deeper gold outwards, where MOND takes over.',
          text:'The graph’s gold, laid on your galaxy: the deeper the gold, the more MOND boosts gravity there.',
          action:'Switch on Where MOND acts in the View panel.'},
@@ -5721,7 +5726,7 @@ __GALAXIES_JS__
     const sbVal=id=>{const el=document.getElementById(id);return el?Number(el.value):0;};
     function tutorialResetChecks(){
       tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;holdTutorialPart(null);
-      tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
+      tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),fitOff:galaxyMode==='preset'&&!mondMode&&shownRedChi>=tutorialChiGoal(),haloChi:!mondMode&&Number.isFinite(shownRedChi)?shownRedChi:null,sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
     }
     function tutorialUpdateChecks(){
       const step=tutorialStep();
@@ -5814,7 +5819,11 @@ __GALAXIES_JS__
     tutorialSliders.addEventListener('change',e=>{const real=tutorialRealOf(e.target);if(real)real.dispatchEvent(new Event('change',{bubbles:true}));});
     tutorialSliders.addEventListener('pointerdown',()=>tutorialSpotlight.classList.add('is-interacting'));
     // Watch steps finish by themselves: each render checks the step's done() test (camera angle, layers, play time).
-    let tutorialPlayedMyr=0,tutorialWatchLast=0,tutorialScaleSeen=[0,0,0];
+    let tutorialPlayedMyr=0,tutorialWatchLast=0,tutorialScaleSeen=[0,0]; // [value when the card opened, lowest since]
+    // 'Drag the scale radius both ways' needs a real move each way, so the small jump when the thumb is first
+    // grabbed off-centre never counts as the second direction.
+    const TOUR_SCALE_MOVE_KPC=2;
+    const tutorialScaleDown=([start,min])=>min<start&&min<=Math.max(Number(scaleSlider.min),start-TOUR_SCALE_MOVE_KPC)||start<=Number(scaleSlider.min);
     function tutorialWatchTick(){
       if(tutorialCard.hidden)return;
       const prev=tutorialWatchLast;
@@ -5858,6 +5867,9 @@ __GALAXIES_JS__
         const viewClosed=viewPanel.classList.contains('collapsed');
         return{target:viewClosed?viewToggle:fsBtn,gesture:'click',say:viewClosed?'Open View in the 3D panel and press Fullscreen first. ':'Press Fullscreen first. '};
       }
+      // 'Put the halo back': the stars only stay bound with (nearly) the fitted halo, so ask for that, not just any halo.
+      if(step.id==='fsFullHalo'&&Number(massSlider.value)<TOUR_HALO_BACK_FRACTION*DEFAULTS.massT)
+        return{target:fullscreen?fsMass:massSlider,gesture:'increase',say:`Drag Halo mass back up to the fitted halo, about ${Number(DEFAULTS.massT).toFixed(2)} × 10¹² M☉ first. `};
       if(step.halo&&Number(massSlider.value)===0)return{target:fullscreen?fsMass:massSlider,gesture:'increase',say:'Increase halo mass above 0 first so there is a halo to see. '};
       if(step.viewPanel&&viewPanel.classList.contains('collapsed'))return{target:viewToggle,gesture:'click',say:'Open View first. '};
       return null;
@@ -5884,11 +5896,22 @@ __GALAXIES_JS__
     function tutorialInstruction(){
       const step=tutorialStep();
       if(step.id==='puzzle'&&!tutorialCompleted.puzzle){const n=[0,1,2].filter(i=>tutorialFlags['scan'+i]).length;if(n)return step.action+` (${n} of 3 stretches covered)`;}
+      // The last card can leave the fit off already (a packed or spread-out halo); then part 1 only asks for a drag.
+      if(step.id==='fit'&&tutorialStart.fitOff&&!tutorialLatched.massSlider){
+        return step.action.replace(/^1\. [^.]*\./,'1. The fit is already off after the last card: drag Halo mass and watch χ² in the yellow box change.');
+      }
       if(step.id==='fit'&&tutorialChiGoal()>CLOSE_FIT_RED_CHI){
         const goal=tutorialChiGoal().toFixed(1);
         return step.action.replace('the yellow box no longer reads Close fit',`χ²ᵣ (the second number in the yellow box) rises above ${goal}`)
           .replace('the yellow box reads Close fit',`χ²ᵣ drops below ${goal}, close to the best the published fit manages for this galaxy`);
       }
+      // Break the halo: with a heavy halo only the small end of the slider leaves the band, so say so at the other end.
+      if(step.id==='sbStability'&&!tutorialCompleted.sbStability){
+        const v=Number(scaleSlider.value),atEnd=v<=Number(scaleSlider.min)||v>=Number(scaleSlider.max),state=stabilityReport().state;
+        if(atEnd&&state!=='diffuse'&&state!=='dense')return step.action+' Still in the band at this end: try the other end.';
+      }
+      // Test a rival idea: the halo's score disappears once MOND is chosen, so the card keeps it for the comparison.
+      if(step.id==='mond'&&tutorialStart.haloChi!=null)return step.action+` Your halo’s χ²ᵣ: ${tutorialStart.haloChi.toFixed(1)}.`;
       if(step.id==='removeHalo'){
         if(tutorialShortcutUnlocked)return 'Compare the orange line with the white points on the right. (The new Visible matter only button is a shortcut back to 0.)';
         if(Number(massSlider.value)===0)return 'Halo mass is already 0: drag it right, then back to 0.';
@@ -5899,7 +5922,7 @@ __GALAXIES_JS__
     function tutorialPartIndex(step,count){
       if(tutorialCompleted[step.id])return count-1;
       if(step.checks){const i=tutorialPartHold?Object.keys(step.checks).indexOf(tutorialPartHold):Object.keys(step.checks).findIndex(id=>!tutorialLatched[id]);return i<0?count-1:Math.min(i,count-1);}
-      if(step.id==='haloShape'){const[start,min]=tutorialScaleSeen;return min<start||start<=Number(scaleSlider.min)?1:0;}
+      if(step.id==='haloShape')return tutorialScaleDown(tutorialScaleSeen)?1:0;
       return 0;
     }
     // "First:" line for anything in the way, then the action; "1. … 2. …" actions show one part at a time,
@@ -5942,7 +5965,10 @@ __GALAXIES_JS__
       const box=document.createElement('div'),q=document.createElement('strong'),row=document.createElement('div');
       q.textContent=predict.question;row.className='tutorial-choices';row.id='tutorialChoices';
       predict.options.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.textContent=label;
-        b.addEventListener('click',()=>{tutorialFlags.prediction=i;tutorialPlayedMyr=0;tutorialWatchLast=raceStartMyr=simTime;refreshTutorialGuidance();});row.appendChild(b);});
+        b.addEventListener('click',()=>{
+          // The race needs TOUR_RACE_MYR of clock: too near the end of the timeline, it starts again from 0 Myr.
+          if(simTime>SIM_TOTAL_TIME_MYR-TOUR_RACE_MYR)onSliderInput(0);
+          tutorialFlags.prediction=i;tutorialPlayedMyr=0;tutorialWatchLast=raceStartMyr=simTime;refreshTutorialGuidance();});row.appendChild(b);});
       box.append(q,row);return box;
     }
     function refreshTutorialGuidance(){
@@ -6387,18 +6413,21 @@ __GALAXIES_JS__
         if(head&&(head.matches('.view-label')||head.tagName==='LABEL'))head.classList.toggle('tutorial-trim',hide);
       });
     }
-    // Phones: a value the card says to watch that is off screen (χ² above the graph while the model cards sit below it;
-    // the M/L and tilt tiles far up the page) is copied live onto the card, so it can be read without scrolling.
+    // A value the card says to watch that is off screen or under the card (χ² above the graph while the model cards
+    // sit below it; the M/L and tilt tiles or the halo mass far up the page) is copied live onto the card, so it can
+    // be read without scrolling.
     const TUTORIAL_READOUTS={
       chiBadge:{label:'Fit',value:el=>el.innerText.replace(/\s+/g,' ').trim()},
       mlStat:{label:'M/L',value:el=>[...el.querySelectorAll('.stat-value b')].map(b=>b.textContent).join(' / ')},
-      tiltStat:{label:'Tilt',value:()=>document.getElementById('tiltValue').textContent}
+      tiltStat:{label:'Tilt',value:()=>document.getElementById('tiltValue').textContent},
+      massValue:{label:'Halo mass',value:el=>el.textContent.trim()}
     };
     const tutorialReadout=document.getElementById('tutorialReadout');let tutorialReadoutKey='';
     function syncTutorialReadout(){
       const step=tutorialStep(),card=tutorialCard.getBoundingClientRect(),top=tutorialCoverBottom(tutorialCard);
-      const offScreen=el=>{if(!el.getClientRects().length)return false;const r=el.getBoundingClientRect();return r.top<top||r.bottom>card.top;};
-      const items=tutorialPhone()&&!tutorialBlocker()?tutorialRingList(step).filter(r=>r.watch&&TUTORIAL_READOUTS[r.id]).map(r=>[r.id,document.getElementById(r.id)]).filter(([,el])=>el&&offScreen(el)):[];
+      const offScreen=el=>{if(!el.getClientRects().length)return false;const r=el.getBoundingClientRect();
+        return r.top<top||r.bottom>innerHeight||r.bottom>card.top&&r.top<card.bottom&&r.right>card.left&&r.left<card.right;};
+      const items=!tutorialBlocker()?tutorialRingList(step).filter(r=>r.watch&&TUTORIAL_READOUTS[r.id]).map(r=>[r.id,document.getElementById(r.id)]).filter(([,el])=>el&&offScreen(el)):[];
       const key=items.map(([id,el])=>id+'='+TUTORIAL_READOUTS[id].value(el)).join('|');
       if(key===tutorialReadoutKey)return;
       tutorialReadoutKey=key;tutorialReadout.hidden=!items.length;
@@ -6432,7 +6461,7 @@ __GALAXIES_JS__
       const backHadFocus=document.activeElement===tutorialBack;
       tutorialLastMass=Number(massSlider.value);
       tutorialLastScale=Number(scaleSlider.value);
-      tutorialScaleSeen=[tutorialLastScale,tutorialLastScale,tutorialLastScale];
+      tutorialScaleSeen=[tutorialLastScale,tutorialLastScale];
       tutorialLastTime=Number(timeSlider.value);
       tutorialDrag=null;
       // A box still showing on the control the new card starts on stays put instead of replaying its arrival.
@@ -6715,11 +6744,10 @@ __GALAXIES_JS__
     scaleSlider.addEventListener('input',()=>{
       const value=Number(scaleSlider.value);
       if(!mondMode&&value!==tutorialLastScale){
-        // 'Move the scale radius both ways': done once it has gone below and above where the card started
-        // (or reached an end of the track on the other side).
-        const[start]=tutorialScaleSeen,lo=Number(scaleSlider.min),hi=Number(scaleSlider.max);
-        tutorialScaleSeen[1]=Math.min(tutorialScaleSeen[1],value);tutorialScaleSeen[2]=Math.max(tutorialScaleSeen[2],value);
-        const down=tutorialScaleSeen[1]<start||start<=lo,up=tutorialScaleSeen[2]>start||start>=hi;
+        // 'Move the scale radius both ways': done once it has gone at least TOUR_SCALE_MOVE_KPC left of where the
+        // card started (or the track's left end), then that far back right from the lowest point (or the right end).
+        tutorialScaleSeen[1]=Math.min(tutorialScaleSeen[1],value);
+        const down=tutorialScaleDown(tutorialScaleSeen),up=down&&(value-tutorialScaleSeen[1]>=TOUR_SCALE_MOVE_KPC||value>=Number(scaleSlider.max));
         if(down&&up)completeTutorialAction('haloShape','Both ways: the same mass, arranged differently.');
         else if(down&&tutorialStep().id==='haloShape')renderTutorialTry();
         checkStabilityStep();
@@ -6750,18 +6778,20 @@ __GALAXIES_JS__
     document.getElementById('mlInfoBtn').addEventListener('explainerread',()=>completeTutorialAction('ml','Explainer read.'));
     const SANDBOX_STEP_FEEDBACK={
       sbDiskMass:['sbDisk','Disk mass changed: the typical halo followed it.'],
-      sbGasMass:['sbGas','Gas mass changed.']
+      sbGasMass:['sbGas','Gas mass changed: the curve moves most far out, where the gas reaches beyond the stars.']
     };
     sandboxInputs.forEach(input=>input.addEventListener('input',()=>{
       const feedback=SANDBOX_STEP_FEEDBACK[input.id];
       if(feedback)completeTutorialAction(feedback[0],feedback[1]);
       if(input.id==='sbBulgeMass'&&Number(input.value)>0)completeTutorialAction('sbBulge','Bulge added: the inner orbits speed up.');
-      completeTutorialAction('sbSummary','Totals updated.');
+      completeTutorialAction('sbSummary','Totals updated: the typical halo follows the mass of the stars.');
     }));
     window.addEventListener('pointerup',()=>tutorialSpotlight.classList.remove('is-interacting'));
     window.addEventListener('pointercancel',()=>tutorialSpotlight.classList.remove('is-interacting'));
     mondToggle.addEventListener('change',()=>{
-      if(mondMode)completeTutorialAction('mond','MOND selected: no halo, modified gravity instead.');
+      if(mondMode)completeTutorialAction('mond',tutorialStart.haloChi!=null
+        ?`MOND chosen. Compare its χ²ᵣ in the yellow box with your halo’s ${tutorialStart.haloChi.toFixed(1)}. Plain MOND tunes nothing to this galaxy; the halo tuned two values.`
+        :'MOND selected: no halo, modified gravity instead.');
       tutorialRecheck();
     });
     bestFitToggle.addEventListener('change',()=>{

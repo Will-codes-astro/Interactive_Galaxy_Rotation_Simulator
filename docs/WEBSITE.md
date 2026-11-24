@@ -66,9 +66,12 @@ card's control and everything it rings are scrolled into view together when they
 fit above the card, the View panel opens by itself on cards that use it, and in
 fullscreen the View panel and the halo slider panel show only the rows the card
 names, so the galaxy stays visible. Star labels flip left before they would run
-off the right edge. When a value the card says to watch (χ², M/L, tilt) is off
-screen, a live copy of it sits on the card in a yellow dashed box, so "Test a
-rival idea" can compare χ² without scrolling.
+off the right edge.
+
+On every screen size, when a value the card says to watch (χ², M/L, tilt, halo mass) is off
+screen or under the card, a live copy of it sits on the card in a yellow dashed box
+(`TUTORIAL_READOUTS`), so the sandbox's "Make the disk heavier or lighter" shows the halo mass
+without scrolling.
 
 The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
@@ -363,21 +366,25 @@ The main tutorial's 21 steps start from the mass discrepancy in the rotation cur
 (measured speeds stay above the visible-matter prediction; the pointer must
 cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
-measured speeds over the outer third of the points), change its shape, open all three halo cards (r200, scale
+measured speeds over the outer third of the points), change its shape (at least 2 kpc left, then 2 kpc back right,
+`TOUR_SCALE_MOVE_KPC`, so the jump when the thumb is grabbed off-centre never counts), open all three halo cards (r200, scale
 radius, concentration), then fit the halo by hand: break the fit with Halo
 mass, then tune both sliders until the badge reads Close fit (Fit halo to
-data stays locked). For a galaxy whose published halo fit is not Close, the goal
+data stays locked; if the last card left the fit off already, part 1 just asks for a drag). For a galaxy whose published halo fit is not Close, the goal
 is χ²ᵣ within 1.25 × that fit's value. Then it compares MOND and its best-fit
-switch. A "watch it happen" chapter then runs inside fullscreen, where the
+switch ("Test a rival idea" keeps the halo's χ²ᵣ from when the card opened and shows it, since it vanishes once
+MOND is chosen). A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
 predict which of two ringed stars will finish more laps (Play stays locked
 until a prediction is chosen), then watch them race (live lap counts and
 speeds show differential rotation on a flat rotation curve; the lap counts start at zero when the race card
-opens, so they cannot give the answer away, and start again if the clock is taken back), turn edge-on to see a ringed star bob
-through the thin disk, type a number in the Star # box to follow any star, switch on the ejection line, remove the halo and follow
-the first star to cross it, then restore the halo and zoom out to the full halo.
+opens, so they cannot give the answer away, and start again if the clock is taken back; with less than the race's
+400 Myr (`TOUR_RACE_MYR`) left on the clock, choosing a prediction takes it back to 0 Myr), turn edge-on to see a ringed star bob
+through the thin disk (it ticks after 200 Myr of playing, `TOUR_BOB_WATCH_MYR`, so the bob has been seen), type a number in the Star # box to follow any star, switch on the ejection line, remove the halo and follow
+the first star to cross it (the ejection line is drawn in red), then restore the halo (to at least 90% of the fitted
+halo mass, `TOUR_HALO_BACK_FRACTION`, since a smaller halo still loses stars) and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer, the Scorecard
-(read the At a glance table, then press Next) and the Scorecard's "Before drawing conclusions" notes (`#scoreNotes`; no box or dimming, since they cover a whole block). The rings and labels are tutorial aids drawn from the
+(read the At a glance table, then press Next) and the Scorecard's "Before drawing conclusions" notes (`#scoreNotes` on their heading; no box or dimming, since they cover a whole block). The rings and labels are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the
@@ -412,7 +419,8 @@ scrolling: a card too long for its space widens step by step (to 540 px at
 most), and in fullscreen can also grow up to just below the view buttons. On
 phones the card keeps its full-width layout and scrolls if it must. A second, 14-step Sandbox tutorial covers
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
-halo shape monitor (what it reads, then pushing a halo out of range), the
+halo shape monitor (what it reads, then pushing a halo out of range; at an end of the slider that is still
+in range, the card says to try the other end), the
 halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
 orbits, then the first star lost without dark matter). It follows on from the simulator
 tutorial in the full guided tour, or starts from the Sandbox tutorial button on
