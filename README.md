@@ -1,4 +1,4 @@
-# Interactive Galaxy Rotation Simulator (EPQ)
+# Simulating the Invisible: interactive galaxy rotation simulator (EPQ)
 
 Will's EPQ, *Simulating the Invisible*, compares two explanations for why
 galaxies spin too fast at large radii: a **dark matter halo (NFW)** and

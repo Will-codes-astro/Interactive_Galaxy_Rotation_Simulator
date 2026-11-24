@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Interactive Galaxy Rotation Simulator: explore SPARC rotation curves and star orbits for NGC 3198, NGC 2403, NGC 7331 and UGC 128">
-  <title>Interactive Galaxy Rotation Simulator</title>
+  <meta name="description" content="Simulating the Invisible: an interactive galaxy rotation simulator testing dark matter and MOND against real SPARC rotation curves of NGC 3198, NGC 2403, NGC 7331 and UGC 128">
+  <title>Simulating the Invisible · Galaxy rotation, dark matter and MOND</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
@@ -411,7 +411,7 @@
     .tutorial-clock b { position:absolute; inset:0; display:grid; place-items:center; font-size:10px; font-variant-numeric:tabular-nums; }
     /* Moving between cards: the old text slides out the way you are going, the new text follows in, line by line. */
     .tutorial-card { transition:opacity .38s ease, transform .38s ease; }
-    .tutorial-content, .tutorial-feedback { transition:opacity .42s ease, transform .42s ease; }
+    .tutorial-content, .tutorial-feedback { transition:opacity .42s ease, transform .42s ease, filter .42s ease; }
     .tutorial-try.part-in { animation:tutorial-pop .5s ease both; }
     .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { opacity:0; transform:translateX(calc(var(--dir,1) * -12px)); }
     .tutorial-card.enter :is(#tutorialTitle,#tutorialText,#tutorialTry) { animation:tutorial-in .7s cubic-bezier(.2,.8,.2,1) both; }
@@ -1052,6 +1052,83 @@
     html.calm .ml-explainer, html.calm .ml-explainer > *, html.calm .stat-q::after, html.calm .settings-panel, html.calm .settings-panel > *, html.calm .galaxy-menu-list, html.calm .galaxy-menu-list li, html.calm .halo-metric dd, html.calm .halo-metric dd > span > span, html.calm .view-panel > :not(.view-head) { transform:none !important; transition-property:opacity, visibility, display !important; transition-delay:0s !important; }
     html.calm .view-panel, html.calm .view-panel.collapsed, html.calm .halo-metric dd, html.calm details::details-content { transition:none !important; }
     html.calm .ml-explainer::before, html.calm .settings-panel::before { display:none; }
+    /* ---------- Section titles line up with the content ----------
+       The section number sits above its title, so every title starts at the same left edge as the cards under it. */
+    .section-head { grid-template-columns:minmax(0,1fr); }
+    .section-head .kicker { grid-row:auto; display:flex; align-items:center; gap:10px; margin-bottom:5px; font-size:11.5px; }
+    .section-head .kicker::after { content:""; width:40px; height:1px; background:linear-gradient(90deg,var(--accent),transparent); }
+    .section-head p { grid-column:1; }
+    /* ---------- Motion (visual only) ----------
+       Page changes cross-fade with a slide and blur (View Transitions, where the browser has them), the menu's
+       highlight glides to the new entry, content rises into view as it scrolls in, the homepage title and galaxy
+       arrive on load, and the homepage figure draws itself. Reduce motion and lite visuals turn all of it off. */
+    .topnav { position:relative; }
+    .topnav a { position:relative; z-index:1; }
+    .nav-ink { position:absolute; left:0; top:0; width:0; height:0; border-radius:7px; background:rgba(138,180,248,.16); box-shadow:inset 0 0 0 1px rgba(138,180,248,.24),0 4px 18px rgba(110,150,240,.18); pointer-events:none; opacity:0; view-transition-name:nav-ink; transition:transform .55s cubic-bezier(.16,1,.3,1),width .55s cubic-bezier(.16,1,.3,1),height .3s,opacity .3s; }
+    .topnav.has-ink .nav-ink { opacity:1; }
+    .topnav.has-ink a[aria-current="page"] { background:none; }
+    html:is(.calm,.lite) .nav-ink { transition:none; }
+    .topbar { view-transition-name:topbar; }
+    ::view-transition-group(topbar) { animation:none; }
+    ::view-transition-old(topbar) { display:none; } ::view-transition-new(topbar) { animation:none; }
+    ::view-transition-group(nav-ink) { animation-duration:.55s; animation-timing-function:cubic-bezier(.16,1,.3,1); }
+    ::view-transition-old(root) { animation:page-out .3s cubic-bezier(.4,0,1,1) both; }
+    ::view-transition-new(root) { animation:page-in .7s cubic-bezier(.16,1,.3,1) .06s both; }
+    @keyframes page-out { to { opacity:0; transform:translateX(calc(var(--nav-dir,1) * -48px)) scale(.985); filter:blur(8px); } }
+    @keyframes page-in { from { opacity:0; transform:translateX(calc(var(--nav-dir,1) * 72px)) scale(.99); filter:blur(12px); } }
+    /* A faint starfield behind the whole site, drifting very slowly (two layers for depth). */
+    body::before, body::after { content:""; position:fixed; inset:-20%; z-index:-1; pointer-events:none;
+      background-image:radial-gradient(1px 1px at 12% 18%,rgba(255,255,255,.55),transparent),radial-gradient(1px 1px at 33% 72%,rgba(200,215,255,.45),transparent),radial-gradient(1.4px 1.4px at 61% 41%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 84% 12%,rgba(255,236,210,.45),transparent),radial-gradient(1px 1px at 72% 86%,rgba(255,255,255,.4),transparent),radial-gradient(1.2px 1.2px at 47% 9%,rgba(190,210,255,.5),transparent),radial-gradient(1px 1px at 6% 63%,rgba(255,255,255,.35),transparent),radial-gradient(1px 1px at 93% 55%,rgba(255,255,255,.4),transparent);
+      background-size:540px 540px; opacity:.55; }
+    body::after { background-size:310px 310px; opacity:.28; transform:rotate(17deg); }
+    html:not(.calm):not(.lite) body::before { animation:star-drift 220s linear infinite; }
+    html:not(.calm):not(.lite) body::after { animation:star-drift-near 140s linear infinite, star-twinkle 7s ease-in-out infinite alternate; }
+    @keyframes star-drift { to { transform:translate3d(-540px,-180px,0); } }
+    @keyframes star-drift-near { from { transform:rotate(17deg) translate3d(0,0,0); } to { transform:rotate(17deg) translate3d(-620px,-310px,0); } }
+    @keyframes star-twinkle { from { opacity:.16; } to { opacity:.34; } }
+    /* Homepage title: "missing mass" in a soft blue-to-gold gradient; on load the words rise in one after another. */
+    .hero h1 .w { display:inline-block; }
+    .hero h1 .hl { background:linear-gradient(100deg,#a9c4ff 5%,#d4c6ff 50%,#f0cf91 95%); background-size:200% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; }
+    html:not(.calm):not(.lite) .hero h1 .w { animation:word-in 1.05s cubic-bezier(.16,1,.3,1) both; animation-delay:calc(.12s + var(--i,0) * .075s); }
+    html:not(.calm):not(.lite) .hero h1 .hl { animation:word-in 1.05s cubic-bezier(.16,1,.3,1) calc(.12s + var(--i,0) * .075s) both, hl-shift 9s ease-in-out 1.4s infinite alternate; }
+    html:not(.calm):not(.lite) :is(.hero .eyebrow,.hero .lead,.abstract > div,.hero-switch,.hero-galaxy figcaption) { animation:rise .9s cubic-bezier(.16,1,.3,1) both; }
+    html:not(.calm):not(.lite) .hero .eyebrow { animation-delay:.02s; }
+    html:not(.calm):not(.lite) .hero .lead { animation-delay:.6s; }
+    html:not(.calm):not(.lite) .abstract > div:nth-child(1) { animation-delay:.75s; } html:not(.calm):not(.lite) .abstract > div:nth-child(2) { animation-delay:.83s; }
+    html:not(.calm):not(.lite) .abstract > div:nth-child(3) { animation-delay:.91s; } html:not(.calm):not(.lite) .abstract > div:nth-child(4) { animation-delay:.99s; }
+    html:not(.calm):not(.lite) .hero-galaxy canvas { animation:galaxy-in 1.8s cubic-bezier(.16,1,.3,1) .15s both; }
+    html:not(.calm):not(.lite) .hero-switch { animation-delay:1s; } html:not(.calm):not(.lite) .hero-galaxy figcaption { animation-delay:1.15s; }
+    @keyframes word-in { from { opacity:0; transform:translateY(.5em) rotate(2deg); filter:blur(10px); } }
+    @keyframes hl-shift { to { background-position:100% 0; } }
+    @keyframes rise { from { opacity:0; transform:translateY(16px); filter:blur(6px); } }
+    @keyframes galaxy-in { from { opacity:0; transform:scale(.86) rotate(-14deg); filter:blur(14px) brightness(1.8); } }
+    /* Scroll reveal: marked by revealOnScroll(); the class is removed once the element has arrived. */
+    html:not(.calm):not(.lite) .reveal { opacity:0; transform:translateY(26px) scale(.985); filter:blur(6px); transition:opacity .75s ease,transform .95s cubic-bezier(.16,1,.3,1),filter .75s ease; transition-delay:calc(var(--i,0) * 75ms); }
+    html:not(.calm):not(.lite) .reveal.in { opacity:1; transform:none; filter:none; }
+    /* The homepage figure draws itself: measured points pop in left to right, then the prediction line sweeps across
+       and the gap fills in. */
+    html:not(.calm):not(.lite) .puzzle-fig:not(.play) :is(.pf-pt,.pf-pred,.pf-gap,.pf-label) { opacity:0; }
+    html:not(.calm):not(.lite) .puzzle-fig.play .pf-pt { transform-box:fill-box; transform-origin:center; animation:pt-in .55s cubic-bezier(.34,1.56,.64,1) both; animation-delay:calc(.1s + var(--i,0) * 24ms); }
+    html:not(.calm):not(.lite) .puzzle-fig.play .pf-pred { animation:draw-x 1.6s cubic-bezier(.65,0,.35,1) .55s both; }
+    html:not(.calm):not(.lite) .puzzle-fig.play .pf-gap { animation:fade-in 1.1s ease 1.9s both; }
+    html:not(.calm):not(.lite) .puzzle-fig.play .pf-label { animation:fade-in .8s ease 2.3s both; }
+    @keyframes pt-in { from { opacity:0; transform:translateY(-10px) scale(.2); } }
+    @keyframes draw-x { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
+    @keyframes fade-in { from { opacity:0; } }
+    /* Cards: a soft light follows the pointer, and small cards lift a little on hover. */
+    .glow { position:relative; }
+    .glow::after { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),rgba(138,180,248,.12),transparent 48%); opacity:0; transition:opacity .35s; }
+    .glow:hover::after { opacity:1; }
+    :is(.evidence-card,.answer,.limits-grid > li,.score-notes > li,.method-flow a) { transition:transform .35s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .35s; }
+    :is(.evidence-card,.answer,.limits-grid > li,.score-notes > li,.method-flow a):hover { border-color:var(--line-strong); box-shadow:0 14px 34px rgba(0,0,0,.32); }
+    html:not(.calm):not(.lite) :is(.evidence-card,.answer,.limits-grid > li,.score-notes > li,.method-flow a):hover { transform:translateY(-3px); }
+    html:is(.calm,.lite) .glow::after { display:none; }
+    .next-link { transition:background .15s,border-color .15s,transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s; }
+    html:not(.calm):not(.lite) .next-link:hover { transform:translateY(-2px); box-shadow:0 10px 26px rgba(110,150,240,.22); }
+    /* Tutorial cards: the new card's words slide in from the direction of travel with a short blur. */
+    @keyframes tutorial-in { from { opacity:0; transform:translateX(calc(var(--dir,1) * 28px)); filter:blur(6px); } }
+    html:not(.calm):not(.lite) .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { filter:blur(4px); }
+    .tutorial-progress-fill { box-shadow:0 0 10px rgba(138,180,248,.55); }
   </style>
   <script>
     /* Reduce motion (Settings). Until the visitor chooses, it follows the computer's own setting (prefers-reduced-motion),
@@ -1080,8 +1157,8 @@
 </head>
 <body>
   <nav class="topbar" aria-label="Page sections">
-    <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Galaxy Rotation Simulator</span></a>
-    <div class="topnav"><a href="#puzzle" aria-current="page"><span class="nav-long">Missing mass</span><span class="nav-short">Problem</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
+    <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Simulating the Invisible</span></a>
+    <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
     <div class="settings">
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
@@ -1099,7 +1176,7 @@
   <main>
     <div class="page active" data-page="puzzle">
     <header id="top" class="hero">
-    <div class="intro"><div class="eyebrow">Galaxy rotation curves · real SPARC data</div><h1>Galaxy rotation and the missing mass problem</h1><p class="lead">The outer stars and gas of a galaxy orbit faster than the gravity of its visible matter can explain. This site measures that gap in real galaxies and tests two explanations for it.</p>
+    <div class="intro"><div class="eyebrow">Galaxy rotation curves · real SPARC data</div><h1 aria-label="Galaxy rotation and the missing mass problem"><span class="w" style="--i:0">Galaxy</span> <span class="w" style="--i:1">rotation</span> <span class="w" style="--i:2">and</span> <span class="w" style="--i:3">the</span> <span class="w hl" style="--i:4">missing mass</span> <span class="w" style="--i:5">problem</span></h1><p class="lead">The outer stars and gas of a galaxy orbit faster than the gravity of its visible matter can explain. This site measures that gap in real galaxies and tests two explanations for it.</p>
       <dl class="abstract" aria-label="The project in brief">
         <div><dt>Aim</dt><dd>Test whether a dark matter halo or modified gravity better explains how fast galaxies rotate.</dd></div>
         <div><dt>Data</dt><dd>Measured orbit speeds of NGC 3198, NGC 2403, NGC 7331 and UGC 128 (SPARC; Lelli, McGaugh &amp; Schombert 2016).</dd></div>
@@ -1349,7 +1426,7 @@
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#background">Next: the two ideas and the wider evidence →</a></nav>
     </div>
     <div class="page" data-page="background">
-    <div class="section-head" id="background"><span class="kicker">05</span><h2>Dark matter or MOND?</h2><p>How each idea explains the fast orbits, and what the rest of the evidence says.</p></div>
+    <div class="section-head" id="background"><span class="kicker">05</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <article class="compare"><h3>Side by side</h3>
         <div class="score-scroll" tabindex="0" role="region" aria-label="The two ideas compared">
@@ -1646,6 +1723,7 @@
       <p><b>Check the numbers yourself</b>Download the model on screen as two CSV files: the rotation curve and the stars’ time series.</p>
       <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
     </div>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#puzzle">Back to the homepage ↑</a></nav>
     </div>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
@@ -1678,7 +1756,7 @@
   </aside>
   <script>
 /*
- * galaxies.js - SPARC rotation-curve presets for the Interactive Galaxy Rotation Simulator.
+ * galaxies.js - SPARC rotation-curve presets for Simulating the Invisible, the galaxy rotation simulator.
  *
  * Generated by generate_interactive_html.py from data/sparc/table2.dat and table1.mrt (SPARC mass
  * models and galaxy sample: Lelli, McGaugh & Schombert 2016, AJ 152, 157). Do not edit by hand: add or change presets in
@@ -4622,18 +4700,30 @@ window.GALAXIES = {
       let from=0;
       rows.forEach((p,i)=>{if(p.observed_kms<=vBar[i])from=Math.min(i+1,n-1);});
       const top=rows.slice(from).map(p=>`${f(x(p.radius_kpc))},${f(y(p.observed_kms))}`),bottom=rows.slice(from).map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[from+i]))}`).reverse();
-      svg+=`<polygon points="${top.concat(bottom).join(' ')}" fill="${gold}" fill-opacity=".13"/>`;
-      svg+=`<polyline points="${rows.map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[i]))}`).join(' ')}" fill="none" stroke="${cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
-      rows.forEach(p=>{svg+=`<path d="M${f(x(p.radius_kpc))} ${f(y(p.observed_kms-p.error_kms))}V${f(y(p.observed_kms+p.error_kms))}" stroke="${white}" stroke-opacity=".55"/><circle cx="${f(x(p.radius_kpc))}" cy="${f(y(p.observed_kms))}" r="2.4" fill="${white}"/>`;});
+      svg+=`<polygon class="pf-gap" points="${top.concat(bottom).join(' ')}" fill="${gold}" fill-opacity=".13"/>`;
+      svg+=`<polyline class="pf-pred" points="${rows.map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[i]))}`).join(' ')}" fill="none" stroke="${cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
+      rows.forEach((p,i)=>{svg+=`<g class="pf-pt" style="--i:${i}"><path d="M${f(x(p.radius_kpc))} ${f(y(p.observed_kms-p.error_kms))}V${f(y(p.observed_kms+p.error_kms))}" stroke="${white}" stroke-opacity=".55"/><circle cx="${f(x(p.radius_kpc))}" cy="${f(y(p.observed_kms))}" r="2.4" fill="${white}"/></g>`;});
       const mid=rows[Math.max(from,Math.round(0.7*(n-1)))],midBar=vBar[rows.indexOf(mid)];
-      svg+=`<text x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
-      svg+=`<text x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
-      svg+=`<text x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
+      svg+=`<text class="pf-label" x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
+      svg+=`<text class="pf-label" x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
+      svg+=`<text class="pf-label" x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
       document.getElementById('puzzleChart').innerHTML=svg;
       const ratio=(outer.observed_kms/vBar[n-1])**2;
-      document.getElementById('puzzleObs').textContent=`${Math.round(outer.observed_kms)} km/s`;
-      document.getElementById('puzzleBar').textContent=`${Math.round(vBar[n-1])} km/s`;
-      document.getElementById('puzzleRatio').textContent=ratio<3?ratio.toFixed(1):String(Math.round(ratio));
+      setCountable('puzzleObs',Math.round(outer.observed_kms),0,' km/s');
+      setCountable('puzzleBar',Math.round(vBar[n-1]),0,' km/s');
+      setCountable('puzzleRatio',ratio<3?Number(ratio.toFixed(1)):Math.round(ratio),ratio<3?1:0,'');
+    }
+    /* A number that counts up from zero when its step scrolls into view (countUp, visual only); it always shows its
+       final value first, so nothing depends on the animation running. */
+    function setCountable(id,value,decimals,suffix){
+      const el=document.getElementById(id);
+      Object.assign(el.dataset,{countTo:value,countDecimals:decimals,countSuffix:suffix});
+      el.textContent=value.toFixed(decimals)+suffix;
+    }
+    function countUp(el){
+      const to=Number(el.dataset.countTo),decimals=Number(el.dataset.countDecimals),suffix=el.dataset.countSuffix||'',start=performance.now(),DURATION_MS=1400;
+      const tick=now=>{const t=Math.min(1,(now-start)/DURATION_MS),eased=1-(1-t)**3;el.textContent=(to*eased).toFixed(decimals)+suffix;if(t<1)requestAnimationFrame(tick);};
+      requestAnimationFrame(tick);
     }
     drawPuzzleFigure();
 
@@ -4811,33 +4901,96 @@ window.GALAXIES = {
     let activePage='puzzle';
     const pageOf=el=>{const page=el&&el.closest?el.closest('.page'):null;return page?page.dataset.page:null;};
     const pageLink=page=>document.querySelector(`.topnav a[href="#${page}"]`);
-    function showPage(page,{scroll=true}={}){
-      if(!pageEls.some(el=>el.dataset.page===page))return;
-      const changed=page!==activePage;
-      activePage=page;
-      pageEls.forEach(el=>el.classList.toggle('active',el.dataset.page===page));
-      document.querySelectorAll('.topnav a').forEach(a=>{if(a.getAttribute('href')==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-      const link=pageLink(page);
-      if(link)link.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'}); // keeps the menu entry in view on phones
-      if(scroll)window.scrollTo({top:0,behavior:'instant'});
-      if(changed)document.dispatchEvent(new CustomEvent('pagechange',{detail:{page}}));
+    const navInk=document.querySelector('.nav-ink');
+    function placeNavInk(){ // the menu's highlight sits under the current entry and glides when it changes
+      const link=document.querySelector('.topnav a[aria-current="page"]');
+      if(!navInk||!link||!link.offsetWidth)return;
+      navInk.style.width=`${link.offsetWidth}px`;navInk.style.height=`${link.offsetHeight}px`;
+      navInk.style.transform=`translate(${link.offsetLeft}px,${link.offsetTop}px)`;
+      navInk.parentElement.classList.add('has-ink');
     }
-    function followHash(hash){
+    /* showPage swaps pages at once. With animate (a visitor's own click or Back), and where the browser has View
+       Transitions, the old page slides out and the new one in (visual only; never during a tour or fullscreen). */
+    function showPage(page,{scroll=true,animate=false,after=null}={}){
+      if(!pageEls.some(el=>el.dataset.page===page))return;
+      const changed=page!==activePage,order=pageEls.map(el=>el.dataset.page);
+      const apply=()=>{
+        activePage=page;
+        pageEls.forEach(el=>el.classList.toggle('active',el.dataset.page===page));
+        document.querySelectorAll('.topnav a').forEach(a=>{if(a.getAttribute('href')==='#'+page)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+        const link=pageLink(page);
+        if(link)link.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'}); // keeps the menu entry in view on phones
+        if(scroll)window.scrollTo({top:0,behavior:'instant'});
+        placeNavInk();
+        if(after)after();
+        if(changed)document.dispatchEvent(new CustomEvent('pagechange',{detail:{page}}));
+      };
+      const tourOpen=!document.getElementById('tutorialCard').hidden;
+      if(!(animate&&changed&&document.startViewTransition&&!calmMotion()&&!document.fullscreenElement&&!tourOpen)){apply();return;}
+      document.documentElement.style.setProperty('--nav-dir',order.indexOf(page)>=order.indexOf(activePage)?1:-1);
+      if(navInk)navInk.style.transition='none'; // the transition itself moves the highlight
+      const transition=document.startViewTransition(()=>{apply();revealInView(page);});
+      transition.finished.finally(()=>{if(navInk)navInk.style.transition='';});
+    }
+    function followHash(hash,animate=false){
       const id=String(hash).replace(/^#/,'');
       if(!id)return false;
-      if(pageEls.some(el=>el.dataset.page===id)){showPage(id);return true;}
+      if(pageEls.some(el=>el.dataset.page===id)){showPage(id,{animate});return true;}
       const target=document.getElementById(id),page=pageOf(target);
       if(!page)return false;
-      showPage(page);target.scrollIntoView({behavior:'instant'});
+      showPage(page,{animate,after:()=>target.scrollIntoView({behavior:'instant'})});
       return true;
     }
     document.addEventListener('click',e=>{
       const link=e.target.closest?e.target.closest('a[href^="#"]'):null;
-      if(!link||!followHash(link.getAttribute('href')))return;
+      if(!link||!followHash(link.getAttribute('href'),true))return;
       e.preventDefault();
       history.pushState(null,'',link.getAttribute('href'));
     });
-    window.addEventListener('popstate',()=>{if(!followHash(location.hash))showPage('puzzle');});
+    window.addEventListener('popstate',()=>{if(!followHash(location.hash,true))showPage('puzzle',{animate:true});});
+    window.addEventListener('resize',placeNavInk);
+    document.fonts?.ready?.then?.(placeNavInk); // re-measure once the web fonts have changed the menu's widths
+    placeNavInk();
+
+    /* ---------- Scroll reveal (visual only) ----------
+       Cards and sections on the reading pages rise into view as they scroll in, a few at a time. The simulator page is
+       left alone so the tour's highlights always find its controls in place. The homepage figure draws itself and its
+       numbers count up when they arrive. With reduced motion or lite visuals everything simply shows. */
+    const REVEAL_SELECTOR=['.page:not([data-page="simulator"]) .section-head','.puzzle-steps > li','.puzzle-fig','.puzzle-cta',
+      '.learn > article:not(.evidence)','.evidence-card','.evidence-open-title','.score-intro','.score-legend','.score-notes > li',
+      '.method-flow > li','.method-step:not(.ms-limits)','.limits-grid > li','.refs','.method-data','.page:not([data-page="simulator"]) .page-next'].join(',');
+    const REVEAL_CLEAR_MS=1700;
+    let revealObserver=null;
+    function arrive(el){
+      revealObserver?.unobserve(el);
+      el.classList.add('in');
+      if(el.matches('.puzzle-fig'))el.classList.add('play');
+      el.querySelectorAll('[data-count-to]').forEach(countUp);
+      setTimeout(()=>el.classList.remove('reveal','in'),REVEAL_CLEAR_MS);
+    }
+    function revealInView(page){ // before a page-change snapshot: whatever is already on screen arrives at once
+      document.querySelectorAll(`.page[data-page="${page}"] .reveal:not(.in)`).forEach(el=>{
+        if(el.getBoundingClientRect().top>=innerHeight)return;
+        el.classList.remove('reveal');arrive(el);
+      });
+    }
+    (function setupReveal(){
+      if(calmMotion()||!('IntersectionObserver' in window)){document.querySelectorAll('.puzzle-fig').forEach(fig=>fig.classList.add('play'));return;}
+      revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)arrive(entry.target);}),{rootMargin:'0px 0px -8% 0px',threshold:.06});
+      document.querySelectorAll(REVEAL_SELECTOR).forEach(el=>{
+        const siblings=[...el.parentElement.children].filter(child=>child.matches(REVEAL_SELECTOR));
+        el.style.setProperty('--i',Math.min(siblings.indexOf(el),6));
+        el.classList.add('reveal');revealObserver.observe(el);
+      });
+    })();
+    // A soft light follows the pointer across cards (visual only).
+    document.querySelectorAll('.evidence-card,.answer,.limits-grid > li,.score-notes > li,.method-flow a,.source-card,.learn > article,.method-step,.abstract > div').forEach(card=>card.classList.add('glow'));
+    document.addEventListener('pointermove',e=>{
+      const card=e.target.closest?e.target.closest('.glow'):null;
+      if(!card)return;
+      const box=card.getBoundingClientRect();
+      card.style.setProperty('--mx',`${e.clientX-box.left}px`);card.style.setProperty('--my',`${e.clientY-box.top}px`);
+    },{passive:true});
 
     const timeSlider=document.getElementById('timeSlider');
     function setPlaying(isPlaying){
@@ -5349,7 +5502,7 @@ window.GALAXIES = {
         return{target:viewClosed?viewToggle:fsBtn,gesture:'click',say:'Leave fullscreen first: press Esc. '};
       }
       const stepPage=pageOf(document.getElementById(step.target));
-      if(stepPage&&stepPage!==activePage)return{target:pageLink(stepPage),gesture:'click',say:`Go back to the ${(pageLink(stepPage).querySelector('.nav-long')||pageLink(stepPage)).textContent} page first (top menu). `};
+      if(stepPage&&stepPage!==activePage)return{target:pageLink(stepPage),gesture:'click',say:`Go back to the ${(pageLink(stepPage).querySelector('.nav-long')||pageLink(stepPage)).textContent.replace(/^The /,'')} page first (top menu). `};
       if(step.mode&&step.mode!==galaxyMode){
         return{target:sourceToggle.querySelector(`input[value=${step.mode}]`).parentElement,gesture:'click',
           say:step.mode==='custom'?'Switch to Custom Sandbox first. ':'Switch back to Preset Galaxies first. '};

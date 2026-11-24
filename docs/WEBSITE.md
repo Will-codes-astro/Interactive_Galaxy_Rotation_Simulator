@@ -4,19 +4,20 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 (the page's HTML, CSS and JavaScript are in `HTML_TEMPLATE`). The equations are
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
-The site is one file (`index.html`) split into five pages: The missing mass problem (page id `puzzle`, menu
-"Missing mass", "Problem" on narrow screens; its section heading is "Background: from prediction to problem"),
-Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "Dark
-matter or MOND?"; page id `background`, menu label "Ideas" on narrow screens),
+The site is called **Simulating the Invisible** (the EPQ's title; top bar, browser tab and page
+description). It is one file (`index.html`) split into five pages: the homepage (page id `puzzle`, menu
+"Home"; its section heading is "Background: from prediction to problem"),
+Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "The two ideas"; page id
+`background`, menu label "Ideas" on narrow screens),
 and Method & sources. The top menu shows one page at a time (`showPage`); each page ends with
-a "Next" button, the browser's Back button works, and a link such as
+a "Next" button (Method's is "Back to the homepage"), the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
 correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
-WebGL is off, a red note at the top says which, and the page shows The missing mass problem,
+WebGL is off, a red note at the top says which, and the page shows the homepage,
 The two ideas and Method as one long scroll; the Simulator and Scorecard, which need
 the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
-("Problem", "Ideas", "Method") in one row (below 420 px the logo is hidden to make room); on
+("Home", "Ideas", "Method") in one row (below 420 px the logo is hidden to make room); on
 narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
@@ -76,7 +77,7 @@ nothing is stored between visits). Each tour step opens the page its control is 
 open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
-The missing mass problem page opens the site, before any control. It is laid out like the front
+The homepage opens the site, before any control. It is laid out like the front
 of a paper: an eyebrow ("Galaxy rotation curves · real SPARC data"), the title "Galaxy rotation and
 the missing mass problem", a two-sentence lead and a structured abstract (`.abstract`: Aim, Data,
 Models, Test, two by two, each cited; Data lists the preset galaxies from `__GALAXY_NAMES__` and Test
@@ -328,7 +329,7 @@ never during a tutorial. In MOND only the halo sliders leave the box.
 Between 961 and 1279 px the gravity model takes its own row above the four
 slider columns, so readouts such as the orbit time have room, and Play shows
 its icon only. Below 1200 px on laptops (and on phones) the curve's legend uses
-the short names. Below 900 px the top menu uses short labels ("Problem",
+the short names. Below 900 px the top menu uses short labels ("Ideas",
 "Method") so the settings gear fits.
 On phones (640 px or narrower) the order is 3D view, rotation curve, sliders, and
 the rotation curve stays pinned under the menu while the sliders scroll beneath it,
@@ -466,6 +467,27 @@ or keyboard.
 Hover explainers (the halo value cards and the M/L, Tilt and Test stars "?"
 boxes) open only after the mouse rests on them for 0.35 s, so sweeping past
 does not open them. Opening one halo card closes the others.
+
+Section titles: each page's numbered section heading puts its number (with a short accent line) above
+the title, so every title starts at the same left edge as the content under it.
+
+Motion (all visual choices; Reduce motion and lite visuals turn every part off and show everything at once):
+- Page changes the visitor makes (menu, Next links, Back) use View Transitions where the browser has them:
+  the old page slides out and blurs, the new one slides in from the side of travel (`--nav-dir`). Changes
+  made by a tour, in fullscreen, or by code are instant. The menu's highlight (`.nav-ink`) glides to the new
+  entry (`placeNavInk`).
+- On the reading pages (not the Simulator, so tour highlights always find their controls), sections and
+  cards rise into view as they scroll in, a few at a time (`REVEAL_SELECTOR`,
+  `arrive`, `revealInView`). Whatever is on screen when a page opens arrives at once.
+- On load the homepage title's words rise in one after another ("missing mass" in a blue-to-gold gradient),
+  then the lead, the abstract and the galaxy.
+- The homepage figure draws itself when it scrolls in: measured points pop in left to right, the
+  visible-matter line sweeps across, then the gap and labels fade in; the 149 km/s, 65 km/s and "5 times"
+  figures count up (`setCountable`, `countUp`). The final values are always in the page first.
+- A faint two-layer starfield drifts very slowly behind every page (`body::before`, `body::after`).
+- Cards on the reading pages catch a soft light that follows the pointer (`.glow`), and small cards lift a
+  little on hover.
+- Tour cards: the new card's words slide in from the direction of travel with a short blur.
 
 Pull-outs share one opening motion (a visual choice): the "?" boxes and tips,
 the halo cards' notes, the View panel, Settings, the Galaxy menu and the
