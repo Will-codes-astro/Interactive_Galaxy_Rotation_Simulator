@@ -10,7 +10,7 @@ tested): the homepage (page id `puzzle`, menu "Home"; its section heading is "Ba
 to problem"), The two ideas (heading "The two ideas"; page id `background`, menu label "Ideas" on narrow
 screens), Simulator (Model setup and Simulation), Scorecard, and Method & sources. The page order is the
 order of the `.page` blocks in the HTML (`showPage` reads it for the slide direction). The top menu shows one page at a time (`showPage`); each page ends with
-a "Next" button (Method's is "Back to the homepage"), the browser's Back button works, and a link such as
+a "Next" button (The two ideas' is the guided tour panel; Method's is "Back to the homepage"), the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
 correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
@@ -113,12 +113,17 @@ Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
 speeds against the speed its visible matter predicts, with the gap between them
 shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
-visual aid only. "Take the full guided tour" runs the simulator tutorial and
-then, straight on, the sandbox tutorial and a short "Wrapping up" part ("Part 1 of 3" to
+visual aid only. The homepage ends with just "Next: the two ideas →" (Will's choice, 24 Nov: the
+tour comes after the theory).
+
+The two ideas ends with a "Now test them" panel (`.tour-cta`). "Take the full guided tour"
+(`#fullTourButton`, filled, with a small orbiting-star icon that is a visual choice only) runs the simulator
+tutorial and then, straight on, the sandbox tutorial and a short "Wrapping up" part ("Part 1 of 3" to
 "Part 3 of 3"). The simulator tutorial's two closing cards (the Scorecard's table, then its notes) are held back
-for that last part, so the full tour ends on them. Beside it, "Next: the two ideas →" leads on in page order. Opening the
-Simulator from the menu instead brings up the welcome offer, whose "Start simulator
-tutorial" runs the simulator tutorial alone.
+for that last part, so the full tour ends on them. Beside it, "Explore on my own →" opens the Simulator
+without the welcome offer. Opening the Simulator from the menu instead brings up the welcome offer, whose "Start simulator
+tutorial" runs the simulator tutorial alone. Page "Next" buttons are pills with the arrow in a small disc;
+the buttons that move a tour on (`.tutorial-primary`) are filled blue like the guided tour button.
 
 The Galaxy menu (Model setup) chooses which SPARC galaxy
 the dashboard models. Choosing a galaxy swaps in its rotation curve, rebuilds

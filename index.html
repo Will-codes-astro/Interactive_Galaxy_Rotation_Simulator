@@ -356,8 +356,9 @@
     .halo-metric .info-icon { color:#b39ae8; margin-left:3px; }
     .halo-metric .metric-value { display:block; margin-top:5px; color:#e6ddfa; font-size:18px; font-weight:600; font-variant-numeric:tabular-nums; }
     html.calm .view-panel .sw, html.calm .view-panel .sw::after { transition:none; }
-    .tutorial-launch { margin-left:auto; background:transparent; color:var(--muted); font-size:12px; }
-    .tutorial-launch:hover, .tutorial-launch:focus-visible { color:var(--ink); }
+    .tutorial-launch { margin-left:auto; padding:7px 14px; border-color:rgba(138,180,248,.4); border-radius:999px; background:rgba(138,180,248,.08); color:#dbe7ff; font-size:12px; }
+    .tutorial-launch::before { content:'\25B8\00a0'; color:var(--accent); }
+    .tutorial-launch:hover, .tutorial-launch:focus-visible { border-color:rgba(160,195,255,.8); background:rgba(138,180,248,.18); color:#f4f7ff; }
     .tutorial-welcome { width:min(460px,calc(100% - 32px)); max-height:calc(100% - 32px); padding:28px; border:1px solid rgba(138,180,248,.22); border-radius:18px; background:linear-gradient(145deg,#132739,#0b1522 65%); color:var(--ink); box-shadow:0 24px 80px rgba(0,0,0,.6); }
     .tutorial-welcome::backdrop { background:rgba(2,6,12,.8); }
     /* End of a tour: a short celebration (visual only). Three stars orbit a green tick, then the box settles. */
@@ -671,8 +672,12 @@
     button { padding:7px 13px; border:1px solid var(--line-strong); border-radius:8px; background:rgba(255,255,255,.035); color:var(--ink); font:500 12.5px/1.2 var(--f-ui); transition:background .15s,border-color .15s,color .15s; }
     button:hover { border-color:rgba(138,180,248,.6); background:rgba(138,180,248,.08); }
     button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-    #applyObservedFit, .tutorial-primary { background:rgba(138,180,248,.16); border-color:rgba(138,180,248,.6); color:#eef4ff; }
-    #applyObservedFit:hover, .tutorial-primary:hover { background:rgba(138,180,248,.26); }
+    #applyObservedFit { background:rgba(138,180,248,.16); border-color:rgba(138,180,248,.6); color:#eef4ff; }
+    #applyObservedFit:hover { background:rgba(138,180,248,.26); }
+    /* The buttons that move the tour on are filled like the guided tour button, so the way forward stands out. */
+    .tutorial-primary { padding-inline:16px; border-color:rgba(170,200,255,.6); background:linear-gradient(135deg,#3561b0,#1d3566 75%); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(70,120,235,.28); color:#f4f7ff; font-weight:600; }
+    .tutorial-primary:hover, .tutorial-primary:focus-visible { border-color:#cfe0ff; background:linear-gradient(135deg,#3d6cc2,#213c72 75%); box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 8px 24px rgba(80,135,245,.42); }
+    .tutorial-primary:disabled { box-shadow:none; }
     .preset-picker { flex:1 1 420px; min-width:0; gap:12px 14px; }
     .galaxy-menu { position:relative; }
     .galaxy-menu-btn { display:flex; align-items:center; gap:10px; min-width:200px; padding:6px 36px 6px 7px; background-color:var(--panel-2); background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 19px) 52%,calc(100% - 14px) 52%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; font:600 14px var(--f-ui); text-align:left; }
@@ -815,9 +820,7 @@
     .puzzle-fig svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:13px var(--f-ui); }
     .puzzle-fig figcaption { margin-top:8px; color:var(--muted); font-size:12px; line-height:1.5; }
     .puzzle-cta { grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-top:10px; padding-top:16px; border-top:1px solid var(--line); }
-    .puzzle-cta button { padding:9px 16px; font-size:13px; }
-    .puzzle-cta a, .refs a, .evidence-source a, .score-notes a { color:var(--accent); text-underline-offset:3px; }
-    .puzzle-cta a { font-size:13px; }
+    .refs a, .evidence-source a, .score-notes a { color:var(--accent); text-underline-offset:3px; }
     @media (max-width:900px) { .puzzle { grid-template-columns:1fr; gap:18px; padding:18px 16px; } .puzzle-fig { position:static; } }
     /* Fit badge: a plain-language verdict in front of the numbers. */
     #chiBadge sub { font-size:.82em; }
@@ -932,8 +935,29 @@
     .sim-head > .section-head { margin-bottom:0; }
     @media (max-width:900px) { .sim-head { grid-template-columns:1fr; } }
     .page-next { display:flex; justify-content:flex-end; margin-top:22px; }
-    .next-link { display:inline-block; padding:9px 16px; border:1px solid rgba(138,180,248,.5); border-radius:8px; background:rgba(138,180,248,.08); color:#dbe7ff; font:500 13px/1.2 var(--f-ui); text-decoration:none; transition:background .15s,border-color .15s; }
-    .next-link:hover, .next-link:focus-visible { background:rgba(138,180,248,.18); border-color:rgba(138,180,248,.8); }
+    .next-link { display:inline-flex; align-items:center; gap:10px; padding:8px 8px 8px 18px; border:1px solid rgba(138,180,248,.45); border-radius:999px; background:linear-gradient(180deg,rgba(138,180,248,.13),rgba(138,180,248,.05)); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); color:#e4ecff; font:500 13.5px/1.2 var(--f-ui); text-decoration:none; transition:background .15s,border-color .15s; }
+    .next-link:hover, .next-link:focus-visible { background:linear-gradient(180deg,rgba(138,180,248,.24),rgba(138,180,248,.1)); border-color:rgba(160,195,255,.85); }
+    /* The arrow sits in its own small disc and nudges the way it points on hover. */
+    .next-arrow { display:inline-grid; place-items:center; width:26px; height:26px; border-radius:50%; background:rgba(138,180,248,.22); color:#f2f6ff; font-size:13px; transition:transform .3s cubic-bezier(.16,1,.3,1),background .15s; }
+    .next-link:hover .next-arrow, .next-link:focus-visible .next-arrow { background:rgba(138,180,248,.4); transform:translateX(3px); }
+    .next-link:hover .next-arrow.up, .next-link:focus-visible .next-arrow.up { transform:translateY(-3px); }
+    /* End of The two ideas: the invitation to take the full guided tour, or to explore alone. */
+    .tour-cta { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:18px 36px; margin-top:34px; padding:24px 28px; border:1px solid rgba(138,180,248,.24); border-radius:var(--r-lg); background:radial-gradient(90% 160% at 100% 0%,rgba(110,150,240,.16),transparent 60%),var(--panel); box-shadow:var(--shadow); }
+    .tour-cta-eyebrow { color:var(--accent); font:600 11px/1 var(--f-ui); letter-spacing:.12em; text-transform:uppercase; }
+    .tour-cta-text p { max-width:46ch; margin:8px 0 0; color:var(--ink); font:400 18px/1.45 var(--f-serif); }
+    .tour-cta-actions { display:flex; flex-wrap:wrap; align-items:center; gap:14px 18px; }
+    .tour-go { position:relative; display:inline-flex; align-items:center; gap:13px; overflow:hidden; padding:10px 18px 10px 10px; border:1px solid rgba(170,200,255,.6); border-radius:14px; background:linear-gradient(135deg,#3561b0,#1d3566 70%); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 30px rgba(70,120,235,.32); color:#f4f7ff; text-align:left; cursor:pointer; transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,border-color .15s; }
+    .tour-go:hover, .tour-go:focus-visible { border-color:#cfe0ff; background:linear-gradient(135deg,#3d6cc2,#213c72 70%); box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 14px 38px rgba(80,135,245,.45); }
+    .tour-go-icon { display:grid; place-items:center; flex:none; width:42px; height:42px; border-radius:11px; background:rgba(255,255,255,.1); box-shadow:inset 0 0 0 1px rgba(255,255,255,.12); }
+    .tour-go-icon svg { width:30px; height:30px; overflow:visible; }
+    .tour-go-icon ellipse { fill:none; stroke:rgba(220,232,255,.55); stroke-width:1.4; }
+    .tour-go-core { fill:#ffe6a8; filter:drop-shadow(0 0 3px rgba(255,214,140,.9)); }
+    .tour-go-orbit circle { fill:#bfe0ff; filter:drop-shadow(0 0 3px rgba(150,200,255,.9)); }
+    .tour-go-text b { display:block; font:600 15px/1.25 var(--f-ui); }
+    .tour-go-text small { display:block; margin-top:3px; color:#c2d3f2; font-size:12px; }
+    .tour-go-arrow { margin-left:4px; font-size:17px; transition:transform .3s cubic-bezier(.16,1,.3,1); }
+    .tour-go:hover .tour-go-arrow, .tour-go:focus-visible .tour-go-arrow { transform:translateX(4px); }
+    @media (max-width:760px) { .tour-cta { grid-template-columns:1fr; padding:20px 18px; } .tour-go { width:100%; } }
     .puzzle-cta span { color:var(--ink-2); font-size:13.5px; }
     .answers { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px; }
     .answer { padding:10px 12px; border:1px solid var(--line); border-left-width:3px; border-radius:var(--r); background:rgba(0,0,0,.22); }
@@ -1135,6 +1159,13 @@
     html:is(.calm,.lite) .glow::after { display:none; }
     .next-link { transition:background .15s,border-color .15s,transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s; }
     html:not(.calm):not(.lite) .next-link:hover { transform:translateY(-2px); box-shadow:0 10px 26px rgba(110,150,240,.22); }
+    /* The tour button's icon is a tiny galaxy: a star circles its centre, and a light sweeps across on hover (visual only). */
+    html:not(.calm):not(.lite) .tour-go:hover { transform:translateY(-2px); }
+    html:not(.calm):not(.lite) .tour-go-orbit { transform:rotate(-24deg) scaleY(.5); transform-origin:16px 16px; }
+    html:not(.calm):not(.lite) .tour-go-orbit circle { transform-origin:16px 16px; animation:tour-go-orbit 6s linear infinite; }
+    @keyframes tour-go-orbit { to { transform:rotate(360deg); } }
+    html:not(.calm):not(.lite) .tour-go::after { content:''; position:absolute; inset:0; background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.16) 50%,transparent 70%); transform:translateX(-110%); pointer-events:none; }
+    html:not(.calm):not(.lite) .tour-go:hover::after { transform:translateX(110%); transition:transform .9s ease; }
     /* Tutorial cards: the new card's words slide in from the direction of travel with a short blur. */
     @keyframes tutorial-in { from { opacity:0; transform:translateX(calc(var(--dir,1) * 28px)); filter:blur(6px); } }
     html:not(.calm):not(.lite) .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { filter:blur(4px); }
@@ -1220,7 +1251,7 @@
         <div id="puzzleChart"></div>
         <figcaption>NGC 3198, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas.</figcaption>
       </figure>
-      <div class="puzzle-cta"><span>See how each answer works, then test both on real galaxies:</span><a class="next-link" href="#background">Next: the two ideas →</a><button type="button" class="tutorial-primary" id="puzzleTour" title="The simulator tutorial, then the sandbox tutorial">Take the full guided tour</button></div>
+      <div class="puzzle-cta"><span>Next, see how each answer works:</span><a class="next-link" href="#background">Next: the two ideas <span class="next-arrow" aria-hidden="true">→</span></a></div>
     </section>
     </div>
     <div class="page" data-page="background">
@@ -1326,7 +1357,10 @@
         </div>
       </article>
     </section>
-    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#simulator">Next: test both ideas in the simulator →</a></nav>
+    <nav class="page-next tour-cta" aria-label="Next page">
+      <div class="tour-cta-text"><span class="tour-cta-eyebrow">Now test them</span><p>Put both ideas to work on real galaxies: follow the guided tour, or explore the simulator on your own.</p></div>
+      <div class="tour-cta-actions"><button type="button" class="tour-go" id="fullTourButton"><span class="tour-go-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><ellipse cx="16" cy="16" rx="13" ry="6.5" transform="rotate(-24 16 16)"/><circle class="tour-go-core" cx="16" cy="16" r="3.2"/><g class="tour-go-orbit"><circle cx="29" cy="16" r="2.2"/></g></svg></span><span class="tour-go-text"><b>Take the full guided tour</b><small>The simulator, the sandbox, then the scores</small></span><span class="tour-go-arrow" aria-hidden="true">→</span></button><a class="next-link" href="#simulator" id="exploreAlone">Explore on my own <span class="next-arrow" aria-hidden="true">→</span></a></div>
+    </nav>
     </div>
     <div class="page" data-page="simulator">
     <div class="sim-head">
@@ -1504,7 +1538,7 @@
       </article>
     </section>
     </div>
-    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#scorecard">Next: how both ideas score on every galaxy →</a></nav>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#scorecard">Next: how both ideas score on every galaxy <span class="next-arrow" aria-hidden="true">→</span></a></nav>
     </div>
     <div class="page" data-page="scorecard">
     <div class="section-head" id="scorecard"><span class="kicker">05</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
@@ -1538,7 +1572,7 @@
         <li><b>A small sample</b><span id="scoreCount">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner.</li>
       </ul>
     </section>
-    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#method">Next: method and sources →</a></nav>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#method">Next: method and sources <span class="next-arrow" aria-hidden="true">→</span></a></nav>
     </div>
     <div class="page" data-page="method">
     <div class="section-head" id="method"><span class="kicker">06</span><h2>Method &amp; sources</h2><p>From telescope measurements to a score, and where every number comes from.</p></div>
@@ -1733,7 +1767,7 @@
       <p><b>Check the numbers yourself</b>Download the model on screen as two CSV files: the rotation curve and the stars’ time series.</p>
       <button type="button" id="exportCsv" class="export-btn" title="Download the time-series log and the rotation-curve model as two CSV files">Export raw data (CSV)</button>
     </div>
-    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#puzzle">Back to the homepage ↑</a></nav>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#puzzle">Back to the homepage <span class="next-arrow up" aria-hidden="true">↑</span></a></nav>
     </div>
   </main>
   <dialog class="tutorial-welcome" id="tutorialWelcome" aria-labelledby="welcomeTitle" aria-describedby="welcomeDescription">
@@ -5407,7 +5441,7 @@ window.GALAXIES = {
     const sourceToggle=document.getElementById('sourceToggle');
     const tutorialTopbar=document.querySelector('.topbar'),tutorialBar=document.querySelector('.sim-stage .controls'),tutorialPlots=document.querySelector('.sim-stage .panel-grid');
     let tutorialTour='main',tutorialSteps=TOURS.main.steps,tutorialIndex=0,tutorialTarget=null,tutorialCompleted={};
-    // The full guided tour (from the puzzle page) runs every tour in this order, one after the other.
+    // The full guided tour (from the end of The two ideas) runs every tour in this order, one after the other.
     // Its closing cards (the Scorecard's table, then its notes) are held back until after the sandbox tour, so it ends on them.
     TOURS.closing={label:'Wrapping up',steps:TOURS.main.steps.filter(s=>s.closing)};
     const FULL_TOUR=['main','sandbox','closing'];let tutorialFull=false;
@@ -6551,7 +6585,9 @@ window.GALAXIES = {
     document.getElementById('tutorialStart').addEventListener('click',()=>startTutorial('main'));
     document.getElementById('tutorialWelcomeSkip').addEventListener('click',()=>tutorialWelcome.close());
     tutorialLaunch.addEventListener('click',()=>startTutorial(galaxyMode==='custom'?'sandbox':'main'));
-    document.getElementById('puzzleTour').addEventListener('click',()=>{if(galaxyMode==='custom')setGalaxyMode('preset');startTutorial('main',true);});
+    document.getElementById('fullTourButton').addEventListener('click',()=>{if(galaxyMode==='custom')setGalaxyMode('preset');startTutorial('main',true);});
+    // Chose to explore without the tour at the end of The two ideas: the Simulator doesn't offer it again.
+    document.getElementById('exploreAlone').addEventListener('click',()=>{tourOffered=true;});
     document.getElementById('tutorialSkip').addEventListener('click',endTutorial);
     tutorialBack.addEventListener('click',()=>{if(tutorialIndex>0)goTutorialStep(tutorialIndex-1,-1);});
     tutorialNext.addEventListener('click',()=>{
