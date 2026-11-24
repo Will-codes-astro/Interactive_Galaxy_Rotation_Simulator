@@ -5,11 +5,11 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
 The site is called **Simulating the Invisible** (the EPQ's title; top bar, browser tab and page
-description). It is one file (`index.html`) split into five pages: the homepage (page id `puzzle`, menu
-"Home"; its section heading is "Background: from prediction to problem"),
-Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "The two ideas"; page id
-`background`, menu label "Ideas" on narrow screens),
-and Method & sources. The top menu shows one page at a time (`showPage`); each page ends with
+description). It is one file (`index.html`) split into five pages, in this order (Will's choice, 24 Nov: the ideas are explained before they are
+tested): the homepage (page id `puzzle`, menu "Home"; its section heading is "Background: from prediction
+to problem"), The two ideas (heading "The two ideas"; page id `background`, menu label "Ideas" on narrow
+screens), Simulator (Model setup and Simulation), Scorecard, and Method & sources. The page order is the
+order of the `.page` blocks in the HTML (`showPage` reads it for the slide direction). The top menu shows one page at a time (`showPage`); each page ends with
 a "Next" button (Method's is "Back to the homepage"), the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
@@ -74,7 +74,7 @@ The tutorial offer appears the first time the Simulator page opens in each page
 load, not over the opening story. "I've been here before" closes it for the rest
 of that page load; a refresh or a new tab offers it again (Will's choice:
 nothing is stored between visits). Each tour step opens the page its control is on (the last two
-open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
+open the Scorecard); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
 The homepage opens the site, before any control. It is laid out like the front
@@ -112,9 +112,9 @@ shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
 visual aid only. "Take the full guided tour" runs the simulator tutorial and
 then, straight on, the sandbox tutorial and a short "Wrapping up" part ("Part 1 of 3" to
-"Part 3 of 3"). The simulator tutorial's two closing cards (Scorecard, The two ideas) are held back
-for that last part, so the full tour ends on them. "Open
-the simulator" instead brings up the welcome offer, whose "Start simulator
+"Part 3 of 3"). The simulator tutorial's two closing cards (the Scorecard's table, then its notes) are held back
+for that last part, so the full tour ends on them. Beside it, "Next: the two ideas →" leads on in page order. Opening the
+Simulator from the menu instead brings up the welcome offer, whose "Start simulator
 tutorial" runs the simulator tutorial alone.
 
 The Galaxy menu (Model setup) chooses which SPARC galaxy
@@ -377,7 +377,7 @@ opens, so they cannot give the answer away, and start again if the clock is take
 through the thin disk, type a number in the Star # box to follow any star, switch on the ejection line, remove the halo and follow
 the first star to cross it, then restore the halo and zoom out to the full halo.
 It ends with the Galaxy menu, the mass-to-light explainer, the Scorecard
-(read the At a glance table, then press Next) and the theory guide (no box or dimming, since it covers a whole section). The rings and labels are tutorial aids drawn from the
+(read the At a glance table, then press Next) and the Scorecard's "Before drawing conclusions" notes (`#scoreNotes`; no box or dimming, since they cover a whole block). The rings and labels are tutorial aids drawn from the
 already computed trajectories; they never change the simulation. Watch steps
 tick themselves off once the camera, layers or clock reach the right state. An animated pointer shows where to go on
 each step; it fades out as soon as the mouse or a finger reaches the

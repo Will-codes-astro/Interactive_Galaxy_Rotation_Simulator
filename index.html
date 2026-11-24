@@ -531,7 +531,7 @@
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
     html:not(.calm) { scroll-behavior:smooth; }
     body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
-    .section-head[id], #curvePanel, #theoryGuide, #references { scroll-margin-top:72px; }
+    .section-head[id], #curvePanel, #theoryGuide, #scoreNotes, #references { scroll-margin-top:72px; }
     .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
     .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:600; font-size:14px; letter-spacing:.01em; text-decoration:none; white-space:nowrap; }
     .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
@@ -1161,7 +1161,7 @@
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Simulating the Invisible</span></a>
-    <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
+    <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
     <div class="settings">
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
@@ -1213,12 +1213,117 @@
         <div id="puzzleChart"></div>
         <figcaption>NGC 3198, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas.</figcaption>
       </figure>
-      <div class="puzzle-cta"><span>Test both answers against real measurements:</span><button type="button" class="tutorial-primary" id="puzzleTour" title="The simulator tutorial, then the sandbox tutorial">Take the full guided tour</button><a class="next-link" href="#simulator">Open the simulator →</a></div>
+      <div class="puzzle-cta"><span>See how each answer works, then test both on real galaxies:</span><a class="next-link" href="#background">Next: the two ideas →</a><button type="button" class="tutorial-primary" id="puzzleTour" title="The simulator tutorial, then the sandbox tutorial">Take the full guided tour</button></div>
     </section>
+    </div>
+    <div class="page" data-page="background">
+    <div class="section-head" id="background"><span class="kicker">02</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says.</p></div>
+    <section class="learn" id="theoryGuide" aria-label="Theory guide">
+      <article class="compare"><h3>Side by side</h3>
+        <div class="score-scroll" tabindex="0" role="region" aria-label="The two ideas compared">
+        <table class="compare-table">
+          <thead><tr><th scope="col"><span class="sr-only">Question</span></th><th scope="col" class="nfw">Dark matter halo</th><th scope="col" class="mond">MOND</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">What it changes</th><td>Adds unseen mass. Newton’s gravity is unchanged.</td><td>No extra mass. Gravity is boosted where it is very weak.</td></tr>
+            <tr><th scope="row">Values tuned to each galaxy here</th><td><b>2</b>: halo mass and scale radius</td><td><b>0</b>: one constant, a<sub>0</sub>, shared by every galaxy</td></tr>
+            <tr><th scope="row">Best evidence for it</th><td>Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)</td><td>Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)</td></tr>
+            <tr><th scope="row">Biggest open problem</th><td>No dark matter particle has been found (Bertone &amp; Hooper 2018)</td><td>Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </article>
+      <article class="nfw"><h3>What is a dark matter halo?</h3>
+        <div class="learn-content">
+        <p class="tldr">Dark matter gives out no light, so we only detect it through its gravity. A halo is a huge, roughly round cloud of it around a galaxy, reaching far beyond the stars.</p>
+        <figure class="schematic">
+          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: the speed from visible matter falls with radius, the halo’s share grows, and together they stay level">
+            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+            <path d="M36.0 124.0L42.8 96.8L49.6 76.9L56.4 65.8L63.2 60.9L70.0 59.7L76.8 60.2L83.6 61.6L90.4 63.4L97.2 65.3L104.0 67.2L110.8 69.0L117.6 70.7L124.4 72.4L131.2 73.9L138.0 75.3L144.8 76.6L151.6 77.8L158.4 79.0L165.2 80.0L172.0 81.0L178.8 82.0L185.6 82.9L192.4 83.7L199.2 84.5L206.0 85.2L212.8 86.0L219.6 86.6L226.4 87.3L233.2 87.9L240.0 88.5L246.8 89.0L253.6 89.5L260.4 90.0L267.2 90.5L274.0 91.0L280.8 91.4L287.6 91.9L294.4 92.3L301.2 92.7L308.0 93.1" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M36.0 124.0L42.8 101.0L49.6 92.3L56.4 86.1L63.2 81.3L70.0 77.4L76.8 74.1L83.6 71.3L90.4 68.9L97.2 66.7L104.0 64.9L110.8 63.2L117.6 61.7L124.4 60.4L131.2 59.2L138.0 58.1L144.8 57.1L151.6 56.2L158.4 55.4L165.2 54.7L172.0 54.1L178.8 53.4L185.6 52.9L192.4 52.4L199.2 51.9L206.0 51.5L212.8 51.1L219.6 50.8L226.4 50.4L233.2 50.1L240.0 49.9L246.8 49.6L253.6 49.4L260.4 49.2L267.2 49.0L274.0 48.8L280.8 48.7L287.6 48.6L294.4 48.4L301.2 48.3L308.0 48.2" fill="none" stroke="#b39ae8" stroke-width="2" stroke-dasharray="2 3"/>
+            <path d="M36.0 124.0L42.8 88.3L49.6 67.2L56.4 54.6L63.2 47.9L70.0 44.5L76.8 43.0L83.6 42.3L90.4 42.1L97.2 42.0L308.0 42.0" fill="none" stroke="#ffae5c" stroke-width="2.4"/>
+            <g fill="#f4f7fb"><circle cx="55" cy="57" r="3"/><circle cx="74" cy="43" r="3"/><circle cx="101" cy="42" r="3"/><circle cx="131" cy="42" r="3"/><circle cx="161" cy="42" r="3"/><circle cx="191" cy="42" r="3"/><circle cx="221" cy="42" r="3"/><circle cx="251" cy="42" r="3"/><circle cx="281" cy="42" r="3"/></g>
+            <text x="300" y="30" text-anchor="end" fill="#ffae5c">Together: stays level</text>
+            <text x="300" y="66" text-anchor="end" fill="#b39ae8">Halo: grows</text>
+            <text x="300" y="110" text-anchor="end" fill="#5fd0e0">Visible matter: falls</text>
+            <text x="172" y="142" text-anchor="middle">radius →</text>
+            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
+          </svg>
+          <figcaption>Schematic, not real data. The halo’s share (purple) grows as the visible matter’s (cyan) falls, so the total (orange) stays level.</figcaption>
+        </figure>
+        <p>Newton’s gravity stays as it is; there is just more mass. The simulator uses an <b>NFW halo</b> (Navarro, Frenk &amp; White 1996). Its shape came out of computer simulations of dark matter clumping as the Universe grew, not from fitting rotation curves: dense in the middle, thinning outwards. Two sliders set it: mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is).</p>
+        <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
+        <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration. For a round distribution of mass, only the mass M(r) inside the orbit pulls overall (Newton’s shell theorem):</p>
+        <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>v</mi><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt></math></div>
+        <p><b>2. Visible matter alone.</b> Beyond most of the stars, M(r) hardly grows, so v ∝ 1/√r: the speed should fall, like the planets’ speeds in the Solar System.</p>
+        <p><b>3. What a flat curve needs.</b> For v to stay constant, M(r) must grow in step with r. That happens if the density falls as 1/r²: each thin shell of thickness Δr then holds the same mass, 4πr²ρΔr, so every step outwards adds the same amount.</p>
+        <p><b>4. The NFW density.</b> With ρ<sub>s</sub> setting how dense the halo is:</p>
+        <div class="eq"><math display="block"><mi>ρ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>ρ</mi><mi>s</mi></msub><mrow><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac></math></div>
+        <p>Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method).</p>
+        </details>
+        <p class="weakness"><b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated.</p>
+        </div>
+      </article>
+      <article class="mond"><h3>What is MOND?</h3>
+        <div class="learn-content">
+        <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves differently when it is extremely weak (Milgrom 1983).</p>
+        <figure class="schematic">
+          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
+            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
+            <path d="M118 18V124" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="2 3"/>
+            <path d="M36 124C58 52 78 38 108 42S196 78 302 98" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
+            <path d="M36 124C58 52 78 38 108 42S170 45 302 43" fill="none" stroke="#ffae5c" stroke-width="2.4"/>
+            <g fill="#f4f7fb"><circle cx="58" cy="70" r="3"/><circle cx="84" cy="49" r="3"/><circle cx="110" cy="42" r="3"/><circle cx="140" cy="40" r="3"/><circle cx="170" cy="39" r="3"/><circle cx="200" cy="40" r="3"/><circle cx="230" cy="38" r="3"/><circle cx="260" cy="40" r="3"/><circle cx="290" cy="39" r="3"/></g>
+            <text x="122" y="24">g ≈ a₀</text>
+            <text x="300" y="30" text-anchor="end" fill="#ffae5c">MOND: levels off</text>
+            <text x="300" y="114" text-anchor="end" fill="#5fd0e0">Newton, visible matter: falls</text>
+            <text x="172" y="142" text-anchor="middle">radius →</text>
+            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
+          </svg>
+          <figcaption>Schematic, not real data. Dotted line: where gravity falls to a₀. Beyond it the boost grows large and the speed levels off (Milgrom 1983).</figcaption>
+        </figure>
+        <p>MOND boosts gravity everywhere, by an amount that depends on how strong it already is. Near a galaxy’s centre gravity is strong and the boost is small; far out it is weak and the boost is large, so the outer stars keep moving fast.</p>
+        <div class="boost">
+        <p><b>a<sub>0</sub> sets the scale.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², is about 10¹¹ times weaker than gravity at Earth’s surface. It is a turning point, not a switch. With the simulator’s formula, a star speeds up by:</p>
+        <table class="mini-table boost-table"><thead><tr><th scope="col">Newtonian pull, g<sub>N</sub></th><th scope="col">Speed boost</th></tr></thead><tbody><tr><td>10 × a<sub>0</sub></td><td>+2%</td></tr><tr><td>3 × a<sub>0</sub></td><td>+10%</td></tr><tr><td>a<sub>0</sub></td><td>+26%</td></tr><tr><td>a<sub>0</sub> ÷ 10</td><td>+92%</td></tr><tr><td>a<sub>0</sub> ÷ 100</td><td>+224%</td></tr></tbody></table>
+        </div>
+        <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
+        <p>It is measured, not derived. Milgrom set it to match the galaxies known in 1983; today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). That study found that the extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy. Even where gravity is strongest in the galaxies here, MOND adds at least 4%.</p>
+        </details>
+        <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
+        <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration, and Newton gives the pull g<sub>N</sub> of the visible mass M:</p>
+        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>,</mo><mspace width="1.5em"/><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></math></div>
+        <p><b>2. MOND’s rule.</b> Strong gravity is almost unchanged; weak gravity is boosted:</p>
+        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≫</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
+        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><msub><mi>a</mi><mn>0</mn></msub></msqrt><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≪</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
+        <p><b>3. Far out,</b> put the weak rule into step 1:</p>
+        <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><msqrt><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></msqrt><mi>r</mi></mfrac></math></div>
+        <div class="eq"><math display="block"><mo>⇒</mo><mspace width="0.5em"/><msup><mi>v</mi><mn>4</mn></msup><mo>=</mo><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></math></div>
+        <p>r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method).</p>
+        </details>
+        </div>
+      </article>
+      <article class="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
+        <div class="learn-content">
+        <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
+        <div class="evidence-grid">
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
+          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
+          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
+        </div>
+        <p class="evidence-open-title">Still open</p>
+        <div class="evidence-grid two">
+          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
+          <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
+        </div>
+        </div>
+      </article>
+    </section>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#simulator">Next: test both ideas in the simulator →</a></nav>
     </div>
     <div class="page" data-page="simulator">
     <div class="sim-head">
-    <div class="section-head" id="simulator"><span class="kicker">02</span><h2>Model setup</h2><p>Choose a real galaxy, or build your own.</p></div>
+    <div class="section-head" id="simulator"><span class="kicker">03</span><h2>Model setup</h2><p>Choose a real galaxy, or build your own.</p></div>
     <button type="button" class="tutorial-launch" id="tutorialLaunch">Simulator tutorial</button>
     </div>
     <section class="model-bar galaxy-bar" id="galaxyBar" aria-label="Galaxy source">
@@ -1254,7 +1359,7 @@
         </div>
       </div>
     </section>
-    <div class="section-head" id="results"><span class="kicker">03</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
+    <div class="section-head" id="results"><span class="kicker">04</span><h2>Simulation</h2><p>Move the sliders: the orbits and the rotation curve respond straight away.</p></div>
     <div class="stats-row">
     <div class="header-stats" aria-label="Simulation summary">
       <div class="ml-col">
@@ -1395,7 +1500,7 @@
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#scorecard">Next: how both ideas score on every galaxy →</a></nav>
     </div>
     <div class="page" data-page="scorecard">
-    <div class="section-head" id="scorecard"><span class="kicker">04</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
+    <div class="section-head" id="scorecard"><span class="kicker">05</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
       <p class="score-intro">One score per galaxy and idea: χ<sup>2</sup><sub>r</sub> (reduced chi-squared), how far the model misses the measured speeds, in error bars. Lower is better; about 1 is as close as the data allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
@@ -1417,7 +1522,7 @@
       </div>
       </details>
       <p class="score-notes-title">Before drawing conclusions</p>
-      <ul class="score-notes">
+      <ul class="score-notes" id="scoreNotes">
         <li><b>A fair test</b>Every model starts from the same stars and gas, with SPARC’s mass-to-light ratio, distance and tilt. Best realistic fits let each model adjust those, and the score counts every value tuned, so extra freedom costs something.</li>
         <li><b>Only realistic values</b>Star masses that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a typical halo concentration (Dutton &amp; Macciò 2014). <span class="at-limit">at limit</span> means a better fit needed an unrealistic value. <a href="#mScore">All limits</a></li>
         <li><b>MOND’s constant</b>Best fits may nudge a<sub>0</sub> between 1.16 and 1.24 × 10⁻¹⁰ m/s² (McGaugh, Lelli &amp; Schombert 2016). MOND says a<sub>0</sub> is universal (Milgrom 1983), so galaxies needing clearly different values would be a warning sign.</li>
@@ -1425,111 +1530,6 @@
         <li><b>What the error bars cover</b>Only each speed’s own uncertainty. A wrong distance or tilt shifts the whole curve at once, so the best fits vary those separately.</li>
         <li><b>A small sample</b><span id="scoreCount">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner.</li>
       </ul>
-    </section>
-    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#background">Next: the two ideas and the wider evidence →</a></nav>
-    </div>
-    <div class="page" data-page="background">
-    <div class="section-head" id="background"><span class="kicker">05</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says.</p></div>
-    <section class="learn" id="theoryGuide" aria-label="Theory guide">
-      <article class="compare"><h3>Side by side</h3>
-        <div class="score-scroll" tabindex="0" role="region" aria-label="The two ideas compared">
-        <table class="compare-table">
-          <thead><tr><th scope="col"><span class="sr-only">Question</span></th><th scope="col" class="nfw">Dark matter halo</th><th scope="col" class="mond">MOND</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">What it changes</th><td>Adds unseen mass. Newton’s gravity is unchanged.</td><td>No extra mass. Gravity is boosted where it is very weak.</td></tr>
-            <tr><th scope="row">Values tuned to each galaxy here</th><td><b>2</b>: halo mass and scale radius</td><td><b>0</b>: one constant, a<sub>0</sub>, shared by every galaxy</td></tr>
-            <tr><th scope="row">Best evidence for it</th><td>Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)</td><td>Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)</td></tr>
-            <tr><th scope="row">Biggest open problem</th><td>No dark matter particle has been found (Bertone &amp; Hooper 2018)</td><td>Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)</td></tr>
-          </tbody>
-        </table>
-        </div>
-      </article>
-      <article class="nfw"><h3>What is a dark matter halo?</h3>
-        <div class="learn-content">
-        <p class="tldr">Dark matter gives out no light, so we only detect it through its gravity. A halo is a huge, roughly round cloud of it around a galaxy, reaching far beyond the stars.</p>
-        <figure class="schematic">
-          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: the speed from visible matter falls with radius, the halo’s share grows, and together they stay level">
-            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
-            <path d="M36.0 124.0L42.8 96.8L49.6 76.9L56.4 65.8L63.2 60.9L70.0 59.7L76.8 60.2L83.6 61.6L90.4 63.4L97.2 65.3L104.0 67.2L110.8 69.0L117.6 70.7L124.4 72.4L131.2 73.9L138.0 75.3L144.8 76.6L151.6 77.8L158.4 79.0L165.2 80.0L172.0 81.0L178.8 82.0L185.6 82.9L192.4 83.7L199.2 84.5L206.0 85.2L212.8 86.0L219.6 86.6L226.4 87.3L233.2 87.9L240.0 88.5L246.8 89.0L253.6 89.5L260.4 90.0L267.2 90.5L274.0 91.0L280.8 91.4L287.6 91.9L294.4 92.3L301.2 92.7L308.0 93.1" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
-            <path d="M36.0 124.0L42.8 101.0L49.6 92.3L56.4 86.1L63.2 81.3L70.0 77.4L76.8 74.1L83.6 71.3L90.4 68.9L97.2 66.7L104.0 64.9L110.8 63.2L117.6 61.7L124.4 60.4L131.2 59.2L138.0 58.1L144.8 57.1L151.6 56.2L158.4 55.4L165.2 54.7L172.0 54.1L178.8 53.4L185.6 52.9L192.4 52.4L199.2 51.9L206.0 51.5L212.8 51.1L219.6 50.8L226.4 50.4L233.2 50.1L240.0 49.9L246.8 49.6L253.6 49.4L260.4 49.2L267.2 49.0L274.0 48.8L280.8 48.7L287.6 48.6L294.4 48.4L301.2 48.3L308.0 48.2" fill="none" stroke="#b39ae8" stroke-width="2" stroke-dasharray="2 3"/>
-            <path d="M36.0 124.0L42.8 88.3L49.6 67.2L56.4 54.6L63.2 47.9L70.0 44.5L76.8 43.0L83.6 42.3L90.4 42.1L97.2 42.0L308.0 42.0" fill="none" stroke="#ffae5c" stroke-width="2.4"/>
-            <g fill="#f4f7fb"><circle cx="55" cy="57" r="3"/><circle cx="74" cy="43" r="3"/><circle cx="101" cy="42" r="3"/><circle cx="131" cy="42" r="3"/><circle cx="161" cy="42" r="3"/><circle cx="191" cy="42" r="3"/><circle cx="221" cy="42" r="3"/><circle cx="251" cy="42" r="3"/><circle cx="281" cy="42" r="3"/></g>
-            <text x="300" y="30" text-anchor="end" fill="#ffae5c">Together: stays level</text>
-            <text x="300" y="66" text-anchor="end" fill="#b39ae8">Halo: grows</text>
-            <text x="300" y="110" text-anchor="end" fill="#5fd0e0">Visible matter: falls</text>
-            <text x="172" y="142" text-anchor="middle">radius →</text>
-            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
-          </svg>
-          <figcaption>Schematic, not real data. The halo’s share (purple) grows as the visible matter’s (cyan) falls, so the total (orange) stays level.</figcaption>
-        </figure>
-        <p>Newton’s gravity stays as it is; there is just more mass. The simulator uses an <b>NFW halo</b> (Navarro, Frenk &amp; White 1996). Its shape came out of computer simulations of dark matter clumping as the Universe grew, not from fitting rotation curves: dense in the middle, thinning outwards. Two sliders set it: mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is).</p>
-        <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
-        <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration. For a round distribution of mass, only the mass M(r) inside the orbit pulls overall (Newton’s shell theorem):</p>
-        <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>v</mi><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt></math></div>
-        <p><b>2. Visible matter alone.</b> Beyond most of the stars, M(r) hardly grows, so v ∝ 1/√r: the speed should fall, like the planets’ speeds in the Solar System.</p>
-        <p><b>3. What a flat curve needs.</b> For v to stay constant, M(r) must grow in step with r. That happens if the density falls as 1/r²: each thin shell of thickness Δr then holds the same mass, 4πr²ρΔr, so every step outwards adds the same amount.</p>
-        <p><b>4. The NFW density.</b> With ρ<sub>s</sub> setting how dense the halo is:</p>
-        <div class="eq"><math display="block"><mi>ρ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>ρ</mi><mi>s</mi></msub><mrow><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac></math></div>
-        <p>Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method).</p>
-        </details>
-        <p class="weakness"><b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated.</p>
-        </div>
-      </article>
-      <article class="mond"><h3>What is MOND?</h3>
-        <div class="learn-content">
-        <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves differently when it is extremely weak (Milgrom 1983).</p>
-        <figure class="schematic">
-          <svg viewBox="0 0 320 150" role="img" aria-label="Schematic: Newtonian gravity from visible matter gives falling speeds, but MOND levels off where the acceleration drops below a0">
-            <path d="M36 14V124H308" fill="none" stroke="currentColor" stroke-opacity=".35"/>
-            <path d="M118 18V124" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-dasharray="2 3"/>
-            <path d="M36 124C58 52 78 38 108 42S196 78 302 98" fill="none" stroke="#5fd0e0" stroke-width="2" stroke-dasharray="5 4"/>
-            <path d="M36 124C58 52 78 38 108 42S170 45 302 43" fill="none" stroke="#ffae5c" stroke-width="2.4"/>
-            <g fill="#f4f7fb"><circle cx="58" cy="70" r="3"/><circle cx="84" cy="49" r="3"/><circle cx="110" cy="42" r="3"/><circle cx="140" cy="40" r="3"/><circle cx="170" cy="39" r="3"/><circle cx="200" cy="40" r="3"/><circle cx="230" cy="38" r="3"/><circle cx="260" cy="40" r="3"/><circle cx="290" cy="39" r="3"/></g>
-            <text x="122" y="24">g ≈ a₀</text>
-            <text x="300" y="30" text-anchor="end" fill="#ffae5c">MOND: levels off</text>
-            <text x="300" y="114" text-anchor="end" fill="#5fd0e0">Newton, visible matter: falls</text>
-            <text x="172" y="142" text-anchor="middle">radius →</text>
-            <text x="14" y="70" text-anchor="middle" transform="rotate(-90 14 70)">speed →</text>
-          </svg>
-          <figcaption>Schematic, not real data. Dotted line: where gravity falls to a₀. Beyond it the boost grows large and the speed levels off (Milgrom 1983).</figcaption>
-        </figure>
-        <p>MOND boosts gravity everywhere, by an amount that depends on how strong it already is. Near a galaxy’s centre gravity is strong and the boost is small; far out it is weak and the boost is large, so the outer stars keep moving fast.</p>
-        <div class="boost">
-        <p><b>a<sub>0</sub> sets the scale.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², is about 10¹¹ times weaker than gravity at Earth’s surface. It is a turning point, not a switch. With the simulator’s formula, a star speeds up by:</p>
-        <table class="mini-table boost-table"><thead><tr><th scope="col">Newtonian pull, g<sub>N</sub></th><th scope="col">Speed boost</th></tr></thead><tbody><tr><td>10 × a<sub>0</sub></td><td>+2%</td></tr><tr><td>3 × a<sub>0</sub></td><td>+10%</td></tr><tr><td>a<sub>0</sub></td><td>+26%</td></tr><tr><td>a<sub>0</sub> ÷ 10</td><td>+92%</td></tr><tr><td>a<sub>0</sub> ÷ 100</td><td>+224%</td></tr></tbody></table>
-        </div>
-        <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
-        <p>It is measured, not derived. Milgrom set it to match the galaxies known in 1983; today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). That study found that the extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy. Even where gravity is strongest in the galaxies here, MOND adds at least 4%.</p>
-        </details>
-        <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
-        <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration, and Newton gives the pull g<sub>N</sub> of the visible mass M:</p>
-        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>,</mo><mspace width="1.5em"/><msub><mi>g</mi><mi>N</mi></msub><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac></math></div>
-        <p><b>2. MOND’s rule.</b> Strong gravity is almost unchanged; weak gravity is boosted:</p>
-        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msub><mi>g</mi><mi>N</mi></msub><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≫</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
-        <div class="eq"><math display="block"><mi>g</mi><mo>=</mo><msqrt><msub><mi>g</mi><mi>N</mi></msub><msub><mi>a</mi><mn>0</mn></msub></msqrt><mtext>&#8195;if&#8194;</mtext><msub><mi>g</mi><mi>N</mi></msub><mo>≪</mo><msub><mi>a</mi><mn>0</mn></msub></math></div>
-        <p><b>3. Far out,</b> put the weak rule into step 1:</p>
-        <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><msqrt><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></msqrt><mi>r</mi></mfrac></math></div>
-        <div class="eq"><math display="block"><mo>⇒</mo><mspace width="0.5em"/><msup><mi>v</mi><mn>4</mn></msup><mo>=</mo><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></math></div>
-        <p>r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method).</p>
-        </details>
-        </div>
-      </article>
-      <article class="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
-        <div class="learn-content">
-        <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
-        <div class="evidence-grid">
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
-          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
-        </div>
-        <p class="evidence-open-title">Still open</p>
-        <div class="evidence-grid two">
-          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
-          <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
-        </div>
-        </div>
-      </article>
     </section>
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#method">Next: method and sources →</a></nav>
     </div>
@@ -5314,9 +5314,9 @@ window.GALAXIES = {
         {id:'scorecard',closing:true,target:'glanceTable',gesture:'look',tag:'Read along the rows',title:'How both ideas score',
          text:'Each row is a galaxy, scored under each idea: close (green), rough (yellow) or poor (red). An arrow leads from the standard values to the best realistic fit; a † marks a fit that needed a value at the edge of its realistic range.',
          action:'Read along the rows in the blue box, then press Next.'},
-        {id:'finish',closing:true,noRing:true,target:'theoryGuide',gesture:'scan',tag:'Read on',title:'What this does and doesn’t show',
-         text:'A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too. Below: how each idea works, and what else points to dark matter or MOND.',
-         action:'Read on below.'}
+        {id:'finish',closing:true,noRing:true,target:'scoreNotes',gesture:'scan',tag:'Read these',title:'What this does and doesn’t show',
+         text:'A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (The two ideas page sums it up). These notes say what limits this comparison.',
+         action:'Read these notes, then press Finish.'}
       ]},
       sandbox:{label:'Sandbox tutorial',steps:[
         {id:'sbIntro',mode:'custom',target:'sandboxGroups',gesture:'look',tag:'Your galaxy’s sliders',title:'Build your own galaxy',
@@ -5388,7 +5388,7 @@ window.GALAXIES = {
     const tutorialTopbar=document.querySelector('.topbar'),tutorialBar=document.querySelector('.sim-stage .controls'),tutorialPlots=document.querySelector('.sim-stage .panel-grid');
     let tutorialTour='main',tutorialSteps=TOURS.main.steps,tutorialIndex=0,tutorialTarget=null,tutorialCompleted={};
     // The full guided tour (from the puzzle page) runs every tour in this order, one after the other.
-    // Its closing cards (Scorecard, then The two ideas) are held back until after the sandbox tour, so it ends on them.
+    // Its closing cards (the Scorecard's table, then its notes) are held back until after the sandbox tour, so it ends on them.
     TOURS.closing={label:'Wrapping up',steps:TOURS.main.steps.filter(s=>s.closing)};
     const FULL_TOUR=['main','sandbox','closing'];let tutorialFull=false;
     const tourSteps=(tour,full)=>full&&tour==='main'?TOURS.main.steps.filter(s=>!s.closing):TOURS[tour].steps;
