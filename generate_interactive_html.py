@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from analysis.sparc_data import SPARC_PATH, GalaxyInfo, galaxy_rows, load_galaxy_info
+from site_text import SNAPSHOT_PATH, write_snapshot
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -7035,9 +7036,10 @@ def main() -> None:
     html = html.replace("__ML_BULGE_RANGE__", f"{UPSILON_BULGE / ml_spread:.2f} to {UPSILON_BULGE * ml_spread:.2f}")
     html = html.replace("__C_RANGE__", f"{1 / c_spread:.1f} to {c_spread:.1f}")
     OUTPUT_PATH.write_text(html, encoding="utf-8")
+    write_snapshot(HTML_TEMPLATE)  # the wording, for Will's site text editor
     size_mb = OUTPUT_PATH.stat().st_size / (1024 * 1024)
     print(f"Generated {OUTPUT_PATH.name} ({size_mb:.2f} MiB) and {GALAXIES_JS_PATH.name}")
-    print(f"Embedded {len(galaxies)} SPARC galaxies")
+    print(f"Embedded {len(galaxies)} SPARC galaxies; site text in {SNAPSHOT_PATH.relative_to(BASE_DIR)}")
     for galaxy in galaxies:
         std, nfw, mond = (galaxy["best_fit"][key] for key in ("nfw_standard", "nfw", "mond"))
         print(

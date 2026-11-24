@@ -1,0 +1,194 @@
+<title>Simulating the Invisible Text</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap">
+<style>
+  /* Layout: one reading column of the site's text, grouped page > section, with a sticky filter bar. */
+  :root {
+    --bg: #f6f7fa; --surface: #ffffff; --fg: #18202e; --muted: #5d6779; --line: #dde2ea;
+    --accent: #0f7f9c; --edited: #a86b00; --edited-bg: #fff6e2; --problem: #b3261e; --problem-bg: #fdecea;
+    --serif: "Source Serif 4", Georgia, serif; --sans: Inter, system-ui, sans-serif; --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --bg: #0b1018; --surface: #121a26; --fg: #e4e9f1; --muted: #93a0b4; --line: #243044;
+    --accent: #5fd0ea; --edited: #f2c879; --edited-bg: #2a2212; --problem: #ff8a80; --problem-bg: #331816; color-scheme: dark } }
+  :root[data-theme="dark"] {
+    --bg: #0b1018; --surface: #121a26; --fg: #e4e9f1; --muted: #93a0b4; --line: #243044;
+    --accent: #5fd0ea; --edited: #f2c879; --edited-bg: #2a2212; --problem: #ff8a80; --problem-bg: #331816; color-scheme: dark }
+  body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--sans); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+  .wrap { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header.intro { padding-block: 32px 8px; }
+  h1 { font: 600 30px/1.2 var(--serif); margin: 0 0 8px; text-wrap: balance; }
+  .intro p { margin: 0 0 8px; color: var(--muted); max-width: 64ch; }
+  .intro code, .hint code { font: 13px var(--mono); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .bar .wrap { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding-block: 10px; }
+  .bar input[type=search] { flex: 1 1 220px; min-width: 0; font: inherit; padding: 7px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips button { font: 500 13px var(--sans); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+  .chips button[aria-pressed=true] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .status { font: 500 13px var(--sans); color: var(--muted); white-space: nowrap; }
+  .status b { color: var(--edited); }
+  main { padding-block: 8px 64px; display: grid; gap: 28px; }
+  h2 { font: 600 22px/1.3 var(--serif); margin: 16px 0 0; padding-top: 12px; border-top: 2px solid var(--fg); }
+  h3 { font: 600 12px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 18px 0 6px; }
+  .group { display: grid; gap: 6px; }
+  .item { display: grid; gap: 4px; padding: 8px 10px; border-radius: 6px; border: 1px solid transparent; }
+  .item:hover, .item:focus-within { border-color: var(--line); background: var(--surface); }
+  .item.edited { background: var(--edited-bg); border-color: var(--edited); }
+  .item.problem { background: var(--problem-bg); border-color: var(--problem); }
+  .meta { display: flex; gap: 8px; align-items: center; font: 12px var(--mono); color: var(--muted); min-height: 18px; }
+  .meta .flag { font-family: var(--sans); font-weight: 600; color: var(--edited); }
+  .item.problem .meta .flag { color: var(--problem); }
+  .meta button { margin-left: auto; font: 500 12px var(--sans); border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 4px; padding: 1px 8px; cursor: pointer; }
+  .text { outline: none; min-width: 0; overflow-wrap: anywhere; border-radius: 4px; }
+  .text:focus-visible, textarea:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+  .text.h { font: 600 19px/1.35 var(--serif); }
+  .text.label { font-weight: 500; }
+  textarea.text { font: 14px/1.5 var(--sans); color: var(--fg); background: transparent; border: 1px dashed var(--line); padding: 4px 6px; resize: vertical; width: 100%; box-sizing: border-box; field-sizing: content; }
+  .text b, .text strong { font-weight: 600; }
+  .original { font-size: 13px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 8px; }
+  .notice { padding: 12px 14px; border-radius: 6px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); }
+  .notice.bad { border-color: var(--problem); color: var(--problem); }
+  @media (prefers-reduced-motion: no-preference) { .item { transition: background .15s, border-color .15s; } }
+</style>
+
+<header class="intro wrap">
+  <h1>Simulating the Invisible: site text</h1>
+  <p>Every piece of wording on the live site, in page order. Click any text and type. Changes save here as you go and are marked in gold until they reach the site.</p>
+  <p>To put them live, tell Claude <code>sync my site text</code>. Claude writes them into the site, checks it still works, pushes it and refreshes this page. Leave anything like <code>__GALAXY_NAMES__</code> or <code>${...}</code> exactly as it is: the site fills those in with numbers and names.</p>
+</header>
+
+<div class="bar"><div class="wrap">
+  <input type="search" id="search" placeholder="Find text…" aria-label="Find text">
+  <span class="status" id="status">Loading…</span>
+  <div class="chips" id="chips" role="group" aria-label="Show page"></div>
+</div></div>
+
+<main class="wrap" id="list"><p class="notice">Loading the site's text…</p></main>
+
+<script>
+const PAGES = [
+  ["all", "All"], ["edited", "Edited"], ["top bar", "Top bar"], ["puzzle", "Home"], ["background", "The two ideas"],
+  ["simulator", "Simulator"], ["scorecard", "Scorecard"], ["method", "Method & sources"],
+  ["scripts", "Tour cards & messages"], ["shared (menus, tour card, pop-ups)", "Pop-ups"]
+];
+const SAVE_DELAY_MS = 900;
+let items = [], edits = {}, db = null, filter = "all", query = "";
+const timers = {}, fields = {};
+
+const esc = s => s.replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+// The browser rewrites HTML slightly (entities, quotes); compare in its own form so untouched text never counts as edited.
+const norm = html => { const t = document.createElement("template"); t.innerHTML = html; return t.innerHTML.trim(); };
+const current = it => it.kind === "html" ? cleanHtml(fields[it.id]) : fields[it.id].value.trim();
+function cleanHtml(el) {
+  const copy = el.cloneNode(true);
+  copy.querySelectorAll("[style]").forEach(n => n.removeAttribute("style"));
+  copy.querySelectorAll("font, div, p").forEach(n => n.replaceWith(...n.childNodes));
+  return copy.innerHTML.replace(/&nbsp;$/, "").trim();
+}
+
+function setStatus() {
+  const waiting = Object.values(edits).filter(e => !e.problem).length;
+  const problems = Object.values(edits).filter(e => e.problem).length;
+  document.getElementById("status").innerHTML = db === null
+    ? "Saving is off in this view"
+    : (waiting ? `<b>${waiting} edit${waiting > 1 ? "s" : ""}</b> waiting to go live` : "All edits are live")
+      + (problems ? ` · <b style="color:var(--problem)">${problems} need a look</b>` : "");
+}
+
+function render() {
+  const list = document.getElementById("list");
+  const q = query.toLowerCase();
+  const byId = Object.fromEntries(items.map(it => [it.id, it]));
+  let html = "", page = null, section = null;
+  const orphans = Object.entries(edits).filter(([id]) => !byId[id]);
+  if (orphans.length && (filter === "all" || filter === "edited")) {
+    html += `<section class="group"><h2>Edits whose text changed on the site</h2><p class="notice bad">Claude changed these lines on the site after you edited them. Your version is kept below: copy it into the new text, then press Remove.</p>`;
+    for (const [id, e] of orphans) html += `<div class="item problem"><div class="meta"><span class="flag">Your version</span><button data-undo="${id}">Remove</button></div><div class="original">Was: ${esc(e.base)}</div><div>${esc(e.text)}</div></div>`;
+    html += `</section>`;
+  }
+  for (const it of items) {
+    const e = edits[it.id];
+    if (filter === "edited" ? !e : filter !== "all" && it.page !== filter) continue;
+    if (q && !(it.text.toLowerCase().includes(q) || (e && e.text.toLowerCase().includes(q)))) continue;
+    if (it.page !== page) { page = it.page; section = null; html += `<h2>${esc((PAGES.find(p => p[0] === page) || [0, page])[1])}</h2>`; }
+    if (it.section !== section) { section = it.section; html += `<h3>${esc(section)}</h3>`; }
+    const cls = e ? (e.problem ? "item problem" : "item edited") : "item";
+    const flag = e ? (e.problem ? `Couldn't go live: ${esc(e.problem)}` : "Edited · waiting to go live") : "";
+    const kindClass = /^h\d$/.test(it.tag) ? "h" : ["button", "a", "label", "dt", "summary"].includes(it.tag) ? "label" : "";
+    const meta = `<div class="meta"><span>${esc(it.tag)}</span><span class="flag">${flag}</span>${e ? `<button data-undo="${it.id}">Undo</button>` : ""}</div>`;
+    const field = it.kind === "html"
+      ? `<div class="text ${kindClass}" contenteditable="true" data-id="${it.id}" id="t-${it.id}">${e ? e.text : it.text}</div>`
+      : `<textarea class="text" rows="1" data-id="${it.id}" id="t-${it.id}" aria-label="Script text">${esc(e ? e.text : it.text)}</textarea>`;
+    const original = e ? `<div class="original">Live now: ${it.kind === "html" ? it.text : esc(it.text)}</div>` : "";
+    html += `<div class="${cls}">${meta}${field}${original}</div>`;
+  }
+  list.innerHTML = html || `<p class="notice">${filter === "edited" ? "No edits yet. Click any text on another tab to change it." : "No text matches that search."}</p>`;
+  for (const k in fields) delete fields[k];
+  list.querySelectorAll("[data-id]").forEach(el => { fields[el.dataset.id] = el; });
+  setStatus();
+}
+
+async function save(id) {
+  const it = items.find(i => i.id === id);
+  if (!it || !db) return;
+  const text = current(it);
+  const same = it.kind === "html" ? norm(text) === norm(it.text) : text === it.text;
+  const ref = db.collection("edits").doc(id);
+  try {
+    if (same || !text) await ref.delete();
+    else await ref.set({base: it.text, text, kind: it.kind, page: it.page, section: it.section, savedAt: new Date().toISOString()});
+  } catch (err) {
+    document.getElementById("status").textContent = "Couldn't save: " + (err.code || "error") + ". Your typing is still on screen; try again shortly.";
+  }
+}
+
+const list = document.getElementById("list");
+list.addEventListener("input", ev => {
+  const id = ev.target.dataset.id; if (!id) return;
+  clearTimeout(timers[id]); timers[id] = setTimeout(() => save(id), SAVE_DELAY_MS);
+});
+list.addEventListener("keydown", ev => { if (ev.key === "Enter" && ev.target.isContentEditable) ev.preventDefault(); });
+list.addEventListener("paste", ev => {
+  if (!ev.target.closest("[contenteditable]")) return;
+  ev.preventDefault();
+  document.execCommand("insertText", false, (ev.clipboardData.getData("text/plain") || "").replace(/\s+/g, " "));
+});
+list.addEventListener("focusout", ev => { const id = ev.target.dataset && ev.target.dataset.id; if (id && timers[id]) { clearTimeout(timers[id]); delete timers[id]; save(id); } });
+list.addEventListener("click", async ev => {
+  const id = ev.target.dataset && ev.target.dataset.undo; if (!id || !db) return;
+  try { await db.collection("edits").doc(id).delete(); } catch (err) { setStatus(); }
+});
+
+const chips = document.getElementById("chips");
+chips.innerHTML = PAGES.map(([k, label]) => `<button type="button" data-page="${esc(k)}" aria-pressed="${k === filter}">${esc(label)}</button>`).join("");
+chips.addEventListener("click", ev => {
+  const k = ev.target.dataset && ev.target.dataset.page; if (k == null) return;
+  filter = k; chips.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.page === k)); render();
+});
+let searchTimer;
+document.getElementById("search").addEventListener("input", ev => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { query = ev.target.value.trim(); render(); }, 200); });
+
+// Re-render from the store only when nobody is mid-edit, so typing is never interrupted.
+let pendingRender = false;
+function renderWhenIdle() {
+  if (document.activeElement && document.activeElement.dataset && document.activeElement.dataset.id) { pendingRender = true; return; }
+  pendingRender = false; render();
+}
+document.addEventListener("focusout", () => setTimeout(() => { if (pendingRender) renderWhenIdle(); }, 50));
+
+(async () => {
+  try { items = await (await fetch("site_text.json")).json(); }
+  catch (err) { list.innerHTML = `<p class="notice bad">The site's text didn't load. Reload the page; if it keeps failing, ask Claude to republish the site text editor.</p>`; return; }
+  render();
+  db = window.claude ? await claude.use("db") : null;
+  if (!db) { setStatus(); return; }
+  const slow = setTimeout(() => { document.getElementById("status").textContent = "Can't reach saved edits yet…"; }, 10000);
+  db.collection("edits").onSnapshot(snap => {
+    if (!snap.metadata.fromCache) clearTimeout(slow);
+    edits = Object.fromEntries(snap.docs.map(d => [d.id, d.data()]));
+    renderWhenIdle(); setStatus();
+  }, err => { clearTimeout(slow); document.getElementById("status").textContent = "Saved edits unavailable (" + err.code + ")"; });
+})();
+</script>

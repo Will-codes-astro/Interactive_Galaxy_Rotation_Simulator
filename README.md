@@ -36,6 +36,7 @@ analysis/                      offline Python
 blender/                       Blender scene script and saved .blend (needs Blender's Python)
 generate_interactive_html.py   builds the website: index.html + galaxies.js
 index.html, galaxies.js        generated website (do not edit by hand)
+site_text.py, content/         the site's wording for Will's text editor artifact (site_text.json is generated)
 epq_qr_code.png/.svg, generate_qr.py   QR code to the live site
 results/, plots/               generated outputs of analysis/
 tests/                         physics checks (Python + Node.js)
@@ -68,6 +69,8 @@ From the project root:
 
 ```powershell
 python generate_interactive_html.py      # rebuild index.html and galaxies.js
+python site_text.py apply EDITS.json     # write edits from the text editor into the generator
+python site_text.py check                # syntax-check the page's scripts after a text change
 python tests/run_physics_checks.py       # physics checks (add --update-baseline only for intended changes)
 python -m http.server 8000               # preview at http://localhost:8000/
 python analysis/baryonic_baseline.py

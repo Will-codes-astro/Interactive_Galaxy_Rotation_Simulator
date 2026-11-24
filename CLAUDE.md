@@ -117,6 +117,7 @@ What this means for you:
 | Data: columns, units, provenance, outputs | `docs/DATA_DICTIONARY.md` | `analysis/sparc_data.py` |
 | Anything visible on the site | `docs/WEBSITE.md` | `generate_interactive_html.py` |
 | Setup, running, deployment | `README.md` | – |
+| Site wording, Will's text editor | `.claude/skills/site-text/SKILL.md` | `site_text.py`, `content/` |
 
 Layout: `data/sparc/table2.dat` (raw, read-only), `analysis/` (offline
 Python), `blender/` (needs Blender's own Python), `generate_interactive_html.py`
@@ -163,7 +164,10 @@ never `index.html` or `galaxies.js`; regenerate with
 files with the generator. Pushing to `main` deploys the live site: always
 ask Will first. `.github/workflows/deploy-pages.yml` publishes only root
 `index.html`, `epq_qr_code.png` and `epq_qr_code.svg`; change that contract
-only together with the workflow.
+only together with the workflow. Will writes the site's wording in his
+"Simulating the Invisible Text" editor artifact: when he says "sync my site
+text", or a commit changes `content/site_text.json`, run the `site-text`
+skill so the editor and the site never drift apart.
 
 **G. Testing.** Run the relevant checks (below); for moved files, make
 sure every script still compiles and runs; for analysis changes, compare

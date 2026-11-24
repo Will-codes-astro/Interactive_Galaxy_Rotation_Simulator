@@ -1,0 +1,5978 @@
+[
+ {
+  "id": "e277f47033",
+  "kind": "html",
+  "page": "top bar",
+  "section": "(page top)",
+  "tag": "title",
+  "text": "Simulating the Invisible · Galaxy rotation, dark matter and MOND"
+ },
+ {
+  "id": "ad569d1d49",
+  "kind": "html",
+  "page": "top bar",
+  "section": "(page top)",
+  "tag": "div",
+  "text": "<span class=\"nav-ink\" aria-hidden=\"true\"></span><a href=\"#puzzle\" aria-current=\"page\">Home</a><a href=\"#background\"><span class=\"nav-long\">The two ideas</span><span class=\"nav-short\">Ideas</span></a><a href=\"#simulator\">Simulator</a><a href=\"#scorecard\">Scorecard</a><a href=\"#method\">Method<span class=\"nav-long\"> &amp; sources</span></a>"
+ },
+ {
+  "id": "18c7aa1b18",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "h2",
+  "text": "Settings"
+ },
+ {
+  "id": "555cac761e",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "input",
+  "text": "<span><b>High-quality visuals</b><small>Glow, pulsing highlights, blur and motion, and a sharper 3D galaxy view. Untick it on a slow computer: everything gets simpler and runs smoother.</small></span>"
+ },
+ {
+  "id": "946bd87996",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "p",
+  "text": "<span id=\"qualityNote\" aria-live=\"polite\">The 3D view has not loaded.</span>"
+ },
+ {
+  "id": "3257576d23",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "button",
+  "text": "Use automatic"
+ },
+ {
+  "id": "f3946c2ca5",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "input",
+  "text": "<span><b>Reduce motion</b><small>Boxes open without sliding or growing, the tour's pointer rests where to act, and decorative animations stop. The galaxy still moves.</small></span>"
+ },
+ {
+  "id": "4aa2e745dd",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "button",
+  "text": "Follow my computer"
+ },
+ {
+  "id": "9a5de19ad6",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "input",
+  "text": "<span><b>Camera glide</b><small>Let go mid-drag and the 3D view coasts to a smooth stop. Untick it to stop the view the moment you let go.</small></span>"
+ },
+ {
+  "id": "5a7b819d67",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "button",
+  "text": "Use default"
+ },
+ {
+  "id": "2144eee6a1",
+  "kind": "html",
+  "page": "top bar",
+  "section": "Settings",
+  "tag": "button",
+  "text": "Reset all settings"
+ },
+ {
+  "id": "5643f2b591",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Settings",
+  "tag": "div",
+  "text": "Galaxy rotation curves · real SPARC data"
+ },
+ {
+  "id": "c853c0b0ac",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "h1",
+  "text": "<span class=\"w\" style=\"--i:0\">Galaxy</span> <span class=\"w\" style=\"--i:1\">rotation</span> <span class=\"w\" style=\"--i:2\">and</span> <span class=\"w\" style=\"--i:3\">the</span> <span class=\"w hl\" style=\"--i:4\">missing mass</span> <span class=\"w\" style=\"--i:5\">problem</span>"
+ },
+ {
+  "id": "0cdc05baa4",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "p",
+  "text": "The outer stars and gas of a galaxy orbit faster than the gravity of its visible matter can explain. This site measures that gap in real galaxies and tests two explanations for it."
+ },
+ {
+  "id": "dff92f2752",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dt",
+  "text": "Aim"
+ },
+ {
+  "id": "c43dff6ae8",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dd",
+  "text": "Test whether a dark matter halo or modified gravity better explains how fast galaxies rotate."
+ },
+ {
+  "id": "7e3466b234",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dt",
+  "text": "Data"
+ },
+ {
+  "id": "569cb1e4dd",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dd",
+  "text": "Measured orbit speeds of __GALAXY_NAMES__ (SPARC; Lelli, McGaugh &amp; Schombert 2016)."
+ },
+ {
+  "id": "a9cb1d6207",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dt",
+  "text": "Models"
+ },
+ {
+  "id": "b94c300802",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dd",
+  "text": "An NFW dark matter halo (Navarro, Frenk &amp; White 1996) and MOND (Milgrom 1983)."
+ },
+ {
+  "id": "30d2a37028",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dt",
+  "text": "Test"
+ },
+ {
+  "id": "a73a84373f",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "dd",
+  "text": "χ², the gap between each model and every measured speed, in units of its error bar. <a href=\"#scorecard\">See the scores</a>"
+ },
+ {
+  "id": "d71b21bd9d",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "button",
+  "text": "Measured speeds"
+ },
+ {
+  "id": "cee3b67bed",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Galaxy rotation and the missing mass problem",
+  "tag": "button",
+  "text": "Visible matter only"
+ },
+ {
+  "id": "5a258b21e8",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Background: from prediction to problem",
+  "tag": "h2",
+  "text": "Background: from prediction to problem"
+ },
+ {
+  "id": "19afaeb7b5",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Background: from prediction to problem",
+  "tag": "p",
+  "text": "What a rotation curve shows, what Newton’s gravity predicts, and what telescopes found."
+ },
+ {
+  "id": "f56be87874",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Background: from prediction to problem",
+  "tag": "li",
+  "text": "<span class=\"step-tag\">Definition</span>"
+ },
+ {
+  "id": "8480a74501",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "A rotation curve is a speed chart",
+  "tag": "h3",
+  "text": "A rotation curve is a speed chart"
+ },
+ {
+  "id": "f963241ac6",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "A rotation curve is a speed chart",
+  "tag": "p",
+  "text": "Plot how fast a galaxy’s stars and gas orbit against their distance from the centre. Orbit speed works like a weighing scale: the faster something orbits at a given distance, the more mass lies inside its orbit."
+ },
+ {
+  "id": "96cd3147ac",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "A rotation curve is a speed chart",
+  "tag": "li",
+  "text": "<span class=\"step-tag\">Prediction</span>"
+ },
+ {
+  "id": "26e4730b93",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Outer stars should slow down",
+  "tag": "h3",
+  "text": "Outer stars should slow down"
+ },
+ {
+  "id": "4e819d293f",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Outer stars should slow down",
+  "tag": "p",
+  "text": "Gravity weakens with distance. Mercury orbits the Sun at 47 km/s, Neptune at 5 km/s (Williams 2024). Most of a galaxy’s visible matter sits near its centre, so its outer stars should slow down in the same way: the dashed line."
+ },
+ {
+  "id": "2d0a65ef37",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Outer stars should slow down",
+  "tag": "li",
+  "text": "<span class=\"step-tag\">Observation</span>"
+ },
+ {
+  "id": "3006dccd8f",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "They don’t",
+  "tag": "h3",
+  "text": "They don’t"
+ },
+ {
+  "id": "df2e9e7ff6",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "They don’t",
+  "tag": "p",
+  "text": "By 1980 Vera Rubin and colleagues had shown that the speeds stay high, galaxy after galaxy (Rubin, Ford &amp; Thonnard 1980). At the edge of __DEFAULT_GALAXY_NAME__, gas orbits at <b id=\"puzzleObs\">–</b>, but its visible matter could only hold it at about <b id=\"puzzleBar\">–</b>. Keeping it in orbit takes about <b id=\"puzzleRatio\">–</b> times the pull. <b>That gap is the missing mass problem.</b>"
+ },
+ {
+  "id": "b06226331b",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "They don’t",
+  "tag": "summary",
+  "text": "How are speeds that far out measured?"
+ },
+ {
+  "id": "2f34a67f12",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "They don’t",
+  "tag": "p",
+  "text": "From the Doppler shift: gas moving towards us looks slightly bluer, gas moving away slightly redder. Cold hydrogen glows faintly at 21 cm in radio, and it reaches far beyond the stars, so the speeds go further out than starlight does (Lelli, McGaugh &amp; Schombert 2016)."
+ },
+ {
+  "id": "d38383d49c",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "They don’t",
+  "tag": "li",
+  "text": "<span class=\"step-tag\">Hypotheses</span>"
+ },
+ {
+  "id": "b1b76aa3ba",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "h3",
+  "text": "Two possible answers"
+ },
+ {
+  "id": "06afa53ae0",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "p",
+  "text": "Either galaxies hold far more mass than we can see, or gravity stops following Newton’s law when it is very weak."
+ },
+ {
+  "id": "d1fe6ea69a",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "div",
+  "text": "<b>Dark matter</b><span>The galaxy sits inside a huge halo of unseen mass.</span>"
+ },
+ {
+  "id": "001d475c13",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "div",
+  "text": "<b>MOND</b><span>Very weak gravity is stronger than Newton’s law predicts (Milgrom 1983).</span>"
+ },
+ {
+  "id": "ec031e5eaa",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "figcaption",
+  "text": "__DEFAULT_GALAXY_NAME__, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas."
+ },
+ {
+  "id": "516a9ffed5",
+  "kind": "html",
+  "page": "puzzle",
+  "section": "Two possible answers",
+  "tag": "div",
+  "text": "<span>Next, see how each answer works:</span><a class=\"next-link\" href=\"#background\">Next: the two ideas <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
+ },
+ {
+  "id": "a1865df225",
+  "kind": "html",
+  "page": "background",
+  "section": "The two ideas",
+  "tag": "h2",
+  "text": "The two ideas"
+ },
+ {
+  "id": "f4eb1e6616",
+  "kind": "html",
+  "page": "background",
+  "section": "The two ideas",
+  "tag": "p",
+  "text": "Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says."
+ },
+ {
+  "id": "aa32669000",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "h3",
+  "text": "Side by side"
+ },
+ {
+  "id": "9ce0f70da8",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "<span class=\"sr-only\">Question</span>"
+ },
+ {
+  "id": "8056b15e94",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "Dark matter halo"
+ },
+ {
+  "id": "c2acc4b1ad",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "MOND"
+ },
+ {
+  "id": "c8f4c56efd",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "What it changes"
+ },
+ {
+  "id": "722fe680e7",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "Adds unseen mass. Newton’s gravity is unchanged."
+ },
+ {
+  "id": "132be868cc",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "No extra mass. Gravity is boosted where it is very weak."
+ },
+ {
+  "id": "c6f9271f5e",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "Values tuned to each galaxy here"
+ },
+ {
+  "id": "01bac0a352",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "<b>2</b>: halo mass and scale radius"
+ },
+ {
+  "id": "fc93ffe197",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "<b>0</b>: one constant, a<sub>0</sub>, shared by every galaxy"
+ },
+ {
+  "id": "cc1ceb3e91",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "Best evidence for it"
+ },
+ {
+  "id": "ba6ad89d45",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)"
+ },
+ {
+  "id": "2e63e7d638",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)"
+ },
+ {
+  "id": "2ebea1157d",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "th",
+  "text": "Biggest open problem"
+ },
+ {
+  "id": "b74fc95035",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "No dark matter particle has been found (Bertone &amp; Hooper 2018)"
+ },
+ {
+  "id": "0a7bdc0079",
+  "kind": "html",
+  "page": "background",
+  "section": "Side by side",
+  "tag": "td",
+  "text": "Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)"
+ },
+ {
+  "id": "4c45156a3c",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "h3",
+  "text": "What is a dark matter halo?"
+ },
+ {
+  "id": "3cd5eadd9e",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "Dark matter gives out no light, so we only detect it through its gravity. A halo is a huge, roughly round cloud of it around a galaxy, reaching far beyond the stars."
+ },
+ {
+  "id": "93a6465d6a",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "text",
+  "text": "Together: stays level"
+ },
+ {
+  "id": "b18dd34acd",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "text",
+  "text": "Halo: grows"
+ },
+ {
+  "id": "aba18df75c",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "text",
+  "text": "Visible matter: falls"
+ },
+ {
+  "id": "06725e1015",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "text",
+  "text": "radius →"
+ },
+ {
+  "id": "4f11ad33c2",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "text",
+  "text": "speed →"
+ },
+ {
+  "id": "043bd7cf38",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "figcaption",
+  "text": "Schematic, not real data. The halo’s share (purple) grows as the visible matter’s (cyan) falls, so the total (orange) stays level."
+ },
+ {
+  "id": "e9d0017709",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "Newton’s gravity stays as it is; there is just more mass. The simulator uses an <b>NFW halo</b> (Navarro, Frenk &amp; White 1996). Its shape came out of computer simulations of dark matter clumping as the Universe grew, not from fitting rotation curves: dense in the middle, thinning outwards. Two sliders set it: mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is)."
+ },
+ {
+  "id": "7f413d68d7",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "summary",
+  "text": "Show the maths (A-level circular motion)"
+ },
+ {
+  "id": "bb0e58e117",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "<b>1. Orbits.</b> Gravity supplies the centripetal acceleration. For a round distribution of mass, only the mass M(r) inside the orbit pulls overall (Newton’s shell theorem):"
+ },
+ {
+  "id": "a8b6fc5224",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "<b>2. Visible matter alone.</b> Beyond most of the stars, M(r) hardly grows, so v ∝ 1/√r: the speed should fall, like the planets’ speeds in the Solar System."
+ },
+ {
+  "id": "4aa1f33548",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "<b>3. What a flat curve needs.</b> For v to stay constant, M(r) must grow in step with r. That happens if the density falls as 1/r²: each thin shell of thickness Δr then holds the same mass, 4πr²ρΔr, so every step outwards adds the same amount."
+ },
+ {
+  "id": "8b6de5ed27",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "<b>4. The NFW density.</b> With ρ<sub>s</sub> setting how dense the halo is:"
+ },
+ {
+  "id": "89f5eb3030",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method)."
+ },
+ {
+  "id": "1d4d168914",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "tag": "p",
+  "text": "<b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated."
+ },
+ {
+  "id": "36752719ba",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "h3",
+  "text": "What is MOND?"
+ },
+ {
+  "id": "0fd423e912",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves differently when it is extremely weak (Milgrom 1983)."
+ },
+ {
+  "id": "a85d8ac8ac",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "text",
+  "text": "g ≈ a₀"
+ },
+ {
+  "id": "617cdd54c2",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "text",
+  "text": "MOND: levels off"
+ },
+ {
+  "id": "0d7eb9b441",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "text",
+  "text": "Newton, visible matter: falls"
+ },
+ {
+  "id": "0a8ba78548",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "text",
+  "text": "radius →"
+ },
+ {
+  "id": "623179cec8",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "text",
+  "text": "speed →"
+ },
+ {
+  "id": "47a9537454",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "figcaption",
+  "text": "Schematic, not real data. Dotted line: where gravity falls to a₀. Beyond it the boost grows large and the speed levels off (Milgrom 1983)."
+ },
+ {
+  "id": "a4337f7209",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "MOND boosts gravity everywhere, by an amount that depends on how strong it already is. Near a galaxy’s centre gravity is strong and the boost is small; far out it is weak and the boost is large, so the outer stars keep moving fast."
+ },
+ {
+  "id": "1552488bb4",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "<b>a<sub>0</sub> sets the scale.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², is about 10¹¹ times weaker than gravity at Earth’s surface. It is a turning point, not a switch. With the simulator’s formula, a star speeds up by:"
+ },
+ {
+  "id": "dd30041238",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "th",
+  "text": "Newtonian pull, g<sub>N</sub>"
+ },
+ {
+  "id": "56a0e915dc",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "th",
+  "text": "Speed boost"
+ },
+ {
+  "id": "0220fb340f",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "summary",
+  "text": "Where does a<sub>0</sub> come from?"
+ },
+ {
+  "id": "4c6305be6f",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "It is measured, not derived. Milgrom set it to match the galaxies known in 1983; today it is fitted to SPARC’s rotation curves (McGaugh, Lelli &amp; Schombert 2016). That study found that the extra gravity a galaxy needs depends on its acceleration, whatever its size, which is why one number can work for every galaxy. Even where gravity is strongest in the galaxies here, MOND adds at least 4%."
+ },
+ {
+  "id": "7d63fb698b",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "summary",
+  "text": "Show the maths (A-level circular motion)"
+ },
+ {
+  "id": "da7f4520f8",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "<b>1. Orbits.</b> Gravity supplies the centripetal acceleration, and Newton gives the pull g<sub>N</sub> of the visible mass M:"
+ },
+ {
+  "id": "389f198a79",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "<b>2. MOND’s rule.</b> Strong gravity is almost unchanged; weak gravity is boosted:"
+ },
+ {
+  "id": "27a5d2d47c",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "mtext",
+  "text": "&#8195;if&#8194;"
+ },
+ {
+  "id": "83a057096c",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "mtext",
+  "text": "&#8195;if&#8194;"
+ },
+ {
+  "id": "eee081ff89",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "<b>3. Far out,</b> put the weak rule into step 1:"
+ },
+ {
+  "id": "fe557b2fe7",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "tag": "p",
+  "text": "r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method)."
+ },
+ {
+  "id": "3992e1f4ac",
+  "kind": "html",
+  "page": "background",
+  "section": "Beyond rotation curves: the wider evidence",
+  "tag": "h3",
+  "text": "Beyond rotation curves: the wider evidence"
+ },
+ {
+  "id": "88ac455096",
+  "kind": "html",
+  "page": "background",
+  "section": "Beyond rotation curves: the wider evidence",
+  "tag": "p",
+  "text": "Rotation curves are one clue among several. A winning explanation has to account for all of them."
+ },
+ {
+  "id": "be417771c0",
+  "kind": "html",
+  "page": "background",
+  "section": "Beyond rotation curves: the wider evidence",
+  "tag": "div",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "e63ed848d3",
+  "kind": "html",
+  "page": "background",
+  "section": "Galaxy clusters",
+  "tag": "h4",
+  "text": "Galaxy clusters"
+ },
+ {
+  "id": "9de2f6cc88",
+  "kind": "html",
+  "page": "background",
+  "section": "Galaxy clusters",
+  "tag": "p",
+  "text": "<b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933)."
+ },
+ {
+  "id": "b0633efbd0",
+  "kind": "html",
+  "page": "background",
+  "section": "Galaxy clusters",
+  "tag": "p",
+  "text": "<b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "203e91f5b3",
+  "kind": "html",
+  "page": "background",
+  "section": "Galaxy clusters",
+  "tag": "div",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "f7d8dd3cd6",
+  "kind": "html",
+  "page": "background",
+  "section": "The Bullet Cluster",
+  "tag": "h4",
+  "text": "The Bullet Cluster"
+ },
+ {
+  "id": "5eae808d5c",
+  "kind": "html",
+  "page": "background",
+  "section": "The Bullet Cluster",
+  "tag": "p",
+  "text": "<b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006)."
+ },
+ {
+  "id": "d877ea27ff",
+  "kind": "html",
+  "page": "background",
+  "section": "The Bullet Cluster",
+  "tag": "p",
+  "text": "<b>Why it matters:</b> the mass and the visible matter ended up in different places."
+ },
+ {
+  "id": "8e1bde6c72",
+  "kind": "html",
+  "page": "background",
+  "section": "The Bullet Cluster",
+  "tag": "div",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "aa25e679c4",
+  "kind": "html",
+  "page": "background",
+  "section": "The oldest light",
+  "tag": "h4",
+  "text": "The oldest light"
+ },
+ {
+  "id": "cff37f92bf",
+  "kind": "html",
+  "page": "background",
+  "section": "The oldest light",
+  "tag": "p",
+  "text": "<b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches."
+ },
+ {
+  "id": "92591dac8c",
+  "kind": "html",
+  "page": "background",
+  "section": "The oldest light",
+  "tag": "p",
+  "text": "<b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020)."
+ },
+ {
+  "id": "c0a5c2b475",
+  "kind": "html",
+  "page": "background",
+  "section": "The oldest light",
+  "tag": "div",
+  "text": "<span class=\"evidence-tag mond\">Points to MOND</span>"
+ },
+ {
+  "id": "0d6422b2f0",
+  "kind": "html",
+  "page": "background",
+  "section": "Visible matter predicts the pull",
+  "tag": "h4",
+  "text": "Visible matter predicts the pull"
+ },
+ {
+  "id": "03383511f7",
+  "kind": "html",
+  "page": "background",
+  "section": "Visible matter predicts the pull",
+  "tag": "p",
+  "text": "<b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016)."
+ },
+ {
+  "id": "a4dd5e4dd1",
+  "kind": "html",
+  "page": "background",
+  "section": "Visible matter predicts the pull",
+  "tag": "p",
+  "text": "<b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining."
+ },
+ {
+  "id": "147c9c3102",
+  "kind": "html",
+  "page": "background",
+  "section": "Visible matter predicts the pull",
+  "tag": "p",
+  "text": "Still open"
+ },
+ {
+  "id": "7a48af1dc8",
+  "kind": "html",
+  "page": "background",
+  "section": "No confirmed dark matter particle",
+  "tag": "h4",
+  "text": "No confirmed dark matter particle"
+ },
+ {
+  "id": "766a2e0dc1",
+  "kind": "html",
+  "page": "background",
+  "section": "No confirmed dark matter particle",
+  "tag": "p",
+  "text": "Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026)."
+ },
+ {
+  "id": "18362bc49f",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "h4",
+  "text": "MOND beyond galaxies"
+ },
+ {
+  "id": "2c7ea2ad0e",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "p",
+  "text": "MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "af7649a290",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "div",
+  "text": "<span class=\"tour-cta-eyebrow\">Now test them</span>"
+ },
+ {
+  "id": "f22a402ddf",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "p",
+  "text": "Put both ideas to work on real galaxies: follow the guided tour, or explore the simulator on your own."
+ },
+ {
+  "id": "a5c21bf2ee",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "circle",
+  "text": "<span class=\"tour-go-text\"><b>Take the full guided tour</b><small>The simulator, the sandbox, then the scores</small></span><span class=\"tour-go-arrow\" aria-hidden=\"true\">→</span>"
+ },
+ {
+  "id": "d57f5fb75d",
+  "kind": "html",
+  "page": "background",
+  "section": "MOND beyond galaxies",
+  "tag": "circle",
+  "text": "<a class=\"next-link\" href=\"#simulator\" id=\"exploreAlone\">Explore on my own <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
+ },
+ {
+  "id": "ca0674fb5d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "h2",
+  "text": "Model setup"
+ },
+ {
+  "id": "99d8316478",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "p",
+  "text": "Choose a real galaxy, or build your own."
+ },
+ {
+  "id": "c018446e6e",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "button",
+  "text": "Simulator tutorial"
+ },
+ {
+  "id": "8418efef1b",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "div",
+  "text": "<span class=\"model-label\" id=\"galaxyLabel\">Galaxy</span>"
+ },
+ {
+  "id": "25eac08103",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "dt",
+  "text": "Distance"
+ },
+ {
+  "id": "a52d6ca430",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "dt",
+  "text": "Flat rotation speed"
+ },
+ {
+  "id": "325cdb3e26",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "dt",
+  "text": "Measured out to"
+ },
+ {
+  "id": "75fcd89521",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "div",
+  "text": "<span>Visible mass, in billions of Suns</span><span><i class=\"gp-dot stars\"></i>Stars <b id=\"gpStars\"></b> &nbsp; <i class=\"gp-dot gas\"></i>Gas <b id=\"gpGas\"></b></span>"
+ },
+ {
+  "id": "2ab99f9be6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "tag": "p",
+  "text": "Source: SPARC Table 1 (Lelli, McGaugh &amp; Schombert 2016)."
+ },
+ {
+  "id": "1f297059c3",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Simulation",
+  "tag": "h2",
+  "text": "Simulation"
+ },
+ {
+  "id": "073f29a103",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Simulation",
+  "tag": "p",
+  "text": "Move the sliders: the orbits and the rotation curve respond straight away."
+ },
+ {
+  "id": "7986710786",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Simulation",
+  "tag": "div",
+  "text": "<span>Test stars</span>"
+ },
+ {
+  "id": "fffe09ffcf",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "h3",
+  "text": "What are test stars?"
+ },
+ {
+  "id": "9d40ae8963",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "p",
+  "text": "The dots in the 3D view are <b>test stars</b>: they feel the model’s gravity but do not pull on each other, so each one shows how that gravity alone moves a star."
+ },
+ {
+  "id": "7b3d9468d7",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "li",
+  "text": "<b>They start on balanced orbits</b>, set by the starting galaxy’s gravity (for a real galaxy, its measured speeds)."
+ },
+ {
+  "id": "d180a63427",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "li",
+  "text": "<b>Change the gravity and they respond.</b> Too little pull and they drift outwards; beyond 1.5 × the galaxy’s edge they count as ejected."
+ },
+ {
+  "id": "29c253f42e",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "p",
+  "text": "The number is a display choice: 800 for NGC 3198, scaled with visible mass (200 to 2400). A real galaxy has billions."
+ },
+ {
+  "id": "80e01976ae",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "Timeline"
+ },
+ {
+  "id": "6c04d7aa58",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "1 Billion Years"
+ },
+ {
+  "id": "e818c4d948",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<span>Mass-to-light (M/L)</span>"
+ },
+ {
+  "id": "0d0a1d4e26",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<b id=\"mlDisk\">0.50</b><span>DISK</span>"
+ },
+ {
+  "id": "766a89d0ec",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<b id=\"mlBulge\">0.70</b><span>BULGE</span>"
+ },
+ {
+  "id": "f526067fc2",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<small class=\"ml-source\" id=\"mlSource\">standard SPARC values</small>"
+ },
+ {
+  "id": "029d6a8af5",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<span>Tilt</span>"
+ },
+ {
+  "id": "646eca126c",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What are test stars?",
+  "tag": "div",
+  "text": "<small class=\"ml-source\" id=\"tiltSource\">standard SPARC value</small>"
+ },
+ {
+  "id": "984931ed4a",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "h3",
+  "text": "What is a mass-to-light ratio?"
+ },
+ {
+  "id": "ea863fcce6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "p",
+  "text": "Telescopes measure a galaxy's <b>light</b>, not its mass. The mass-to-light ratio (M/L) converts one into the other: Suns' worth of mass per Sun's worth of light."
+ },
+ {
+  "id": "61882294e7",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "li",
+  "text": "<b>Low M/L means young stars.</b> Young, massive blue stars are very bright for their mass."
+ },
+ {
+  "id": "e3d14102bb",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "li",
+  "text": "<b>High M/L means old stars.</b> Old populations are mostly small, dim red stars: lots of mass, not much light."
+ },
+ {
+  "id": "67233f211e",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "p",
+  "text": "SPARC’s standard values (3.6 μm infrared) are <b>0.5 for the disk</b> and <b>0.7 for the older bulge</b>: averages, so each galaxy differs a little. A higher M/L lifts the visible-matter curve and leaves less for dark matter."
+ },
+ {
+  "id": "d01ab538f4",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "p",
+  "text": "<b>Best realistic fits</b> may scale them by 0.6 to 1.6, the range stellar models allow."
+ },
+ {
+  "id": "c8b3e66fcc",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is a mass-to-light ratio?",
+  "tag": "p",
+  "text": "Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; McGaugh &amp; Schombert (2014)."
+ },
+ {
+  "id": "e4e5ae1b78",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "h3",
+  "text": "What is the tilt?"
+ },
+ {
+  "id": "dcdc6d2d51",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "p",
+  "text": "We see every galaxy at an angle. The <b>tilt</b> (or <b>inclination</b>, i) is that angle: 0° is face-on, 90° is edge-on."
+ },
+ {
+  "id": "4158cd706e",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "li",
+  "text": "<b>Telescopes only see motion towards or away from us</b> (the Doppler shift), not sideways."
+ },
+ {
+  "id": "32ce501af8",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "li",
+  "text": "<b>So a tilted disk looks slower than it really spins.</b> True speed = measured speed ÷ sin i."
+ },
+ {
+  "id": "637e7d18c6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "p",
+  "text": "SPARC’s speeds are already corrected, but its tilt has an error of a few degrees. Nearly face-on galaxies are the most sensitive."
+ },
+ {
+  "id": "994f5add6f",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "p",
+  "text": "<b>Best realistic fits</b> may change the tilt within twice SPARC’s error."
+ },
+ {
+  "id": "c4e47b0794",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "p",
+  "text": "Source: Lelli, McGaugh &amp; Schombert (2016), SPARC; Li et al. (2018)."
+ },
+ {
+  "id": "c26100575f",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What is the tilt?",
+  "tag": "label",
+  "text": "<span class=\"fit-label\">Best realistic fits</span>"
+ },
+ {
+  "id": "928eb58b3b",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Custom galaxy builder",
+  "tag": "h2",
+  "text": "Custom galaxy builder"
+ },
+ {
+  "id": "8f7eac05ac",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Custom galaxy builder",
+  "tag": "p",
+  "text": "What you have built"
+ },
+ {
+  "id": "4f1dbeb5e2",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Custom galaxy builder",
+  "tag": "p",
+  "text": "Rough guide from star mass, bulge share, gas fraction and disk density (Hubble 1926; Freeman 1970; Graham &amp; Worley 2008)."
+ },
+ {
+  "id": "388e522cc9",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "h3",
+  "text": "Stellar disk"
+ },
+ {
+  "id": "0e355addfa",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "label",
+  "text": "<span>Disk mass, M<sub>disk</sub></span>"
+ },
+ {
+  "id": "56a485a513",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "p",
+  "text": "Mass of the stars in the flat disk."
+ },
+ {
+  "id": "8ff421d301",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "label",
+  "text": "<span>Scale length, R<sub>d</sub></span>"
+ },
+ {
+  "id": "0fb79ecfc0",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "p",
+  "text": "How quickly the disk fades outwards. Bigger means more spread out."
+ },
+ {
+  "id": "0906a09994",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "label",
+  "text": "<span>Truncation radius, R<sub>max</sub></span>"
+ },
+ {
+  "id": "030070c13d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stellar disk",
+  "tag": "p",
+  "text": "Outer edge of the visible galaxy. Stars past 1.5 × R<sub>max</sub> are ejected."
+ },
+ {
+  "id": "90b87f7679",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Bulge",
+  "tag": "h3",
+  "text": "Bulge"
+ },
+ {
+  "id": "d920de44d0",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Bulge",
+  "tag": "label",
+  "text": "<span>Bulge mass, M<sub>bulge</sub></span>"
+ },
+ {
+  "id": "087d80dc67",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Bulge",
+  "tag": "p",
+  "text": "Mass of the round ball of stars at the centre. Zero means no bulge."
+ },
+ {
+  "id": "4c859a385b",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Bulge",
+  "tag": "label",
+  "text": "<span>Hernquist scale radius, r<sub>b</sub></span>"
+ },
+ {
+  "id": "92da4c3b3d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Bulge",
+  "tag": "p",
+  "text": "Size of the bulge (not the halo’s scale radius). Half its mass lies within about 2.4 × r<sub>b</sub>."
+ },
+ {
+  "id": "23ed2d59d1",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Gas",
+  "tag": "h3",
+  "text": "Gas"
+ },
+ {
+  "id": "7a8441e286",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Gas",
+  "tag": "label",
+  "text": "<span>Gas mass, M<sub>gas</sub></span>"
+ },
+ {
+  "id": "6a253a6ffe",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Gas",
+  "tag": "p",
+  "text": "Mass of cold hydrogen gas, spread three times wider than the stars."
+ },
+ {
+  "id": "57d70e78f3",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "h3",
+  "text": "Stats"
+ },
+ {
+  "id": "713e1ea31c",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Visible mass<span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"Disk stars + bulge stars + gas: everything you could see with a telescope.\" data-tip=\"Disk stars + bulge stars + gas: everything you could see with a telescope.\">?</span>"
+ },
+ {
+  "id": "af36662d95",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Bulge-to-total<span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"Share of the stars that sit in the central bulge. 0% is a pure disk.\" data-tip=\"Share of the stars that sit in the central bulge. 0% is a pure disk.\">?</span>"
+ },
+ {
+  "id": "8a34815759",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Gas fraction<span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"Share of the visible mass that is gas rather than stars.\" data-tip=\"Share of the visible mass that is gas rather than stars.\">?</span>"
+ },
+ {
+  "id": "e73401a09f",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Typical halo M<sub>200</sub><span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"The dark matter halo mass usually found around this many stars (Moster et al. 2013). The halo mass slider starts here.\" data-tip=\"The dark matter halo mass usually found around this many stars (Moster et al. 2013). The halo mass slider starts here.\">?</span>"
+ },
+ {
+  "id": "1ae92dc944",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Test stars<span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"Stars in the 3D simulation, split between the disk and the bulge.\" data-tip=\"Stars in the 3D simulation, split between the disk and the bulge.\">?</span>"
+ },
+ {
+  "id": "9fb06f4d84",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "dt",
+  "text": "Ejection radius<span class=\"stat-q\" tabindex=\"0\" role=\"img\" aria-label=\"A star that moves beyond this distance counts as ejected: gravity failed to hold it.\" data-tip=\"A star that moves beyond this distance counts as ejected: gravity failed to hold it.\">?</span>"
+ },
+ {
+  "id": "cfcfaee1f6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "Changing the galaxy resets the halo to its typical size. An imaginary galaxy has no measured speeds."
+ },
+ {
+  "id": "e0365abe29",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "button",
+  "text": "Reset anatomy"
+ },
+ {
+  "id": "eceb382625",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "div",
+  "text": "<span class=\"gravity-label\" id=\"gravityLabel\">Gravity model</span>"
+ },
+ {
+  "id": "8fbfca5d70",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "input",
+  "text": "<span><b>Dark matter halo</b><small>Extra unseen mass</small></span>"
+ },
+ {
+  "id": "f11e9bced6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "input",
+  "text": "<span><b>MOND</b><small>Gravity changes, no extra mass</small></span>"
+ },
+ {
+  "id": "0f3d57a8b4",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "Or try MOND: change gravity instead of adding mass."
+ },
+ {
+  "id": "4d656af2ea",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "MOND on: no dark matter. MOND boosts gravity everywhere: a little where it is strong, a lot where it is weaker than a<sub>0</sub> = <span id=\"mondA0Text\">1.2×10⁻¹⁰</span> m/s².<span id=\"mondZoneNote\" hidden> On the graph, the gold is in proportion to the boost: faint gold is a small boost, deep gold a big one.</span>"
+ },
+ {
+  "id": "0acc03c453",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "label",
+  "text": "<span>Halo mass, M<sub>200</sub></span>"
+ },
+ {
+  "id": "9bc7b0c643",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "How much dark matter surrounds the galaxy. More mass, faster orbits: the orange curve rises."
+ },
+ {
+  "id": "852a2d3d1d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "button",
+  "text": "Fit halo to data"
+ },
+ {
+  "id": "dcebd6cce1",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "button",
+  "text": "Visible matter only"
+ },
+ {
+  "id": "f9fc811aa2",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "label",
+  "text": "<span>Scale radius, r<sub>s</sub></span>"
+ },
+ {
+  "id": "ea830065d0",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "How spread out the halo is. Small packs it near the centre and speeds up the inner stars."
+ },
+ {
+  "id": "fc62285894",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "label",
+  "text": "<span>Orbit time</span>"
+ },
+ {
+  "id": "829f636687",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "button",
+  "text": "<span class=\"play-icon\" aria-hidden=\"true\">▶</span><span class=\"play-text\">Play</span>"
+ },
+ {
+  "id": "3fcb1cd673",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "One billion years of orbits. Drag, or press Play."
+ },
+ {
+  "id": "8edac7dc98",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "label",
+  "text": "<span>Track a star</span>"
+ },
+ {
+  "id": "dbf2a20d9b",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "tag": "p",
+  "text": "Rings one star and shows its laps, speed and distance. Star 1 starts nearest the centre, star <span id=\"trackLast\">800</span> furthest out."
+ },
+ {
+  "id": "fb549d0d94",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 13D galaxy simulation",
+  "tag": "h2",
+  "text": "<span class=\"fig\">Fig. 1</span>3D galaxy simulation"
+ },
+ {
+  "id": "d2b7961946",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "h2",
+  "text": "<span>Test-star orbits over 1 billion years</span>"
+ },
+ {
+  "id": "4bf50e90cb",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "div",
+  "text": "<span>Ejected</span><b><span id=\"escape-count-val\">0</span> / <span id=\"star-total-val\">800</span></b>"
+ },
+ {
+  "id": "e0089969c5",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "div",
+  "text": "<span>Halo r<sub>200</sub></span><b id=\"tm-r200\">—</b>"
+ },
+ {
+  "id": "276add38db",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span>View</span><span class=\"chev\" aria-hidden=\"true\">▾</span>"
+ },
+ {
+  "id": "eeac14c082",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "⛶ Fullscreen"
+ },
+ {
+  "id": "4c97ce7b48",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "↺ Reset"
+ },
+ {
+  "id": "c2ee26011c",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "div",
+  "text": "Camera"
+ },
+ {
+  "id": "83f7c9a1bb",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "Face-on"
+ },
+ {
+  "id": "eb9a2c35f6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "Edge-on"
+ },
+ {
+  "id": "15b44421d2",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "Full halo"
+ },
+ {
+  "id": "bd9cf66b38",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "div",
+  "text": "Show"
+ },
+ {
+  "id": "9fc073dc56",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Orbits"
+ },
+ {
+  "id": "5ebae3e2ec",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Gas"
+ },
+ {
+  "id": "c7a0d20df1",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Halo"
+ },
+ {
+  "id": "cd249e7ee0",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Ejection line"
+ },
+ {
+  "id": "526a0656e9",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Where MOND acts"
+ },
+ {
+  "id": "764ee4882b",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "div",
+  "text": "Speed"
+ },
+ {
+  "id": "09f8f38be4",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "Rotate"
+ },
+ {
+  "id": "22011fb997",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "button",
+  "text": "Pan"
+ },
+ {
+  "id": "873b17a2d3",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "output",
+  "text": "0 / 1000 Myr"
+ },
+ {
+  "id": "9d7241d469",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "label",
+  "text": "<span>Halo mass</span>"
+ },
+ {
+  "id": "ef349c580d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "tag": "label",
+  "text": "<span>Scale radius</span>"
+ },
+ {
+  "id": "b11610496a",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "h3",
+  "text": "Your NFW halo"
+ },
+ {
+  "id": "2f9e601aec",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "p",
+  "text": "Updates with the sliders. 1 kpc ≈ 3,260 light-years. <span class=\"on-mouse\">Hover over a value for more.</span><span class=\"on-touch\">Tap a value for more.</span>"
+ },
+ {
+  "id": "ca1f499e6d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "button",
+  "text": "Halo radius, r<sub>200</sub><span class=\"info-icon\" aria-hidden=\"true\">ⓘ</span><span class=\"metric-value\" id=\"haloRadius\">—</span>"
+ },
+ {
+  "id": "4397faf4ac",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "dd",
+  "text": "<span><span>The usual way to mark a halo’s edge, since halos fade out gradually: inside it, the dark matter’s average density is 200 times the Universe’s critical density.</span></span>"
+ },
+ {
+  "id": "119f98e176",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "button",
+  "text": "Scale radius, r<sub>s</sub><span class=\"info-icon\" aria-hidden=\"true\">ⓘ</span><span class=\"metric-value\" id=\"haloScale\">—</span>"
+ },
+ {
+  "id": "6849105b51",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "dd",
+  "text": "<span><span>Where the halo’s density stops falling as 1/r (inside) and starts heading towards 1/r³ (outside). A small r<sub>s</sub> packs the dark matter towards the centre.</span></span>"
+ },
+ {
+  "id": "7df0f57005",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "button",
+  "text": "Concentration, c<span class=\"info-icon\" aria-hidden=\"true\">ⓘ</span><span class=\"metric-value\" id=\"haloConcentration\">—</span>"
+ },
+ {
+  "id": "6284fd6ccd",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Your NFW halo",
+  "tag": "dd",
+  "text": "<span><span>Halo radius ÷ scale radius. Higher c means the dark matter is packed more towards the centre.</span></span>"
+ },
+ {
+  "id": "c2774c1032",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "h2",
+  "text": "<span class=\"fig\">Fig. 2</span>Rotation curve"
+ },
+ {
+  "id": "8c5250d416",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "p",
+  "text": "Tap or slide along the graph to read the speeds. Tap outside to close."
+ },
+ {
+  "id": "222e63083a",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "div",
+  "text": "<span class=\"stability-title\">Halo shape monitor</span><span class=\"stability-badge\" id=\"stabilityBadge\" role=\"status\"></span>"
+ },
+ {
+  "id": "671ac130bb",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "summary",
+  "text": "Understanding the colours<span data-preset-only> and χ²</span>"
+ },
+ {
+  "id": "f2970fc7ef",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<i class=\"sw dot\" style=\"background:#f4f7fb\"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty."
+ },
+ {
+  "id": "c758b24949",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<i class=\"sw ldash\" style=\"border-color:#5fd0e0\"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas)."
+ },
+ {
+  "id": "73c96d29de",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<i class=\"sw dash\" style=\"border-color:#b39ae8\"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode)."
+ },
+ {
+  "id": "d861e776e1",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<i class=\"sw\" style=\"background:#ffae5c\"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span>"
+ },
+ {
+  "id": "6a54c8ccc9",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<i class=\"sw bar\" style=\"background:#aab8cc\"></i><b>Grey bars</b> show the gap at each point: up means the model is too slow there, down too fast."
+ },
+ {
+  "id": "ad67443e5d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<b>Fit badge:</b> <span class=\"g\">green</span> close (χ<sup>2</sup><sub>r</sub> below 2), <span class=\"o\">yellow</span> rough (2 to 10), <span class=\"r\">red</span> poor (above 10). The cut-offs are this site’s rule of thumb, not a published standard."
+ },
+ {
+  "id": "2209fcda8d",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Fig. 2Rotation curve",
+  "tag": "li",
+  "text": "<b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve."
+ },
+ {
+  "id": "614562e017",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What do χ² and χ2r mean?",
+  "tag": "h3",
+  "text": "What do χ² and χ<sup>2</sup><sub>r</sub> mean?"
+ },
+ {
+  "id": "5496eb3f95",
+  "kind": "html",
+  "page": "simulator",
+  "section": "What do χ² and χ2r mean?",
+  "tag": "p",
+  "text": "At each point, divide the gap between model and measurement by the error bar and square it; χ² is the total. χ<sup>2</sup><sub>r</sub> divides that by the number of points minus the values tuned, so galaxies and models compare fairly. Missing every point by one error bar gives about 1; by three, about 9."
+ },
+ {
+  "id": "c8afe1f7d9",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Why not 0?",
+  "tag": "h3",
+  "text": "Why not 0?"
+ },
+ {
+  "id": "78636f4432",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Why not 0?",
+  "tag": "p",
+  "text": "Measurements are noisy, so even a correct model misses by about one error bar."
+ },
+ {
+  "id": "f391223771",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Why count tuned values?",
+  "tag": "h3",
+  "text": "Why count tuned values?"
+ },
+ {
+  "id": "c20b4e3677",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Why count tuned values?",
+  "tag": "p",
+  "text": "More dials can always bend a model closer to the data. With standard values the halo tunes 2 (mass and size) and MOND none. Best realistic fits also tune M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total."
+ },
+ {
+  "id": "37685c5298",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Why count tuned values?",
+  "tag": "nav",
+  "text": "<a class=\"next-link\" href=\"#scorecard\">Next: how both ideas score on every galaxy <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
+ },
+ {
+  "id": "0f4ac11edd",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "h2",
+  "text": "Scorecard"
+ },
+ {
+  "id": "71b2cadc5c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "p",
+  "text": "How closely each idea matches every galaxy on this site."
+ },
+ {
+  "id": "44719b134a",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "p",
+  "text": "One score per galaxy and idea: χ<sup>2</sup><sub>r</sub> (reduced chi-squared), how far the model misses the measured speeds, in error bars. Lower is better; about 1 is as close as the data allow."
+ },
+ {
+  "id": "f25004f95a",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<span class=\"score good\">below 2</span>close fit"
+ },
+ {
+  "id": "979ea65158",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<span class=\"score ok\">2 to 10</span>rough fit"
+ },
+ {
+  "id": "7926534191",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<span class=\"score poor\">above 10</span>poor fit"
+ },
+ {
+  "id": "94bbbe1f3c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "p",
+  "text": "At a glance"
+ },
+ {
+  "id": "5c9074a5b9",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Galaxy"
+ },
+ {
+  "id": "9498c0eb6c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Visible matter only<small>Newton’s gravity, nothing added</small>"
+ },
+ {
+  "id": "84f2fbd319",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Dark matter halo (NFW)<small>standard values → best realistic fit</small>"
+ },
+ {
+  "id": "4d26e80132",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "MOND<small>standard values → best realistic fit</small>"
+ },
+ {
+  "id": "772804cae2",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "td",
+  "text": "Calculating the scores…"
+ },
+ {
+  "id": "60a7f2d02e",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "p",
+  "text": "<sup>†</sup> The best fit needed at least one value at its realistic limit (see the full scores)."
+ },
+ {
+  "id": "728108665e",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "summary",
+  "text": "Full scores, error bars and tuned values"
+ },
+ {
+  "id": "88825dd960",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Galaxy"
+ },
+ {
+  "id": "564c026bcf",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Standard values<small>SPARC’s M/L, distance and tilt for every model</small>"
+ },
+ {
+  "id": "f4780c7752",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Best realistic fits<small>each model also tunes M/L, distance and tilt</small>"
+ },
+ {
+  "id": "22c178004d",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Visible matter only<small>Newton’s gravity, nothing added</small>"
+ },
+ {
+  "id": "122cd8469a",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Dark matter halo (NFW)<small>halo mass and size tuned</small>"
+ },
+ {
+  "id": "0cccd3d6cf",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "MOND<small>nothing tuned</small>"
+ },
+ {
+  "id": "2e76ecec12",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "Dark matter halo (NFW)"
+ },
+ {
+  "id": "54ffcfcf40",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "th",
+  "text": "MOND<small>a₀ also tuned</small>"
+ },
+ {
+  "id": "1e6954fb71",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "td",
+  "text": "Calculating the scores…"
+ },
+ {
+  "id": "ea9cb85995",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "p",
+  "text": "Before drawing conclusions"
+ },
+ {
+  "id": "64ae65b57f",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>A fair test</b>Every model starts from the same stars and gas, with SPARC’s mass-to-light ratio, distance and tilt. Best realistic fits let each model adjust those, and the score counts every value tuned, so extra freedom costs something."
+ },
+ {
+  "id": "fe02fb3f5c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>Only realistic values</b>Star masses that stellar models allow (McGaugh &amp; Schombert 2014), distance and tilt within twice SPARC’s errors, and a typical halo concentration (Dutton &amp; Macciò 2014). <span class=\"at-limit\">at limit</span> means a better fit needed an unrealistic value. <a href=\"#mScore\">All limits</a>"
+ },
+ {
+  "id": "4604964a11",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>MOND’s constant</b>Best fits may nudge a<sub>0</sub> between __A0_MIN__ and __A0_MAX__ × 10⁻¹⁰ m/s² (McGaugh, Lelli &amp; Schombert 2016). MOND says a<sub>0</sub> is universal (Milgrom 1983), so galaxies needing clearly different values would be a warning sign."
+ },
+ {
+  "id": "c1aeb59e4c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>Why MOND scores badly here</b>Plain MOND tunes nothing, and some error bars are tiny (under 1 km/s across much of UGC 128), so a small steady miss adds up. With softer limits, Li et al. (2018) found acceptable MOND fits for most of SPARC’s 175 galaxies. A poor score here reflects these galaxies and limits, not a verdict on MOND."
+ },
+ {
+  "id": "9badb97457",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>What the error bars cover</b>Only each speed’s own uncertainty. A wrong distance or tilt shifts the whole curve at once, so the best fits vary those separately."
+ },
+ {
+  "id": "d31c3c041c",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "li",
+  "text": "<b>A small sample</b><span id=\"scoreCount\">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner."
+ },
+ {
+  "id": "b8afe40aec",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "tag": "nav",
+  "text": "<a class=\"next-link\" href=\"#method\">Next: method and sources <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
+ },
+ {
+  "id": "a6b96c3429",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "h2",
+  "text": "Method &amp; sources"
+ },
+ {
+  "id": "0837ae2a90",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "p",
+  "text": "From telescope measurements to a score, and where every number comes from."
+ },
+ {
+  "id": "82cfcc45e1",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "li",
+  "text": "<a href=\"#mMeasure\"><span class=\"mf-n\">1</span><b>Measure</b><span>Real orbit speeds</span></a>"
+ },
+ {
+  "id": "337eac0220",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "li",
+  "text": "<a href=\"#mVisible\"><span class=\"mf-n\">2</span><b>Weigh</b><span>Add up what we can see</span></a>"
+ },
+ {
+  "id": "ba75c468af",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "li",
+  "text": "<a href=\"#mExplain\"><span class=\"mf-n\">3</span><b>Explain</b><span>A halo, or new gravity</span></a>"
+ },
+ {
+  "id": "633db07838",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "li",
+  "text": "<a href=\"#mScore\"><span class=\"mf-n\">4</span><b>Score</b><span>How big is the miss?</span></a>"
+ },
+ {
+  "id": "3c029d10f0",
+  "kind": "html",
+  "page": "method",
+  "section": "Method & sources",
+  "tag": "li",
+  "text": "<a href=\"#mOrbits\"><span class=\"mf-n\">5</span><b>Animate</b><span>Stars under that gravity</span></a>"
+ },
+ {
+  "id": "fdfd6debc2",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "h3",
+  "text": "Start from real measurements"
+ },
+ {
+  "id": "41a102cbcc",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "p",
+  "text": "Every speed on the Simulator comes from SPARC, a public catalogue of 175 disk galaxies (Lelli, McGaugh &amp; Schombert 2016)."
+ },
+ {
+  "id": "4c8eaa63a0",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "p",
+  "text": "For each galaxy, SPARC picks a series of distances from the centre, r, and lists at each one:"
+ },
+ {
+  "id": "edf791de0c",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "li",
+  "text": "<b>The measured orbit speed</b>, V<sub>obs</sub>, with its error bar, ±σ: the one-standard-deviation uncertainty in that speed."
+ },
+ {
+  "id": "b74f8c4f05",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "li",
+  "text": "<b>The speed each visible part would give on its own</b>: the gas (V<sub>gas</sub>), the disk of stars (V<sub>disk</sub>) and the central bulge (V<sub>bulge</sub>). SPARC works these out from radio maps of the hydrogen gas and infrared (3.6 μm) images of the starlight from the Spitzer Space Telescope."
+ },
+ {
+  "id": "9f68004a2a",
+  "kind": "html",
+  "page": "method",
+  "section": "Start from real measurements",
+  "tag": "p",
+  "text": "The site reads SPARC’s table as published for __GALAXY_NAMES__; no speed is typed in or adjusted. (The Custom Sandbox galaxy is imaginary, so it has none.)"
+ },
+ {
+  "id": "6be271afbd",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "h4",
+  "text": "Correcting for tilt"
+ },
+ {
+  "id": "29f897748b",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "p",
+  "text": "A telescope only sees motion towards or away from us (the Doppler shift), so a tilted disk looks slower than it really spins. SPARC divides by sin i, where the tilt i is 0° face-on and 90° edge-on:"
+ },
+ {
+  "id": "0326a5fe9c",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "summary",
+  "text": "What if SPARC’s tilt is slightly off?"
+ },
+ {
+  "id": "4f36cb3d31",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "p",
+  "text": "SPARC’s tilt, i<sub>SPARC</sub>, has an error of a few degrees. If the true tilt is i, every speed changes by the same factor (Li et al. 2018, eq. 5):"
+ },
+ {
+  "id": "7f0eee0c75",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "p",
+  "text": "<b>Example:</b> SPARC says 60° but the truth is 55°: s = 0.866 / 0.819 ≈ 1.06, so the real speeds are 6% higher. At 30° instead of 25°, s ≈ 1.18. Nearly face-on galaxies are far more sensitive."
+ },
+ {
+  "id": "bc644daa00",
+  "kind": "html",
+  "page": "method",
+  "section": "Correcting for tilt",
+  "tag": "p",
+  "text": "With Best realistic fits on, each model may change i by up to __FIT_LIMIT_SIGMA__× SPARC’s error (never past 90°). The page leaves the points where SPARC put them and divides the model by s instead, which gives the same score."
+ },
+ {
+  "id": "cbe5e7f7e6",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "h3",
+  "text": "Add up the visible matter"
+ },
+ {
+  "id": "1c30a3401b",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "How fast things would orbit if only the visible stars and gas pulled: the cyan dashed line."
+ },
+ {
+  "id": "4f9d298037",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "<b>Why add squares?</b> For a circular orbit, the pull is g = V²/r, so V² = gr. The pulls of the gas, disk and bulge add up, so their V² values add too. The square root at the end turns the total back into a speed."
+ },
+ {
+  "id": "32064b4588",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "<b>Turning starlight into mass.</b> Telescopes measure starlight, not mass. The two numbers in the formula are mass-to-light ratios: Suns’ worth of mass per Sun’s worth of infrared light. SPARC’s standard 0.50 (disk) and 0.70 (older bulge) come from models of how ageing stars change in light and mass (McGaugh &amp; Schombert 2014). In use now: <b id=\"methodMlSource\">standard SPARC values</b>."
+ },
+ {
+  "id": "734beedfbf",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "V<sub>bar</sub> is the speed a star would have if only the visible matter pulled on it."
+ },
+ {
+  "id": "2119f07c71",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "summary",
+  "text": "Why multiply by the mass-to-light ratio?"
+ },
+ {
+  "id": "139a490cf2",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "SPARC gives V<sub>disk</sub> and V<sub>bulge</sub> for a ratio of 1. V² is proportional to mass, so doubling the ratio doubles the stars’ mass and doubles their V²."
+ },
+ {
+  "id": "f35bff27a1",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "summary",
+  "text": "Why V<sub>gas</sub>|V<sub>gas</sub>| instead of V<sub>gas</sub>²?"
+ },
+ {
+  "id": "dbb0d19747",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "Much of a galaxy’s gas lies in a ring further out. Inside a flat ring, the near side pulls harder than the far side, so near the centre the gas pulls outwards overall and SPARC lists V<sub>gas</sub> as negative. (Newton’s shell theorem, that only the mass inside you pulls, holds for a round cloud but not for a flat disk.) V<sub>gas</sub>|V<sub>gas</sub>| keeps the minus sign that squaring would lose, so there the gas lowers the total."
+ },
+ {
+  "id": "ee89878b3a",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "In the Custom Sandbox you set the masses yourself, so nothing needs converting from light. The stars and the gas are flat disks that fade steadily outwards (exponential disks), and the bulge is a ball of stars (a Hernquist profile)."
+ },
+ {
+  "id": "bdfa6a1864",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "Their speeds add as squares, for the same reason as in a real galaxy: V² = gr, and pulls add."
+ },
+ {
+  "id": "f833d49aaa",
+  "kind": "html",
+  "page": "method",
+  "section": "Add up the visible matter",
+  "tag": "p",
+  "text": "The thin dotted lines on the rotation curve show each part on its own."
+ },
+ {
+  "id": "36947435c5",
+  "kind": "html",
+  "page": "method",
+  "section": "Supply the missing pull",
+  "tag": "h3",
+  "text": "Supply the missing pull"
+ },
+ {
+  "id": "e213a7b225",
+  "kind": "html",
+  "page": "method",
+  "section": "Supply the missing pull",
+  "tag": "p",
+  "text": "The measured speeds sit above the cyan line, so something must pull harder. Each idea gives a different answer: the orange line."
+ },
+ {
+  "id": "aa8e64c645",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "h4",
+  "text": "Answer A: a dark matter halo"
+ },
+ {
+  "id": "635694492f",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "p",
+  "text": "Keep Newton’s gravity and add unseen mass. The halo’s speed is worked out like any orbit, from the mass inside it, then added to the visible matter’s as squares:"
+ },
+ {
+  "id": "e8d237fe2d",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "p",
+  "text": "M<sub>halo</sub>(r) is the dark matter inside radius r. For a round cloud, only that mass pulls overall (Newton’s shell theorem). The two halo sliders set the halo’s mass, M<sub>200</sub>, and its scale radius, r<sub>s</sub>."
+ },
+ {
+  "id": "98ca4eb394",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "summary",
+  "text": "The NFW mass formula"
+ },
+ {
+  "id": "feb38d9869",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "p",
+  "text": "f describes how the mass builds up with radius in an NFW halo, the profile that cosmological N-body simulations of cold dark matter produce (Navarro, Frenk &amp; White 1996). Dividing by f(c) makes the mass inside r<sub>200</sub> exactly M<sub>200</sub>."
+ },
+ {
+  "id": "240324be9c",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer A: a dark matter halo",
+  "tag": "p",
+  "text": "<b>r<sub>200</sub></b> is the halo’s conventional edge: inside it, the average density is 200 times the Universe’s critical density, the density that would make the Universe’s geometry exactly flat (with H<sub>0</sub> = 70 km/s/Mpc, about five hydrogen atoms’ worth per cubic metre). The model adds no dark matter beyond it."
+ },
+ {
+  "id": "0c91d715de",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "h4",
+  "text": "Answer B: MOND"
+ },
+ {
+  "id": "00441e660e",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "p",
+  "text": "Keep only the visible matter and change the law of gravity instead (Milgrom 1983). Three steps, with a<sub>0</sub> = 1.2×10⁻¹⁰ m/s²:"
+ },
+ {
+  "id": "f2d121cb1b",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "li",
+  "text": "<b>Newton’s pull</b> from the visible matter:"
+ },
+ {
+  "id": "8f6f0e9089",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "li",
+  "text": "<b>MOND’s boost:</b>"
+ },
+ {
+  "id": "81badc635d",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "li",
+  "text": "<b>Back to a speed</b>, since g = V²/r:"
+ },
+ {
+  "id": "0fc3f92a50",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "p",
+  "text": "<b>What the boost does.</b> When g<sub>N</sub> is much bigger than a<sub>0</sub>, the bottom of the fraction is almost 1, so gravity is plain Newton. When g<sub>N</sub> is much smaller, writing x = √(g<sub>N</sub>/a<sub>0</sub>), 1 − e<sup>−x</sup> ≈ x, which gives g ≈ √(g<sub>N</sub>a<sub>0</sub>): a stronger pull that keeps the curve flat."
+ },
+ {
+  "id": "51aff672d9",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "summary",
+  "text": "Why this formula?"
+ },
+ {
+  "id": "fdbd034aa8",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "p",
+  "text": "MOND fixes how gravity behaves when it is strong and when it is very weak, but not the blend in between. This site uses the radial acceleration relation’s formula (McGaugh, Lelli &amp; Schombert 2016, eq. 4), because a<sub>0</sub> was measured with it from the same SPARC data, and Li et al. (2018), whose fit limits the site follows, use it too. Older work often used the “standard” formula, μ(x) = x/√(1+x²) (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "d679f8409b",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "p",
+  "text": "The choice matters for single galaxies. Plain MOND’s χ<sup>2</sup><sub>r</sub> with each formula:"
+ },
+ {
+  "id": "b26ce06bc7",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "th",
+  "text": "Galaxy"
+ },
+ {
+  "id": "efd0271003",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "th",
+  "text": "Standard"
+ },
+ {
+  "id": "b5ab0ddabf",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "th",
+  "text": "RAR (used)"
+ },
+ {
+  "id": "7f240cea99",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "tbody",
+  "text": "__MOND_FORMULA_ROWS__"
+ },
+ {
+  "id": "1d72869a2d",
+  "kind": "html",
+  "page": "method",
+  "section": "Answer B: MOND",
+  "tag": "p",
+  "text": "So MOND’s formula was itself fitted to SPARC (one curve shared by 153 galaxies, not tuned to each), while the halo is fitted to each galaxy separately. Neither model meets this data completely fresh."
+ },
+ {
+  "id": "93b93faf66",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "h3",
+  "text": "Score the fit"
+ },
+ {
+  "id": "0a7da73d88",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "p",
+  "text": "How far each orange line misses the measured points, with their error bars as the ruler."
+ },
+ {
+  "id": "3644635d57",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "p",
+  "text": "<b>For each point,</b> find the gap between the model and the measurement, divide it by that point’s error bar and square it. Add these up to get χ² (“chi-squared”). Squaring means misses above and below both count, and big misses count far more than small ones."
+ },
+ {
+  "id": "53e05843b3",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "p",
+  "text": "<b>Then divide by N − k,</b> the number of points minus the number of values tuned to fit this galaxy. The result, χ<sup>2</sup><sub>r</sub>, is roughly the squared miss per point. About 1 means the curve misses by about one error bar: as close as the measurements allow."
+ },
+ {
+  "id": "cedefeca3a",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "p",
+  "text": "<b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND, and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = __K_NFW_FIT__ for the halo and __K_MOND_FIT__ for MOND."
+ },
+ {
+  "id": "794b170765",
+  "kind": "html",
+  "page": "method",
+  "section": "Score the fit",
+  "tag": "p",
+  "text": "<b>Close, rough or poor.</b> The fit badge says Close fit below 2, Rough fit from 2 to 10 and Poor fit above 10. These cut-offs are this site’s own rule of thumb, not a published standard."
+ },
+ {
+  "id": "071c7ba0ce",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "h4",
+  "text": "Best realistic fits"
+ },
+ {
+  "id": "908f2216f7",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "p",
+  "text": "Some inputs are uncertain for every galaxy. With the switch on, each model may adjust them for its lowest χ², within the same limits, each twice the published uncertainty:"
+ },
+ {
+  "id": "2cc6dd0be2",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "th",
+  "text": "Disk mass-to-light"
+ },
+ {
+  "id": "1ba3d28e31",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "td",
+  "text": "__ML_DISK_RANGE__"
+ },
+ {
+  "id": "8cff710311",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "th",
+  "text": "Bulge mass-to-light"
+ },
+ {
+  "id": "b4c5d21b34",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "td",
+  "text": "__ML_BULGE_RANGE__"
+ },
+ {
+  "id": "2578f912bf",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "th",
+  "text": "Distance and tilt"
+ },
+ {
+  "id": "930df5f222",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "td",
+  "text": "SPARC’s value ± 2 errors"
+ },
+ {
+  "id": "69ba93687c",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "th",
+  "text": "MOND’s a<sub>0</sub>"
+ },
+ {
+  "id": "e275250554",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "td",
+  "text": "__A0_MIN__ to __A0_MAX__ ×10⁻¹⁰ m/s²"
+ },
+ {
+  "id": "6ebacc692f",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "th",
+  "text": "Halo concentration"
+ },
+ {
+  "id": "b242e5b861",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "td",
+  "text": "__C_RANGE__ × typical for its mass"
+ },
+ {
+  "id": "d3e35d2107",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "summary",
+  "text": "Where the limits come from"
+ },
+ {
+  "id": "345150dd3f",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "p",
+  "text": "<b>Mass-to-light:</b> 0.1 dex of scatter around SPARC’s standard values (McGaugh &amp; Schombert 2014; Li et al. 2018). <b>Distance and tilt:</b> SPARC’s own errors. <b>Concentration:</b> the scatter of simulated halos (Dutton &amp; Macciò 2014)."
+ },
+ {
+  "id": "7cb655467d",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "p",
+  "text": "<b>a<sub>0</sub>:</b> measured as 1.20 ± 0.02 (McGaugh, Lelli &amp; Schombert 2016). They also quote a wider ±0.24, but that comes from the stars’ mass-to-light ratio, which the fits already vary, so using it would count the same uncertainty twice."
+ },
+ {
+  "id": "bb7226c7de",
+  "kind": "html",
+  "page": "method",
+  "section": "Best realistic fits",
+  "tag": "p",
+  "text": "<b>Distance</b> matters because a galaxy twice as far away as thought must be twice as wide and four times as bright to look the same, so every radius and every visible-matter V² changes with it."
+ },
+ {
+  "id": "8ae4e45f8b",
+  "kind": "html",
+  "page": "method",
+  "section": "Watch stars move under that gravity",
+  "tag": "h3",
+  "text": "Watch stars move under that gravity"
+ },
+ {
+  "id": "c1f552e4a7",
+  "kind": "html",
+  "page": "method",
+  "section": "Watch stars move under that gravity",
+  "tag": "p",
+  "text": "The 3D view moves test stars under the model’s gravity for a billion years."
+ },
+ {
+  "id": "8f6cea4528",
+  "kind": "html",
+  "page": "method",
+  "section": "Watch stars move under that gravity",
+  "tag": "p",
+  "text": "<b>Test stars</b> feel the model’s gravity but do not pull on each other. There are 800 for NGC 3198, scaled with visible mass (200 to 2400): a display choice, since a real galaxy has billions."
+ },
+ {
+  "id": "4969112d77",
+  "kind": "html",
+  "page": "method",
+  "section": "Watch stars move under that gravity",
+  "tag": "p",
+  "text": "<b>They start in balance.</b> Disk stars start on circular orbits at the measured speeds; bulge stars get random motions (a velocity dispersion) that hold the bulge up, much as pressure holds up a gas. With too little pull they drift outwards, and past 1.5 × the visible edge they count as ejected."
+ },
+ {
+  "id": "fde1759a4d",
+  "kind": "html",
+  "page": "method",
+  "section": "Watch stars move under that gravity",
+  "tag": "p",
+  "text": "<b>The pull on each star</b> gives it an acceleration a = V<sub>model</sub>(r)²/r towards the centre."
+ },
+ {
+  "id": "480421d1fc",
+  "kind": "html",
+  "page": "method",
+  "section": "One small step at a time",
+  "tag": "h4",
+  "text": "One small step at a time"
+ },
+ {
+  "id": "13a24139f0",
+  "kind": "html",
+  "page": "method",
+  "section": "One small step at a time",
+  "tag": "p",
+  "text": "An orbit cannot be solved in one go, so the computer moves each star in small steps of Δt = 0.5 Myr, 2000 times over 1 Gyr (the velocity-Verlet method). First the position, as in SUVAT’s s = ut + ½at²:"
+ },
+ {
+  "id": "75452bf87a",
+  "kind": "html",
+  "page": "method",
+  "section": "One small step at a time",
+  "tag": "p",
+  "text": "Then it finds the acceleration at the new position, a<sub>new</sub>, and updates the velocity with the average of the old and new accelerations:"
+ },
+ {
+  "id": "8060ecb278",
+  "kind": "html",
+  "page": "method",
+  "section": "One small step at a time",
+  "tag": "summary",
+  "text": "Why this method?"
+ },
+ {
+  "id": "5fb878deea",
+  "kind": "html",
+  "page": "method",
+  "section": "One small step at a time",
+  "tag": "p",
+  "text": "Using only the old acceleration (Euler’s method) makes each step slightly wrong in a way that builds up, so the orbit’s energy drifts and stars slowly spiral in or out. Velocity-Verlet is symplectic: its energy error stays small and bounded instead of growing, so a star that leaves does so because of the physics, not the size of the step."
+ },
+ {
+  "id": "2d9ac57fbd",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "h3",
+  "text": "What this model leaves out"
+ },
+ {
+  "id": "14d7f5a300",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "p",
+  "text": "The simplifications that matter most, so you can judge the results yourself."
+ },
+ {
+  "id": "afc693a1ee",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>A round pull</b>The 3D view treats the galaxy’s mass as a ball, though the disk is flat. The rotation curve uses SPARC’s own disk calculations and is unaffected; the stars’ bobbing is approximate."
+ },
+ {
+  "id": "7b003a4aa1",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>A softened centre</b>Near the centre the pull is smoothed over 0.5 to 1 kpc and is exactly Newtonian beyond 2.8 softening lengths (the GADGET-2 spline; Springel 2005), so close passes don’t fling stars out."
+ },
+ {
+  "id": "a0126a1be5",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>A smooth, round halo</b>The halo is perfectly smooth and stops at r<sub>200</sub>. In many small, faint galaxies, the speeds near the centre suggest a flatter middle than NFW’s (the cusp–core problem; de Blok 2010)."
+ },
+ {
+  "id": "87ede4014b",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>Estimated star masses</b>Mass-to-light ratios are averages, not measured per galaxy. Best realistic fits vary them within limits."
+ },
+ {
+  "id": "568acdd31b",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>Hard limits</b>Best fits stop sharply at each range’s edge. With softer limits, Li et al. (2018) found acceptable MOND fits for most SPARC galaxies."
+ },
+ {
+  "id": "7e00bfc63a",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>Four galaxies</b>SPARC has 175. Four show the method; they cannot decide between the ideas."
+ },
+ {
+  "id": "96ec76a0a0",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>Drawn, not calculated</b>The glow, star spikes, purple halo cloud and MOND’s gold shading are visual aids. They change no numbers."
+ },
+ {
+  "id": "c9c94856d0",
+  "kind": "html",
+  "page": "method",
+  "section": "What this model leaves out",
+  "tag": "li",
+  "text": "<b>Spiral arms are drawn on</b>The test stars don’t pull on each other, so they can’t form arms. The drawn arms follow density-wave theory (Lin &amp; Shu 1964): a slower pattern the stars pass through, lit mostly by young stars and absent in gas-poor disks. Their shape and speed are a visual choice."
+ },
+ {
+  "id": "13dac2647e",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "h3",
+  "text": "Sources"
+ },
+ {
+  "id": "607141e242",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "p",
+  "text": "Every source cited on this site, in Harvard style. Links open in a new tab."
+ },
+ {
+  "id": "e8f083d83c",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href=\"https://doi.org/10.1103/RevModPhys.90.045002\" target=\"_blank\" rel=\"noopener\">doi:10.1103/RevModPhys.90.045002</a>"
+ },
+ {
+  "id": "7b6638295a",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href=\"https://doi.org/10.1086/508162\" target=\"_blank\" rel=\"noopener\">doi:10.1086/508162</a>"
+ },
+ {
+  "id": "963831e3b9",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "de Blok, W.J.G. (2010) ‘The core-cusp problem’, <i>Advances in Astronomy</i>, 2010, 789293. <a href=\"https://doi.org/10.1155/2010/789293\" target=\"_blank\" rel=\"noopener\">doi:10.1155/2010/789293</a>"
+ },
+ {
+  "id": "abe2ab0bd1",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "de Blok, W.J.G. and McGaugh, S.S. (1996) ‘Does low surface brightness mean low density?’, <i>The Astrophysical Journal</i>, 469(2), pp. L89–L92. <a href=\"https://doi.org/10.1086/310266\" target=\"_blank\" rel=\"noopener\">doi:10.1086/310266</a>"
+ },
+ {
+  "id": "9207888893",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Dutton, A.A. and Macciò, A.V. (2014) ‘Cold dark matter haloes in the Planck era: evolution of structural parameters for Einasto and NFW profiles’, <i>Monthly Notices of the Royal Astronomical Society</i>, 441(4), pp. 3359–3374. <a href=\"https://doi.org/10.1093/mnras/stu742\" target=\"_blank\" rel=\"noopener\">doi:10.1093/mnras/stu742</a>"
+ },
+ {
+  "id": "58a9e23e8f",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Famaey, B. and McGaugh, S.S. (2012) ‘Modified Newtonian Dynamics (MOND): observational phenomenology and relativistic extensions’, <i>Living Reviews in Relativity</i>, 15, 10. <a href=\"https://doi.org/10.12942/lrr-2012-10\" target=\"_blank\" rel=\"noopener\">doi:10.12942/lrr-2012-10</a>"
+ },
+ {
+  "id": "a2776454ae",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Freeman, K.C. (1970) ‘On the disks of spiral and S0 galaxies’, <i>The Astrophysical Journal</i>, 160, p. 811. <a href=\"https://doi.org/10.1086/150474\" target=\"_blank\" rel=\"noopener\">doi:10.1086/150474</a>"
+ },
+ {
+  "id": "42f2e0c94d",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Graham, A.W. and Worley, C.C. (2008) ‘Inclination- and dust-corrected galaxy parameters: bulge-to-disc ratios and size–luminosity relations’, <i>Monthly Notices of the Royal Astronomical Society</i>, 388(4), pp. 1708–1728. <a href=\"https://doi.org/10.1111/j.1365-2966.2008.13506.x\" target=\"_blank\" rel=\"noopener\">doi:10.1111/j.1365-2966.2008.13506.x</a>"
+ },
+ {
+  "id": "f65150de59",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Hubble, E.P. (1926) ‘Extragalactic nebulae’, <i>The Astrophysical Journal</i>, 64, p. 321. <a href=\"https://doi.org/10.1086/143018\" target=\"_blank\" rel=\"noopener\">doi:10.1086/143018</a>"
+ },
+ {
+  "id": "59036e68ec",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Lelli, F., McGaugh, S.S. and Schombert, J.M. (2016) ‘SPARC: mass models for 175 disk galaxies with Spitzer photometry and accurate rotation curves’, <i>The Astronomical Journal</i>, 152(6), 157. <a href=\"https://doi.org/10.3847/0004-6256/152/6/157\" target=\"_blank\" rel=\"noopener\">doi:10.3847/0004-6256/152/6/157</a>"
+ },
+ {
+  "id": "68ab1c4a16",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Li, P., Lelli, F., McGaugh, S. and Schombert, J. (2018) ‘Fitting the radial acceleration relation to individual SPARC galaxies’, <i>Astronomy &amp; Astrophysics</i>, 615, A3. <a href=\"https://doi.org/10.1051/0004-6361/201732547\" target=\"_blank\" rel=\"noopener\">doi:10.1051/0004-6361/201732547</a>"
+ },
+ {
+  "id": "60063c062f",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "LZ Collaboration (Akerib, D.S. et al.) (2026) ‘Search for dark matter particle interactions in an extended nuclear recoil energy window with the LUX-ZEPLIN (LZ) experiment’. Preprint, not yet peer reviewed. <a href=\"https://arxiv.org/abs/2609.02823\" target=\"_blank\" rel=\"noopener\">arXiv:2609.02823</a>"
+ },
+ {
+  "id": "a6bc7dd367",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Lin, C.C. and Shu, F.H. (1964) ‘On the spiral structure of disk galaxies’, <i>The Astrophysical Journal</i>, 140, p. 646. <a href=\"https://doi.org/10.1086/147955\" target=\"_blank\" rel=\"noopener\">doi:10.1086/147955</a>"
+ },
+ {
+  "id": "c17b413371",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "McGaugh, S.S., Lelli, F. and Schombert, J.M. (2016) ‘Radial acceleration relation in rotationally supported galaxies’, <i>Physical Review Letters</i>, 117(20), 201101. <a href=\"https://doi.org/10.1103/PhysRevLett.117.201101\" target=\"_blank\" rel=\"noopener\">doi:10.1103/PhysRevLett.117.201101</a>"
+ },
+ {
+  "id": "0cc1dd62db",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "McGaugh, S.S. and Schombert, J.M. (2014) ‘Color–mass-to-light-ratio relations for disk galaxies’, <i>The Astronomical Journal</i>, 148(5), 77. <a href=\"https://doi.org/10.1088/0004-6256/148/5/77\" target=\"_blank\" rel=\"noopener\">doi:10.1088/0004-6256/148/5/77</a>"
+ },
+ {
+  "id": "2d64baa029",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Milgrom, M. (1983) ‘A modification of the Newtonian dynamics as a possible alternative to the hidden mass hypothesis’, <i>The Astrophysical Journal</i>, 270, p. 365. <a href=\"https://doi.org/10.1086/161130\" target=\"_blank\" rel=\"noopener\">doi:10.1086/161130</a>"
+ },
+ {
+  "id": "62b48c0d05",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Moster, B.P., Naab, T. and White, S.D.M. (2013) ‘Galactic star formation and accretion histories from matching galaxies to dark matter haloes’, <i>Monthly Notices of the Royal Astronomical Society</i>, 428(4), pp. 3121–3138. <a href=\"https://doi.org/10.1093/mnras/sts261\" target=\"_blank\" rel=\"noopener\">doi:10.1093/mnras/sts261</a>"
+ },
+ {
+  "id": "53fab743af",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Navarro, J.F., Frenk, C.S. and White, S.D.M. (1996) ‘The structure of cold dark matter halos’, <i>The Astrophysical Journal</i>, 462, p. 563. <a href=\"https://doi.org/10.1086/177173\" target=\"_blank\" rel=\"noopener\">doi:10.1086/177173</a>"
+ },
+ {
+  "id": "a10fd9d1d5",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Planck Collaboration (2020) ‘Planck 2018 results. VI. Cosmological parameters’, <i>Astronomy &amp; Astrophysics</i>, 641, A6. <a href=\"https://doi.org/10.1051/0004-6361/201833910\" target=\"_blank\" rel=\"noopener\">doi:10.1051/0004-6361/201833910</a>"
+ },
+ {
+  "id": "7ba5775ab4",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Rubin, V.C., Ford, W.K. and Thonnard, N. (1980) ‘Rotational properties of 21 Sc galaxies with a large range of luminosities and radii, from NGC 4605 (R = 4 kpc) to UGC 2885 (R = 122 kpc)’, <i>The Astrophysical Journal</i>, 238, p. 471. <a href=\"https://doi.org/10.1086/158003\" target=\"_blank\" rel=\"noopener\">doi:10.1086/158003</a>"
+ },
+ {
+  "id": "9a9c1a1df5",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Springel, V. (2005) ‘The cosmological simulation code GADGET-2’, <i>Monthly Notices of the Royal Astronomical Society</i>, 364(4), pp. 1105–1134. <a href=\"https://doi.org/10.1111/j.1365-2966.2005.09655.x\" target=\"_blank\" rel=\"noopener\">doi:10.1111/j.1365-2966.2005.09655.x</a>"
+ },
+ {
+  "id": "e7c5d1c17f",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Williams, D.R. (2024) <i>Planetary fact sheet</i>. NASA Goddard Space Flight Center. <a href=\"https://nssdc.gsfc.nasa.gov/planetary/factsheet/\" target=\"_blank\" rel=\"noopener\">nssdc.gsfc.nasa.gov/planetary/factsheet</a>"
+ },
+ {
+  "id": "846504b05e",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "li",
+  "text": "Zwicky, F. (1933) ‘Die Rotverschiebung von extragalaktischen Nebeln’, <i>Helvetica Physica Acta</i>, 6, pp. 110–127. English translation (2009): ‘The redshift of extragalactic nebulae’, <i>General Relativity and Gravitation</i>, 41(1), pp. 207–224. <a href=\"https://doi.org/10.1007/s10714-008-0707-4\" target=\"_blank\" rel=\"noopener\">doi:10.1007/s10714-008-0707-4</a>"
+ },
+ {
+  "id": "4bed951649",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "p",
+  "text": "<b>Check the numbers yourself</b>Download the model on screen as two CSV files: the rotation curve and the stars’ time series."
+ },
+ {
+  "id": "e37032316f",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "button",
+  "text": "Export raw data (CSV)"
+ },
+ {
+  "id": "91369dff99",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "tag": "nav",
+  "text": "<a class=\"next-link\" href=\"#puzzle\">Back to the homepage <span class=\"next-arrow up\" aria-hidden=\"true\">↑</span></a>"
+ },
+ {
+  "id": "bdfca46478",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Sources",
+  "tag": "div",
+  "text": "Explore <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span>"
+ },
+ {
+  "id": "4948c1a719",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Welcome to the simulator",
+  "tag": "h2",
+  "text": "Welcome to the simulator"
+ },
+ {
+  "id": "f93bc3e1a6",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Welcome to the simulator",
+  "tag": "p",
+  "text": "A short hands-on tour: find the missing mass in a real galaxy’s rotation curve, then test dark matter and modified gravity against it. Skip it any time."
+ },
+ {
+  "id": "6c78f5051f",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Welcome to the simulator",
+  "tag": "button",
+  "text": "Start simulator tutorial"
+ },
+ {
+  "id": "52fe52296f",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Welcome to the simulator",
+  "tag": "button",
+  "text": "I've been here before"
+ },
+ {
+  "id": "30fdf1ec2c",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "h2",
+  "text": "Tutorial complete!"
+ },
+ {
+  "id": "0162d66357",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "p",
+  "text": "Now it’s yours: try other galaxies, switch between dark matter and MOND, or build your own."
+ },
+ {
+  "id": "5a75869035",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Start exploring"
+ },
+ {
+  "id": "9c8a4c41d2",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Skip tutorial"
+ },
+ {
+  "id": "5b7cc24e73",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Next slide"
+ },
+ {
+  "id": "2618e1f74e",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "div",
+  "text": "<span class=\"tutorial-keys\">← → to navigate</span>"
+ },
+ {
+  "id": "3fb3168fa5",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Back"
+ },
+ {
+  "id": "73a1439274",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Sandbox tutorial"
+ },
+ {
+  "id": "dd504bf51c",
+  "kind": "html",
+  "page": "shared (menus, tour card, pop-ups)",
+  "section": "Tutorial complete!",
+  "tag": "button",
+  "text": "Next"
+ },
+ {
+  "id": "d6ca8f7949",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: KEY",
+  "tag": "script",
+  "text": "(prefers-reduced-motion: reduce)"
+ },
+ {
+  "id": "1da35a5f1b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "Three.js (3D view)"
+ },
+ {
+  "id": "e6bb7b0d95",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "could not load ${missing.join(' and ')}"
+ },
+ {
+  "id": "775194281a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "WebGL is turned off in this browser"
+ },
+ {
+  "id": "89926948f8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "<b>The interactive simulator could not start:</b> ${window.SIM_UNAVAILABLE}. "
+ },
+ {
+  "id": "0b85ee8280",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "These load from the internet, so a school or work network may be blocking them. Try another network, or reload."
+ },
+ {
+  "id": "bdadcff0a0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "Try another browser, or turn on hardware acceleration in this one."
+ },
+ {
+  "id": "cdd4d15136",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": " The explanations below still work."
+ },
+ {
+  "id": "8b262c2963",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: ",
+  "tag": "script",
+  "text": "Simulator not started: "
+ },
+ {
+  "id": "1de021b288",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateHaloVisual",
+  "tag": "script",
+  "text": "Set the halo mass above zero to see its size and shape."
+ },
+ {
+  "id": "f47799c3bf",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateStarTelemetry",
+  "tag": "script",
+  "text": "Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected"
+ },
+ {
+  "id": "326f4d1859",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncQualitySetting",
+  "tag": "script",
+  "text": "Your choice, remembered on this device."
+ },
+ {
+  "id": "1e1c5dd7de",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncQualitySetting",
+  "tag": "script",
+  "text": "Automatic: high quality on this device."
+ },
+ {
+  "id": "28c0e2eaff",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncQualitySetting",
+  "tag": "script",
+  "text": "Automatic: lowered to keep the 3D view smooth."
+ },
+ {
+  "id": "6bd0ed8a39",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitLabel",
+  "tag": "script",
+  "text": "Visible matter only"
+ },
+ {
+  "id": "b393d6f01a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitLabel",
+  "tag": "script",
+  "text": "MOND best fit"
+ },
+ {
+  "id": "222ff5fccf",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitLabel",
+  "tag": "script",
+  "text": "NFW best fit"
+ },
+ {
+  "id": "5c6561fe81",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitLabel",
+  "tag": "script",
+  "text": "NFW halo fit"
+ },
+ {
+  "id": "68adeffba0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitLabel",
+  "tag": "script",
+  "text": "Your halo + fit’s M/L, distance, tilt"
+ },
+ {
+  "id": "8b9f766ba3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateChi",
+  "tag": "script",
+  "text": "${fitLabel(model)} · ${k} tuned · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off"
+ },
+ {
+  "id": "4464d4f6f3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateChi",
+  "tag": "script",
+  "text": "χ² = ${chi.toFixed(0)} over ${obsV.length} measured speeds, ${k} values tuned. Lower is better; about 1 is as close as the measurements allow."
+ },
+ {
+  "id": "1c84c81b0e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: AXIS",
+  "tag": "script",
+  "text": "JetBrains Mono,ui-monospace,Consolas,monospace"
+ },
+ {
+  "id": "10d075b102",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: CURVE_GHOST_HOLD_MS",
+  "tag": "script",
+  "text": "Dark matter halo"
+ },
+ {
+  "id": "c0fcc74b90",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: LEGEND_NAMES",
+  "tag": "script",
+  "text": "Visible matter (baryons)"
+ },
+ {
+  "id": "dbd15b3c2b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: LEGEND_NAMES",
+  "tag": "script",
+  "text": "Dark matter halo (none)"
+ },
+ {
+  "id": "47ca61da9a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: LEGEND_NAMES",
+  "tag": "script",
+  "text": "Inter,Segoe UI,system-ui,sans-serif"
+ },
+ {
+  "id": "4db2554f37",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: LEGEND_NAMES",
+  "tag": "script",
+  "text": "Orbital speed, V (km/s)"
+ },
+ {
+  "id": "5b5aae6239",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: mondZoneLayout",
+  "tag": "script",
+  "text": "Deeper gold = bigger MOND boost"
+ },
+ {
+  "id": "261c005464",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Dark matter dominated"
+ },
+ {
+  "id": "1870a251aa",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Gas-rich: lots of fuel for new stars"
+ },
+ {
+  "id": "09fe0679f4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Gas-poor: few new stars"
+ },
+ {
+  "id": "0cd8736f86",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Faint, spread-out disk"
+ },
+ {
+  "id": "7b72d19e6b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Every dial turned up. This is heavier than almost any spiral known: a bright, gas-stuffed giant that needs a huge halo to keep its outer stars from flying off."
+ },
+ {
+  "id": "7d2a6ce0f4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Closest real cousin: UGC 2885 (“Rubin’s galaxy”), one of the largest spirals known."
+ },
+ {
+  "id": "28e45af153",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Gas-rich dwarf irregular"
+ },
+ {
+  "id": "d915b512f3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A small, scruffy galaxy with more gas than stars. Its gravity is so weak that dark matter (or MOND) does almost all the work, which makes dwarfs some of the best tests in this project."
+ },
+ {
+  "id": "44cb83a3b8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: DDO 154, where the gas outweighs the stars."
+ },
+ {
+  "id": "45f5c3a020",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A lightweight with only a few billion suns of stars. Dwarfs are the most common galaxies in the Universe, but they are faint, and their slow-spinning stars are mostly held in by dark matter."
+ },
+ {
+  "id": "73611795e9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: the Large Magellanic Cloud, a dwarf orbiting the Milky Way."
+ },
+ {
+  "id": "629c772898",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Low surface brightness galaxy"
+ },
+ {
+  "id": "1477c9d2a9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A ghostly disk: its stars are spread so thinly that it barely shows up against the night sky. These galaxies are packed with dark matter compared with their stars."
+ },
+ {
+  "id": "1ae9244193",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real examples: UGC 128, and the giant Malin 1."
+ },
+ {
+  "id": "425aae9a61",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A big, bright bulge with a smooth disk and almost no gas left. With no fuel, it has stopped making new stars: halfway between a spiral and an elliptical."
+ },
+ {
+  "id": "a17d45375a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: NGC 5866, the Spindle Galaxy."
+ },
+ {
+  "id": "a8d23ec45a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Bulge-heavy spiral (Sa)"
+ },
+ {
+  "id": "59d0e575eb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "The central bulge outshines the disk, so the spiral arms are tightly wound and faint. Push the bulge any further and it starts to look like an elliptical."
+ },
+ {
+  "id": "5ebf0bea67",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: M104, the Sombrero Galaxy."
+ },
+ {
+  "id": "aebbb82267",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Spiral with a bright bulge (Sb)"
+ },
+ {
+  "id": "67e5f940c4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A classic grand spiral: a glowing central bulge wrapped in a disk of stars and gas. The bulge makes the inner stars orbit fast, so the curve rises steeply."
+ },
+ {
+  "id": "21c641a7e9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: Andromeda (M31), our nearest big neighbour."
+ },
+ {
+  "id": "f9a2d6b91d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Late-type spiral (Sbc–Sc)"
+ },
+ {
+  "id": "f879e44c01",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Mostly disk with a small bulge at its heart and open, loose spiral arms. Plenty of gas keeps new stars forming."
+ },
+ {
+  "id": "b274d6c72d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real example: the Milky Way, our home galaxy."
+ },
+ {
+  "id": "2e67137829",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Bulgeless disk galaxy (Sc–Sd)"
+ },
+ {
+  "id": "22553b6417",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "A flat, pure disk with no central bulge. Its rotation curve stays flat far beyond the stars, one of the clearest signs that something unseen is there."
+ },
+ {
+  "id": "0a30061b1b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: classifyGalaxy",
+  "tag": "script",
+  "text": "Real examples: NGC 3198 (this project’s main galaxy) and M33."
+ },
+ {
+  "id": "95efbd8ea2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateSandbox",
+  "tag": "script",
+  "text": "No bulge: this is a pure disk galaxy."
+ },
+ {
+  "id": "ce71d015c3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: UNSTABLE_BADGE",
+  "tag": "script",
+  "text": "⚠️ Unusual halo shape"
+ },
+ {
+  "id": "dbdc0d4cb4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "No halo to assess"
+ },
+ {
+  "id": "047333f1f0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "MOND has no dark matter halo, so there is no concentration to check. Choose Dark matter halo to see it."
+ },
+ {
+  "id": "b9edbf28a7",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "No halo to assess"
+ },
+ {
+  "id": "e4430d2169",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "With the halo mass at zero there is no halo to check. Raise it to see its concentration."
+ },
+ {
+  "id": "be78260775",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "c is below ${STABLE_C_MIN}: this halo is far more spread out than typical NFW halos, whose concentrations mostly lie between ${range} (a rough guide, not a strict limit). You can still run the simulation to see how the galaxy behaves."
+ },
+ {
+  "id": "8e122d35f6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "c is above ${STABLE_C_MAX}: this halo packs its mass into an extremely dense centre, beyond typical NFW halos, whose concentrations mostly lie between ${range} (a rough guide, not a strict limit). You can still run the simulation to see how the galaxy behaves."
+ },
+ {
+  "id": "487480c3bb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "✓ Typical halo shape"
+ },
+ {
+  "id": "1e0b1b01a2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: stabilityReport",
+  "tag": "script",
+  "text": "c is inside the ${STABLE_C_MIN}–${STABLE_C_MAX} range typical of NFW halos. The monitor follows the halo mass and scale radius sliders."
+ },
+ {
+  "id": "10fa17e388",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateHalo",
+  "tag": "script",
+  "text": "Goodness of fit of the MOND prediction to the SPARC points"
+ },
+ {
+  "id": "031cd8dcf4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateHalo",
+  "tag": "script",
+  "text": "Goodness of fit of visible matter + NFW halo to the SPARC points"
+ },
+ {
+  "id": "c42b2708cc",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateHalo",
+  "tag": "script",
+  "text": ", using the best fit's distance (${fit.distance_mpc.toFixed(1)} Mpc) and tilt (${fit.inclination_deg.toFixed(0)}°)"
+ },
+ {
+  "id": "6a44caa3cf",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateHalo",
+  "tag": "script",
+  "text": "Dark matter halo"
+ },
+ {
+  "id": "648e9d1fa2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyBaryonState",
+  "tag": "script",
+  "text": "MOND best fit"
+ },
+ {
+  "id": "8a06be2260",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyBaryonState",
+  "tag": "script",
+  "text": "NFW best fit"
+ },
+ {
+  "id": "900405264c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyBaryonState",
+  "tag": "script",
+  "text": "standard SPARC values"
+ },
+ {
+  "id": "046bd403c5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyBaryonState",
+  "tag": "script",
+  "text": "Stellar mass-to-light ratios in use (${mlSource}). Best realistic fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply."
+ },
+ {
+  "id": "3d1df933c8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyBaryonState",
+  "tag": "script",
+  "text": "standard SPARC value"
+ },
+ {
+  "id": "74cdecb13c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "No spiral arms"
+ },
+ {
+  "id": "a7f246a7d7",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Tightly wound arms"
+ },
+ {
+  "id": "dffc36cdb0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Fairly tight arms"
+ },
+ {
+  "id": "0050a05a41",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Fairly open arms"
+ },
+ {
+  "id": "10aa53c8ba",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Very loose arms"
+ },
+ {
+  "id": "ceb26e0ecd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Loose, patchy arms"
+ },
+ {
+  "id": "be74b588dc",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Late-type spiral"
+ },
+ {
+  "id": "649a02d6fa",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Faint, patchy arms"
+ },
+ {
+  "id": "47138569ce",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Barely-there arms"
+ },
+ {
+  "id": "266649cd09",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "No clear shape"
+ },
+ {
+  "id": "f8740662dd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Blue compact dwarf"
+ },
+ {
+  "id": "a548c2be95",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: HUBBLE_TYPES",
+  "tag": "script",
+  "text": "Small, bright and forming stars"
+ },
+ {
+  "id": "98252785a0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: pickGalaxy",
+  "tag": "script",
+  "text": "New galaxy loaded: its own data, visible matter and starting halo. Its profile is under the menu."
+ },
+ {
+  "id": "d8f255e5cf",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: renderGalaxyProfile",
+  "tag": "script",
+  "text": "${Math.round(c.distance_mpc*LIGHT_YEARS_PER_MPC/1e6)} million light-years"
+ },
+ {
+  "id": "084ca44048",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: renderGalaxyProfile",
+  "tag": "script",
+  "text": "Stars ${Math.round(100*stars/(stars+gas))}% and gas ${Math.round(100*gas/(stars+gas))}% of the visible mass"
+ },
+ {
+  "id": "37c677064b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyGalaxyLabels",
+  "tag": "script",
+  "text": "Interactive three-dimensional ${galaxyMode==='custom'?'custom galaxy':galaxy.name} star trajectories"
+ },
+ {
+  "id": "5f83f565d5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyGalaxyLabels",
+  "tag": "script",
+  "text": "Custom galaxy baryonic, halo and model rotation curves"
+ },
+ {
+  "id": "fc8c215bec",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyGalaxyLabels",
+  "tag": "script",
+  "text": "${galaxy.name} observed, baryonic, and fitted rotation curves"
+ },
+ {
+  "id": "3b9e6166e5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyGalaxyLabels",
+  "tag": "script",
+  "text": "Return to the default ${galaxyMode==='custom'?'custom galaxy':galaxy.name} view"
+ },
+ {
+  "id": "4390b0f720",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "Dark matter around your galaxy: 0 to 5 × the typical halo for these stars (Moster et al. 2013)."
+ },
+ {
+  "id": "a72384adff",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "How much dark matter surrounds the galaxy. More mass, faster orbits: the orange curve rises."
+ },
+ {
+  "id": "e4a2d9b603",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "How spread out the halo is. Starts at the typical value for this mass (Dutton & Macciò 2014)."
+ },
+ {
+  "id": "ad4ebfc366",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "How spread out the halo is. Small packs it near the centre and speeds up the inner stars."
+ },
+ {
+  "id": "89ef955205",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "Fit halo to data"
+ },
+ {
+  "id": "dbfa786215",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: applyModeLabels",
+  "tag": "script",
+  "text": "Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)"
+ },
+ {
+  "id": "d509972f7f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: fitSettingsHtml",
+  "tag": "script",
+  "text": "M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)"
+ },
+ {
+  "id": "0d4320d020",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SCORE_COLUMNS",
+  "tag": "script",
+  "text": "Visible matter only"
+ },
+ {
+  "id": "3a19a5298c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SCORE_COLUMNS",
+  "tag": "script",
+  "text": "Dark matter halo (NFW), standard values"
+ },
+ {
+  "id": "98308350fa",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SCORE_COLUMNS",
+  "tag": "script",
+  "text": "MOND, standard values"
+ },
+ {
+  "id": "9932821321",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SCORE_COLUMNS",
+  "tag": "script",
+  "text": "NFW, best realistic fit"
+ },
+ {
+  "id": "6eed0fd472",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SCORE_COLUMNS",
+  "tag": "script",
+  "text": "MOND, best realistic fit"
+ },
+ {
+  "id": "b944691e24",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: scoreRowHtml",
+  "tag": "script",
+  "text": "<tr><th scope=\"row\">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type=\"button\" class=\"score-show\" data-galaxy=\"${galaxy.id}\">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>"
+ },
+ {
+  "id": "18be70c400",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: drawPuzzleFigure",
+  "tag": "script",
+  "text": "<text x=\"${(LEFT+W-RIGHT)/2}\" y=\"${H-4}\" text-anchor=\"middle\" fill=\"${axis}\">Distance from the centre (kpc)</text><text x=\"12\" y=\"${(TOP+H-BOTTOM)/2}\" text-anchor=\"middle\" fill=\"${axis}\" transform=\"rotate(-90 12 ${(TOP+H-BOTTOM)/2})\">Orbital speed (km/s)</text>"
+ },
+ {
+  "id": "ff39704555",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: drawPuzzleFigure",
+  "tag": "script",
+  "text": "<text class=\"pf-label pf-l-pred\" x=\"${W-RIGHT}\" y=\"${f(y(vBar[n-1])+17)}\" text-anchor=\"end\" fill=\"${cyan}\">expected from visible matter</text></svg>"
+ },
+ {
+  "id": "b7d0730ecc",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: setCaption",
+  "tag": "script",
+  "text": "Visible matter alone could hold the edge star at only ${Math.round(outer.vb)} km/s. It really moves at ${Math.round(outer.vo)} km/s."
+ },
+ {
+  "id": "38721e7330",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: setCaption",
+  "tag": "script",
+  "text": "${galaxy.name} seen face-on. ${caption.textContent}"
+ },
+ {
+  "id": "c238b7ffe4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: setCaption",
+  "tag": "script",
+  "text": "1 s = ${HERO_MYR_PER_SECOND} Myr · Speeds: SPARC (Lelli et al. 2016) · Layout and arms illustrative"
+ },
+ {
+  "id": "3a16634186",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncMotionSettings",
+  "tag": "script",
+  "text": "Your choice, remembered on this device."
+ },
+ {
+  "id": "c53ee914b5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncMotionSettings",
+  "tag": "script",
+  "text": "Following your computer: ${reduced?'reduced':'full'} motion."
+ },
+ {
+  "id": "036e3c45d4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: syncMotionSettings",
+  "tag": "script",
+  "text": "Your choice, remembered on this device."
+ },
+ {
+  "id": "50a728b2b6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: STAR_MARKS",
+  "tag": "script",
+  "text": "First to leave · ${Math.round(out)} Myr"
+ },
+ {
+  "id": "eea70d0cc8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: STAR_MARKS",
+  "tag": "script",
+  "text": "Ejected · ${Math.hypot(...starPositionAt(idx,simTime)).toFixed(0)} kpc out"
+ },
+ {
+  "id": "25c654effa",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: EDGE_ON_RAD",
+  "tag": "script",
+  "text": "Star ${idx+1} · ${lapsAt(idx,simTime).toFixed(1)} laps · ${starSpeedAt(idx,simTime).toFixed(0)} km/s · ${where}"
+ },
+ {
+  "id": "017c8c1a3a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: puzzle",
+  "tag": "script",
+  "text": "Move along the right half"
+ },
+ {
+  "id": "b17cf21254",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: puzzle",
+  "tag": "script",
+  "text": "Spot the mass discrepancy"
+ },
+ {
+  "id": "0fad7721bd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: puzzle",
+  "tag": "script",
+  "text": "Spotted: all the way out, the measured speeds stay well above the visible-matter prediction. Press Next to test an explanation."
+ },
+ {
+  "id": "f4eedf991d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: puzzle",
+  "tag": "script",
+  "text": "Each white point is a measured orbital speed, with its error bar. The cyan dashed line is the speed Newtonian gravity predicts from the visible matter alone: the stars and gas."
+ },
+ {
+  "id": "b3ba3203f7",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: puzzle",
+  "tag": "script",
+  "text": "Move your mouse (or slide your finger) slowly across the right half of the graph, from the middle to the far edge, reading the speeds. Do the white points stay above the cyan line?"
+ },
+ {
+  "id": "5fd2322f41",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: removeHalo",
+  "tag": "script",
+  "text": "curvePlot:Watch the orange line"
+ },
+ {
+  "id": "4dba5da39b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: removeHalo",
+  "tag": "script",
+  "text": "Take the dark matter away"
+ },
+ {
+  "id": "1ff731c37f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: removeHalo",
+  "tag": "script",
+  "text": "That gap is the missing mass problem. The orange line is one proposed solution: the visible matter plus a halo of dark matter."
+ },
+ {
+  "id": "dc337bd94a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: removeHalo",
+  "tag": "script",
+  "text": "Drag Halo mass (blue box) all the way to the left, to 0."
+ },
+ {
+  "id": "17183f7df4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: addHalo",
+  "tag": "script",
+  "text": "curvePlot:Watch the orange line"
+ },
+ {
+  "id": "671d9708cb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: addHalo",
+  "tag": "script",
+  "text": "Add the halo back"
+ },
+ {
+  "id": "dfb021f048",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: addHalo",
+  "tag": "script",
+  "text": "Gap closed: with enough dark matter, the model reaches the measured speeds."
+ },
+ {
+  "id": "e4ef708a1f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: addHalo",
+  "tag": "script",
+  "text": "A halo is a vast, roughly spherical cloud of unseen matter surrounding the galaxy. Its extra gravity raises the orbital speeds, most noticeably far out, where the visible matter thins."
+ },
+ {
+  "id": "5fb4fbf746",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: addHalo",
+  "tag": "script",
+  "text": "Drag Halo mass to the right until the orange line climbs up to the white points on the right of the graph."
+ },
+ {
+  "id": "852beabf20",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloShape",
+  "tag": "script",
+  "text": "Drag both ways"
+ },
+ {
+  "id": "8790e93ef9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloShape",
+  "tag": "script",
+  "text": "curvePlot:Watch the left of the orange line"
+ },
+ {
+  "id": "138cbeb494",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloShape",
+  "tag": "script",
+  "text": "Pack the halo in or spread it out"
+ },
+ {
+  "id": "405908d65a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloShape",
+  "tag": "script",
+  "text": "The scale radius, rₛ, sets how centrally concentrated the halo is, while its mass, M₂₀₀, stays fixed. A compact halo pulls hardest near the centre."
+ },
+ {
+  "id": "56da885769",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloShape",
+  "tag": "script",
+  "text": "1. Drag Scale radius left: the inner (left) part of the orange line rises. 2. Drag it right: that part falls."
+ },
+ {
+  "id": "1cf03b231a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloNumbers",
+  "tag": "script",
+  "text": "Read the halo’s numbers"
+ },
+ {
+  "id": "b0320f0327",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloNumbers",
+  "tag": "script",
+  "text": "All three read: each value updates as you move the halo sliders."
+ },
+ {
+  "id": "771f3b7ff2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloNumbers",
+  "tag": "script",
+  "text": "These cards describe your halo. r₂₀₀ is its conventional outer edge, and the concentration, c = r₂₀₀ ÷ rₛ, measures how centrally packed it is."
+ },
+ {
+  "id": "e234c20828",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: haloNumbers",
+  "tag": "script",
+  "text": "1. Hover over (or tap) Halo radius. 2. Then Scale radius. 3. Then Concentration."
+ },
+ {
+  "id": "84038d332e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fit",
+  "tag": "script",
+  "text": "chiBadge:χ² (lower is better)"
+ },
+ {
+  "id": "8d7ebc4ffa",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fit",
+  "tag": "script",
+  "text": "Score your fit"
+ },
+ {
+  "id": "5a3ba8bc62",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fit",
+  "tag": "script",
+  "text": "Fitted by hand: your halo now reproduces the measured speeds closely."
+ },
+ {
+  "id": "b17c187f92",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fit",
+  "tag": "script",
+  "text": "χ² (yellow box) scores the fit: it adds up the squared gaps between the orange line and the white points, each measured in error bars. The badge shows χ²ᵣ, roughly that total per point. Lower is better."
+ },
+ {
+  "id": "4b815696c2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fit",
+  "tag": "script",
+  "text": "1. Drag Halo mass until the yellow box no longer reads Close fit. 2. Drag Scale radius and watch χ² respond. 3. Fine-tune both until it reads Close fit again."
+ },
+ {
+  "id": "b2846e26d3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mond",
+  "tag": "script",
+  "text": "Test a rival idea"
+ },
+ {
+  "id": "3d46d32c70",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mond",
+  "tag": "script",
+  "text": "MOND (Modified Newtonian Dynamics) removes the dark matter and changes the law of gravity instead. Its boost is small where gravity is strong and grows as gravity weakens; deeper gold on the graph means a bigger boost."
+ },
+ {
+  "id": "3bd2714e45",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mond",
+  "tag": "script",
+  "text": "Click the MOND card (blue box), then compare χ² in the yellow box with the halo’s."
+ },
+ {
+  "id": "b365c16858",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mondZone3d",
+  "tag": "script",
+  "text": "See where MOND acts"
+ },
+ {
+  "id": "284efddada",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mondZone3d",
+  "tag": "script",
+  "text": "Faint gold means a small boost; deep gold means MOND supplies most of the pull there."
+ },
+ {
+  "id": "f8980d79c1",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mondZone3d",
+  "tag": "script",
+  "text": "The graph’s gold, laid on the galaxy itself: faint near the centre, where gravity is strong and MOND changes little, and deeper further out, always in proportion to the boost."
+ },
+ {
+  "id": "0061655795",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: mondZone3d",
+  "tag": "script",
+  "text": "Switch on Where MOND acts in the View panel."
+ },
+ {
+  "id": "6b4b78ac6b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: bestFit",
+  "tag": "script",
+  "text": "Give both their best shot"
+ },
+ {
+  "id": "5f1cedcfcb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: bestFit",
+  "tag": "script",
+  "text": "Three inputs are uncertain for every galaxy: the stars’ mass-to-light ratio (their mass per unit of light), the distance and the tilt. This switch lets each model adjust them within twice their published uncertainties."
+ },
+ {
+  "id": "006513c5be",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: bestFit",
+  "tag": "script",
+  "text": "Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change."
+ },
+ {
+  "id": "02e19a7e47",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEnter",
+  "tag": "script",
+  "text": "Now watch it happen"
+ },
+ {
+  "id": "246b25a8a4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEnter",
+  "tag": "script",
+  "text": "Fullscreen and playing: watch for as long as you like, then press Next."
+ },
+ {
+  "id": "2bc48c4dc0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEnter",
+  "tag": "script",
+  "text": "The 3D view follows hundreds of test stars moving under the model’s gravity for a billion years. If it runs jerkily, untick High-quality visuals in Settings (the gear, top right)."
+ },
+ {
+  "id": "ea1b7fe25e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEnter",
+  "tag": "script",
+  "text": "1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space)."
+ },
+ {
+  "id": "a9c0b8eabe",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsClean",
+  "tag": "script",
+  "text": "toggleHalo:2 · Halo off"
+ },
+ {
+  "id": "2cec647ded",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsClean",
+  "tag": "script",
+  "text": "Clear the stage"
+ },
+ {
+  "id": "b27249982b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsClean",
+  "tag": "script",
+  "text": "The blue haze is cold gas. The purple cloud marks the halo so you can see it; real dark matter gives out no light at all."
+ },
+ {
+  "id": "c126a7e2a5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsClean",
+  "tag": "script",
+  "text": "1. Switch off Gas. 2. Switch off Halo."
+ },
+ {
+  "id": "d31ac5f384",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsClean",
+  "tag": "script",
+  "text": "Clear view: everything left is a test star."
+ },
+ {
+  "id": "b7e968a5e2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsOrbits",
+  "tag": "script",
+  "text": "toggleOrbits:2 · Orbits on"
+ },
+ {
+  "id": "da2a011094",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsOrbits",
+  "tag": "script",
+  "text": "Look down on the disk"
+ },
+ {
+  "id": "7b1d6828f9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsOrbits",
+  "tag": "script",
+  "text": "Face-on, you look straight down on the disk. Each line traces one star’s path: near-perfect circles, because each star starts with exactly the speed the gravity at its radius requires."
+ },
+ {
+  "id": "385f5b59cc",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsOrbits",
+  "tag": "script",
+  "text": "1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play."
+ },
+ {
+  "id": "c3085790af",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsOrbits",
+  "tag": "script",
+  "text": "Circles everywhere: gravity and orbital speed are in balance."
+ },
+ {
+  "id": "996f8b1587",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "Which star laps more?"
+ },
+ {
+  "id": "7fa162e426",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "Predict first: over the next ${TOUR_RACE_MYR} million years, which ringed star will finish more laps?"
+ },
+ {
+  "id": "87eb458af0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "About the same"
+ },
+ {
+  "id": "e0241e6d2f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "The two ringed stars orbit at similar speeds, but the outer one is about four times further from the centre."
+ },
+ {
+  "id": "90c619a0c3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "Press ▶ Play and watch the lap counts on the two ringed stars."
+ },
+ {
+  "id": "4b4a37da58",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "You called it: at similar speeds, the inner star’s much shorter lap means it laps far more often. This is differential rotation."
+ },
+ {
+  "id": "b1168e0b96",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsRace",
+  "tag": "script",
+  "text": "The inner star wins. At similar speeds, the outer star’s lap (2πr) is about four times longer, so the inner star finishes several laps for each of the outer star’s. This is differential rotation."
+ },
+ {
+  "id": "b501020fdc",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTilt",
+  "tag": "script",
+  "text": "fsPlay:2 · Keep playing"
+ },
+ {
+  "id": "c4a9c4088e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTilt",
+  "tag": "script",
+  "text": "Turn it on its side"
+ },
+ {
+  "id": "6d21c0a41b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTilt",
+  "tag": "script",
+  "text": "Edge-on, the disk is a thin line. The ringed star bobs above and below it as it orbits."
+ },
+ {
+  "id": "ed084a1a55",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTilt",
+  "tag": "script",
+  "text": "1. Press Edge-on. 2. Press ▶ Play and watch the ringed star’s height."
+ },
+ {
+  "id": "88ca477f61",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTilt",
+  "tag": "script",
+  "text": "Up, down, up: one bob per lap here, because this model’s pull is spherical. In a real, flat disk, the disk’s own pull makes stars bob faster than they orbit."
+ },
+ {
+  "id": "1ad962ebad",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTrack",
+  "tag": "script",
+  "text": "Follow any star"
+ },
+ {
+  "id": "49514f675d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTrack",
+  "tag": "script",
+  "text": "Tracked: its label shows its laps, its speed, and its distance from the centre (its height above the disk when edge-on)."
+ },
+ {
+  "id": "65d27031e8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTrack",
+  "tag": "script",
+  "text": "Every star has a number: star 1 starts nearest the centre."
+ },
+ {
+  "id": "ce9dbde450",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsTrack",
+  "tag": "script",
+  "text": "Type a star number in the Star # box."
+ },
+ {
+  "id": "c5a46912f4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "1 · Ejection line on"
+ },
+ {
+  "id": "575429cb39",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "fsMassSlider:2 · Drag to 0"
+ },
+ {
+  "id": "63671b9292",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "escape-counter:Ejected count"
+ },
+ {
+  "id": "a422aa2242",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "Pull the halo away"
+ },
+ {
+  "id": "c97106b468",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to keep them on their orbits."
+ },
+ {
+  "id": "fb25d814a2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star."
+ },
+ {
+  "id": "653b61ec07",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsEscape",
+  "tag": "script",
+  "text": "Gone: the visible matter alone cannot hold the outer stars at their measured speeds."
+ },
+ {
+  "id": "379dfaf759",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsFullHalo",
+  "tag": "script",
+  "text": "viewFullHalo:2 · Full halo"
+ },
+ {
+  "id": "bdb9c0101a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsFullHalo",
+  "tag": "script",
+  "text": "Put the halo back, and step back"
+ },
+ {
+  "id": "6a4e2ca261",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsFullHalo",
+  "tag": "script",
+  "text": "Zoomed out: the whole visible galaxy is that bright speck, deep inside its halo."
+ },
+ {
+  "id": "433ef67825",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsFullHalo",
+  "tag": "script",
+  "text": "With the halo restored, the stars stay bound. The sphere marks the halo’s edge, r₂₀₀; the bright speck at its centre is the entire visible galaxy."
+ },
+ {
+  "id": "cb4e0f7e3f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: fsFullHalo",
+  "tag": "script",
+  "text": "1. Press Restart: the stars stay put. 2. Press Full halo to zoom out."
+ },
+ {
+  "id": "dcce8f53e2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: galaxies",
+  "tag": "script",
+  "text": "galaxyProfile:Its profile"
+ },
+ {
+  "id": "36f280ec8f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: galaxies",
+  "tag": "script",
+  "text": "Try another galaxy"
+ },
+ {
+  "id": "7d10277a63",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: galaxies",
+  "tag": "script",
+  "text": "Each galaxy has its own measured speeds and mass model. The profile card (yellow box) gives its type, its distance and how its visible mass splits between stars and gas."
+ },
+ {
+  "id": "f4f0d15fb5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: galaxies",
+  "tag": "script",
+  "text": "Open the Galaxy menu (blue box) and pick another galaxy."
+ },
+ {
+  "id": "8ccd698c26",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: ml",
+  "tag": "script",
+  "text": "Hover or tap"
+ },
+ {
+  "id": "44ce89b88e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: ml",
+  "tag": "script",
+  "text": "How heavy are the stars?"
+ },
+ {
+  "id": "2495965d95",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: ml",
+  "tag": "script",
+  "text": "Telescopes measure light, not mass. The mass-to-light ratio converts one into the other, and its real uncertainty is why the best fits may vary it."
+ },
+ {
+  "id": "c6300ca6a8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: ml",
+  "tag": "script",
+  "text": "Hover over (or tap) the ? in the blue box."
+ },
+ {
+  "id": "4e25a74c38",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: scorecard",
+  "tag": "script",
+  "text": "Read along the rows"
+ },
+ {
+  "id": "9a0298a605",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: scorecard",
+  "tag": "script",
+  "text": "How both ideas score"
+ },
+ {
+  "id": "d077e4cd58",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: scorecard",
+  "tag": "script",
+  "text": "Each row is a galaxy, scored under each idea: close (green), rough (yellow) or poor (red). An arrow leads from the standard values to the best realistic fit; a † marks a fit that needed a value at the edge of its realistic range."
+ },
+ {
+  "id": "1cc7046fd8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: scorecard",
+  "tag": "script",
+  "text": "Read along the rows in the blue box, then press Next."
+ },
+ {
+  "id": "9482a61fa0",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: finish",
+  "tag": "script",
+  "text": "What this does and doesn’t show"
+ },
+ {
+  "id": "67f186e90f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: finish",
+  "tag": "script",
+  "text": "A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (The two ideas page sums it up). These notes say what limits this comparison."
+ },
+ {
+  "id": "91c757057b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: finish",
+  "tag": "script",
+  "text": "Read these notes, then press Finish."
+ },
+ {
+  "id": "7eaf3c5a8b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbIntro",
+  "tag": "script",
+  "text": "Your galaxy’s sliders"
+ },
+ {
+  "id": "748eb1774b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbIntro",
+  "tag": "script",
+  "text": "Build your own galaxy"
+ },
+ {
+  "id": "bc762d4fc4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbIntro",
+  "tag": "script",
+  "text": "Here you design the galaxy yourself: the mass of its stars and gas, and how they are spread out."
+ },
+ {
+  "id": "31bd172d6e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbIntro",
+  "tag": "script",
+  "text": "Look at the three groups of sliders in the blue box, then press Next."
+ },
+ {
+  "id": "650092207e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "Drag both ways"
+ },
+ {
+  "id": "47c18c210a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "massValue:Halo mass"
+ },
+ {
+  "id": "6975e308d7",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "curvePlot:Watch the cyan line"
+ },
+ {
+  "id": "eb8c31b773",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "Make the disk heavier or lighter"
+ },
+ {
+  "id": "d55cdfe08c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "The disk is the flat, rotating part that holds most of the stars. Galaxies with more stars tend to sit in more massive halos (Moster et al. 2013), so the halo mass follows."
+ },
+ {
+  "id": "92f5fa1464",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbDisk",
+  "tag": "script",
+  "text": "Drag Disk mass up and down. Watch the cyan line and Halo mass."
+ },
+ {
+  "id": "7db8b23030",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSize",
+  "tag": "script",
+  "text": "Disk reshaped and edge moved."
+ },
+ {
+  "id": "12febd8ce6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSize",
+  "tag": "script",
+  "text": "Spread the stars out"
+ },
+ {
+  "id": "e42db796bd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSize",
+  "tag": "script",
+  "text": "The scale length sets how quickly the disk’s density fades outwards; the truncation radius is where it ends."
+ },
+ {
+  "id": "9493c30577",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSize",
+  "tag": "script",
+  "text": "1. Drag Scale length and watch the peak of the cyan line. 2. Drag Truncation radius and watch the 3D galaxy’s size."
+ },
+ {
+  "id": "6d682760c8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbBulge",
+  "tag": "script",
+  "text": "curvePlot:Watch the left of the cyan line"
+ },
+ {
+  "id": "93805c384e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbBulge",
+  "tag": "script",
+  "text": "A bulge is a dense, roughly spherical concentration of stars at the centre. Its mass speeds up the innermost orbits."
+ },
+ {
+  "id": "b62f77f107",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbBulge",
+  "tag": "script",
+  "text": "Drag Bulge mass above 0. Watch the left of the cyan line climb."
+ },
+ {
+  "id": "b340b484c9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbGas",
+  "tag": "script",
+  "text": "Drag both ways"
+ },
+ {
+  "id": "67de1c2044",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbGas",
+  "tag": "script",
+  "text": "curvePlot:Watch the right of the cyan line"
+ },
+ {
+  "id": "8c15e9734c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbGas",
+  "tag": "script",
+  "text": "Add the gas"
+ },
+ {
+  "id": "33191928bd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbGas",
+  "tag": "script",
+  "text": "Here the gas disk is three times wider than the stars (real gas disks extend beyond the starlight), so it matters most far out."
+ },
+ {
+  "id": "2127dc03dd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbGas",
+  "tag": "script",
+  "text": "Drag Gas mass up and down. Watch the right of the cyan line."
+ },
+ {
+  "id": "0d2d7816b3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "sbHaloBaseline:Typical halo mass"
+ },
+ {
+  "id": "9c850de111",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "Watch the totals"
+ },
+ {
+  "id": "33e506f211",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "sbDiskMass:Drag this"
+ },
+ {
+  "id": "f41d16f33e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "Check the totals"
+ },
+ {
+  "id": "fad97c587b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "You never set the dark matter directly: your galaxy gets the halo typical for its stellar mass (Moster et al. 2013)."
+ },
+ {
+  "id": "d763b3c4a5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbSummary",
+  "tag": "script",
+  "text": "Drag Disk mass and watch Typical halo mass change."
+ },
+ {
+  "id": "e6d0987ec4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "sbDiskMass:2 · Drag right"
+ },
+ {
+  "id": "2d6348522f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "curvePlot:Watch the gold zone"
+ },
+ {
+  "id": "07fb54bea1",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "Where MOND steps in"
+ },
+ {
+  "id": "3f2353631c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "Near a heavy disk’s centre gravity is strong, so MOND changes it only a little. Its boost grows further out."
+ },
+ {
+  "id": "df0fd7264c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "MOND boosts gravity everywhere, but only a little where gravity is strong. The weaker it gets, the bigger the boost, and the deeper the gold on the graph."
+ },
+ {
+  "id": "e5085770e8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMond",
+  "tag": "script",
+  "text": "1. Choose MOND. 2. Drag Disk mass to the right until the gold near the centre of the graph turns very faint."
+ },
+ {
+  "id": "ab7975dbce",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMondZone3d",
+  "tag": "script",
+  "text": "MOND in your galaxy"
+ },
+ {
+  "id": "8e21b5ce5f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMondZone3d",
+  "tag": "script",
+  "text": "Dim in the middle, where your disk pulls hard, and deeper gold outwards, where MOND takes over."
+ },
+ {
+  "id": "e6842b42d6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMondZone3d",
+  "tag": "script",
+  "text": "The graph’s gold, laid on your galaxy: the deeper the gold, the more MOND boosts gravity there."
+ },
+ {
+  "id": "5d780a1144",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMondZone3d",
+  "tag": "script",
+  "text": "Switch on Where MOND acts in the View panel."
+ },
+ {
+  "id": "affa4c87d3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMonitor",
+  "tag": "script",
+  "text": "Look at the gauge"
+ },
+ {
+  "id": "720b793c14",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMonitor",
+  "tag": "script",
+  "text": "Meet the halo shape monitor"
+ },
+ {
+  "id": "e0d044951e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMonitor",
+  "tag": "script",
+  "text": "This monitor checks that your halo has a realistic shape, using its concentration c. The shaded band, c from ${STABLE_C_MIN} to ${STABLE_C_MAX}, is a rule of thumb for real halos."
+ },
+ {
+  "id": "8b1002e5a8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbMonitor",
+  "tag": "script",
+  "text": "Look at the monitor (blue box) and find its marker. Is it inside the shaded band? Then press Next."
+ },
+ {
+  "id": "71a71f2c80",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "Drag to each end"
+ },
+ {
+  "id": "eea49a44f9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "stabilityMonitor:Watch the marker"
+ },
+ {
+  "id": "1d13c1622e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "stabilityChip:Warning shows here"
+ },
+ {
+  "id": "ec4a6fe796",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "Break the halo"
+ },
+ {
+  "id": "742c4081e3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "A very small or very large scale radius gives a halo unlike any found in simulations. The monitor turns red, but the simulation still runs."
+ },
+ {
+  "id": "d520877275",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbStability",
+  "tag": "script",
+  "text": "Drag Scale radius to one end until the monitor turns red."
+ },
+ {
+  "id": "6da7736263",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbHalo",
+  "tag": "script",
+  "text": "curvePlot:Watch the orange line"
+ },
+ {
+  "id": "6ed96b89cb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbHalo",
+  "tag": "script",
+  "text": "Halo back to typical. Try a heavy or light halo in fullscreen after the tour."
+ },
+ {
+  "id": "a007f721ce",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbHalo",
+  "tag": "script",
+  "text": "Tune the halo yourself"
+ },
+ {
+  "id": "b96da10ce5",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbHalo",
+  "tag": "script",
+  "text": "Halo mass runs from 0 to 5 × the typical halo. The stars start in balance with the typical one, so any other value unsettles them."
+ },
+ {
+  "id": "d97e9e63db",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbHalo",
+  "tag": "script",
+  "text": "1. Drag Halo mass low, then high. 2. Press Typical halo to reset it."
+ },
+ {
+  "id": "57d864b748",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFs",
+  "tag": "script",
+  "text": "Watch your galaxy"
+ },
+ {
+  "id": "c0745292a4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFs",
+  "tag": "script",
+  "text": "Fullscreen and playing: watch for as long as you like, then press Next."
+ },
+ {
+  "id": "dda1d503ad",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFs",
+  "tag": "script",
+  "text": "Now watch your own galaxy evolve."
+ },
+ {
+  "id": "e2f522c695",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFs",
+  "tag": "script",
+  "text": "1. Press Fullscreen: the tour comes too. 2. Press ▶ Play (or Space)."
+ },
+ {
+  "id": "56f953b57e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "toggleGas:2 · Gas off"
+ },
+ {
+  "id": "af089ae7a6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "toggleHalo:3 · Halo off"
+ },
+ {
+  "id": "92963e7b9f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "Two kinds of orbit"
+ },
+ {
+  "id": "c81bbf411a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "Disk stars trace near-circles. Bulge stars (the ringed one) trace tangled loops: their random motions, not rotation, hold the bulge up."
+ },
+ {
+  "id": "237942f760",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "1. Switch on Orbits. 2. Switch off Gas. 3. Switch off Halo. 4. Press ▶ Play."
+ },
+ {
+  "id": "727bb80fd1",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbOrbits",
+  "tag": "script",
+  "text": "Circles in the disk, a tangle in the bulge."
+ },
+ {
+  "id": "548ee8e8c1",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "1 · Ejection line on"
+ },
+ {
+  "id": "78747b4828",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "fsMassSlider:2 · Drag to 0"
+ },
+ {
+  "id": "003eeb54bf",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "escape-counter:Ejected count"
+ },
+ {
+  "id": "761f74dbb2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "Starve it of dark matter"
+ },
+ {
+  "id": "b01ede38a4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "Remove the halo and the ringed star is the first your galaxy loses."
+ },
+ {
+  "id": "94a817ec20",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star."
+ },
+ {
+  "id": "9038de2a8d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Tour card: sbFsEscape",
+  "tag": "script",
+  "text": "Lost: without dark matter, the visible matter cannot hold the outer stars."
+ },
+ {
+  "id": "de86dc406e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialBlocker",
+  "tag": "script",
+  "text": "Leave fullscreen first: press Esc${viewClosed?' (or open View and press Fullscreen)':' or Fullscreen'}. Then: ${blocker.say}"
+ },
+ {
+  "id": "584c5c564c",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Leave fullscreen first: press Esc. "
+ },
+ {
+  "id": "d7695bc554",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Go back to the ${(pageLink(stepPage).querySelector('.nav-long')||pageLink(stepPage)).textContent.replace(/^The /,'')} page first (top menu). "
+ },
+ {
+  "id": "8f0ed9b853",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Switch to Custom Sandbox first. "
+ },
+ {
+  "id": "34774fdf9b",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Switch back to Preset Galaxies first. "
+ },
+ {
+  "id": "2c1e58b6ab",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Choose Dark matter halo first; MOND does not use one. "
+ },
+ {
+  "id": "ca7d08fe38",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Choose Dark matter halo first. "
+ },
+ {
+  "id": "f5a45f3682",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Choose MOND first. "
+ },
+ {
+  "id": "71cc33d3ef",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Open View in the 3D panel and press Fullscreen first. "
+ },
+ {
+  "id": "626a8008a6",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Press Fullscreen first. "
+ },
+ {
+  "id": "2484d94ed9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Drag Halo mass back up to the fitted halo, about ${Number(DEFAULTS.massT).toFixed(2)} × 10¹² M☉ first. "
+ },
+ {
+  "id": "b4eda36bee",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Increase halo mass above 0 first so there is a halo to see. "
+ },
+ {
+  "id": "41474bec48",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPageBlocker",
+  "tag": "script",
+  "text": "Open View first. "
+ },
+ {
+  "id": "8accf4f7eb",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": " (${n} of 3 stretches covered)"
+ },
+ {
+  "id": "efcd6678fd",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "1. The fit is already off after the last card: drag Halo mass and watch χ² in the yellow box change."
+ },
+ {
+  "id": "40b51ed1de",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "the yellow box no longer reads Close fit"
+ },
+ {
+  "id": "4638a64453",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "χ²ᵣ (the second number in the yellow box) rises above ${goal}"
+ },
+ {
+  "id": "7f96b39554",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "the yellow box reads Close fit"
+ },
+ {
+  "id": "cbf0ddf097",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "χ²ᵣ drops below ${goal}, close to the best the published fit manages for this galaxy"
+ },
+ {
+  "id": "e2dd38f3e2",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": " Still in the band at this end: try the other end."
+ },
+ {
+  "id": "5ee2f95859",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": " Now drag it ${dir.up?'down':'up'} too."
+ },
+ {
+  "id": "84eba29942",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "Compare the orange line with the white points on the right. (The new Visible matter only button is a shortcut back to 0.)"
+ },
+ {
+  "id": "683c2a44b4",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialInstruction",
+  "tag": "script",
+  "text": "Halo mass is already 0: drag it right, then back to 0."
+ },
+ {
+  "id": "258b433c9a",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: renderTutorialTry",
+  "tag": "script",
+  "text": "Part ${i+1} of ${parts.length}: the next part appears when this one is done."
+ },
+ {
+  "id": "7fc298ffc8",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: updateTutorialNextGate",
+  "tag": "script",
+  "text": "Press Fullscreen to carry on"
+ },
+ {
+  "id": "42d2650b95",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: leaveTutorialGhost",
+  "tag": "script",
+  "text": "tutorial-also is-leaving"
+ },
+ {
+  "id": "cb76b6f39e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: tutorialPointerReach",
+  "tag": "script",
+  "text": "Found it. Next, push the marker out of the band."
+ },
+ {
+  "id": "c7176caa65",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: checkStabilityStep",
+  "tag": "script",
+  "text": "Warning shown: this halo is outside the range seen for real halos."
+ },
+ {
+  "id": "99ba4d4305",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: checkStabilityStep",
+  "tag": "script",
+  "text": "Halo removed: the orange line now shows visible matter only."
+ },
+ {
+  "id": "d85e7c09e9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: checkStabilityStep",
+  "tag": "script",
+  "text": "Both ways: the same mass, arranged differently."
+ },
+ {
+  "id": "59ac2237b9",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: checkStabilityStep",
+  "tag": "script",
+  "text": "Halo removed: the orange line now shows visible matter only."
+ },
+ {
+  "id": "51b2d5103f",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "Disk mass changed: the typical halo followed it."
+ },
+ {
+  "id": "af0184ab6e",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "Gas mass changed: the curve moves most far out, where the gas reaches beyond the stars."
+ },
+ {
+  "id": "68b09746d3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "Bulge added: the inner orbits speed up."
+ },
+ {
+  "id": "f87f446be1",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "Totals updated: the typical halo follows the mass of the stars."
+ },
+ {
+  "id": "6ea0d2bee3",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "MOND chosen. Compare its χ²ᵣ in the yellow box with your halo’s ${tutorialStart.haloChi.toFixed(1)}. Plain MOND tunes nothing to this galaxy; the halo tuned two values."
+ },
+ {
+  "id": "199c628b96",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "MOND selected: no halo, modified gravity instead."
+ },
+ {
+  "id": "c42cd4100d",
+  "kind": "js",
+  "page": "scripts",
+  "section": "Script: SANDBOX_STEP_FEEDBACK",
+  "tag": "script",
+  "text": "Best fits on: each model has re-tuned the mass-to-light ratio, distance and tilt (and MOND its a₀) within realistic limits."
+ }
+]
