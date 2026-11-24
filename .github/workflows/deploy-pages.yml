@@ -14,11 +14,11 @@ concurrency:
   group: github-pages
   cancel-in-progress: false
 
+# Two jobs, as in GitHub's own Pages template: the deploy job starts only once the
+# upload has finished and registered (one job doing both failed on 24 Nov 2026 with
+# "No artifacts named github-pages were found").
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -37,6 +37,13 @@ jobs:
         with:
           path: _site
 
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
