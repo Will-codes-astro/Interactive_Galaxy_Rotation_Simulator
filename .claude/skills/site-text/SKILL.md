@@ -17,14 +17,23 @@ Never reword his edits: they are his own writing (academic integrity).
 
 1. `ArtifactData list` collection `edits` (url above, `limit` 1000,
    `out_dir` = scratchpad). If empty and the editor is up to date, say so.
-2. Build one JSON array `[{id, base, text}]` from the docs without a
+2. Layout baseline first: `python site_text.py layout <scratch>/before.json`
+   (headless Chrome, every page at 1440 and 390 px; ~25 s).
+3. Build one JSON array `[{id, base, text}]` from the docs without a
    `problem` field (or whose `problem` is older than their `savedAt`),
-   write it to the scratchpad, run `python site_text.py apply <file>`.
-3. `python generate_interactive_html.py` then `python site_text.py check`
+   write it to the scratchpad, run `python site_text.py apply <file>`, then
+   `python generate_interactive_html.py` and `python site_text.py check`
    (Node syntax check of the page scripts). If the check fails, revert the
    generator with `git checkout -- generate_interactive_html.py index.html
    content/site_text.json` (only after confirming no other uncommitted work
    in them) and tell Will which edit broke it.
+   Then `python site_text.py layout <scratch>/after.json <scratch>/before.json`:
+   it lists only NEW cut-off, spilling or off-screen text. Fix each in the
+   generator's CSS (let the box grow or wrap: min-width:0, flex-wrap,
+   overflow-wrap, a taller max-height; never shrink Will's text or change
+   his words), regenerate and rerun until it prints "No new layout
+   problems". Also look at a screenshot of each changed page at both widths
+   for problems the probe can't see (lines wrapping badly, misaligned rows).
 4. Physics checks only if an edit touched a slider, orbit or physics
    claim's numbers (rarely: wording only).
 5. Commit "Site text: Will's wording for <pages>" with the generator,
@@ -39,12 +48,14 @@ Never reword his edits: they are his own writing (academic integrity).
    `python site_text.py mark-published` and commit
    `content/site_text_published.txt`.
 8. Tell Will in one or two lines: how many edits went live, any that
-   couldn't and why. If his wording changes a scientific claim, flag it
+   couldn't and why, and any layout fix made for them. If his wording changes a scientific claim, flag it
    (rule C) but don't change it.
 
 ## After Claude changes the site's wording
 
 When `content/site_text.json` changes in a commit, the hook reminds you.
-Run Sync first (so pending edits aren't stranded), then step 7. An edit
+Run Sync first (so pending edits aren't stranded), then step 7. Run the
+layout check (step 2 before your change, step 3's compare after) for your
+own wording changes too. An edit
 whose text Claude changed meanwhile shows in the editor under "Edits whose
 text changed on the site", with Will's version kept.

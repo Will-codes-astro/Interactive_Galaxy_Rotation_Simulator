@@ -71,6 +71,7 @@ From the project root:
 python generate_interactive_html.py      # rebuild index.html and galaxies.js
 python site_text.py apply EDITS.json     # write edits from the text editor into the generator
 python site_text.py check                # syntax-check the page's scripts after a text change
+python site_text.py layout OUT.json [BEFORE.json]   # cut-off/off-screen text at desktop and phone width
 python tests/run_physics_checks.py       # physics checks (add --update-baseline only for intended changes)
 python -m http.server 8000               # preview at http://localhost:8000/
 python analysis/baryonic_baseline.py
