@@ -188,8 +188,8 @@ or OneDrive duplicates such as `*-Wills_Laptop_V2.*`. Never number work as
   uncertain. Don't restate the plan or repeat what the diff shows.
 - Don't re-read files or Notion pages you already have; read only the part
   you need.
-- Skip screenshots and browser checks unless the change is visual and Will
-  asks, or it's a Big change.
+- Skip browser checks unless the change is visual and Will asks, or it's a
+  Big change. Progress screenshots are separate: see `build-log` below.
 
 ## Physics checks: only when physics could break
 
@@ -217,6 +217,13 @@ fails, report it plainly and don't commit.
   change, meaningful fix, physics change, mistake), update the Notion build
   log and living documents without being asked. Load the skill for the
   format. Skip pure tweaks.
+- **Documenting progress (always):** whenever something new is added or the
+  visuals change, screenshot it (headless Chrome, 1440×900, the feature
+  actually showing) and attach it with a short caption to that day's
+  build-log entry. Write entries in Will's first-person voice ("I asked…, so
+  Claude…"), in the existing template: dated heading, screenshots, then
+  `<b>Short name (my decision/feedback):</b>` bullets with the why, numbers
+  and sources. No AI-sounding filler.
 - **`big-change`**: the routine for Big changes.
 - **`report-checks`**: report–code check, citation check, and the Word
   safety check, which is required before any edit to the report.

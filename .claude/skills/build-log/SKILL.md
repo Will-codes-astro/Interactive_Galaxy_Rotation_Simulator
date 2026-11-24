@@ -46,7 +46,19 @@ project-status.md. Keep the page order: status callout, Part 1 (before the
 website), Part 2 (dated build log, oldest first), Part 3. When
 one of its facts changes, edit that line, and remove to-dos once done.
 
-## Screenshots (only when Will asks)
+## Screenshots (every new feature or visual change)
 
-Open the live site, capture the new feature, attach it to that day's
-build-log entry.
+Without being asked, capture each new feature or visual change in the
+state that shows it (open the card, toggle the mode, start the tour step).
+Use headless Chrome over the DevTools protocol at 1440×900 (390×844 for
+phone layouts) on the regenerated `index.html`; view each shot before
+using it. Upload with Notion's create-file-upload, then place it under that
+day's heading, before the bullets, as `<image source="file-upload://ID">`
+with a one-line caption. Uploads expire after an hour, so place them
+promptly. Never commit screenshots to the repo.
+
+## Voice
+
+Write as Will, first person: "I asked…", "my decision", "Claude checked…".
+Plain sentences, no AI filler (pivotal, seamless, showcase), keep numbers,
+sources and the reason for each decision.
