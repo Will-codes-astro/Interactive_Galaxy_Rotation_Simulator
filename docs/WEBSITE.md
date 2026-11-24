@@ -5,7 +5,7 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
 The site is one file (`index.html`) split into five pages: The missing mass problem (page id `puzzle`, menu
-"Missing mass", "Problem" on narrow screens),
+"Missing mass", "Problem" on narrow screens; its section heading is "Background: from prediction to problem"),
 Simulator (Model setup and Simulation), Scorecard, The two ideas (heading "Dark
 matter or MOND?"; page id `background`, menu label "Ideas" on narrow screens),
 and Method & sources. The top menu shows one page at a time (`showPage`); each page ends with
@@ -20,7 +20,8 @@ the libraries, are hidden. On phones (640 px or narrower) the menu uses short la
 narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
 (Will's choice), all in one row on wide screens, so the values in use stay next to
-the controls that change them. On wide screens the galaxy profile card splits into
+the controls that change them. From 1100 px the tiles stretch to share the full row width (the M/L and
+tilt pair takes two shares), so the row lines up with the slider bar below it. On wide screens the galaxy profile card splits into
 two columns (who the galaxy is | its numbers) to keep the figures nearer the top.
 The gravity model choice ("Gravity model", `#modelBar`) is the first control in
 the slider bar (Will's choice), so on screens at least 961 × 700 px, where that bar
@@ -75,8 +76,12 @@ nothing is stored between visits). Each tour step opens the page its control is 
 open the Scorecard, then The two ideas); if the visitor moves to another page mid-tour, the card asks
 them to go back and points at the top-menu entry.
 
-The missing mass problem page opens the site, before any control. Its hero pairs the
-title, "Galaxies spin too fast for what we can see" (under the site name), with a
+The missing mass problem page opens the site, before any control. It is laid out like the front
+of a paper: an eyebrow ("Galaxy rotation curves · real SPARC data"), the title "Galaxy rotation and
+the missing mass problem", a two-sentence lead and a structured abstract (`.abstract`: Aim, Data,
+Models, Test, two by two, each cited; Data lists the preset galaxies from `__GALAXY_NAMES__` and Test
+links to the Scorecard). The wording of the Aim is a placeholder for Will's own research question.
+The hero pairs this with a
 face-on galaxy drawn on a canvas (`startHeroGalaxy`): the default galaxy, every point
 moving on a circle at the speed SPARC measured at its radius (straight lines between
 SPARC radii). Three marked stars (where the disk pulls hardest, at 2.2 scale lengths;
@@ -84,14 +89,17 @@ halfway out; the last measured radius) carry their speed and a trail as long as 
 distance they cover in 1.6 s, so equal trails mean equal speeds. A switch,
 "Measured speeds" / "Visible matter only", eases every speed to the visible-matter
 prediction (the puzzle figure's dashed line, standard M/L) and turns the marks cyan;
-the caption, built from the data, names the edge star's two speeds. Time runs at 40 Myr
+the caption, built from the data, is one sentence: the marked stars' speed range, or the edge star's two
+speeds. The note under it is one line: "1 s = 40 Myr · Speeds: SPARC (Lelli et al. 2016) · Layout and
+arms illustrative". Time runs at 40 Myr
 per second (`HERO_MYR_PER_SECOND`). The speeds are real; where the points sit (stars
 in an exponential disk of the galaxy's scale length, peak of V_disk ÷ 2.16; gas out to
 the last measured radius, since SPARC's outer speeds come from gas), the two spiral
 arms (a pattern turning at one rate) and the colours are visual choices, and the note
-under the caption says so. It animates only while on screen on the open page, and
+under the caption says so (short form). It animates only while on screen on the open page, and
 shows a still frame with reduced motion or lite visuals. Below 900 px the galaxy
-sits under the title. Four numbered steps explain
+sits under the title. Four numbered steps, each with a small label (Definition, Prediction,
+Observation, Hypotheses; `.step-tag`), explain
 what a rotation curve is (and that orbit speed works like a scale for mass),
 what astronomers expected (with the Solar System as the comparison), what they
 measured (Rubin, Ford & Thonnard 1980; the step ends "That gap is the missing
@@ -524,7 +532,12 @@ scores badly here": tiny error bars, hard limits, and Li et al. 2018's acceptabl
 fits for most SPARC galaxies with soft limits) state
 what limits the comparison; they do not say which idea wins.
 
-The two ideas page has a third, full-width box, "Beyond rotation curves: the wider
+The two ideas page opens with a full-width "Side by side" table (`.compare-table`): what each idea
+changes, values tuned to each galaxy here (2 for the halo, 0 for MOND), best evidence for it and its
+biggest open problem, each cited. In each idea's card the schematic comes straight after the one-line
+summary, before the text (picture first); the MOND card's a₀ explanation sits beside the boost table,
+and "Where does a₀ come from?" is a fold-out. The cards align to the top, so the shorter one no longer
+stretches. Below them is a full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with a tag for the idea it points
 to and two short lines, "Seen:" (the observation, with its source) and "Why it
