@@ -4224,17 +4224,23 @@ __GALAXIES_JS__
     // Sandbox it spans 0 to HALO_FINE_RANGE x the stellar-to-halo baseline, so it fine-tunes that baseline: haloFine is
     // M200 as a multiple of it, reset to 1 whenever the anatomy changes. rsManual records that the user took over r_s.
     const HALO_FINE_RANGE=5;
+    // The scale-radius slider runs 5 to 60 kpc (the presets' fit range). In the sandbox a heavy galaxy's typical halo can
+    // be wider than that, so the track stretches to SANDBOX_RS_HEADROOM x the typical value (in 10 kpc steps).
+    const HALO_SCALE_MAX_KPC=60,SANDBOX_RS_HEADROOM=2;
+    const sandboxScaleMax=rs=>Math.max(HALO_SCALE_MAX_KPC,Math.ceil(SANDBOX_RS_HEADROOM*rs/10)*10);
     let haloFine=1,rsManual=false;
     function configureHaloSliders(){
       if(customActive){
         const maxT=DEFAULTS.massT*HALO_FINE_RANGE;
         massSlider.max=fsMass.max=String(maxT);
         massSlider.step=fsMass.step=String(maxT/500);
+        scaleSlider.max=fsScale.max=String(DEFAULTS.scaleMax);
         massSlider.value=haloFine*DEFAULTS.massT;
         if(!rsManual)scaleSlider.value=DEFAULTS.scaleRadius;
         return;
       }
       massSlider.step=fsMass.step='0.01';
+      scaleSlider.max=fsScale.max=String(HALO_SCALE_MAX_KPC);
       const maxT=String(Math.max(2,Math.ceil(2*DEFAULTS.massT/0.5)*0.5));
       massSlider.max=maxT;fsMass.max=maxT;
       massSlider.value=DEFAULTS.massT;scaleSlider.value=DEFAULTS.scaleRadius;
@@ -4846,7 +4852,7 @@ __GALAXIES_JS__
     }
     // Custom Sandbox: everything below is recomputed from the anatomy sliders, as fast as the sliders move.
     const COMPONENT_SQ=['diskSq','bulgeSq','gasSq']; // same order as COMPONENT_STYLE
-    const snapScaleRadius=rs=>Math.min(60,Math.max(5,Math.round(rs/0.5)*0.5)); // the scale-radius slider's range and step
+    const snapScaleRadius=(rs,max=HALO_SCALE_MAX_KPC)=>Math.min(max,Math.max(5,Math.round(rs/0.5)*0.5)); // the slider's range and step
     function updateCustomSummary(baseline){
       document.getElementById('sbHaloBaseline').textContent=formatMass(baseline.m200);
       document.getElementById('sbStarCount').textContent=bulgeStarCount>0?`${starCount} (${starCount-bulgeStarCount} disk + ${bulgeStarCount} bulge)`:`${starCount} (all disk)`;
@@ -4892,7 +4898,8 @@ __GALAXIES_JS__
       componentCurves=COMPONENT_SQ.map(key=>radii.map(r=>Math.sqrt(customModel[key](r))));
       // Halo: the stellar-to-halo mass relation sets the baseline; haloFine and rsManual hold the user's tuning until the anatomy changes.
       const baseline=PhysicsEngine.baselineHalo(anatomy.diskMass+anatomy.bulgeMass);
-      DEFAULTS={massT:baseline.m200/1e12,scaleRadius:snapScaleRadius(baseline.scaleRadius)};
+      const scaleMax=sandboxScaleMax(baseline.scaleRadius);
+      DEFAULTS={massT:baseline.m200/1e12,scaleRadius:snapScaleRadius(baseline.scaleRadius,scaleMax),scaleMax};
       configureHaloSliders();
       // Stars start on the orbits of the baryons plus baseline halo, then feel whatever halo the sliders leave.
       const baselineHalo=nfwVelocityModel(baseline.m200,DEFAULTS.scaleRadius);
@@ -5500,6 +5507,8 @@ __GALAXIES_JS__
     }));
     trackInputs.forEach(el=>el.addEventListener('focus',syncTrackLimits));
     syncTrackLimits();
+    // A new galaxy (another preset, or the sandbox) has different stars, so star N is no longer the one being followed.
+    document.addEventListener('galaxychange',()=>{trackedStar=-1;trackInputs.forEach(el=>{el.value='';});requestRender();});
     function setStarMarks(names){
       starMarks=(names||[]).flatMap(name=>STAR_MARKS[name]);
       requestRender();
@@ -5714,6 +5723,10 @@ __GALAXIES_JS__
     // tutorialStale: when a card opens with every part already true (an earlier card was skipped, so the page is
     // already in this card's end state), a part only counts once it has been undone and redone on this card, so a
     // skipped card never earns praise for nothing. Holds the ids seen false since the card opened (false = not stale).
+    // A card already in its end state when it opens (a switch already on, MOND already chosen) ticks at once; it does not
+    // then move on by itself, so there is time to read it. 'At once' = within TOUR_OPEN_DONE_MS of the card opening.
+    const TOUR_OPEN_DONE_MS=1500;let tutorialShownAt=0;
+    let tutorialSbSeen={}; // sandbox slider id -> [lowest, highest] since the card opened (sandboxBothWays)
     let tutorialFlags={},tutorialLatched={},tutorialStart={},tutorialCheckSig='',tutorialStale=null;
     // step.given: parts that count as done when already true as the card opens (MOND already chosen, orbit lines
     // already on, already playing), so a card never asks for a switch to be undone just to be redone. step.partPause: when a part is done, its ring turns green and
@@ -5726,7 +5739,7 @@ __GALAXIES_JS__
     const sbVal=id=>{const el=document.getElementById(id);return el?Number(el.value):0;};
     function tutorialResetChecks(){
       tutorialFlags={};tutorialLatched={};tutorialCheckSig='';tutorialStale=null;holdTutorialPart(null);
-      tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),fitOff:galaxyMode==='preset'&&!mondMode&&shownRedChi>=tutorialChiGoal(),haloChi:!mondMode&&Number.isFinite(shownRedChi)?shownRedChi:null,sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
+      tutorialSbSeen={};tutorialStart={mass:Number(massSlider.value),scale:Number(scaleSlider.value),sbGasMass:sbVal('sbGasMass'),fitOff:galaxyMode==='preset'&&!mondMode&&shownRedChi>=tutorialChiGoal(),haloChi:!mondMode&&Number.isFinite(shownRedChi)?shownRedChi:null,sbDiskMass:sbVal('sbDiskMass'),sbDiskScale:sbVal('sbDiskScale'),sbTruncation:sbVal('sbTruncation')};
     }
     function tutorialUpdateChecks(){
       const step=tutorialStep();
@@ -5910,6 +5923,11 @@ __GALAXIES_JS__
         const v=Number(scaleSlider.value),atEnd=v<=Number(scaleSlider.min)||v>=Number(scaleSlider.max),state=stabilityReport().state;
         if(atEnd&&state!=='diffuse'&&state!=='dense')return step.action+' Still in the band at this end: try the other end.';
       }
+      // Disk and gas: once one direction is done, say which is left.
+      if((step.id==='sbDisk'||step.id==='sbGas')&&!tutorialCompleted[step.id]){
+        const dir=tutorialFlags[step.target+'Dir'];
+        if(dir&&dir.down!==dir.up)return step.action+` Now drag it ${dir.up?'down':'up'} too.`;
+      }
       // Test a rival idea: the halo's score disappears once MOND is chosen, so the card keeps it for the comparison.
       if(step.id==='mond'&&tutorialStart.haloChi!=null)return step.action+` Your halo’s χ²ᵣ: ${tutorialStart.haloChi.toFixed(1)}.`;
       if(step.id==='removeHalo'){
@@ -6071,7 +6089,7 @@ __GALAXIES_JS__
       tutorialFeedback.hidden=false;
       showTutorialFeedback(tutorialCompleted[id],missed);
       tutorialCard.classList.remove('is-celebrating');void tutorialCard.offsetWidth;if(!missed)tutorialCard.classList.add('is-celebrating');
-      if(!noAuto)startTutorialAuto();
+      if(!noAuto&&performance.now()-tutorialShownAt>TOUR_OPEN_DONE_MS)startTutorialAuto();
       tutorialSpotlight.classList.toggle('is-missed',!!missed);
       tutorialSpotlight.classList.remove('is-revisit');tutorialSpotlight.classList.add('is-complete');
       updateTutorialNextGate();
@@ -6467,7 +6485,7 @@ __GALAXIES_JS__
       // A box still showing on the control the new card starts on stays put instead of replaying its arrival.
       tutorialCarryTarget=!tutorialSpotlight.hidden&&!tutorialSpotlight.classList.contains('is-complete')?tutorialAimTarget:null;
       tutorialAimTarget=null;tutorialAimId=null;
-      tutorialResetChecks();
+      tutorialResetChecks();tutorialShownAt=performance.now();
       tutorialTarget=document.getElementById(step.target);
       // Phones: a card that uses the View panel opens it, so there is no extra toggle to find on a small screen.
       if(tutorialPhone()&&(step.viewPanel||step.fs)&&viewPanel.classList.contains('collapsed'))viewToggle.click();
@@ -6776,13 +6794,25 @@ __GALAXIES_JS__
     // Restart (fullscreen corner panel): back to 0 Myr and play, so a new halo can be watched from the start.
     document.getElementById('fsRestart').addEventListener('click',()=>{tutorialFlags[Number(massSlider.value)===0?'restart0':'restartHalo']=true;onSliderInput(0);setPlaying(true);});
     document.getElementById('mlInfoBtn').addEventListener('explainerread',()=>completeTutorialAction('ml','Explainer read.'));
+    // 'Drag Disk (or Gas) mass up and down': done once it has moved at least TOUR_BOTH_WAYS_FRACTION of the track each way
+    // from where the card started (or reached that end of the track).
+    const TOUR_BOTH_WAYS_FRACTION=0.05;
+    function sandboxBothWays(input){
+      const v=Number(input.value),lo=Number(input.min),hi=Number(input.max),start=tutorialStart[input.id]??v,move=(hi-lo)*TOUR_BOTH_WAYS_FRACTION;
+      const seen=tutorialSbSeen[input.id]||(tutorialSbSeen[input.id]=[start,start]);
+      seen[0]=Math.min(seen[0],v);seen[1]=Math.max(seen[1],v);
+      return{down:start<=lo||seen[0]<start&&seen[0]<=Math.max(lo,start-move),up:start>=hi||seen[1]>start&&seen[1]>=Math.min(hi,start+move)};
+    }
     const SANDBOX_STEP_FEEDBACK={
       sbDiskMass:['sbDisk','Disk mass changed: the typical halo followed it.'],
       sbGasMass:['sbGas','Gas mass changed: the curve moves most far out, where the gas reaches beyond the stars.']
     };
     sandboxInputs.forEach(input=>input.addEventListener('input',()=>{
       const feedback=SANDBOX_STEP_FEEDBACK[input.id];
-      if(feedback)completeTutorialAction(feedback[0],feedback[1]);
+      if(feedback&&!tutorialCard.hidden&&tutorialStep().id===feedback[0]){
+        const dir=tutorialFlags[input.id+'Dir']=sandboxBothWays(input);
+        if(dir.down&&dir.up)completeTutorialAction(feedback[0],feedback[1]);else renderTutorialTry();
+      }
       if(input.id==='sbBulgeMass'&&Number(input.value)>0)completeTutorialAction('sbBulge','Bulge added: the inner orbits speed up.');
       completeTutorialAction('sbSummary','Totals updated: the typical halo follows the mass of the stars.');
     }));

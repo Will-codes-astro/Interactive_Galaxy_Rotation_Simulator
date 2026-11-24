@@ -192,6 +192,8 @@ residual columns.
   stellar-to-halo mass relation): M200 is
   Moster et al. (2013) inverted for the stellar mass (disk + bulge) and r_s
   comes from the Dutton & Macciò (2014) mass–concentration relation.
+  The scale-radius slider runs 5 to 60 kpc (the presets' fit range); in the sandbox it stretches to twice the
+  typical r_s, in 10 kpc steps (`sandboxScaleMax`), so a heavy galaxy's typical halo is never pinned to the end.
   The existing halo mass slider becomes the fine-tuning control, spanning
   0 to 5 times the baseline. Any change to the anatomy sliders resets both
   halo sliders to the new typical halo.
@@ -345,7 +347,8 @@ star in the 3D view with its laps round the centre since 0 Myr, speed and
 distance from the centre; with the view within 0.2 rad (about 11°) of edge-on,
 the distance is replaced by the star's height above or below the disk, its
 bob, as in the tour's edge-on card (also in the fullscreen corner panel, beside the round Play and
-Restart buttons). It only reads the computed orbits.
+Restart buttons). It only reads the computed orbits. Choosing another galaxy or the sandbox clears it, since star N
+is then a different star.
 
 The dashboard offers an optional hands-on tutorial when opened. Visitors can
 skip it at any point and restart it using the Simulator tutorial button beside the
@@ -403,7 +406,7 @@ When a task is done the highlight turns green with one small ripple (every
 finished highlight holds green 1.4 s, then fades over 1.2 s), the card
 border tints green briefly, and the done message starts with a short word of
 praise; a 10 s countdown (paused while a control is held, restarted by more
-input) then fades to the next card. Green only ever marks something done on that
+input) then fades to the next card (not on a card that is already done when it opens, so it can be read). Green only ever marks something done on that
 card: Next skips a card without a tick, a card that opens already in its end state
 (because an earlier card was skipped) only ticks once its part is undone and redone,
 leaving a card clears its rings at once, and going back to a finished card shows
@@ -421,7 +424,7 @@ phones the card keeps its full-width layout and scrolls if it must. A second, 14
 the Custom Sandbox: the disk, bulge and gas sliders, the totals list, the
 halo shape monitor (what it reads, then pushing a halo out of range; at an end of the slider that is still
 in range, the card says to try the other end), the
-halo sliders, and a fullscreen chapter (disk circles versus tangled bulge
+halo sliders (the disk and gas cards need a drag of at least 5% of the track each way), and a fullscreen chapter (disk circles versus tangled bulge
 orbits, then the first star lost without dark matter). It follows on from the simulator
 tutorial in the full guided tour, or starts from the Sandbox tutorial button on
 the simulator tutorial's last step (which opens the Custom Sandbox), or from the
