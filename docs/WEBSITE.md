@@ -313,7 +313,7 @@ While a halo or sandbox slider moves, the rotation curve is redrawn every frame
 through Plotly's light transition path (`updateHalo(true)`); the speed axis only
 grows mid-drag, and a full redraw fits the axes once the
 slider settles. Residual bars are one neutral grey (their direction shows the
-sign), and the fit verdicts are green, yellow and red, so neither shares a
+sign; the panel's axis and the guide say they are in km/s), and the fit verdicts are green, yellow and red, so neither shares a
 colour with a curve (`RESIDUAL_COLOR`).
 
 The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's
@@ -494,7 +494,8 @@ Motion (all visual choices; Reduce motion and lite visuals turn every part off a
   entry (`placeNavInk`).
 - On the reading pages (not the Simulator, so tour highlights always find their controls), sections and
   cards rise into view as they scroll in, a few at a time (`REVEAL_SELECTOR`,
-  `arrive`, `revealInView`). Whatever is on screen when a page opens arrives at once.
+  `arrive`, `revealInView`). Whatever is on screen when a page opens arrives at once, and so does whatever is
+  on screen once a page is scrolled to its end (its Next button sits below the reveal line there).
 - On load the homepage title's words rise in one after another ("missing mass" in a blue-to-gold gradient),
   then the lead, the abstract and the galaxy.
 - The homepage figure builds up in the order of the story (`stagePuzzleFigure`). On screens wider than
@@ -554,7 +555,13 @@ values quoted in the Method page and the Scorecard's "Tuned values" card are
 written by the generator (`tuned_count_text`) from the same numbers, so they
 cannot drift from the page's maths.
 
-Scorecard: first an "At a glance" table, one row per galaxy, giving the verdict
+Scorecard: first a chart, "How far off is each model?" (`renderScoreChart`): every galaxy's χ²ᵣ on a log
+scale (0.5 up to the next power of ten above the worst score), one row per galaxy and one lane per model
+(visible matter only in cyan, the halo in purple, MOND in gold, the rotation curve's colours), with the standard-values
+score as a filled dot joined to the best realistic fit as a ring, over the close / rough / poor bands. Galaxy names
+open the galaxy in the simulator; each dot's tooltip gives its score. On arrival the halo and MOND dots slide in from
+where visible matter alone sits (visual only; instant with Reduce motion or lite visuals). On phones the axis reads
+1k and 10k. Then an "At a glance" table, one row per galaxy, giving the verdict
 word for visible matter only and, for NFW and MOND, standard values → best
 realistic fit (a † marks a best fit that needed a value at a realistic limit; the
 galaxy name opens it in the simulator). Under it, "Full scores, error bars and tuned

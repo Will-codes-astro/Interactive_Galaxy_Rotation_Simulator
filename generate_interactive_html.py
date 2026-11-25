@@ -1273,6 +1273,40 @@ HTML_TEMPLATE = r"""<!doctype html>
     .glance-arrow { color:var(--muted); }
     .glance-table .score { min-width:54px; }
     .glance-note { margin:6px 0 0; color:var(--muted); font-size:12px; } .glance-note sup { color:#ffc48a; }
+    /* Scorecard chart: χ²ᵣ on a log scale, one row per galaxy, one lane per model (renderScoreChart). On arrival the
+       halo and MOND dots slide in from where visible matter alone sits (visual only). */
+    .score-chart { margin:6px 0 22px; }
+    .sc-visible { --c:#5fd0e0; } .sc-nfw { --c:#b39ae8; } .sc-mond { --c:#f2c879; }
+    .sc-key { display:flex; flex-wrap:wrap; gap:6px 16px; margin:8px 0 12px; padding:0; list-style:none; color:var(--ink-2); font-size:12px; }
+    .sc-key li { display:inline-flex; align-items:center; gap:7px; } .sc-key .sc-key-gap { margin-left:10px; }
+    .sc-dot { display:inline-block; width:11px; height:11px; border:2px solid var(--c,#cfd8e6); border-radius:50%; background:var(--c,#cfd8e6); box-sizing:border-box; }
+    .sc-dot.ring { background:transparent; }
+    .sc-row { display:grid; grid-template-columns:88px minmax(0,1fr); align-items:center; gap:12px; }
+    .sc-row .sc-name { justify-self:start; }
+    .sc-track { position:relative; height:48px; border-top:1px solid var(--line); }
+    .sc-head .sc-track, .sc-axis .sc-track { height:22px; border-top:0; }
+    .sc-axis .sc-track { border-top:1px solid var(--line-strong); }
+    .sc-band { position:absolute; top:0; bottom:0; left:var(--a); width:var(--w); }
+    .sc-row:not(.sc-head):not(.sc-axis) .sc-band.good { background:rgba(120,214,140,.075); }
+    .sc-row:not(.sc-head):not(.sc-axis) .sc-band.ok { background:rgba(236,204,96,.06); }
+    .sc-row:not(.sc-head):not(.sc-axis) .sc-band.poor { background:rgba(255,138,128,.05); }
+    .sc-head .sc-band { display:grid; place-items:end center; padding-bottom:3px; font:500 11px var(--f-mono); }
+    .sc-head .sc-band.good { color:#93e3a0; } .sc-head .sc-band.ok { color:#f2d675; } .sc-head .sc-band.poor { color:#ff9d94; }
+    .sc-grid { position:absolute; top:0; bottom:0; left:var(--x); border-left:1px dashed rgba(148,170,200,.16); }
+    .sc-tick { position:absolute; top:5px; left:var(--x); transform:translateX(-50%); color:var(--muted); font:500 11px var(--f-mono); white-space:nowrap; }
+    .sc-tick.end { transform:translateX(-100%); }
+    .sc-short { display:none; }
+    .sc-axis .sc-name { color:var(--muted); font-size:11.5px; }
+    .sc-pt { position:absolute; z-index:1; top:var(--y); left:var(--x); width:12px; height:12px; margin:-6px 0 0 -6px; border:2px solid var(--c); border-radius:50%; background:var(--c); box-sizing:border-box; cursor:help;
+      transition:left 1.2s cubic-bezier(.2,.8,.2,1) var(--d,0s); }
+    .sc-pt.ring { background:var(--panel); }
+    .sc-link { position:absolute; top:var(--y); left:var(--a); width:var(--w); height:2px; margin-top:-1px; background:var(--c); opacity:.5;
+      transition:left 1.2s cubic-bezier(.2,.8,.2,1) var(--d,0s), width 1.2s cubic-bezier(.2,.8,.2,1) var(--d,0s); }
+    .score-chart:not(.sc-shown) .sc-pt:not(.sc-visible) { left:var(--x0); }
+    .score-chart:not(.sc-shown) .sc-link { left:var(--x0); width:0; }
+    :is(.calm, .lite) :is(.sc-pt, .sc-link) { transition:none; }
+    .score-chart figcaption { margin:8px 0 0 100px; color:var(--muted); font-size:12px; }
+    @media (max-width:640px) { .sc-row { grid-template-columns:64px minmax(0,1fr); gap:8px; } .score-chart figcaption { margin-left:0; } .sc-long { display:none; } .sc-short { display:inline; } }
     .score-details { margin-top:16px; }
     .score-details > summary { cursor:pointer; color:var(--accent); font-size:13px; font-weight:500; padding:6px 0; }
     .score-details[open] > summary { margin-bottom:10px; }
@@ -1669,7 +1703,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       </ol>
       <figure class="puzzle-fig">
         <div id="puzzleChart"></div>
-        <figcaption>__DEFAULT_GALAXY_NAME__, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas.</figcaption>
+        <figcaption>__DEFAULT_GALAXY_NAME__, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas. 1 kpc (kiloparsec) ≈ 3,260 light-years.</figcaption>
       </figure>
       <div class="puzzle-cta"><span>Next, see how each answer works:</span><a class="next-link" href="#background">Next: the two ideas <span class="next-arrow" aria-hidden="true">→</span></a></div>
     </section>
@@ -1685,7 +1719,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             <tr><th scope="row">What it changes</th><td>Adds unseen mass. Newton’s gravity is unchanged.</td><td>No extra mass. Gravity is boosted where it is very weak.</td></tr>
             <tr><th scope="row">Values tuned to each galaxy here</th><td><b>2</b>: halo mass and scale radius</td><td><b>0</b>: one constant, a<sub>0</sub>, shared by every galaxy</td></tr>
             <tr><th scope="row">Best evidence for it</th><td>Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)</td><td>Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)</td></tr>
-            <tr><th scope="row">Biggest open problem</th><td>No dark matter particle has been found (Bertone &amp; Hooper 2018)</td><td>Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)</td></tr>
+            <tr><th scope="row">Biggest open problem</th><td>No dark matter particle has been confirmed (Bertone &amp; Hooper 2018)</td><td>Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)</td></tr>
           </tbody>
         </table>
         </div>
@@ -1852,7 +1886,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           <p>The number is a display choice: 800 for NGC 3198, scaled with visible mass (200 to 2400). A real galaxy has billions.</p>
         </div>
       </div>
-      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 Billion Years</div></div>
+      <div class="stat"><div class="stat-label">Timeline</div><div class="stat-value">1 billion years</div></div>
       <div class="ml-col">
         <div class="ml-row">
         <div class="stat ml" id="mlStat" title="Mass-to-light ratios used to turn the stars’ light into mass"><div class="stat-label"><span>Mass-to-light (M/L)</span><button type="button" class="ml-info" id="mlInfoBtn" aria-expanded="false" aria-controls="mlExplainer" title="What is a mass-to-light ratio?">?</button></div><div class="stat-value ml-pair"><div><b id="mlDisk">0.50</b><span>DISK</span></div><div><b id="mlBulge">0.70</b><span>BULGE</span></div></div><small class="ml-source" id="mlSource">standard SPARC values</small></div>
@@ -1960,7 +1994,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <details class="key">
           <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#aab8cc"></i><b>Grey bars</b> show the gap at each point: up means the model is too slow there, down too fast.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough (2 to 10), <span class="r">red</span> poor (above 10). The cut-offs are this site’s rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>__DEFAULT_GALAXY_NAME__</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#aab8cc"></i><b>Grey bars</b> show the gap at each point in km/s: up means the model is too slow there, down too fast. A big bar matters less where the error bar is wide.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough (2 to 10), <span class="r">red</span> poor (above 10). The cut-offs are this site’s rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
             <div data-preset-only>
             <h3>What do χ² and χ<sup>2</sup><sub>r</sub> mean?</h3>
             <p>At each point, divide the gap between model and measurement by the error bar and square it; χ² is the total. χ<sup>2</sup><sub>r</sub> divides that by the number of points minus the values tuned, so galaxies and models compare fairly. Missing every point by one error bar gives about 1; by three, about 9.</p>
@@ -1981,6 +2015,12 @@ HTML_TEMPLATE = r"""<!doctype html>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
       <p class="score-intro">One score per galaxy and idea: χ<sup>2</sup><sub>r</sub> (reduced chi-squared), how far the model misses the measured speeds, in error bars. Lower is better; about 1 is as close as the data allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
+      <figure class="score-chart" id="scoreChart">
+        <p class="score-notes-title">How far off is each model?</p>
+        <ul class="sc-key" aria-hidden="true"><li><i class="sc-dot sc-visible"></i>Visible matter only</li><li><i class="sc-dot sc-nfw"></i>Dark matter halo (NFW)</li><li><i class="sc-dot sc-mond"></i>MOND</li><li class="sc-key-gap"><i class="sc-dot"></i>standard values</li><li><i class="sc-dot ring"></i>best realistic fit</li></ul>
+        <div class="sc-plot" id="scoreChartRows" role="group" aria-label="Calculating the scores…"></div>
+        <figcaption>χ²<sub>r</sub> on a log scale: each grid line is ten times the one before, and further left is a closer fit. Select a galaxy to open it in the simulator.</figcaption>
+      </figure>
       <p class="score-notes-title">At a glance</p>
       <div class="score-scroll" tabindex="0" role="region" aria-label="Scorecard summary">
         <table class="score-table glance-table" id="glanceTable">
@@ -4113,7 +4153,7 @@ __GALAXIES_JS__
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
-      yaxis2:{...AXIS,title:{text:'Obs − model',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
+      yaxis2:{...AXIS,title:{text:'Obs − model<br>(km/s)',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,entrywidth:196,tracegroupgap:4}, // fixed width: Plotly can measure the text before Inter loads, so entries overlapped
       hovermode:false,dragmode:false};
     // On a phone-width screen the legend sits two entries per row (with shorter names, see LEGEND_NAMES) and the
@@ -5126,6 +5166,41 @@ __GALAXIES_JS__
       document.getElementById('scoreCount').textContent=String(galaxies.length);
       scoreBody.innerHTML=galaxies.map(scoreRowHtml).join('');
       document.getElementById('glanceBody').innerHTML=galaxies.map(glanceRowHtml).join('');
+      renderScoreChart(galaxies);
+    }
+    /* The chart above the tables: every galaxy's χ²ᵣ on a log scale, one lane per model, standard values (filled dot)
+       joined to the best realistic fit (ring). Same scores as the tables; the band colours are fitVerdict's cut-offs. */
+    const SCORE_CHART_MIN=0.5,SCORE_CHART_LANES={visible:22,nfw:50,mond:78}; // lowest χ²ᵣ shown; lane heights in % of a row
+    function renderScoreChart(galaxies){
+      const rows=galaxies.map(galaxy=>{
+        const score=scoreGalaxy(galaxy),red={};
+        Object.keys(score.chi).forEach(model=>{red[model]=reducedChi(score.chi[model],score.pointCount,score.k[model]);});
+        return{galaxy,red};
+      });
+      const lo=Math.log10(SCORE_CHART_MIN),hi=Math.ceil(Math.log10(Math.max(...rows.map(row=>Math.max(...Object.values(row.red))))));
+      const x=v=>`${(100*(Math.log10(Math.max(v,SCORE_CHART_MIN))-lo)/(hi-lo)).toFixed(2)}%`;
+      const shown=v=>v<100?v.toFixed(2):v.toFixed(0);
+      const decades=[];for(let p=0;p<=hi;p++)decades.push(10**p);
+      const grid=decades.map(v=>`<span class="sc-grid" style="--x:${x(v)}"></span>`).join('');
+      const bands=(labels)=>[['good',SCORE_CHART_MIN,2,'close'],['ok',2,10,'rough'],['poor',10,10**hi,'poor']].map(([cls,a,b,word])=>
+        `<span class="sc-band ${cls}" style="--a:${x(a)};--w:calc(${x(b)} - ${x(a)})">${labels?word:''}</span>`).join('');
+      const point=(cls,model,label,v,from,ring,delay)=>`<span class="sc-pt ${cls}${ring?' ring':''}" style="--x:${x(v)};--x0:${from};--y:${SCORE_CHART_LANES[model]}%;--d:${delay}s" title="${label}: χ²ᵣ ${shown(v)} (${fitVerdict(v).word})"></span>`;
+      const pair=(cls,model,name,std,best,from,delay)=>{
+        const a=Math.min(std,best),b=Math.max(std,best);
+        return `<span class="sc-link ${cls}" style="--a:${x(a)};--w:calc(${x(b)} - ${x(a)});--x0:${from};--y:${SCORE_CHART_LANES[model]}%;--d:${delay}s"></span>`+
+          point(cls,model,`${name}, standard values`,std,from,false,delay)+point(cls,model,`${name}, best realistic fit`,best,from,true,delay+.12);
+      };
+      const body=rows.map(({galaxy,red},i)=>{
+        const from=x(red.visible),delay=0.25+i*0.12;
+        return `<div class="sc-row"><button type="button" class="score-show glance-name sc-name" data-galaxy="${galaxy.id}" title="Show in simulator">${galaxy.name}</button><div class="sc-track">${bands(false)}${grid}`+
+          point('sc-visible','visible','Visible matter only',red.visible,from,false,0)+
+          pair('sc-nfw','nfw','Dark matter halo (NFW)',red.nfwStd,red.nfw,from,delay)+pair('sc-mond','mond','MOND',red.mond,red.mondBest,from,delay+.06)+'</div></div>';
+      }).join('');
+      const ticks=decades.map((v,i)=>`<span class="sc-tick${i===decades.length-1?' end':''}" style="--x:${x(v)}"><span class="sc-long">${v.toLocaleString('en-GB')}</span><span class="sc-short">${v>=1000?`${v/1000}k`:v}</span></span>`).join('');
+      const plot=document.getElementById('scoreChartRows');
+      plot.innerHTML=`<div class="sc-row sc-head" aria-hidden="true"><span></span><div class="sc-track">${bands(true)}</div></div>${body}<div class="sc-row sc-axis" aria-hidden="true"><span class="sc-name">χ²<sub>r</sub> →</span><div class="sc-track">${ticks}</div></div>`;
+      plot.setAttribute('aria-label','Reduced chi-squared for each galaxy, standard values then best realistic fit. '+rows.map(({galaxy,red})=>
+        `${galaxy.name}: visible matter only ${shown(red.visible)}; dark matter halo ${shown(red.nfwStd)} then ${shown(red.nfw)}; MOND ${shown(red.mond)} then ${shown(red.mondBest)}.`).join(' '));
     }
     setTimeout(renderScorecard,400);
     document.querySelector('.scorecard').addEventListener('click',e=>{
@@ -5413,7 +5488,7 @@ __GALAXIES_JS__
        left alone so the tour's highlights always find its controls in place. The homepage figure draws itself and its
        numbers count up when they arrive. With reduced motion or lite visuals everything simply shows. */
     const REVEAL_SELECTOR=['.page:not([data-page="simulator"]) .section-head','.puzzle-steps > li','.puzzle-fig','.puzzle-cta',
-      '.learn > article:not(.evidence)','.evidence-card','.evidence-open-title','.score-intro','.score-legend','.score-notes > li',
+      '.learn > article:not(.evidence)','.evidence-card','.evidence-open-title','.score-intro','.score-legend','.score-chart','.score-notes > li',
       '.method-flow > li','.method-step:not(.ms-limits)','.limits-grid > li','.refs','.method-data','.page:not([data-page="simulator"]) .page-next'].join(',');
     const REVEAL_CLEAR_MS=1700;
     let revealObserver=null;
@@ -5421,6 +5496,7 @@ __GALAXIES_JS__
       revealObserver?.unobserve(el);
       el.classList.add('in');
       if(el.matches('.puzzle-fig')&&!PUZZLE_FIG_BESIDE.matches)stagePuzzleFigure(PUZZLE_STAGES.length);
+      if(el.matches('.score-chart'))setTimeout(()=>el.classList.add('sc-shown'),350); // the model dots slide in once the chart has faded in
       el.querySelectorAll('[data-count-to]').forEach(countUp);
       setTimeout(()=>el.classList.remove('reveal','in'),REVEAL_CLEAR_MS);
     }
@@ -5458,7 +5534,7 @@ __GALAXIES_JS__
       steps.concat(document.querySelector('.puzzle-cta')).forEach(el=>watcher.observe(el));
     }
     (function setupReveal(){
-      if(calmMotion()||!('IntersectionObserver' in window)){document.querySelector('.puzzle-fig').classList.add(...PUZZLE_STAGES);return;}
+      if(calmMotion()||!('IntersectionObserver' in window)){document.querySelector('.puzzle-fig').classList.add(...PUZZLE_STAGES);document.getElementById('scoreChart').classList.add('sc-shown');return;}
       watchPuzzleSteps();
       revealObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)arrive(entry.target);}),{rootMargin:'0px 0px -8% 0px',threshold:.06});
       document.querySelectorAll(REVEAL_SELECTOR).forEach(el=>{
@@ -5466,6 +5542,15 @@ __GALAXIES_JS__
         el.style.setProperty('--i',Math.min(siblings.indexOf(el),6));
         el.classList.add('reveal');revealObserver.observe(el);
       });
+      // At the very end of a page the last items (its Next button) sit below the reveal line and can never scroll past
+      // it, so once the page can scroll no further, whatever is on screen arrives.
+      const revealAtPageEnd=()=>{
+        if(innerHeight+scrollY<document.documentElement.scrollHeight-4)return;
+        document.querySelectorAll('.page.active .reveal:not(.in)').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight)arrive(el);});
+      };
+      addEventListener('scroll',revealAtPageEnd,{passive:true});
+      document.addEventListener('pagechange',()=>requestAnimationFrame(revealAtPageEnd));
+      requestAnimationFrame(revealAtPageEnd);
     })();
     // A soft light follows the pointer across cards (visual only).
     document.querySelectorAll('.evidence-card,.answer,.limits-grid > li,.score-notes > li,.method-flow a,.source-card,.learn > article,.method-step,.abstract > div').forEach(card=>card.classList.add('glow'));

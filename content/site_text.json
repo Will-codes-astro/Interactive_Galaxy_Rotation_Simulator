@@ -411,12 +411,12 @@
   "text": "<b>MOND</b><span>Very weak gravity is stronger than Newton’s law predicts (Milgrom 1983).</span>"
  },
  {
-  "id": "f125720893",
+  "id": "79884b9bd5",
   "kind": "html",
   "page": "puzzle",
   "section": "Two possible answers",
   "label": "Figure caption",
-  "text": "__DEFAULT_GALAXY_NAME__, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas."
+  "text": "__DEFAULT_GALAXY_NAME__, measured by SPARC (Lelli, McGaugh &amp; Schombert 2016). Dashed: Newton’s prediction from its stars and gas. 1 kpc (kiloparsec) ≈ 3,260 light-years."
  },
  {
   "id": "e54e483648",
@@ -572,12 +572,12 @@
   "text": "Biggest open problem"
  },
  {
-  "id": "22cdcf562f",
+  "id": "efc137b683",
   "kind": "html",
   "page": "background",
   "section": "Side by side",
   "label": "Table cell",
-  "text": "No dark matter particle has been found (Bertone &amp; Hooper 2018)"
+  "text": "No dark matter particle has been confirmed (Bertone &amp; Hooper 2018)"
  },
  {
   "id": "ce20cb9c7a",
@@ -1403,12 +1403,12 @@
   "text": "Timeline"
  },
  {
-  "id": "230a15a621",
+  "id": "52b6751a70",
   "kind": "html",
   "page": "simulator",
   "section": "What are test stars?",
   "label": "Text",
-  "text": "1 Billion Years"
+  "text": "1 billion years"
  },
  {
   "id": "8b07dbb7fe",
@@ -2714,12 +2714,12 @@
   "text": "<i class=\"sw\" style=\"background:#ffae5c\"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span>"
  },
  {
-  "id": "e73f77b227",
+  "id": "54ef5e7538",
   "kind": "html",
   "page": "simulator",
   "section": "Fig. 2Rotation curve",
   "label": "List item",
-  "text": "<i class=\"sw bar\" style=\"background:#aab8cc\"></i><b>Grey bars</b> show the gap at each point: up means the model is too slow there, down too fast."
+  "text": "<i class=\"sw bar\" style=\"background:#aab8cc\"></i><b>Grey bars</b> show the gap at each point in km/s: up means the model is too slow there, down too fast. A big bar matters less where the error bar is wide."
  },
  {
   "id": "376e2144f9",
@@ -2864,6 +2864,71 @@
   "section": "Scorecard",
   "label": "List item",
   "text": "<span class=\"score poor\">above 10</span>poor fit"
+ },
+ {
+  "id": "5a8c595da9",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Paragraph",
+  "text": "How far off is each model?"
+ },
+ {
+  "id": "fac03247c1",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "List item",
+  "text": "<i class=\"sc-dot sc-visible\"></i>Visible matter only"
+ },
+ {
+  "id": "77fe5fcba4",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "List item",
+  "text": "<i class=\"sc-dot sc-nfw\"></i>Dark matter halo (NFW)"
+ },
+ {
+  "id": "7c9a85ead5",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "List item",
+  "text": "<i class=\"sc-dot sc-mond\"></i>MOND"
+ },
+ {
+  "id": "5c6661cb88",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "List item",
+  "text": "<i class=\"sc-dot\"></i>standard values"
+ },
+ {
+  "id": "874b2873e4",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "List item",
+  "text": "<i class=\"sc-dot ring\"></i>best realistic fit"
+ },
+ {
+  "id": "97120e59ec",
+  "kind": "attr",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "where": "Score chart rows",
+  "text": "Calculating the scores…"
+ },
+ {
+  "id": "68c9f26183",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Figure caption",
+  "text": "χ²<sub>r</sub> on a log scale: each grid line is ten times the one before, and further left is a closer fit. Select a galaxy to open it in the simulator."
  },
  {
   "id": "b4e2ec9b6b",
@@ -4453,6 +4518,14 @@
   "text": "Orbital speed, V (km/s)"
  },
  {
+  "id": "789df92153",
+  "kind": "js",
+  "page": "messages",
+  "section": "Legend names",
+  "label": "Card explanation",
+  "text": "Obs − model<br>(km/s)"
+ },
+ {
   "id": "8bbb291637",
   "kind": "js",
   "page": "messages",
@@ -5123,6 +5196,46 @@
   "section": "Score row html",
   "label": "Message",
   "text": "<tr><th scope=\"row\">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type=\"button\" class=\"score-show\" data-galaxy=\"${galaxy.id}\">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>"
+ },
+ {
+  "id": "e995c2c1ff",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render score chart",
+  "label": "Message",
+  "text": "${name}, best realistic fit"
+ },
+ {
+  "id": "5c3d97a9d5",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render score chart",
+  "label": "Message",
+  "text": "Visible matter only"
+ },
+ {
+  "id": "f3308a6d64",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render score chart",
+  "label": "Message",
+  "text": "Dark matter halo (NFW)"
+ },
+ {
+  "id": "6a141a7b39",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render score chart",
+  "label": "Message",
+  "text": "Reduced chi-squared for each galaxy, standard values then best realistic fit. "
+ },
+ {
+  "id": "b7423860ee",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render score chart",
+  "label": "Message",
+  "text": "${galaxy.name}: visible matter only ${shown(red.visible)}; dark matter halo ${shown(red.nfwStd)} then ${shown(red.nfw)}; MOND ${shown(red.mond)} then ${shown(red.mondBest)}."
  },
  {
   "id": "a1cf65305b",
