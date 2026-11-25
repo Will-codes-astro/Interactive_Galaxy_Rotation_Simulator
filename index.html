@@ -1590,7 +1590,7 @@
         <details class="key">
           <summary>Understanding the colours<span data-preset-only> and χ²</span></summary>
           <div class="key-content">
-            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#aab8cc"></i><b>Grey bars</b> show the gap at each point in km/s: up means the model is too slow there, down too fast. A big bar matters less where the error bar is wide.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough (2 to 10), <span class="r">red</span> poor (above 10). The cut-offs are this site’s rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
+            <ul><li data-preset-only><i class="sw dot" style="background:#f4f7fb"></i><b>White points</b> are measured speeds of <span data-galaxy-name>NGC 3198</span> (SPARC); bars show uncertainty.</li><li><i class="sw ldash" style="border-color:#5fd0e0"></i><b>Cyan dashed</b> is the speed expected from visible matter only (stars + gas).</li><li><i class="sw dash" style="border-color:#b39ae8"></i><b>Purple</b> is the extra speed supplied by the dark matter halo (NFW mode).</li><li><i class="sw" style="background:#ffae5c"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span></li><li data-preset-only><i class="sw bar" style="background:#aab8cc"></i><b>Grey bars</b> show each point’s gap in error bars: up means the model is too slow there, down too fast.</li><li data-preset-only><b>Fit badge:</b> <span class="g">green</span> close (χ<sup>2</sup><sub>r</sub> below 2), <span class="o">yellow</span> rough (2 to 10), <span class="r">red</span> poor (above 10). The cut-offs are this site’s rule of thumb, not a published standard.</li><li id="componentKey" hidden><b>Thin dotted lines</b> show your custom galaxy's stellar disk, bulge and gas contributions; their squared speeds add to give the cyan curve.</li></ul>
             <div data-preset-only>
             <h3>What do χ² and χ<sup>2</sup><sub>r</sub> mean?</h3>
             <p>At each point, divide the gap between model and measurement by the error bar and square it; χ² is the total. χ<sup>2</sup><sub>r</sub> divides that by the number of points minus the values tuned, so galaxies and models compare fairly. Missing every point by one error bar gives about 1; by three, about 9.</p>
@@ -3808,7 +3808,8 @@ window.GALAXIES = {
       b.className=verdict.cls;
       const fc=document.getElementById('tm-chi');fc.textContent=red.toFixed(2);fc.className=verdict.cls;
     }
-    const residualsOf=total=>obsV.map((v,i)=>v-total[i]);
+    // Each bar is that point's miss in error bars, (V_obs − V_model)/σ, the term χ² squares and adds up (the sandbox has none).
+    const residualsOf=total=>obsV.map((v,i)=>obsErr[i]>0?(v-total[i])/obsErr[i]:0);
     // Residual bars are one neutral grey (direction shows the sign), so they never share a colour with a curve or a fit verdict.
     const RESIDUAL_COLOR='rgba(170,184,204,0.6)',RESIDUAL_SWATCH='#aab8cc';
     const AXIS={gridcolor:'rgba(148,170,200,0.08)',gridwidth:1,zerolinecolor:'rgba(148,170,200,0.3)',linecolor:'rgba(148,170,200,0.32)',showline:true,mirror:false,tickcolor:'rgba(148,170,200,0.32)',ticks:'outside',ticklen:4,automargin:true,tickfont:{size:11,color:'#8e9db3',family:'JetBrains Mono,ui-monospace,Consolas,monospace'},title:{font:{size:12,color:'#b8c4d6'}}};
@@ -3831,7 +3832,7 @@ window.GALAXIES = {
       {type:'scatter',mode:'lines',name:LEGEND_NAMES.visible,x:radii,y:vBary.slice(),line:{color:'#5fd0e0',width:2.2,dash:'6px,4px',shape:'spline',smoothing:0.6},hovertemplate:'Visible <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Dark matter halo',x:radii,y:halo,fill:'tozeroy',fillcolor:'rgba(179,154,232,0.08)',line:{color:'#b39ae8',width:1.8,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:'Halo <b>%{y:.0f}</b> km/s<extra></extra>'},
       {type:'scatter',mode:'lines',name:'Total model',x:radii,y:total,line:{color:'#ffae5c',width:3,shape:'spline',smoothing:0.6},hovertemplate:'Model <b>%{y:.0f}</b> km/s<extra></extra>'},
-      {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:RESIDUAL_COLOR},hovertemplate:'Residual <b>%{y:+.0f}</b><extra></extra>'},
+      {type:'bar',name:'Residual',visible:!customActive,x:radii,y:residualsOf(total),yaxis:'y2',showlegend:false,width:residualBarWidth(),marker:{color:RESIDUAL_COLOR},hovertemplate:'Residual <b>%{y:+.1f}</b> error bars<extra></extra>'},
       ...COMPONENT_STYLE.map(([name,color],i)=>({type:'scatter',mode:'lines',name,x:radii,y:componentCurves[i].slice(),visible:componentVisible(i),line:{color,width:1.6,dash:'dot',shape:'spline',smoothing:0.6},hovertemplate:name+' <b>%{y:.0f}</b><extra></extra>'})),
       curveGhostTrace() // last trace: updateHalo's Plotly.update leaves it alone
     ];
@@ -3842,7 +3843,7 @@ window.GALAXIES = {
     const curveLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',margin:{l:66,r:20,t:44,b:54},font:{color:textColor,size:12,family:'Inter,Segoe UI,system-ui,sans-serif'},
       xaxis:{...AXIS,fixedrange:true,title:{text:'Radius, R (kpc)',standoff:10,font:{size:12,color:'#b8c4d6'}},anchor:'y2',showgrid:true,zeroline:false,hoverformat:'.1f'},
       yaxis:{...AXIS,title:{text:'Orbital speed, V (km/s)',standoff:10,font:{size:12,color:'#b8c4d6'}},range:[0,190],fixedrange:true,domain:[0.32,1],zeroline:false},
-      yaxis2:{...AXIS,title:{text:'Obs − model<br>(km/s)',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
+      yaxis2:{...AXIS,title:{text:'Obs − model<br>(error bars)',standoff:6,font:{size:11,color:'#b8c4d6'}},domain:[0,0.24],anchor:'x',zeroline:true,zerolinewidth:1.5,nticks:4,fixedrange:true},
       bargap:0.2,legend:{orientation:'h',yanchor:'bottom',y:1.02,xanchor:'left',x:0,font:{size:11.5,color:'#cdd6e3'},itemsizing:'constant',itemwidth:36,entrywidth:196,tracegroupgap:4}, // fixed width: Plotly can measure the text before Inter loads, so entries overlapped
       hovermode:false,dragmode:false};
     // On a phone-width screen the legend sits two entries per row (with shorter names, see LEGEND_NAMES) and the
@@ -4012,7 +4013,7 @@ window.GALAXIES = {
           html+=`<div class="ch-row"><i style="background:${colour}"></i><span>${label||(mondMode?'MOND':'Model')}</span><b>${value} km/s</b></div>`;
           dots.push([k,colour]);
         });
-        if(isOn(d[4])&&d[4].y){const r=Number(d[4].y[i]);html+=`<div class="ch-row ch-res"><i style="background:${RESIDUAL_SWATCH}"></i><span>Residual</span><b>${r>=0?'+':'−'}${Math.abs(r).toFixed(0)} km/s</b></div>`;}
+        if(isOn(d[4])&&d[4].y){const r=Number(d[4].y[i]);html+=`<div class="ch-row ch-res"><i style="background:${RESIDUAL_SWATCH}"></i><span>Residual</span><b>${r>=0?'+':'−'}${Math.abs(r).toFixed(1)} error bars</b></div>`;}
         rowsEl.innerHTML=html;
         dotsEl.innerHTML=dots.map(([,c])=>`<div class="ch-dot" style="color:${c}"></div>`).join('');
       }

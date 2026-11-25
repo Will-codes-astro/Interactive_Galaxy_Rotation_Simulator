@@ -313,7 +313,8 @@ While a halo or sandbox slider moves, the rotation curve is redrawn every frame
 through Plotly's light transition path (`updateHalo(true)`); the speed axis only
 grows mid-drag, and a full redraw fits the axes once the
 slider settles. Residual bars are one neutral grey (their direction shows the
-sign; the panel's axis and the guide say they are in km/s), and the fit verdicts are green, yellow and red, so neither shares a
+sign). Each bar is that point's miss in error bars, (V_obs − V_model)/σ, the term χ² squares and adds
+up, so the bars and the fit badge always agree; the axis, the hover readout and the guide say so, and the fit verdicts are green, yellow and red, so neither shares a
 colour with a curve (`RESIDUAL_COLOR`).
 
 The 3D view (the "3D galaxy simulation" panel) also draws the cold gas as a faint blue cloud (the View panel's

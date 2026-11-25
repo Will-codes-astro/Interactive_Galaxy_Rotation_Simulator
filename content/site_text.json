@@ -2714,12 +2714,12 @@
   "text": "<i class=\"sw\" style=\"background:#ffae5c\"></i><b>Orange</b> is the combined model (or the MOND prediction in MOND mode).<span data-preset-only> The closer it hugs the white points, the better the fit.</span>"
  },
  {
-  "id": "54ef5e7538",
+  "id": "660d5f315c",
   "kind": "html",
   "page": "simulator",
   "section": "Fig. 2Rotation curve",
   "label": "List item",
-  "text": "<i class=\"sw bar\" style=\"background:#aab8cc\"></i><b>Grey bars</b> show the gap at each point in km/s: up means the model is too slow there, down too fast. A big bar matters less where the error bar is wide."
+  "text": "<i class=\"sw bar\" style=\"background:#aab8cc\"></i><b>Grey bars</b> show each point’s gap in error bars: up means the model is too slow there, down too fast."
  },
  {
   "id": "376e2144f9",
@@ -4518,12 +4518,12 @@
   "text": "Orbital speed, V (km/s)"
  },
  {
-  "id": "789df92153",
+  "id": "0b9aca903c",
   "kind": "js",
   "page": "messages",
   "section": "Legend names",
   "label": "Card explanation",
-  "text": "Obs − model<br>(km/s)"
+  "text": "Obs − model<br>(error bars)"
  },
  {
   "id": "8bbb291637",
@@ -4564,6 +4564,14 @@
   "section": "Update",
   "label": "Message",
   "text": "Too ${mean>0?'small':'big'}: MOND predicts stars too ${mean>0?'slow':'fast'}, off by <b>${miss}%</b>. Slide ${mean>0?'right':'left'}."
+ },
+ {
+  "id": "2f9bdd3dfe",
+  "kind": "js",
+  "page": "messages",
+  "section": "Fill",
+  "label": "Message",
+  "text": "<div class=\"ch-row ch-res\"><i style=\"background:${RESIDUAL_SWATCH}\"></i><span>Residual</span><b>${r>=0?'+':'−'}${Math.abs(r).toFixed(1)} error bars</b></div>"
  },
  {
   "id": "df9089bca2",
