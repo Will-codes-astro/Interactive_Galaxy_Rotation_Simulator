@@ -1341,24 +1341,22 @@
         <table class="mini-table boost-table"><thead><tr><th scope="col">Newtonian pull, g<sub>N</sub></th><th scope="col">Speed boost</th></tr></thead><tbody><tr><td>10 × a<sub>0</sub></td><td>+2%</td></tr><tr><td>3 × a<sub>0</sub></td><td>+10%</td></tr><tr><td>a<sub>0</sub></td><td>+26%</td></tr><tr><td>a<sub>0</sub> ÷ 10</td><td>+92%</td></tr><tr><td>a<sub>0</sub> ÷ 100</td><td>+224%</td></tr></tbody></table>
         </div>
         <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
-        <p>a<sub>0</sub> is <b>measured from galaxies</b>, not predicted by any theory. It marks the middle of MOND’s change from ordinary gravity to boosted gravity, not the point where the boost starts.</p>
+        <p>a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change, not where the boost starts.</p>
         <div class="a0-facts">
-          <p><b>What a<sub>0</sub> does.</b> MOND’s rule for weak gravity, g = √(g<sub>N</sub> a<sub>0</sub>), needs one number before it can predict real speeds. Far from a galaxy it gives a flat speed with v⁴ = G M a<sub>0</sub> (Milgrom 1983): double a<sub>0</sub> and every outer star should orbit 19% faster. So the speeds of real outer stars pin a<sub>0</sub> down.</p>
-          <p><b>Why is the boost already ×1.6 at a<sub>0</sub>?</b> Because a<sub>0</sub> is where MOND’s two simple rules cross, Newton’s ×1 and the weak-gravity ×√(a<sub>0</sub> ÷ g<sub>N</sub>), not where the boost begins. Both rules give ×1 there: a sharp corner. Nature is not expected to turn a sharp corner, so a smooth formula rounds it and passes above both lines. The boost fades in with no exact starting point (stars are 10% faster at 3 a<sub>0</sub>, 2% at 10 a<sub>0</sub>), but the crossing is exact, so that is what defines a<sub>0</sub>.</p>
-          <p><b>The ×1.6 is not part of a<sub>0</sub>.</b> How tightly the corner is rounded is a separate choice. The “standard” formula gives ×1.27 at a<sub>0</sub> and the “simple” one ×1.62 (Famaey &amp; McGaugh 2012), with the same a<sub>0</sub> and the same far-out speeds. This simulator uses the formula fitted to SPARC, which gives ×1.58 (McGaugh, Lelli &amp; Schombert 2016).</p>
+          <p><b>Why ×1.6 at a<sub>0</sub>, not ×1?</b> a<sub>0</sub> is where MOND’s two rules cross: ×1 for strong gravity, ×√(a<sub>0</sub> ÷ g<sub>N</sub>) for weak. Gravity rounds that corner smoothly, so the curve passes above both. The ×1.6 comes from how it is rounded, not from a<sub>0</sub>; other formulas give ×1.3 to ×1.6 (Famaey &amp; McGaugh 2012).</p>
+          <p><b>What a<sub>0</sub> controls.</b> How fast the outer stars orbit: v⁴ = G M a<sub>0</sub> (Milgrom 1983). So measured speeds pin a<sub>0</sub> down.</p>
         </div>
         <h4 class="a0-head">Find a<sub>0</sub> yourself</h4>
-        <p>Each dot is one radius of a real galaxy: across, how hard its visible matter pulls; up, how much stronger gravity must be to explain the speed actually measured there. The dots are measurements, so they never move. Slide a<sub>0</sub> and MOND’s curve slides sideways. Which value runs it through the dots?</p>
+        <p>Each dot is a real measurement, so it stays put. Slide a<sub>0</sub> to move MOND’s curve. Where does it fit?</p>
         <figure class="a0-graph">
           <svg id="a0Plot" viewBox="0 0 400 250" role="img" aria-label="Log-log graph of the gravity boost real galaxies need against the visible matter’s pull, with MOND’s curve for the chosen a0. The curve runs through the dots only when a0 is close to 1.2 × 10⁻¹⁰ m/s²."></svg>
           <div class="a0-controls"><span class="a0-value" id="a0Value"></span><input type="range" id="a0Slider" min="-11" max="-9" step="0.005" value="-10.6" aria-label="MOND’s a0, from 0.1 to 10 × 10⁻¹⁰ m/s²"><button type="button" class="a0-snap" id="a0Snap">Measured value</button></div>
           <p class="a0-readout" id="a0Readout" aria-live="polite"></p>
-          <figcaption>Dots: every measured radius of the four SPARC galaxies here, with SPARC’s standard mass-to-light ratios; boost = the pull the measured speed needs ÷ the visible matter’s pull (Lelli, McGaugh &amp; Schombert 2016). Curve and dashed rules: the simulator’s MOND formula for the chosen a<sub>0</sub> (McGaugh, Lelli &amp; Schombert 2016). “Miss” = typical gap between the curve and the dots, as a speed. One inner NGC 3198 point (×0.3) lies below the graph.</figcaption>
+          <figcaption>Dots: every radius of the four SPARC galaxies here (Lelli, McGaugh &amp; Schombert 2016). Curve: the simulator’s MOND formula (McGaugh, Lelli &amp; Schombert 2016). One inner NGC 3198 point lies below the graph.</figcaption>
         </figure>
         <div class="a0-facts">
-          <p><b>One a<sub>0</sub> for every galaxy.</b> These four galaxies, from the massive spiral NGC 7331 to the faint, diffuse UGC 128, all line up at one value. MOND claims a<sub>0</sub> is a constant of nature (Milgrom 1983); if each galaxy needed its own value, MOND would be in trouble.</p>
-          <p><b>The official value.</b> Fitting 2,693 points in 153 SPARC galaxies gives a<sub>0</sub> = 1.20 ± 0.02 × 10⁻¹⁰ m/s², with a further ±0.24 from uncertain star masses (McGaugh, Lelli &amp; Schombert 2016). That is about 10¹¹ times weaker than gravity at Earth’s surface.</p>
-          <p><b>An unexplained coincidence.</b> a<sub>0</sub> is close to c × H<sub>0</sub> ÷ 2π, the speed of light times the Universe’s expansion rate, about 1.1 × 10⁻¹⁰ m/s² (Famaey &amp; McGaugh 2012). Nobody knows whether this means something deep or is chance.</p>
+          <p><b>The measured value.</b> 153 SPARC galaxies give a<sub>0</sub> = 1.20 × 10⁻¹⁰ m/s², the same for every galaxy, just as MOND claims (McGaugh, Lelli &amp; Schombert 2016).</p>
+          <p><b>A strange coincidence.</b> a<sub>0</sub> is close to c × H<sub>0</sub> ÷ 2π, built from the speed of light and the Universe’s expansion rate (Famaey &amp; McGaugh 2012). No one knows why.</p>
         </div>
         </details>
         <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
@@ -3927,8 +3925,8 @@ window.GALAXIES = {
         document.getElementById('a0Value').textContent=`a₀ = ${sci(la)}`;
         const miss=Math.round((10**(rms/2)-1)*100);
         readout.innerHTML=Math.abs(la-bestLog)<=A0_NEAR_BEST_DEX
-          ?`<b>That’s the best match</b> for these four galaxies (≈ ${sci(bestLog)}): MOND misses their measured speeds by only about <b>${miss}%</b>.`
-          :`The curve sits too far ${mean>0?'left':'right'}: MOND gives too ${mean>0?'little':'much'} boost, so it predicts these stars orbit too ${mean>0?'slowly':'fast'}, missing by about <b>${miss}%</b>. Slide ${mean>0?'right':'left'}.`;
+          ?`<b>Best fit</b> for these galaxies: MOND misses the measured speeds by only <b>${miss}%</b>.`
+          :`Too ${mean>0?'small':'big'}: MOND predicts stars too ${mean>0?'slow':'fast'}, off by <b>${miss}%</b>. Slide ${mean>0?'right':'left'}.`;
       }
       slider.addEventListener('input',update);
       document.getElementById('a0Snap').addEventListener('click',()=>{slider.value=A0_MEASURED_LOG;update();});

@@ -579,17 +579,15 @@ changes, values tuned to each galaxy here (2 for the halo, 0 for MOND), best evi
 biggest open problem, each cited. In each idea's card the schematic comes straight after the one-line
 summary, before the text (picture first); the MOND card's a₀ explanation sits beside the boost table,
 and "Where does a₀ come from?" is a fold-out that works as the a₀ explainer. It opens with one line (a₀ is
-measured, and marks the middle of MOND's change, not its start), then three cards: what a₀ does (v⁴ = GMa₀),
-why the boost is already ×1.58 at a₀ (a₀ is where the ×1 and ×√(a₀/g_N) rules cross; the smooth formula rounds
-that corner) and why that ×1.58 belongs to the formula, not to a₀ (standard ×1.27, simple ×1.62). "Find a₀
+measured, and marks the middle of MOND's change, not its start), then two short cards: why the boost is already ×1.6 at a₀ (a₀ is where the ×1 and ×√(a₀/g_N) rules cross;
+the formula rounds that corner, ×1.3 to ×1.6 depending on the formula) and what a₀ controls (v⁴ = GMa₀). "Find a₀
 yourself" follows: a log-log graph (`#a0Plot`, drawn by `setupA0Explainer`) of the gravity boost the measured
 speed needs, V_obs²/V_bar² (×0.6 to ×20), against the visible pull g_N = V_bar²/R in m/s² (10⁻¹²·³ to 10⁻⁸·⁷),
 with every radius of the SPARC presets as fixed dots (SPARC's standard mass-to-light ratios). A slider sets a₀
 (0.1 to 10 × 10⁻¹⁰ m/s², opening at 0.25) and slides the page's own `mondVelocity` curve, the two dashed rules
-and an a₀ line sideways; a "Measured value" button jumps to 1.20. The readout gives the rms gap between curve and
+and an a₀ line sideways; a "Measured value" button jumps to 1.20. The one-line readout gives the rms gap between curve and
 dots as a speed and says which way to slide, or that it is the best match for these four galaxies (≈1.11, found
-by scanning the slider's range; within ±0.04 dex counts as best). Three cards follow: one a₀ for every galaxy,
-the official value (1.20 ± 0.02 ± 0.24, 2,693 points in 153 galaxies) and the unexplained a₀ ≈ cH₀/2π
+by scanning the slider's range; within ±0.04 dex counts as best). Two cards follow: the measured value (1.20, 153 galaxies) and the unexplained a₀ ≈ cH₀/2π
 coincidence. A lone last card spans the full width. Below them is a full-width box, "Beyond rotation curves: the wider
 evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with a tag for the idea it points
