@@ -187,6 +187,14 @@ median χ²/N barely moves (9.9 → 10.5).
   at each radius, holds the last shade beyond the data and fades out by 1.6 × the
   last radius. `mondZoneLayout` (page JS); it changes no model numbers.
 
+**a₀ slider (25 Nov 2026).** In MOND mode the simulator has a slider for a₀
+(0.1 to 10 × 10⁻¹⁰ m/s², log scale; `#mondA0Slider`, `a0Manual` in page JS) so a
+visitor can see what the constant does: a smaller a₀ shrinks the boost, so the
+outer speeds fall (far out, v⁴ = G M a₀). It changes only the page's live model
+and orbits, never the Scorecard or the best fits, which keep the measured a₀ or
+their fitted one. The physics check "MOND a0 slider moves the stars" guards it
+(a₀ ÷ 10 for NGC 3198: outer model speed × 0.61, stars move 13.5 kpc on average).
+
 ## Goodness of fit
 
 χ² = Σᵢ [(V_obs,i − V_model,i) / σᵢ]²,  χ²_ν = χ² / (N − k)
@@ -196,7 +204,9 @@ generator, read by `tunedCount` and `reducedChi` in page JS, and by
 `tuned_count_text` for the k values quoted on the page): 2 for the NFW halo (M₂₀₀, r_s) or 1 for the MOND best fit (a₀), plus
 the galaxy settings a best fit tunes (`tuned_settings`: Υ_disk, D, i, and
 Υ_bulge where there is a bulge). Visible matter only and MOND at the default a₀
-use SPARC's values, so k = 0, and the standard-values halo fit k = 2. So the NFW best fit has k = 5 (6 with a bulge) and
+use SPARC's values, so k = 0, and the standard-values halo fit k = 2. MOND with a₀ set by hand on
+the simulator's slider (`mondTuned`, 25 Nov 2026) has k = 1, as the halo's two sliders count 2; with
+Best realistic fits on, a hand-set a₀ replaces the fit's and k stays the MOND best fit's. So the NFW best fit has k = 5 (6 with a bulge) and
 the MOND best fit k = 4 (5). Will chose this rule on 14 Nov 2026 so that the two
 models are compared fairly; before that the page used N − 2 in every mode. A
 halo set by hand with the sliders still counts its 2, plus the fit's settings

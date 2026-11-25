@@ -60,6 +60,8 @@ const documentStub = stub('document');
 documentStub.getElementById = id => element(id);
 documentStub.querySelectorAll = sel => (/galaxyMode/.test(sel) ? modeRadios : []);
 documentStub.querySelector = sel => { const m = sel.match(/^#([\w-]+)$/); return m ? element(m[1]) : stub('qs'); };
+// The "Find a0 yourself" chart unpacks its moving group's five children (line, label, rule, curve, corner).
+element('a0Plot').querySelector = () => Object.assign(stub('#a0Moving'), { children: Array.from({ length: 5 }, (_, i) => stub('a0Moving.child' + i)) });
 
 const ctx = {
   console, Math, JSON, Date, Array, Object, Number, String, Boolean, Map, Set, WeakMap, Promise, Symbol,
@@ -89,6 +91,7 @@ const exportApi = `
   activeHaloMassT: () => activeHaloMassT,
   setMond: on => { mondMode = on; applyBaryonState(); },
   setFitApplied: on => { nfwFitApplied = on; applyBaryonState(); },
+  setA0: a0 => { a0Manual = a0; applyBaryonState(); }, // the MOND a0 slider (null: the measured value)
   mondVelocity, nfwVelocityModel, baryonicVelocity,
   modelCurves, starCountFor, reducedChi, tunedCount, activeFit, scoreGalaxy,
   defaults: () => DEFAULTS, frameCount, MOND_A0,
@@ -179,6 +182,15 @@ const mondA = run(d.massT, d.scaleRadius), mondB = run(d.massT * 3, d.scaleRadiu
 out.mond_halo_mass_used = mondA.haloMassT;
 out.mond_shift_when_halo_sliders_move = meanShift(mondA.final, mondB.final);
 out.reduced_chi2_mond = reducedChi(P.modelCurves(d.massT, d.scaleRadius).total, 'mond');
+// The a0 slider: ten times smaller must slow the outer curve and move the stars (it is real physics, not a label).
+P.setA0(P.MOND_A0 / 10);
+{
+  const low = run(d.massT, d.scaleRadius), lowTotal = P.modelCurves(d.massT, d.scaleRadius).total;
+  const stdTotal = (P.setA0(null), P.modelCurves(d.massT, d.scaleRadius).total);
+  out.mond_shift_when_a0_slider_moves = meanShift(mondA.final, low.final);
+  out.mond_outer_speed_ratio_a0_tenth = lowTotal[lowTotal.length - 1] / stdTotal[stdTotal.length - 1];
+  out.mond_tuned_values_hand_a0 = P.tunedCount('mondTuned', null);
+}
 P.setMond(false);
 // Deep-MOND limit: g -> sqrt(gN * a0), so v^4 -> vN^2 * a0 * r.
 {

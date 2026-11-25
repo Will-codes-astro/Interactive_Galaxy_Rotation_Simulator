@@ -31,6 +31,15 @@ It is two colour-coded cards (Will's choice): "Dark matter halo: extra unseen
 mass" (purple, like the halo line) and "MOND: gravity changes, no extra mass"
 (gold). The cards set the hidden `#mondToggle` checkbox that the rest of the page
 listens to. Its hint suggests trying MOND in NFW mode and gives a₀ in MOND mode.
+In MOND mode the two halo sliders give way to "MOND's constant, a₀" (`#a0Control`; in the fullscreen
+corner box `#fsA0Slider`), added 25 Nov 2026 so a visitor can test MOND's one value as they can the
+halo's two. It is a log slider from 0.1 to 10 × 10⁻¹⁰ m/s² (its value is log10 a₀), read out in units of
+10⁻¹⁰ m/s² everywhere (`formatA0`) so any value reads straight against the measured 1.20. Within 0.01
+dex (`A0_SNAP_DEX`) it snaps onto its reference, the measured a₀ or, with Best realistic fits on, the
+MOND best fit's, and its button ("Measured value" or "Best-fit value") puts it back there. A hand-set
+a₀ counts as one tuned value (badge: "MOND, your a₀ · 1 tuned"; with best fits on, "Your a₀, with the best
+fit's M/L, distance and tilt"). It goes back to its reference when the galaxy, the galaxy source or the
+Best realistic fits switch changes, and the orbits follow it as they follow the halo sliders.
 With MOND on, for every galaxy (preset or sandbox), the rotation curve's speed panel shades in gold
 with opacity in proportion to MOND's boost at each radius (a 1% boost is all but invisible), so it is
 faint near the centre and deepens outwards and covers the whole graph in every preset galaxy
@@ -82,9 +91,10 @@ them to go back and points at the top-menu entry.
 
 The homepage opens the site, before any control. It is laid out like the front
 of a paper: an eyebrow ("Galaxy rotation curves · real SPARC data"), the title "Galaxy rotation and
-the missing mass problem", a two-sentence lead and a structured abstract (`.abstract`: Aim, Data,
+the missing mass problem", a two-sentence lead and a structured abstract (`.abstract`: Question, Data,
 Models, Test, two by two, each cited; Data lists the preset galaxies from `__GALAXY_NAMES__` and Test
-links to the Scorecard). The wording of the Aim is a placeholder for Will's own research question.
+links to the Scorecard). Question is a short form of Will's research question (25 Nov 2026), and
+Test names reduced χ² (χ²ᵣ), the score the badge and Scorecard show.
 The hero pairs this with a
 face-on galaxy drawn on a canvas (`startHeroGalaxy`): the default galaxy, every point
 moving on a circle at the speed SPARC measured at its radius (straight lines between
@@ -371,7 +381,7 @@ the box opens right beside its control, and if an opened info box would sit
 under the tutorial card, the card moves to the other side. Ending or
 skipping the tour unlocks everything. Instructions with several actions show
 one numbered action at a time.
-The main tutorial's 21 steps start from the mass discrepancy in the rotation curve ("Spot the mass discrepancy")
+The main tutorial's 22 steps start from the mass discrepancy in the rotation curve ("Spot the mass discrepancy")
 (measured speeds stay above the visible-matter prediction; the pointer must
 cover all three stretches of the graph's right half), then remove and
 restore the halo (adding it back is done once the model reaches 90% of the
@@ -380,7 +390,7 @@ measured speeds over the outer third of the points), change its shape (at least 
 radius, concentration), then fit the halo by hand: break the fit with Halo
 mass, then tune both sliders until the badge reads Close fit (Fit halo to
 data stays locked; if the last card left the fit off already, part 1 just asks for a drag). For a galaxy whose published halo fit is not Close, the goal
-is χ²ᵣ within 1.25 × that fit's value. Then it compares MOND and its best-fit
+is χ²ᵣ within 1.25 × that fit's value. Then it compares MOND, has the visitor turn its one dial, a₀ ("MOND's one dial"), and its best-fit
 switch ("Test a rival idea" keeps the halo's χ²ᵣ from when the card opened and shows it, since it vanishes once
 MOND is chosen). A "watch it happen" chapter then runs inside fullscreen, where the
 tour card follows: hide the gas and halo, look face-on with orbit lines,
@@ -582,8 +592,31 @@ scores badly here": tiny error bars, hard limits, and Li et al. 2018's acceptabl
 fits for most SPARC galaxies with soft limits) state
 what limits the comparison; they do not say which idea wins.
 
-The two ideas page opens with a full-width "Side by side" table (`.compare-table`): what each idea
-changes, values tuned to each galaxy here (2 for the halo, 0 for MOND), best evidence for it and its
+Predict-first cards (25 Nov 2026, so visitors work as investigators: predict, test, explain). A step's
+`predict` gives a question, its options, the right answer's index and an optional `onPick` (the race uses
+it to restart its clock). The card's controls stay locked until a prediction is chosen; then the done
+message (`tutorialCalled`) begins "You called it:" after the right answer, or, after a wrong one, gives
+the same explanation in orange under "Not quite." and waits for Next instead of moving on by itself
+(`completeTutorialAction` applies this to every predict card, whichever check finishes it). Four cards
+use it: "Take the dark matter away" (what the orange line will do with no halo), "MOND's one dial" (what
+a ten-times-smaller a₀ does to it; drag a₀ to within `TOUR_A0_LOW_DEX` of the slider's left end, then
+press Measured value), "Which star laps more?" and "Pull the halo away" (what the outer stars will do;
+the card no longer says the answer before it is asked).
+
+The two ideas page opens with "How we got here" (`#history`, 25 Nov 2026): a timeline of nine dated
+clues in the order they arrived, from Zwicky (1933) to what is still open today, each cited and
+coloured by what it points to (blue the problem, purple dark matter, orange MOND, grey data and open
+questions, with a key underneath). It mirrors the report's chronological story. On wide screens the
+years sit along one axis (`.timeline`, a nine-column grid whose `li` are `display:contents`) with the
+chosen year's story in a box under it; on phones (700 px or less) it is a vertical list with each
+story under its year and the axis running past it. One story is open at a time (`.tl-pick` buttons
+with `aria-expanded`; arrow keys step along), the first by default, and each ends with a link to the
+card that explains it (`#evClusters`, `#puzzle`, `#ideaMond`, `#ideaHalo`, `#evBullet`, `#mMeasure`,
+`#evRar`, `#evCmb`, `#evOpen`). Its dots pop in one after another when it scrolls into view (not with
+reduced motion or lite visuals).
+
+Then comes a full-width "Side by side" table (`.compare-table`): what each idea
+changes, values tuned to each galaxy with standard values (2 for the halo, 0 for MOND), best evidence for it and its
 biggest open problem, each cited. In each idea's card the schematic comes straight after the one-line
 summary, before the text (picture first); the MOND card's a₀ explanation sits beside the boost table,
 and "Where does a₀ come from?" is a fold-out that works as the a₀ explainer. It opens with one line (a₀ is

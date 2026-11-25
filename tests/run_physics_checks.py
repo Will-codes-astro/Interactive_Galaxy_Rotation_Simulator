@@ -145,6 +145,11 @@ def javascript_checks() -> dict | None:
           "MOND mode uses no dark matter",
           f"a0 = {m['mond_a0']:.1e} m/s^2, halo mass {m['mond_halo_mass_used']}, "
           f"halo sliders move stars {m['mond_shift_when_halo_sliders_move']:.2f} kpc")
+    check(m["mond_shift_when_a0_slider_moves"] > 0.5 and m["mond_outer_speed_ratio_a0_tenth"] < 0.9
+          and m["mond_tuned_values_hand_a0"] == 1,
+          "MOND a0 slider moves the stars",
+          f"a0 ten times smaller: outer speed x{m['mond_outer_speed_ratio_a0_tenth']:.2f}, stars move "
+          f"{m['mond_shift_when_a0_slider_moves']:.1f} kpc, counted as {m['mond_tuned_values_hand_a0']} value tuned")
     check(m["mond_deep_limit_relative_error"] < 1e-3 and 0 <= m["mond_strong_gravity_relative_boost"] < 0.01,
           "MOND formula limits",
           "matches Newton where gravity is strong and v^4 = G M a0 where it is weak")

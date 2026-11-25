@@ -52,7 +52,7 @@ LIMIT_TOLERANCE = 1e-3
 SETTING_NAMES = ("upsilon_disk", "upsilon_bulge", "distance_mpc", "inclination_deg")
 # Values each model tunes to a galaxy, before the galaxy settings a best fit also tunes (its fit record's
 # tuned_settings). k in chi2_r = chi2 / (N - k). The page's chi2_r and the Method text both come from this.
-MODEL_TUNED_VALUES = {"visible": 0, "nfw": 2, "mond": 0, "mondBest": 1}
+MODEL_TUNED_VALUES = {"visible": 0, "nfw": 2, "mond": 0, "mondTuned": 1, "mondBest": 1}  # mondTuned: a0 set by hand
 
 
 class GalaxyPreset(NamedTuple):
@@ -650,7 +650,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .fs-sliders output { color:var(--ink); font-variant-numeric:tabular-nums; }
     .fs-sliders input[type=range] { width:100%; height:16px; margin:0; }
     .control[hidden] { display:none; }
-    @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto repeat(2,minmax(0,1fr)); } }
+    @media (min-width:961px) { .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:auto minmax(0,1.35fr) repeat(2,minmax(0,1fr)); } }
     .gravity-label { display:block; margin-bottom:9px; color:var(--ink-2); font-size:12.5px; font-weight:500; }
     /* Gravity model: two colour-coded cards. Purple = dark matter (the halo line and 3D halo), gold = MOND (its zone). */
     .model-cards { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:8px; margin:2px 0 0; }
@@ -1056,7 +1056,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* Narrower laptops: the gravity model takes its own row, so the four slider columns have room for their values. */
     @media (min-width:961px) and (max-width:1279px) {
       .sim-stage .controls { grid-template-columns:repeat(4,minmax(0,1fr)); }
-      .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .sim-stage .controls:has(#massControl[hidden]) { grid-template-columns:repeat(3,minmax(0,1fr)); }
       .sim-stage .gravity-control { grid-column:1/-1; display:flex; align-items:center; flex-wrap:wrap; gap:8px 18px; }
       .sim-stage .gravity-control .model-cards { flex:0 1 460px; }
       .sim-stage .gravity-control .control-help { flex:1 1 240px; margin:0; }
@@ -1317,6 +1317,54 @@ HTML_TEMPLATE = r"""<!doctype html>
     .score-notes-title + .score-notes { margin-top:8px; padding-top:0; border-top:0; }
     /* Wider evidence: a full-width box under the two theory boxes. */
     .learn article.evidence { grid-column:1/-1; }
+
+    /* History timeline (The two ideas): a row of years on wide screens with the chosen year's story under it, and a
+       vertical list on phones with each story under its own year. Colours follow the site: blue for the clues to the
+       problem, purple dark matter, orange MOND, grey data and open questions. */
+    .learn article.history { grid-column:1/-1; padding-bottom:18px; }
+    #history, #ideaHalo, #ideaMond, .evidence-card[id], #evOpen, #mMeasure { scroll-margin-top:72px; }
+    .timeline { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); margin:2px 0 0; padding:0; list-style:none; }
+    .timeline > li { display:contents; --tl:#8ab4f8; }
+    .timeline > li.tl-dm, .tl-key .tl-dm { --tl:#b39ae8; } .timeline > li.tl-mond, .tl-key .tl-mond { --tl:#ffae5c; } .timeline > li.tl-data, .tl-key .tl-data { --tl:#aab8cc; }
+    .tl-pick { grid-row:1; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; padding:6px 0 8px; border:0; border-radius:var(--r); background:none; color:var(--ink-2); font:inherit; text-align:center; cursor:pointer; }
+    .tl-pick:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
+    .tl-year { font:500 12px var(--f-mono); color:var(--muted); transition:color .25s; }
+    .tl-title { padding:0 4px; font-size:12.5px; line-height:1.3; transition:color .25s; }
+    .tl-pick:hover .tl-year, .tl-pick[aria-expanded=true] .tl-year { color:var(--tl); }
+    .tl-pick:hover .tl-title, .tl-pick[aria-expanded=true] .tl-title { color:var(--ink); }
+    .tl-pick[aria-expanded=true] .tl-title { font-weight:600; }
+    /* The axis is drawn a piece at a time, one per year, so it always meets the dots whatever the widths. */
+    .tl-dot { position:relative; align-self:stretch; height:14px; }
+    .tl-dot::before { content:''; position:absolute; left:0; right:0; top:50%; height:1px; background:var(--line-strong); }
+    .timeline > li:first-child .tl-dot::before { left:50%; } .timeline > li:last-child .tl-dot::before { right:50%; }
+    .tl-dot::after { content:''; position:absolute; left:50%; top:50%; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border:2px solid var(--tl); border-radius:50%; background:var(--panel); transition:background .25s, box-shadow .25s, transform .25s; }
+    .tl-pick:hover .tl-dot::after { background:color-mix(in srgb,var(--tl) 45%,var(--panel)); }
+    .tl-pick[aria-expanded=true] .tl-dot::after { background:var(--tl); box-shadow:0 0 0 5px color-mix(in srgb,var(--tl) 22%,transparent); transform:scale(1.15); }
+    .tl-detail { grid-row:2; grid-column:1/-1; display:none; margin-top:8px; padding:12px 16px; border:1px solid var(--line); border-left:3px solid var(--tl); border-radius:var(--r); background:rgba(0,0,0,.22); }
+    .tl-detail.open { display:block; }
+    .learn .tl-detail p { margin:0; max-width:92ch; }
+    .tl-more { display:inline-block; margin-top:6px; color:var(--accent); font-size:12.5px; text-decoration:none; }
+    .tl-more:hover { text-decoration:underline; }
+    .learn p.tl-key { display:flex; flex-wrap:wrap; gap:4px 16px; margin:12px 0 0; color:var(--muted); font-size:11.5px; }
+    .tl-key span::before { content:''; display:inline-block; width:8px; height:8px; margin-right:6px; border-radius:50%; background:var(--tl); vertical-align:0; }
+    .tl-key .tl-clue { --tl:#8ab4f8; }
+    html:not(.calm):not(.lite) .tl-detail.open { animation:tl-in .35s cubic-bezier(.16,1,.3,1) both; }
+    html:not(.calm):not(.lite) .history.in .tl-dot::after { animation:tl-pop .5s cubic-bezier(.16,1,.3,1) both; animation-delay:calc(.15s + var(--i) * 70ms); }
+    @keyframes tl-in { from { opacity:0; transform:translateY(4px); } }
+    @keyframes tl-pop { from { opacity:0; transform:scale(.3); } }
+    @media (max-width:700px) {
+      .timeline { grid-template-columns:minmax(0,1fr); }
+      .tl-pick { grid-row:auto; flex-direction:row; align-items:stretch; gap:10px; padding:0; text-align:left; }
+      .tl-year { flex:0 0 3.4em; padding:7px 0; text-align:right; }
+      .tl-title { padding:7px 0; }
+      .tl-dot { flex:0 0 14px; height:auto; }
+      .tl-dot::before { left:50%; right:auto; top:0; bottom:0; width:1px; height:auto; }
+      .timeline > li:first-child .tl-dot::before { left:50%; top:50%; } .timeline > li:last-child .tl-dot::before { right:auto; bottom:50%; }
+      .tl-detail { position:relative; grid-row:auto; margin:2px 0 8px calc(3.4em + 34px); }
+      /* The axis carries on past an open story: the dots' column sits 17 px left of the box (20 px past its 3 px edge). */
+      .tl-detail::before { content:''; position:absolute; left:-20.5px; top:-3px; bottom:-9px; width:1px; background:var(--line-strong); }
+      .timeline > li:last-child .tl-detail::before { display:none; }
+    }
     .evidence-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin:6px 0 14px; }
     .evidence-card { padding:12px 14px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); }
     .evidence-card h4 { margin:6px 0 6px; color:var(--ink); font:600 14.5px/1.3 var(--f-serif); }
@@ -1673,10 +1721,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     <header id="top" class="hero">
     <div class="intro"><div class="eyebrow">Galaxy rotation curves · real SPARC data</div><h1 aria-label="Galaxy rotation and the missing mass problem"><span class="w" style="--i:0">Galaxy</span> <span class="w" style="--i:1">rotation</span> <span class="w" style="--i:2">and</span> <span class="w" style="--i:3">the</span> <span class="w hl" style="--i:4">missing mass</span> <span class="w" style="--i:5">problem</span></h1><p class="lead">The outer stars and gas of a galaxy orbit faster than the gravity of its visible matter can explain. This site measures that gap in real galaxies and tests two explanations for it.</p>
       <dl class="abstract" aria-label="The project in brief">
-        <div><dt>Aim</dt><dd>Test whether a dark matter halo or modified gravity better explains how fast galaxies rotate.</dd></div>
+        <div><dt>Question</dt><dd>How well do dark matter halos and MOND reproduce the measured rotation curves of real galaxies, and can an interactive simulator help non-specialists understand the missing mass problem?</dd></div>
         <div><dt>Data</dt><dd>Measured orbit speeds of __GALAXY_NAMES__ (SPARC; Lelli, McGaugh &amp; Schombert 2016).</dd></div>
         <div><dt>Models</dt><dd>An NFW dark matter halo (Navarro, Frenk &amp; White 1996) and MOND (Milgrom 1983).</dd></div>
-        <div><dt>Test</dt><dd>χ²: how far each model misses every measured speed, in error bars, squared and added up. <a href="#scorecard">See the scores</a></dd></div>
+        <div><dt>Test</dt><dd>Reduced χ² (χ²<sub>r</sub>): roughly the squared miss per measured speed, in error bars. About 1 is as close as the data allow. <a href="#scorecard">See the scores</a></dd></div>
       </dl></div>
     <figure class="hero-galaxy">
       <canvas id="heroGalaxy" role="img" aria-label="__DEFAULT_GALAXY_NAME__ seen face-on, turning at its measured speeds"></canvas>
@@ -1711,6 +1759,21 @@ HTML_TEMPLATE = r"""<!doctype html>
     <div class="page" data-page="background">
     <div class="section-head" id="background"><span class="kicker">02</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
+      <article class="history" id="history"><h3>How we got here</h3>
+        <p class="tldr">Ninety years of clues, in the order they arrived. Select a year to see what it added.</p>
+        <ol class="timeline" aria-label="Timeline of the missing mass problem">
+          <li class="tl-clue" style="--i:0"><button type="button" class="tl-pick" aria-expanded="true" aria-controls="tl0"><span class="tl-year">1933</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The first hint</span></button><div class="tl-detail open" id="tl0"><p>Galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><a class="tl-more" href="#evClusters">Galaxy clusters →</a></div></li>
+          <li class="tl-clue" style="--i:1"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl1"><span class="tl-year">1980</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">Flat rotation curves</span></button><div class="tl-detail" id="tl1"><p>Galaxy after galaxy, stars and gas far from the centre orbit as fast as those further in, not slower as Newton’s gravity predicts from the visible matter (Rubin, Ford &amp; Thonnard 1980).</p><a class="tl-more" href="#puzzle">The missing mass problem →</a></div></li>
+          <li class="tl-mond" style="--i:2"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl2"><span class="tl-year">1983</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">MOND</span></button><div class="tl-detail" id="tl2"><p>Milgrom proposes that there is no extra mass: gravity itself becomes stronger than Newton’s law once it is very weak (Milgrom 1983).</p><a class="tl-more" href="#ideaMond">What is MOND? →</a></div></li>
+          <li class="tl-dm" style="--i:3"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl3"><span class="tl-year">1996</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The NFW halo</span></button><div class="tl-detail" id="tl3"><p>Computer simulations of cold dark matter give halos of every size the same density profile, the NFW shape this site tests (Navarro, Frenk &amp; White 1996).</p><a class="tl-more" href="#ideaHalo">What is a dark matter halo? →</a></div></li>
+          <li class="tl-dm" style="--i:4"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl4"><span class="tl-year">2006</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The Bullet Cluster</span></button><div class="tl-detail" id="tl4"><p>After two galaxy clusters collided, most of their mass ended up away from most of their visible matter (Clowe et al. 2006).</p><a class="tl-more" href="#evBullet">The Bullet Cluster →</a></div></li>
+          <li class="tl-data" style="--i:5"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl5"><span class="tl-year">2016</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">SPARC</span></button><div class="tl-detail" id="tl5"><p>A public catalogue of 175 disk galaxies, each with measured orbit speeds and a model of its stars and gas: the data this site uses (Lelli, McGaugh &amp; Schombert 2016).</p><a class="tl-more" href="#mMeasure">Method: start from real measurements →</a></div></li>
+          <li class="tl-mond" style="--i:6"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl6"><span class="tl-year">2016</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">One curve</span></button><div class="tl-detail" id="tl6"><p>Across 153 SPARC galaxies, the pull worked out from the measured speeds follows one curve set by the visible matter alone, as MOND predicts (McGaugh, Lelli &amp; Schombert 2016).</p><a class="tl-more" href="#evRar">Visible matter predicts the pull →</a></div></li>
+          <li class="tl-dm" style="--i:7"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl7"><span class="tl-year">2020</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The oldest light</span></button><div class="tl-detail" id="tl7"><p>Planck’s map of the cosmic microwave background fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p><a class="tl-more" href="#evCmb">The oldest light →</a></div></li>
+          <li class="tl-data" style="--i:8"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl8"><span class="tl-year">Today</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">Still open</span></button><div class="tl-detail" id="tl8"><p>No dark matter particle has been confirmed (Bertone &amp; Hooper 2018), and MOND still needs unseen matter in galaxy clusters (Famaey &amp; McGaugh 2012).</p><a class="tl-more" href="#evOpen">Still open →</a></div></li>
+        </ol>
+        <p class="tl-key"><span class="tl-clue">The problem</span><span class="tl-dm">Dark matter</span><span class="tl-mond">MOND</span><span class="tl-data">Data and open questions</span></p>
+      </article>
       <article class="compare"><h3>Side by side</h3>
         <div class="score-scroll" tabindex="0" role="region" aria-label="The two ideas compared">
         <table class="compare-table">
@@ -1724,7 +1787,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         </table>
         </div>
       </article>
-      <article class="nfw"><h3>What is a dark matter halo?</h3>
+      <article class="nfw" id="ideaHalo"><h3>What is a dark matter halo?</h3>
         <div class="learn-content">
         <p class="tldr">Dark matter gives out no light, so we only detect it through its gravity. A halo is a huge, roughly round cloud of it around a galaxy, reaching far beyond the stars.</p>
         <figure class="schematic">
@@ -1755,7 +1818,7 @@ HTML_TEMPLATE = r"""<!doctype html>
         <p class="weakness"><b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated.</p>
         </div>
       </article>
-      <article class="mond"><h3>What is MOND?</h3>
+      <article class="mond" id="ideaMond"><h3>What is MOND?</h3>
         <div class="learn-content">
         <p class="tldr">MOND (Modified Newtonian Dynamics) says there is no dark matter. Instead, gravity behaves differently when it is extremely weak (Milgrom 1983).</p>
         <figure class="schematic">
@@ -1814,12 +1877,12 @@ HTML_TEMPLATE = r"""<!doctype html>
         <div class="learn-content">
         <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
         <div class="evidence-grid">
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
-          <div class="evidence-card"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
-          <div class="evidence-card"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
+          <div class="evidence-card" id="evClusters"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
+          <div class="evidence-card" id="evBullet"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
+          <div class="evidence-card" id="evCmb"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
+          <div class="evidence-card" id="evRar"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
         </div>
-        <p class="evidence-open-title">Still open</p>
+        <p class="evidence-open-title" id="evOpen">Still open</p>
         <div class="evidence-grid two">
           <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
           <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
@@ -1963,12 +2026,13 @@ HTML_TEMPLATE = r"""<!doctype html>
     <section class="controls" aria-label="Model controls">
     <div class="control gravity-control" id="modelBar" role="group" aria-labelledby="gravityLabel"><span class="gravity-label" id="gravityLabel">Gravity model</span><input type="checkbox" id="mondToggle" hidden autocomplete="off"><div class="model-cards" role="radiogroup" aria-labelledby="gravityLabel"><label class="model-card is-dm" id="optNfw"><input type="radio" name="gravityModel" value="nfw" checked autocomplete="off"><span><b>Dark matter halo</b><small>Extra unseen mass</small></span></label><label class="model-card is-mond" id="optMond"><input type="radio" name="gravityModel" value="mond" autocomplete="off"><span><b>MOND</b><small>Gravity changes, no extra mass</small></span></label></div><p class="control-help" id="nfwNote">Or try MOND: change gravity instead of adding mass.</p><p class="control-help mond-note" id="mondNote" hidden>MOND on: no dark matter. MOND boosts gravity everywhere: a little where it is strong, a lot where it is weaker than a<sub>0</sub> = <span id="mondA0Text">1.2×10⁻¹⁰</span> m/s².<span id="mondZoneNote" hidden> On the graph, the gold is in proportion to the boost: faint gold is a small boost, deep gold a big one.</span></p></div>
     <div class="control" id="massControl"><label for="massSlider"><span>Halo mass, M<sub>200</sub></span><output id="massValue"></output></label><input id="massSlider" type="range" min="0.00" max="2.00" step="0.01"><p class="control-help" id="massHelp">How much dark matter surrounds the galaxy. More mass, faster orbits: the orange curve rises.</p><div class="fit-actions"><button id="applyObservedFit" class="fit-button" type="button">Fit halo to data</button><button id="visibleMatterOnly" class="fit-button" type="button" title="Set the dark matter halo mass to zero">Visible matter only</button></div></div>
+    <div class="control" id="a0Control" hidden><label for="mondA0Slider"><span>MOND’s constant, a<sub>0</sub></span><output id="mondA0Value"></output></label><input id="mondA0Slider" type="range" min="-11" max="-9" step="0.005" value="-9.921"><p class="control-help" id="a0Help">The strength of gravity below which MOND’s boost grows large. Smaller: less boost, so the orange curve sinks towards the cyan one.</p><div class="fit-actions"><button id="a0Measured" class="fit-button" type="button">Measured value</button></div></div>
     <div class="control" id="scaleControl"><label for="scaleSlider"><span>Scale radius, r<sub>s</sub></span><output id="scaleValue"></output></label><input id="scaleSlider" type="range" min="5" max="60" step="0.5"><p class="control-help" id="scaleHelp">How spread out the halo is. Small packs it near the centre and speeds up the inner stars.</p></div>
       <div class="control"><label for="timeSlider"><span>Orbit time</span><output id="timeValue"></output></label><div class="timeline-row"><button type="button" id="playPauseBtn" class="play-btn" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)"><span class="play-icon" aria-hidden="true">▶</span><span class="play-text">Play</span></button><input id="timeSlider" type="range" min="0" max="__FRAME_MAX__" step="1" value="0"></div><p class="control-help">One billion years of orbits. Drag, or press Play.</p></div>
       <div class="control"><label for="trackInput"><span>Track a star</span><output id="trackMax"></output></label><input id="trackInput" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star number"><p class="control-help">Rings one star and shows its laps, speed and distance. Star 1 starts nearest the centre, star <span id="trackLast">800</span> furthest out.</p></div>
     </section>
     <section class="panel-grid">
-    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row" id="tmHaloRow"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × the galaxy’s visible edge count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button><button type="button" role="switch" id="toggleMondZone" class="sw-mond" aria-checked="false" aria-pressed="false" hidden title="Show where MOND boosts gravity: the gold deepens where the boost is bigger, as on the graph (MOND only)"><span class="sw" aria-hidden="true"></span>Where MOND acts</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div></div></div>
+    <article class="panel"><div class="panel-heading"><h2><span class="fig">Fig. 1</span>3D galaxy simulation</h2><span>Test-star orbits over 1 billion years</span></div><div id="orbitPlot" class="plot" role="img" aria-label="Interactive three-dimensional __DEFAULT_GALAXY_NAME__ star trajectories"><div id="escape-counter" class="telemetry" aria-label="Live simulation readout"><div class="tm-row"><span>Ejected</span><b><span id="escape-count-val">0</span> / <span id="star-total-val">800</span></b></div><div class="tm-row" id="tmHaloRow"><span>Halo r<sub>200</sub></span><b id="tm-r200">—</b></div><div class="tm-row tm-chi" id="tmChiRow"><span>χ²ᵣ</span><b id="tm-chi">—</b></div></div><div class="stability-chip" id="stabilityChip" role="status" hidden></div><div class="view-panel" id="viewPanel" role="group" aria-label="3D view controls"><button type="button" class="view-head" id="viewToggle" aria-expanded="true" title="Collapse or expand the view controls"><span>View</span><span class="chev" aria-hidden="true">▾</span></button><div class="view-row view-primary"><button type="button" id="toggleFullscreen" aria-pressed="false" title="Toggle fullscreen view of 3D simulation">⛶ Fullscreen</button><button type="button" id="viewReset" title="Return to the default __DEFAULT_GALAXY_NAME__ view">↺ Reset</button></div><div class="view-label">Camera</div><div class="view-seg"><button type="button" id="viewFaceOn" title="Look straight down on the galactic plane">Face-on</button><button type="button" id="viewEdgeOn" title="Look along the galactic plane">Edge-on</button><button type="button" id="viewFullHalo" title="Pull back to see the full dark matter halo around the tiny disk">Full halo</button></div><div class="view-label">Show</div><div class="view-switches"><button type="button" role="switch" id="toggleOrbits" aria-checked="false" aria-pressed="false" title="Show or hide the orbit trajectory lines"><span class="sw" aria-hidden="true"></span>Orbits</button><button type="button" role="switch" id="toggleGas" aria-checked="true" aria-pressed="true" title="Show or hide the faint cold-gas cloud around the stars"><span class="sw" aria-hidden="true"></span>Gas</button><button type="button" role="switch" id="toggleHalo" aria-checked="true" aria-pressed="true" title="Show or hide the dark matter halo"><span class="sw" aria-hidden="true"></span>Halo</button><button type="button" role="switch" id="toggleEjection" class="sw-eject" aria-checked="false" aria-pressed="false" title="Show the red ejection line: stars beyond 1.5 × the galaxy’s visible edge count as ejected"><span class="sw" aria-hidden="true"></span>Ejection line</button><button type="button" role="switch" id="toggleMondZone" class="sw-mond" aria-checked="false" aria-pressed="false" hidden title="Show where MOND boosts gravity: the gold deepens where the boost is bigger, as on the graph (MOND only)"><span class="sw" aria-hidden="true"></span>Where MOND acts</button></div><div class="view-label">Speed</div><div class="speed-toggle" role="radiogroup" aria-label="Playback speed"><button type="button" role="radio" aria-checked="false" data-speed="0.25" title="0.25x speed">0.25x</button><button type="button" role="radio" aria-checked="false" data-speed="0.5" title="0.5x speed">0.5x</button><button type="button" role="radio" aria-checked="true" data-speed="1" title="1x speed">1x</button><button type="button" role="radio" aria-checked="false" data-speed="2" title="2x speed">2x</button></div><div class="mode-toggle" role="radiogroup" aria-label="Mouse drag mode" title="What a mouse drag does"><button type="button" role="radio" aria-checked="true" data-mode="rotate">Rotate</button><button type="button" role="radio" aria-checked="false" data-mode="pan">Pan</button></div></div><div class="fs-sliders" id="fsSliders" role="group" aria-label="Quick controls"><div class="fs-time"><button type="button" id="fsPlay" class="fs-play" aria-pressed="false" aria-label="Play simulation" title="Play / pause (Space)">▶</button><button type="button" id="fsRestart" class="fs-play" aria-label="Restart from 0 Myr" title="Back to 0 Myr and play">↺</button><input id="fsTrack" class="track-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Star #" aria-label="Track a star by number" title="Type a star number to ring it and count its laps"><output id="fsTimeValue">0 / 1000 Myr</output></div><div class="fs-row" id="fsSandboxRows" hidden></div><div class="fs-row" id="fsHaloRows"><label for="fsMassSlider"><span>Halo mass</span><output id="fsMassValue"></output></label><input id="fsMassSlider" type="range" min="0.00" max="2.00" step="0.01"><label for="fsScaleSlider"><span>Scale radius</span><output id="fsScaleValue"></output></label><input id="fsScaleSlider" type="range" min="5" max="60" step="0.5"></div><div class="fs-row" id="fsMondRows" hidden><label for="fsA0Slider"><span>MOND’s a₀</span><output id="fsA0Value"></output></label><input id="fsA0Slider" type="range" min="-11" max="-9" step="0.005" value="-9.921"></div></div></div>
       <section class="halo-info" id="haloInfo" aria-labelledby="haloInfoTitle">
         <h3 id="haloInfoTitle">Your NFW halo</h3>
         <p class="halo-info-intro">Updates with the sliders. 1 kpc ≈ 3,260 light-years. <span class="on-mouse">Hover over a value for more.</span><span class="on-touch">Tap a value for more.</span></p>
@@ -2001,7 +2065,7 @@ HTML_TEMPLATE = r"""<!doctype html>
             <h3>Why not 0?</h3>
             <p>Measurements are noisy, so even a correct model misses by about one error bar.</p>
             <h3>Why count tuned values?</h3>
-            <p>More dials can always bend a model closer to the data. With standard values the halo tunes 2 (mass and size) and MOND none. Best realistic fits also tune M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total.</p>
+            <p>More dials can always bend a model closer to the data. With standard values the halo tunes 2 (mass and size) and MOND none, or 1 once you move its a<sub>0</sub> slider. Best realistic fits also tune M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total.</p>
             </div>
           </div>
         </details>
@@ -2153,7 +2217,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           <div class="ms-words">
             <p><b>For each point,</b> find the gap between the model and the measurement, divide it by that point’s error bar and square it. Add these up to get χ² (“chi-squared”). Squaring means misses above and below both count, and big misses count far more than small ones.</p>
             <p><b>Then divide by N − k,</b> the number of points minus the number of values tuned to fit this galaxy. The result, χ<sup>2</sup><sub>r</sub>, is roughly the squared miss per point. About 1 means the curve misses by about one error bar: as close as the measurements allow.</p>
-            <p><b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND, and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = __K_NFW_FIT__ for the halo and __K_MOND_FIT__ for MOND.</p>
+            <p><b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND at the measured a<sub>0</sub> (1 if you set a<sub>0</sub> yourself), and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = __K_NFW_FIT__ for the halo and __K_MOND_FIT__ for MOND.</p>
             <p><b>Close, rough or poor.</b> The fit badge says Close fit below 2, Rough fit from 2 to 10 and Poor fit above 10. These cut-offs are this site’s own rule of thumb, not a published standard.</p>
           </div>
           <div class="ms-maths">
@@ -4088,7 +4152,7 @@ __GALAXIES_JS__
       if(mondMode)return bestFits?activeGalaxy.best_fit.mond:null;
       return nfwFitApplied&&Number(document.getElementById('massSlider').value)>0?nfwFitOf(activeGalaxy):null;
     }
-    const activeFitModel=()=>mondMode?(bestFits?'mondBest':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
+    const activeFitModel=()=>mondMode?(bestFits?'mondBest':a0Manual!==null?'mondTuned':'mond'):(Number(document.getElementById('massSlider').value)>0?'nfw':'visible');
     // Plain-language verdict for a reduced chi-squared. The cut-offs are this site's rule of thumb, not a published standard.
     const CLOSE_FIT_RED_CHI=2,ROUGH_FIT_RED_CHI=10;
     const fitVerdict=red=>red<CLOSE_FIT_RED_CHI?{cls:'good',word:'Close fit'}:red<ROUGH_FIT_RED_CHI?{cls:'ok',word:'Rough fit'}:{cls:'poor',word:'Poor fit'};
@@ -4098,7 +4162,8 @@ __GALAXIES_JS__
     function fitLabel(model){
       if(model==='visible')return 'Visible matter only';
       if(model==='mond')return 'Plain MOND';
-      if(model==='mondBest')return 'MOND best fit';
+      if(model==='mondTuned')return 'MOND, your a₀';
+      if(model==='mondBest')return a0Manual!==null?'Your a₀, with the best fit’s M/L, distance and tilt':'MOND best fit';
       const fit=activeFit(),massT=Number(document.getElementById('massSlider').value),rs=Number(document.getElementById('scaleSlider').value);
       const isFit=fit&&Math.abs(massT-fit.m200_msun/1e12)<1e-6&&Math.abs(rs-fit.scale_radius_kpc)<1e-6;
       return isFit?(bestFits?'NFW best fit':'NFW halo fit'):fit&&bestFits?'Your halo, with the best fit’s M/L, distance and tilt':'Your halo';
@@ -4517,6 +4582,7 @@ __GALAXIES_JS__
       document.getElementById('fsMassValue').textContent=haloMassText(Number(massSlider.value));
       document.getElementById('fsScaleValue').textContent=`${Number(scaleSlider.value).toFixed(1)} kpc`;
       document.getElementById('fsHaloRows').hidden=mondMode; // no halo in MOND, so no halo sliders
+      document.getElementById('fsMondRows').hidden=!mondMode;
       document.getElementById('fsSandboxRows').hidden=!customActive;
     }
     [[fsMass,massSlider],[fsScale,scaleSlider]].forEach(([mini,main])=>{
@@ -4749,7 +4815,35 @@ __GALAXIES_JS__
       requestOrbits();
     }
     const mondToggle=document.getElementById('mondToggle'),bestFitToggle=document.getElementById('bestFitToggle');
-    const formatA0=a0=>{const e=Math.floor(Math.log10(a0));return `${(a0/10**e).toFixed(2)}×10${String(e).replace('-','⁻').replace(/\d/g,d=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[d])}`;};
+    // a0 always in units of 10⁻¹⁰ m/s² (as in 'Find a0 yourself'), so any value reads straight against the measured 1.20.
+    const formatA0=a0=>`${(a0/1e-10).toFixed(2)}×10⁻¹⁰`;
+    // MOND's a0 slider (log10 of a0 in m/s², shared with the fullscreen box). a0Manual is the value the viewer set, or
+    // null to use the reference: the measured a0, or the MOND best fit's with Best realistic fits on. A hand-set a0
+    // counts as one value tuned to the galaxy (MODEL_TUNED_VALUES.mondTuned), as the halo's two sliders count as two.
+    const mondA0Slider=document.getElementById('mondA0Slider'),fsA0Slider=document.getElementById('fsA0Slider');
+    const A0_SNAP_DEX=0.01; // within this of the reference (about 2 %), the slider snaps onto it
+    let a0Manual=null;
+    const a0Reference=()=>{const fit=activeFit();return fit&&mondMode?fit.a0_ms2:MOND_A0_DEFAULT;};
+    function syncA0Controls(){
+      const log=Math.log10(MOND_A0).toFixed(3),text=`${formatA0(MOND_A0)} m/s²`;
+      mondA0Slider.value=fsA0Slider.value=log;
+      mondA0Slider.setAttribute('aria-valuetext',`${(MOND_A0/1e-10).toFixed(2)} times 10 to the minus 10 metres per second squared`);
+      document.getElementById('mondA0Value').textContent=text;
+      document.getElementById('fsA0Value').textContent=text;
+      document.getElementById('a0Measured').textContent=activeFit()&&mondMode?'Best-fit value':'Measured value';
+    }
+    function onA0Input(){
+      const a0=10**Number(mondA0Slider.value);
+      a0Manual=Math.abs(Math.log10(a0/a0Reference()))<A0_SNAP_DEX?null:a0;
+      applyBaryonState();
+      if(!sliderFrame)sliderFrame=requestAnimationFrame(()=>{sliderFrame=0;updateHalo(true);}); // at most one redraw per frame
+    }
+    mondA0Slider.addEventListener('input',onA0Input);
+    mondA0Slider.addEventListener('change',updateHalo);
+    [mondA0Slider,fsA0Slider].forEach(slider=>slider.addEventListener('pointerdown',()=>{sliderDragging=true;clearTimeout(orbitModelTimer);}));
+    fsA0Slider.addEventListener('input',()=>{mondA0Slider.value=fsA0Slider.value;mondA0Slider.dispatchEvent(new Event('input'));});
+    fsA0Slider.addEventListener('change',()=>{mondA0Slider.value=fsA0Slider.value;mondA0Slider.dispatchEvent(new Event('change'));});
+    document.getElementById('a0Measured').addEventListener('click',()=>{a0Manual=null;applyBaryonState();updateHalo();});
     function applyBaryonState(){
       // The best fit in use sets the M/L ratios, a0, distance and tilt; otherwise SPARC's standard values apply.
       // A custom galaxy is built from masses, so none of these apply to it (activeFit is null).
@@ -4757,7 +4851,7 @@ __GALAXIES_JS__
       appliedFit=fit;
       mlState.disk=fit?fit.upsilon_disk:DATA.upsilon_disk;
       mlState.bulge=fit?fit.upsilon_bulge:DATA.upsilon_bulge;
-      MOND_A0=fit&&mondMode?fit.a0_ms2:MOND_A0_DEFAULT;
+      MOND_A0=a0Manual??(fit&&mondMode?fit.a0_ms2:MOND_A0_DEFAULT);
       fitFrame=frameOf(activeGalaxy,fit);
       baryonsFor(mlState.disk,mlState.bulge).forEach((v,i)=>{vBary[i]=v;});
       document.getElementById('bestFitWrap').hidden=customActive;
@@ -4773,6 +4867,7 @@ __GALAXIES_JS__
       document.getElementById('methodMlSource').textContent=mlSource;
       mlStat.title=`Stellar mass-to-light ratios in use (${mlSource}). Best realistic fits may change them within realistic limits; otherwise SPARC's standard 0.50 and 0.70 apply.`;
       document.getElementById('mondA0Text').textContent=formatA0(MOND_A0);
+      syncA0Controls();
       if(!customActive){
         const sparcTilt=activeGalaxy.catalogue.inclination_deg,tilt=fit?fit.inclination_deg:sparcTilt;
         document.getElementById('tiltValue').textContent=`${tilt.toFixed(0)}°`;
@@ -4781,6 +4876,7 @@ __GALAXIES_JS__
     }
     bestFitToggle.addEventListener('change',()=>{
       bestFits=bestFitToggle.checked;
+      a0Manual=null; // the a0 slider follows the new reference (the best fit's a0, or the measured one)
       DEFAULTS=haloDefaultsOf(activeGalaxy);
       if(!customActive){ // the halo sliders follow the new fit unless the halo was set to zero (Visible matter only)
         const m=massSlider.value,rs=scaleSlider.value;
@@ -4851,6 +4947,7 @@ __GALAXIES_JS__
       applyBaryonState();
       // MOND has no halo, so its sliders are hidden rather than greyed out.
       ['massControl','scaleControl'].forEach(id=>{document.getElementById(id).hidden=mondMode;});
+      document.getElementById('a0Control').hidden=!mondMode;
       updateHalo();
     });
     function queueSliderUpdate(){
@@ -5009,7 +5106,7 @@ __GALAXIES_JS__
       activeGalaxy=galaxy;
       DEFAULTS=haloDefaultsOf(galaxy);
       loadGalaxyData(galaxy);
-      nfwFitApplied=true;applyBaryonState();
+      nfwFitApplied=true;a0Manual=null;applyBaryonState();
       configureHaloSliders();
       applyModeLabels();
       componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
@@ -5089,7 +5186,7 @@ __GALAXIES_JS__
       updateHalo();clearTimeout(orbitModelTimer);
     }
     function activateCustom(){
-      customActive=true;haloFine=1;rsManual=false;
+      customActive=true;haloFine=1;rsManual=false;a0Manual=null;
       applyModeLabels();
       simTime=0;syncTimelineUI(0);
       rebuildCustomGalaxy({replot:true});
@@ -5484,6 +5581,27 @@ __GALAXIES_JS__
     document.fonts?.ready?.then?.(placeNavInk); // re-measure once the web fonts have changed the menu's widths
     placeNavInk();
 
+    /* ---------- History timeline (The two ideas) ----------
+       One year's story is open at a time: choosing a year opens it and closes the one before. Arrow keys step along. */
+    (()=>{
+      const picks=[...document.querySelectorAll('.tl-pick')];
+      const choose=pick=>picks.forEach(p=>{
+        const open=p===pick;
+        p.setAttribute('aria-expanded',String(open));
+        document.getElementById(p.getAttribute('aria-controls')).classList.toggle('open',open);
+      });
+      picks.forEach((pick,i)=>{
+        pick.addEventListener('click',()=>choose(pick));
+        pick.addEventListener('keydown',e=>{
+          const step={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];
+          if(!step)return;
+          e.preventDefault();
+          const next=picks[(i+step+picks.length)%picks.length];
+          next.focus();choose(next);
+        });
+      });
+    })();
+
     /* ---------- Scroll reveal (visual only) ----------
        Cards and sections on the reading pages rise into view as they scroll in, a few at a time. The simulator page is
        left alone so the tour's highlights always find its controls in place. The homepage figure draws itself and its
@@ -5776,8 +5894,11 @@ __GALAXIES_JS__
     const TUTORIAL_HANDOVER_MS=700;       // the next part's ring cross-fades into the main ring (matches tutorial-handover)
     const TUTORIAL_NEAR_PX=160;           // a ringed thing this close above the control is scrolled into view with it
     const TOUR_RACE_MYR=400; // how long the 'Which star laps more?' race runs
+    const TOUR_A0_LOW_DEX=0.1; // 'MOND's one dial' wants a0 within this of the slider's left end (0.1 × 10⁻¹⁰ m/s²)
     const TOUR_HALO_BACK_FRACTION=0.9; // 'Put the halo back' wants at least this share of the fitted halo mass
     const TOUR_BOB_WATCH_MYR=200; // 'Turn it on its side' ticks only after this much playing, so its result has been seen
+    // A predict-first card's done message: 'You called it: …' after the right answer, otherwise the same explanation.
+    const tutorialCalled=(answer,text)=>tutorialFlags.prediction===answer?'You called it: '+text:text.charAt(0).toUpperCase()+text.slice(1);
     const TOURS={
       main:{label:'Simulator tutorial',steps:[
         {id:'puzzle',mode:'preset',target:'curvePlot',gesture:'scan',tag:'Move along the right half',title:'Spot the mass discrepancy',
@@ -5786,6 +5907,8 @@ __GALAXIES_JS__
          text:'Each white point is a measured orbital speed, with its error bar. The cyan dashed line is the speed Newtonian gravity predicts from the visible matter alone: the stars and gas.',
          action:'Move your mouse (or slide your finger) slowly across the right half of the graph, from the middle to the far edge, reading the speeds. Do the white points stay above the cyan line?'},
         {id:'removeHalo',nfw:true,target:'massSlider',cardSlider:{massSlider:'curvePlot'},gesture:'zero',allow:['visibleMatterOnly'],watch:['curvePlot:Watch the orange line'],title:'Take the dark matter away',
+         predict:{question:'Predict first: with no dark matter at all, what will the orange line do on the right of the graph?',options:['Drop to the cyan line','Stay at the white points','Rise even higher'],answer:0},
+         doneText:()=>tutorialCalled(0,'with no halo, the model is the visible matter alone, so the orange line drops onto the cyan line, far below the measured speeds.'),
          text:'That gap is the missing mass problem. The orange line is one proposed solution: the visible matter plus a halo of dark matter.',
          action:'Drag Halo mass (blue box) all the way to the left, to 0.'},
         {id:'addHalo',nfw:true,mode:'preset',target:'massSlider',cardSlider:{massSlider:'curvePlot'},gesture:'increase',watch:['curvePlot:Watch the orange line'],title:'Add the halo back',
@@ -5811,6 +5934,12 @@ __GALAXIES_JS__
          checks:{toggleMondZone:()=>mondMode&&mondZoneShown},doneText:'Faint gold means a small boost; deep gold means MOND supplies most of the pull there.',
          text:'The graph’s gold, laid on the galaxy itself: faint near the centre, where gravity is strong and MOND changes little, and deeper further out, always in proportion to the boost.',
          action:'Switch on Where MOND acts in the View panel.'},
+        {id:'mondA0',mond:true,target:'mondA0Slider',cardSlider:{mondA0Slider:'curvePlot'},gesture:'decrease',tag:'1 · Drag left',also:['a0Measured:2 · Measured value'],watch:['curvePlot:Watch the orange line'],title:'MOND’s one dial',
+         predict:{question:'Predict first: if a₀ were ten times smaller, what would the orange line do on the right of the graph?',options:['Sink towards the cyan line','Rise higher','Stay the same'],answer:0},
+         checks:{mondA0Slider:()=>!!tutorialFlags.a0Low,a0Measured:()=>!!tutorialFlags.a0Low&&a0Manual===null},
+         text:'MOND has a single constant, a₀: the strength of gravity below which its boost grows large. It is measured from real galaxies, and MOND says every galaxy shares the same value.',
+         action:'1. Drag a₀ all the way to the left. 2. Press Measured value to put it back.',
+         doneText:()=>tutorialCalled(0,'with a smaller a₀, gravity must be weaker before MOND boosts it, so the boost shrinks and the orange line sinks towards the cyan line. The measured a₀ comes from 153 SPARC galaxies (McGaugh, Lelli & Schombert 2016).')},
         {id:'bestFit',mond:true,mode:'preset',target:'bestFitWrap',gesture:'click',tag:'Turn on',watch:['chiBadge:Watch χ²','mlStat:M/L','tiltStat:Tilt'],keepWatch:true,title:'Give both their best shot',
          text:'Three inputs are uncertain for every galaxy: the stars’ mass-to-light ratio (their mass per unit of light), the distance and the tilt. This switch lets each model adjust them within twice their published uncertainties.',
          action:'Turn on Best realistic fits (blue box). Watch χ², M/L and tilt change.'},
@@ -5828,7 +5957,9 @@ __GALAXIES_JS__
          action:'1. Press Face-on. 2. Switch on Orbits. 3. Press ▶ Play.',
          checks:{viewFaceOn:()=>controls.goal.phi<0.3,toggleOrbits:()=>orbitLines.visible,fsPlay:()=>playing||tutorialPlayedMyr>0},doneText:'Circles everywhere: gravity and orbital speed are in balance.'},
         {id:'fsRace',fs:true,nfw:true,marks:['race'],target:'fsPlay',gesture:'click',tag:'2 · Play',checks:{fsPlay:()=>tutorialFlags.prediction!=null&&playing},title:'Which star laps more?',
-         predict:{question:`Predict first: over the next ${TOUR_RACE_MYR} million years, which ringed star will finish more laps?`,options:['Inner star','Outer star','About the same'],answer:0},
+         predict:{question:`Predict first: over the next ${TOUR_RACE_MYR} million years, which ringed star will finish more laps?`,options:['Inner star','Outer star','About the same'],answer:0,
+           // The race needs TOUR_RACE_MYR of clock: too near the end of the timeline, it starts again from 0 Myr.
+           onPick:()=>{if(simTime>SIM_TOTAL_TIME_MYR-TOUR_RACE_MYR)onSliderInput(0);tutorialPlayedMyr=0;tutorialWatchLast=raceStartMyr=simTime;}},
          text:'The two ringed stars orbit at similar speeds, but the outer one is about four times further from the centre.',
          action:'Press ▶ Play and watch the lap counts on the two ringed stars.',
          done:()=>tutorialFlags.prediction!=null&&tutorialPlayedMyr>=TOUR_RACE_MYR,
@@ -5843,9 +5974,10 @@ __GALAXIES_JS__
          action:'Type a star number in the Star # box.'},
         {id:'fsEscape',given:['toggleEjection'],fs:true,nfw:true,viewPanel:true,marks:['escaper'],ring:true,target:'toggleEjection',tag:'1 · Ejection line on',also:['fsMassSlider:2 · Drag to 0','fsRestart:3 · Restart'],
          checks:{toggleEjection:()=>ejectionLineShown,fsMassSlider:()=>Number(massSlider.value)===0,fsRestart:()=>tutorialFlags.restart0},gesture:'click',watch:['escape-counter:Ejected count'],title:'Pull the halo away',
-         text:'A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to keep them on their orbits.',
+         predict:{question:'Predict first: if the halo vanished, what would the outer stars do?',options:['Fly outwards and escape','Fall in towards the centre','Keep orbiting as before'],answer:0},
+         text:'A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. The stars start on orbits balanced by the visible matter and the halo together.',
          action:'1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star.',
-         done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:'Gone: the visible matter alone cannot hold the outer stars at their measured speeds.'},
+         done:prev=>{const k=firstEscaper();return Number(massSlider.value)===0&&k>=0&&prev<escapeTimeByStar[k]&&simTime>=escapeTimeByStar[k];},doneText:()=>tutorialCalled(0,'the outer stars move too fast for the visible matter’s gravity alone to hold them, so they fly outwards and escape.')},
         {id:'fsFullHalo',fs:true,nfw:true,halo:true,viewPanel:true,target:'fsRestart',gesture:'click',tag:'1 · Restart',also:['viewFullHalo:2 · Full halo'],title:'Put the halo back, and step back',
          checks:{fsRestart:()=>tutorialFlags.restartHalo,viewFullHalo:()=>tutorialFlags.fullHalo},doneText:'Zoomed out: the whole visible galaxy is that bright speck, deep inside its halo.',
          text:'With the halo restored, the stars stay bound. The sphere marks the halo’s edge, r₂₀₀; the bright speck at its centre is the entire visible galaxy.',
@@ -6205,9 +6337,8 @@ __GALAXIES_JS__
       q.textContent=predict.question;row.className='tutorial-choices';row.id='tutorialChoices';
       predict.options.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.textContent=label;
         b.addEventListener('click',()=>{
-          // The race needs TOUR_RACE_MYR of clock: too near the end of the timeline, it starts again from 0 Myr.
-          if(simTime>SIM_TOTAL_TIME_MYR-TOUR_RACE_MYR)onSliderInput(0);
-          tutorialFlags.prediction=i;tutorialPlayedMyr=0;tutorialWatchLast=raceStartMyr=simTime;refreshTutorialGuidance();});row.appendChild(b);});
+          if(predict.onPick)predict.onPick();
+          tutorialFlags.prediction=i;refreshTutorialGuidance();});row.appendChild(b);});
       box.append(q,row);return box;
     }
     function refreshTutorialGuidance(){
@@ -6303,6 +6434,14 @@ __GALAXIES_JS__
     // missed: a wrong prediction (no praise, no tick, orange instead of green).
     function completeTutorialAction(id,message,noAuto,missed){
       if(tutorialCard.hidden||tutorialStep().id!==id||tutorialCompleted[id])return;
+      // A predict-first card: its own message says whether the prediction was right, and a wrong one waits for Next.
+      const step=tutorialStep();
+      if(step.predict){
+        if(tutorialFlags.prediction==null)return;
+        missed=tutorialFlags.prediction!==step.predict.answer;
+        if(step.doneText)message=typeof step.doneText==='function'?step.doneText():step.doneText;
+        if(missed)noAuto=true;
+      }
       if(tutorialHolding){tutorialPending=[id,message,noAuto,missed];return;}
       tutorialPending=null;
       tutorialMissed[id]=!!missed;
@@ -7005,6 +7144,9 @@ __GALAXIES_JS__
     });
     // Scrolling waits until the slider is released, so the page never jumps mid-drag.
     massSlider.addEventListener('change',tutorialRecheck);
+    // 'MOND's one dial': part 1 is done once a0 reaches the left end of its track (about ten times below the measured value).
+    mondA0Slider.addEventListener('input',()=>{if(Number(mondA0Slider.value)<=Number(mondA0Slider.min)+TOUR_A0_LOW_DEX)tutorialFlags.a0Low=true;});
+    mondA0Slider.addEventListener('change',tutorialRecheck);
     scaleSlider.addEventListener('input',()=>{
       const value=Number(scaleSlider.value);
       if(!mondMode&&value!==tutorialLastScale){

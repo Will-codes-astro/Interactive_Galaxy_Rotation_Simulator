@@ -162,20 +162,20 @@
   "text": "The project in brief"
  },
  {
-  "id": "1435320ff5",
+  "id": "8b43a34792",
   "kind": "html",
   "page": "puzzle",
   "section": "Galaxy rotation and the missing mass problem",
   "label": "Term",
-  "text": "Aim"
+  "text": "Question"
  },
  {
-  "id": "aa17b06f25",
+  "id": "31703c10cf",
   "kind": "html",
   "page": "puzzle",
   "section": "Galaxy rotation and the missing mass problem",
   "label": "Description",
-  "text": "Test whether a dark matter halo or modified gravity better explains how fast galaxies rotate."
+  "text": "How well do dark matter halos and MOND reproduce the measured rotation curves of real galaxies, and can an interactive simulator help non-specialists understand the missing mass problem?"
  },
  {
   "id": "d2bdadc196",
@@ -218,12 +218,12 @@
   "text": "Test"
  },
  {
-  "id": "75efbb9bc7",
+  "id": "286d96f417",
   "kind": "html",
   "page": "puzzle",
   "section": "Galaxy rotation and the missing mass problem",
   "label": "Description",
-  "text": "χ²: how far each model misses every measured speed, in error bars, squared and added up. <a href=\"#scorecard\">See the scores</a>"
+  "text": "Reduced χ² (χ²<sub>r</sub>): roughly the squared miss per measured speed, in error bars. About 1 is as close as the data allow. <a href=\"#scorecard\">See the scores</a>"
  },
  {
   "id": "0c2031bbae",
@@ -450,6 +450,254 @@
   "label": "Screen-reader label (read aloud, not shown)",
   "where": "Theory guide",
   "text": "Theory guide"
+ },
+ {
+  "id": "82bf68025b",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Heading",
+  "text": "How we got here"
+ },
+ {
+  "id": "b5ee0da5b9",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Ninety years of clues, in the order they arrived. Select a year to see what it added."
+ },
+ {
+  "id": "4b1533965b",
+  "kind": "attr",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "text": "Timeline of the missing mass problem"
+ },
+ {
+  "id": "38d8c5a86b",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">1933</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">The first hint</span>"
+ },
+ {
+  "id": "08eba66c76",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933)."
+ },
+ {
+  "id": "4855cf028f",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#evClusters\">Galaxy clusters →</a>"
+ },
+ {
+  "id": "9694939be5",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">1980</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">Flat rotation curves</span>"
+ },
+ {
+  "id": "86b41cb3cc",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Galaxy after galaxy, stars and gas far from the centre orbit as fast as those further in, not slower as Newton’s gravity predicts from the visible matter (Rubin, Ford &amp; Thonnard 1980)."
+ },
+ {
+  "id": "9952cfce32",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#puzzle\">The missing mass problem →</a>"
+ },
+ {
+  "id": "ca03d068fe",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">1983</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">MOND</span>"
+ },
+ {
+  "id": "297c4b0110",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Milgrom proposes that there is no extra mass: gravity itself becomes stronger than Newton’s law once it is very weak (Milgrom 1983)."
+ },
+ {
+  "id": "1531ad4d04",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#ideaMond\">What is MOND? →</a>"
+ },
+ {
+  "id": "bd09c5ea22",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">1996</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">The NFW halo</span>"
+ },
+ {
+  "id": "6fcafe8f6d",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Computer simulations of cold dark matter give halos of every size the same density profile, the NFW shape this site tests (Navarro, Frenk &amp; White 1996)."
+ },
+ {
+  "id": "a9087e769b",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#ideaHalo\">What is a dark matter halo? →</a>"
+ },
+ {
+  "id": "4d8655cf6c",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">2006</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">The Bullet Cluster</span>"
+ },
+ {
+  "id": "9418026a62",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "After two galaxy clusters collided, most of their mass ended up away from most of their visible matter (Clowe et al. 2006)."
+ },
+ {
+  "id": "9be68aefa8",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#evBullet\">The Bullet Cluster →</a>"
+ },
+ {
+  "id": "da2991079b",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">2016</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">SPARC</span>"
+ },
+ {
+  "id": "27a1591e31",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "A public catalogue of 175 disk galaxies, each with measured orbit speeds and a model of its stars and gas: the data this site uses (Lelli, McGaugh &amp; Schombert 2016)."
+ },
+ {
+  "id": "075192bc9d",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#mMeasure\">Method: start from real measurements →</a>"
+ },
+ {
+  "id": "3b67ae4dce",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">2016</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">One curve</span>"
+ },
+ {
+  "id": "ef30f5ad20",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Across 153 SPARC galaxies, the pull worked out from the measured speeds follows one curve set by the visible matter alone, as MOND predicts (McGaugh, Lelli &amp; Schombert 2016)."
+ },
+ {
+  "id": "fcd6f0d8fc",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#evRar\">Visible matter predicts the pull →</a>"
+ },
+ {
+  "id": "19704ce51f",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">2020</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">The oldest light</span>"
+ },
+ {
+  "id": "d18170e154",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "Planck’s map of the cosmic microwave background fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020)."
+ },
+ {
+  "id": "767d2479a8",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#evCmb\">The oldest light →</a>"
+ },
+ {
+  "id": "3615215551",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Button",
+  "text": "<span class=\"tl-year\">Today</span><span class=\"tl-dot\" aria-hidden=\"true\"></span><span class=\"tl-title\">Still open</span>"
+ },
+ {
+  "id": "ac64ec2912",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "No dark matter particle has been confirmed (Bertone &amp; Hooper 2018), and MOND still needs unseen matter in galaxy clusters (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "4034e8f9ea",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<a class=\"tl-more\" href=\"#evOpen\">Still open →</a>"
+ },
+ {
+  "id": "8207412169",
+  "kind": "html",
+  "page": "background",
+  "section": "How we got here",
+  "label": "Paragraph",
+  "text": "<span class=\"tl-clue\">The problem</span><span class=\"tl-dm\">Dark matter</span><span class=\"tl-mond\">MOND</span><span class=\"tl-data\">Data and open questions</span>"
  },
  {
   "id": "8858869ae3",
@@ -2027,6 +2275,30 @@
   "text": "Visible matter only"
  },
  {
+  "id": "b38886a0e0",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "label": "Control label",
+  "text": "<span>MOND’s constant, a<sub>0</sub></span>"
+ },
+ {
+  "id": "5a41d00fdd",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "label": "Paragraph",
+  "text": "The strength of gravity below which MOND’s boost grows large. Smaller: less boost, so the orange curve sinks towards the cyan one."
+ },
+ {
+  "id": "fc06a1422e",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Stats",
+  "label": "Button",
+  "text": "Measured value"
+ },
+ {
   "id": "74d3a3b2d0",
   "kind": "html",
   "page": "simulator",
@@ -2550,6 +2822,14 @@
   "text": "<span>Scale radius</span>"
  },
  {
+  "id": "a186e1c4d6",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Test-star orbits over 1 billion years",
+  "label": "Control label",
+  "text": "<span>MOND’s a₀</span>"
+ },
+ {
   "id": "f5eea49bc8",
   "kind": "html",
   "page": "simulator",
@@ -2778,12 +3058,12 @@
   "text": "Why count tuned values?"
  },
  {
-  "id": "191e8b04ab",
+  "id": "e31294c2cf",
   "kind": "html",
   "page": "simulator",
   "section": "Why count tuned values?",
   "label": "Paragraph",
-  "text": "More dials can always bend a model closer to the data. With standard values the halo tunes 2 (mass and size) and MOND none. Best realistic fits also tune M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total."
+  "text": "More dials can always bend a model closer to the data. With standard values the halo tunes 2 (mass and size) and MOND none, or 1 once you move its a<sub>0</sub> slider. Best realistic fits also tune M/L, distance and tilt (and MOND’s a<sub>0</sub>): 4 to 6 in total."
  },
  {
   "id": "2363af5ff2",
@@ -3627,12 +3907,12 @@
   "text": "<b>Then divide by N − k,</b> the number of points minus the number of values tuned to fit this galaxy. The result, χ<sup>2</sup><sub>r</sub>, is roughly the squared miss per point. About 1 means the curve misses by about one error bar: as close as the measurements allow."
  },
  {
-  "id": "68813a333e",
+  "id": "71407f2247",
   "kind": "html",
   "page": "method",
   "section": "Score the fit",
   "label": "Paragraph",
-  "text": "<b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND, and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = __K_NFW_FIT__ for the halo and __K_MOND_FIT__ for MOND."
+  "text": "<b>Why subtract k?</b> A model with more dials can always be bent closer to the data, so each dial counts against it. With standard values, k = 0 for visible matter only and for MOND at the measured a<sub>0</sub> (1 if you set a<sub>0</sub> yourself), and 2 for the halo (its mass and scale radius, even when set by hand). Best realistic fits tune more: k = __K_NFW_FIT__ for the halo and __K_MOND_FIT__ for MOND."
  },
  {
   "id": "85e0748da9",
@@ -4422,6 +4702,14 @@
   "text": "Visible matter only"
  },
  {
+  "id": "ddc955cb71",
+  "kind": "js",
+  "page": "messages",
+  "section": "Fit label",
+  "label": "Message",
+  "text": "Your a₀, with the best fit’s M/L, distance and tilt"
+ },
+ {
   "id": "c44bd45861",
   "kind": "js",
   "page": "messages",
@@ -4910,6 +5198,22 @@
   "text": "Dark matter halo"
  },
  {
+  "id": "0706c8fb76",
+  "kind": "js",
+  "page": "messages",
+  "section": "Sync a0controls",
+  "label": "Message",
+  "text": "${(MOND_A0/1e-10).toFixed(2)} times 10 to the minus 10 metres per second squared"
+ },
+ {
+  "id": "0192ebd8f0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Sync a0controls",
+  "label": "Message",
+  "text": "Best-fit value"
+ },
+ {
   "id": "0c15fede0b",
   "kind": "js",
   "page": "messages",
@@ -5334,6 +5638,14 @@
   "text": "Star ${idx+1} · ${lapsAt(idx,simTime).toFixed(1)} laps · ${starSpeedAt(idx,simTime).toFixed(0)} km/s · ${where}"
  },
  {
+  "id": "545a37e65a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Tour bob watch myr",
+  "label": "Message",
+  "text": "You called it: "
+ },
+ {
   "id": "ffa1ac0a4d",
   "kind": "js",
   "page": "tour",
@@ -5388,6 +5700,46 @@
   "section": "Simulator tutorial: Take the dark matter away",
   "label": "Card title",
   "text": "Take the dark matter away"
+ },
+ {
+  "id": "7eb67e6944",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Take the dark matter away",
+  "label": "Prediction question",
+  "text": "Predict first: with no dark matter at all, what will the orange line do on the right of the graph?"
+ },
+ {
+  "id": "280f261e05",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Take the dark matter away",
+  "label": "Answer choice",
+  "text": "Drop to the cyan line"
+ },
+ {
+  "id": "783a3a61b2",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Take the dark matter away",
+  "label": "Answer choice",
+  "text": "Stay at the white points"
+ },
+ {
+  "id": "8c148dbd80",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Take the dark matter away",
+  "label": "Answer choice",
+  "text": "Rise even higher"
+ },
+ {
+  "id": "59312a7095",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Take the dark matter away",
+  "label": "Tour message",
+  "text": "with no halo, the model is the visible matter alone, so the orange line drops onto the cyan line, far below the measured speeds."
  },
  {
   "id": "7296ef474d",
@@ -5676,6 +6028,94 @@
   "section": "Simulator tutorial: See where MOND acts",
   "label": "What to do",
   "text": "Switch on Where MOND acts in the View panel."
+ },
+ {
+  "id": "322a9241bc",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Hint by the highlighted control",
+  "text": "1 · Drag left"
+ },
+ {
+  "id": "70ac26c5c5",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Hint by another highlighted control",
+  "text": "2 · Measured value"
+ },
+ {
+  "id": "e677711b54",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Watch hint",
+  "text": "Watch the orange line"
+ },
+ {
+  "id": "9b7f299e38",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Card title",
+  "text": "MOND’s one dial"
+ },
+ {
+  "id": "feb3264163",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Prediction question",
+  "text": "Predict first: if a₀ were ten times smaller, what would the orange line do on the right of the graph?"
+ },
+ {
+  "id": "cb99d83852",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Answer choice",
+  "text": "Sink towards the cyan line"
+ },
+ {
+  "id": "6ffd6fd287",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Answer choice",
+  "text": "Rise higher"
+ },
+ {
+  "id": "b880db1531",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Answer choice",
+  "text": "Stay the same"
+ },
+ {
+  "id": "172ac90c2c",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Card explanation",
+  "text": "MOND has a single constant, a₀: the strength of gravity below which its boost grows large. It is measured from real galaxies, and MOND says every galaxy shares the same value."
+ },
+ {
+  "id": "c64e7072aa",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "What to do",
+  "text": "1. Drag a₀ all the way to the left. 2. Press Measured value to put it back."
+ },
+ {
+  "id": "23796f01a3",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: MOND’s one dial",
+  "label": "Tour message",
+  "text": "with a smaller a₀, gravity must be weaker before MOND boosts it, so the boost shrinks and the orange line sinks towards the cyan line. The measured a₀ comes from 153 SPARC galaxies (McGaugh, Lelli & Schombert 2016)."
  },
  {
   "id": "6ffe1f766c",
@@ -6094,12 +6534,44 @@
   "text": "Pull the halo away"
  },
  {
-  "id": "c705fb0cdb",
+  "id": "5991e1b251",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Pull the halo away",
+  "label": "Prediction question",
+  "text": "Predict first: if the halo vanished, what would the outer stars do?"
+ },
+ {
+  "id": "8c59020ee0",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Pull the halo away",
+  "label": "Answer choice",
+  "text": "Fly outwards and escape"
+ },
+ {
+  "id": "a584c794d6",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Pull the halo away",
+  "label": "Answer choice",
+  "text": "Fall in towards the centre"
+ },
+ {
+  "id": "d09d480297",
+  "kind": "js",
+  "page": "tour",
+  "section": "Simulator tutorial: Pull the halo away",
+  "label": "Answer choice",
+  "text": "Keep orbiting as before"
+ },
+ {
+  "id": "0c4f713bc0",
   "kind": "js",
   "page": "tour",
   "section": "Simulator tutorial: Pull the halo away",
   "label": "Card explanation",
-  "text": "A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. Without the halo, the outer stars move too fast for the visible matter’s gravity to keep them on their orbits."
+  "text": "A star that crosses the red circle (1.5 × the galaxy’s visible edge) counts as ejected. The stars start on orbits balanced by the visible matter and the halo together."
  },
  {
   "id": "a3e4dd0e98",
@@ -6110,12 +6582,12 @@
   "text": "1. Switch on Ejection line. 2. Drag Halo mass to 0. 3. Press Restart and watch the ringed star."
  },
  {
-  "id": "30b0d22d27",
+  "id": "384dc8322d",
   "kind": "js",
   "page": "tour",
   "section": "Simulator tutorial: Pull the halo away",
-  "label": "Shown when the step is done",
-  "text": "Gone: the visible matter alone cannot hold the outer stars at their measured speeds."
+  "label": "Tour message",
+  "text": "the outer stars move too fast for the visible matter’s gravity alone to hold them, so they fly outwards and escape."
  },
  {
   "id": "9252d99035",
@@ -6742,7 +7214,7 @@
   "text": "2 · Reset"
  },
  {
-  "id": "e677711b54",
+  "id": "8e02841e0a",
   "kind": "js",
   "page": "tour",
   "section": "Sandbox tutorial: Tune the halo yourself",
