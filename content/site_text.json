@@ -218,12 +218,12 @@
   "text": "Test"
  },
  {
-  "id": "605ce99a40",
+  "id": "75efbb9bc7",
   "kind": "html",
   "page": "puzzle",
   "section": "Galaxy rotation and the missing mass problem",
   "label": "Description",
-  "text": "χ², the gap between each model and every measured speed, in units of its error bar. <a href=\"#scorecard\">See the scores</a>"
+  "text": "χ²: how far each model misses every measured speed, in error bars, squared and added up. <a href=\"#scorecard\">See the scores</a>"
  },
  {
   "id": "0c2031bbae",
@@ -516,12 +516,12 @@
   "text": "No extra mass. Gravity is boosted where it is very weak."
  },
  {
-  "id": "176b398b33",
+  "id": "1778a1c369",
   "kind": "html",
   "page": "background",
   "section": "Side by side",
   "label": "Table heading",
-  "text": "Values tuned to each galaxy here"
+  "text": "Values tuned to each galaxy (standard values)"
  },
  {
   "id": "b664f3535a",
@@ -1379,12 +1379,12 @@
   "text": "<b>They start on balanced orbits</b>, set by the starting galaxy’s gravity (for a real galaxy, its measured speeds)."
  },
  {
-  "id": "3454750b37",
+  "id": "5a342afd59",
   "kind": "html",
   "page": "simulator",
   "section": "What are test stars?",
   "label": "List item",
-  "text": "<b>Change the gravity and they respond.</b> Too little pull and they drift outwards; beyond 1.5 × the galaxy’s edge they count as ejected."
+  "text": "<b>Change the gravity and they respond.</b> Too little pull and they drift outwards; beyond 1.5 × the galaxy’s visible edge they count as ejected."
  },
  {
   "id": "a6f5855cb4",
@@ -2338,13 +2338,13 @@
   "text": "<span class=\"sw\" aria-hidden=\"true\"></span>Halo"
  },
  {
-  "id": "b73f2f1e80",
+  "id": "3f59912b10",
   "kind": "attr",
   "page": "simulator",
   "section": "Test-star orbits over 1 billion years",
   "label": "Tooltip (shows on hover)",
   "where": "Toggle ejection",
-  "text": "Show the red ejection line: stars beyond 1.5 × R_max count as ejected"
+  "text": "Show the red ejection line: stars beyond 1.5 × the galaxy’s visible edge count as ejected"
  },
  {
   "id": "20c0827450",
@@ -4382,12 +4382,12 @@
   "text": "Set the halo mass above zero to see its size and shape."
  },
  {
-  "id": "5e6afab837",
+  "id": "aaf5576288",
   "kind": "js",
   "page": "messages",
   "section": "Update star telemetry",
   "label": "Message",
-  "text": "Stars farther than ${PM.ejection_factor} × R_max = ${ejectionRadius.toFixed(1)} kpc from the centre count as ejected"
+  "text": "Stars more than ${ejectionRadius.toFixed(1)} kpc from the centre (${PM.ejection_factor} × the galaxy’s visible edge) count as ejected"
  },
  {
   "id": "491fe251e3",
@@ -4446,12 +4446,12 @@
   "text": "NFW halo fit"
  },
  {
-  "id": "b5bfafea36",
+  "id": "a0f3df3893",
   "kind": "js",
   "page": "messages",
   "section": "Fit label",
   "label": "Message",
-  "text": "Your halo + fit’s M/L, distance, tilt"
+  "text": "Your halo, with the best fit’s M/L, distance and tilt"
  },
  {
   "id": "22a5be7c5f",
@@ -4462,12 +4462,12 @@
   "text": "${fitLabel(model)} · ${k} tuned · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off"
  },
  {
-  "id": "874ea045fb",
+  "id": "339fc4817e",
   "kind": "js",
   "page": "messages",
   "section": "Update chi",
   "label": "Message",
-  "text": "χ² = ${chi.toFixed(0)} over ${obsV.length} measured speeds, ${k} values tuned. Lower is better; about 1 is as close as the measurements allow."
+  "text": "χ² = ${chi.toFixed(0)} over ${obsV.length} measured speeds, ${k} values tuned. Lower is better; a χ²ᵣ of about 1 is as close as the measurements allow."
  },
  {
   "id": "f690c5b589",
