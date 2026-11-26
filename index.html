@@ -1059,10 +1059,9 @@
     .evidence-grid.two { grid-template-columns:1fr 1fr; margin-bottom:6px; }
     @media (max-width:700px) { .evidence-grid.two { grid-template-columns:1fr; } }
     .learn .evidence-card p { margin:0; } .learn .evidence-card p + p { margin-top:8px; }
-    .evidence-open-title { margin:4px 0 0; color:var(--accent); font:500 10.5px var(--f-mono) !important; letter-spacing:.14em; text-transform:uppercase; }
     /* Small labels and minor headings: sentence case in the UI font, not tracked-out monospace capitals (visual only). */
     :is(.eyebrow, .stat-label, .model-bar .model-label, .source-text small, .galaxy-type-kicker, .stability-title, .view-panel-title, .view-panel .view-label, .view-panel .view-head, .tutorial-eyebrow, .gp-stats dt, .panel-heading .fig) { font-family:var(--f-ui) !important; font-size:12px; font-weight:500; letter-spacing:.005em; text-transform:none; }
-    :is(.sandbox-group h3, .settings-panel h2, .score-notes-title, .refs h3, .evidence-open-title, .key summary) { font-family:var(--f-ui) !important; font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; }
+    :is(.sandbox-group h3, .settings-panel h2, .score-notes-title, .refs h3, .key summary) { font-family:var(--f-ui) !important; font-size:13.5px; font-weight:600; letter-spacing:0; text-transform:none; }
     .maths, .fold { margin:0 0 12px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.16); }
     .maths summary, .fold summary { padding:9px 12px; color:var(--accent); font:500 12.5px var(--f-ui); cursor:pointer; }
     :is(.maths,.fold)[open] { padding:0 12px 2px; } :is(.maths,.fold)[open] summary { padding:9px 0; }
@@ -1523,7 +1522,10 @@
           </svg>
           <figcaption>Schematic, not real data. The halo’s share (purple) grows as the visible matter’s (cyan) falls, so the total (orange) stays level.</figcaption>
         </figure>
+        <details class="fold"><summary>Show more: the NFW shape and a known weakness</summary><div class="fold-body">
         <p>Newton’s gravity stays as it is; there is just more mass. The simulator uses an <b>NFW halo</b> (Navarro, Frenk &amp; White 1996). Its shape came out of computer simulations of dark matter clumping as the Universe grew, not from fitting rotation curves: dense in the middle, thinning outwards. Two sliders set it: mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is).</p>
+        <p class="weakness"><b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated.</p>
+        </div></details>
         <details class="maths"><summary>Show the maths (A-level circular motion)</summary>
         <p><b>1. Orbits.</b> Gravity supplies the centripetal acceleration. For a round distribution of mass, only the mass M(r) inside the orbit pulls overall (Newton’s shell theorem):</p>
         <div class="eq"><math display="block"><mfrac><msup><mi>v</mi><mn>2</mn></msup><mi>r</mi></mfrac><mo>=</mo><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><msup><mi>r</mi><mn>2</mn></msup></mfrac><mspace width="1em"/><mo>⇒</mo><mspace width="1em"/><mi>v</mi><mo>=</mo><msqrt><mfrac><mrow><mi>G</mi><mi>M</mi><mo>(</mo><mi>r</mi><mo>)</mo></mrow><mi>r</mi></mfrac></msqrt></math></div>
@@ -1533,7 +1535,6 @@
         <div class="eq"><math display="block"><mi>ρ</mi><mo>(</mo><mi>r</mi><mo>)</mo><mo>=</mo><mfrac><msub><mi>ρ</mi><mi>s</mi></msub><mrow><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><msup><mrow><mo>(</mo><mn>1</mn><mo>+</mo><mfrac><mi>r</mi><msub><mi>r</mi><mi>s</mi></msub></mfrac><mo>)</mo></mrow><mn>2</mn></msup></mrow></mfrac></math></div>
         <p>Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method).</p>
         </details>
-        <p class="weakness"><b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated.</p>
         </div>
       </article>
       <article class="mond" id="ideaMond"><h3>What is MOND?</h3>
@@ -1554,11 +1555,13 @@
           </svg>
           <figcaption>Schematic, not real data. Dotted line: where gravity falls to a₀. Beyond it the boost grows large and the speed levels off (Milgrom 1983).</figcaption>
         </figure>
+        <details class="fold"><summary>Show more: how big MOND’s boost gets</summary><div class="fold-body">
         <p>MOND boosts gravity everywhere, by an amount that depends on how strong it already is. Near a galaxy’s centre gravity is strong and the boost is small; far out it is weak and the boost is large, so the outer stars keep moving fast.</p>
         <div class="boost">
         <p><b>a<sub>0</sub> sets the scale.</b> MOND’s constant, a<sub>0</sub> = 1.2×10⁻¹⁰ m/s², is about 10¹¹ times weaker than gravity at Earth’s surface. It is a turning point, not a switch. With the simulator’s formula, a star speeds up by:</p>
         <table class="mini-table boost-table"><thead><tr><th scope="col">Newtonian pull, g<sub>N</sub></th><th scope="col">Speed boost</th></tr></thead><tbody><tr><td>10 × a<sub>0</sub></td><td>+2%</td></tr><tr><td>3 × a<sub>0</sub></td><td>+10%</td></tr><tr><td>a<sub>0</sub></td><td>+26%</td></tr><tr><td>a<sub>0</sub> ÷ 10</td><td>+92%</td></tr><tr><td>a<sub>0</sub> ÷ 100</td><td>+224%</td></tr></tbody></table>
         </div>
+        </div></details>
         <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
         <p>a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change, not where the boost starts.</p>
         <div class="a0-facts">
@@ -1600,11 +1603,12 @@
           <div class="evidence-card" id="evCmb"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
           <div class="evidence-card" id="evRar"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
         </div>
-        <p class="evidence-open-title" id="evOpen">Still open</p>
+        <details class="fold" id="evOpen"><summary>Still open: each idea’s unsolved problem</summary><div class="fold-body">
         <div class="evidence-grid two">
           <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
           <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
         </div>
+        </div></details>
         </div>
       </article>
     </section>
@@ -5422,7 +5426,10 @@ window.GALAXIES = {
       if(pageEls.some(el=>el.dataset.page===id)){showPage(id,{animate});return true;}
       const target=document.getElementById(id),page=pageOf(target);
       if(!page)return false;
-      showPage(page,{animate,after:()=>target.scrollIntoView({behavior:'instant'})});
+      showPage(page,{animate,after:()=>{
+        if(target.matches('details:not([open])'))target.querySelector('summary').click(); // e.g. the timeline's "Still open →"
+        target.scrollIntoView({behavior:'instant'});
+      }});
       return true;
     }
     document.addEventListener('click',e=>{
@@ -5616,7 +5623,7 @@ window.GALAXIES = {
        left alone so the tour's highlights always find its controls in place. The homepage figure draws itself and its
        numbers count up when they arrive. With reduced motion or lite visuals everything simply shows. */
     const REVEAL_SELECTOR=['.page:not([data-page="simulator"]) .section-head','.puzzle-steps > li','.puzzle-fig','.puzzle-cta',
-      '.learn > article:not(.evidence)','.evidence-card','.evidence-open-title','.score-intro','.score-legend','.score-chart','.score-notes > li',
+      '.learn > article:not(.evidence)','.evidence-card','.score-intro','.score-legend','.score-chart','.score-notes > li',
       '.method-flow > li','.method-step:not(.ms-limits)','.limits-grid > li','.refs','.method-data','.page:not([data-page="simulator"]) .page-next'].join(',');
     const REVEAL_CLEAR_MS=1700;
     let revealObserver=null;

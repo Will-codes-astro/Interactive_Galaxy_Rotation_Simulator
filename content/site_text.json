@@ -908,12 +908,28 @@
   "text": "Schematic, not real data. The halo’s share (purple) grows as the visible matter’s (cyan) falls, so the total (orange) stays level."
  },
  {
+  "id": "3c1703372a",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "label": "Click-to-open heading",
+  "text": "Show more: the NFW shape and a known weakness"
+ },
+ {
   "id": "498f30dd1e",
   "kind": "html",
   "page": "background",
   "section": "What is a dark matter halo?",
   "label": "Paragraph",
   "text": "Newton’s gravity stays as it is; there is just more mass. The simulator uses an <b>NFW halo</b> (Navarro, Frenk &amp; White 1996). Its shape came out of computer simulations of dark matter clumping as the Universe grew, not from fitting rotation curves: dense in the middle, thinning outwards. Two sliders set it: mass (M<sub>200</sub>) and scale radius (r<sub>s</sub>, how spread out it is)."
+ },
+ {
+  "id": "90735ea948",
+  "kind": "html",
+  "page": "background",
+  "section": "What is a dark matter halo?",
+  "label": "Paragraph",
+  "text": "<b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated."
  },
  {
   "id": "b01cc403e5",
@@ -962,14 +978,6 @@
   "section": "What is a dark matter halo?",
   "label": "Paragraph",
   "text": "Well inside r<sub>s</sub> the density falls as 1/r; far outside, as 1/r³. Around r<sub>s</sub> it falls roughly as 1/r², just what step 3 needs, so over that range the halo’s speed stays nearly level. It peaks at about 2.2 r<sub>s</sub>, then falls only slowly (Navarro, Frenk &amp; White 1996). Adding up the shells gives the mass formula used in the simulator (see Method)."
- },
- {
-  "id": "90735ea948",
-  "kind": "html",
-  "page": "background",
-  "section": "What is a dark matter halo?",
-  "label": "Paragraph",
-  "text": "<b>A known weakness.</b> In many small, faint galaxies the inner speeds rise more gently than NFW’s dense centre allows: the cusp–core problem (de Blok 2010). Whether exploding stars could stir the dark matter enough to flatten it is still debated."
  },
  {
   "id": "358fa381a9",
@@ -1042,6 +1050,14 @@
   "section": "What is MOND?",
   "label": "Figure caption",
   "text": "Schematic, not real data. Dotted line: where gravity falls to a₀. Beyond it the boost grows large and the speed levels off (Milgrom 1983)."
+ },
+ {
+  "id": "e2634caa4d",
+  "kind": "html",
+  "page": "background",
+  "section": "What is MOND?",
+  "label": "Click-to-open heading",
+  "text": "Show more: how big MOND’s boost gets"
  },
  {
   "id": "d8cad2c574",
@@ -1374,12 +1390,12 @@
   "text": "<b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining."
  },
  {
-  "id": "6d3c0c5803",
+  "id": "310e68f336",
   "kind": "html",
   "page": "background",
   "section": "Visible matter predicts the pull",
-  "label": "Paragraph",
-  "text": "Still open"
+  "label": "Click-to-open heading",
+  "text": "Still open: each idea’s unsolved problem"
  },
  {
   "id": "89d99827c5",
