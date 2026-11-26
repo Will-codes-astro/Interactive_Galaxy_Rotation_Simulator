@@ -1268,6 +1268,128 @@
     @keyframes tutorial-in { from { opacity:0; transform:translateX(calc(var(--dir,1) * 28px)); filter:blur(6px); } }
     html:not(.calm):not(.lite) .tutorial-card.leave :is(.tutorial-content,.tutorial-feedback) { filter:blur(4px); }
     .tutorial-progress-fill { box-shadow:0 0 10px rgba(138,180,248,.55); }
+    /* ---------- Test your knowledge (quiz page) ----------
+       One card that holds three views: the intro, a question, the results. Colours: green right, red wrong. */
+    .quiz { position:relative; max-width:860px; margin:6px auto 0; padding:32px 36px 30px; border:1px solid rgba(138,180,248,.22); border-radius:var(--r-lg); background:radial-gradient(110% 90% at 100% 0%,rgba(110,150,240,.15),transparent 55%),radial-gradient(80% 70% at 0% 100%,rgba(233,200,138,.07),transparent 60%),var(--panel); box-shadow:var(--shadow); overflow:hidden; }
+    .quiz::before { content:''; position:absolute; inset:0; background-image:radial-gradient(1px 1px at 12% 22%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 78% 14%,rgba(255,255,255,.35),transparent),radial-gradient(1.5px 1.5px at 64% 86%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 34% 72%,rgba(255,255,255,.25),transparent),radial-gradient(1px 1px at 92% 58%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 52% 8%,rgba(255,255,255,.3),transparent); pointer-events:none; }
+    .quiz > * { position:relative; }
+    .quiz [hidden] { display:none !important; }
+    .quiz-eyebrow { margin:0; color:var(--accent); font:600 11px/1 var(--f-ui); letter-spacing:.12em; text-transform:uppercase; }
+    .quiz-intro { display:grid; grid-template-columns:auto minmax(0,1fr); gap:22px 38px; align-items:center; }
+    .quiz-intro h3 { margin:10px 0 8px; font:600 26px/1.2 var(--f-serif); color:var(--ink); letter-spacing:-.01em; }
+    .quiz-intro p:not(.quiz-eyebrow) { margin:0; color:var(--ink-2); font-size:14.5px; line-height:1.6; max-width:56ch; }
+    /* The emblem: two stars on circular orbits at the same speed (the outer lap takes 64/36 as long), the flat
+       rotation curve in miniature, inside a faint violet halo. Visual only. */
+    .quiz-emblem { display:block; width:168px; height:168px; }
+    .qe-halo { fill:rgba(167,139,250,.07); stroke:rgba(167,139,250,.18); }
+    .qe-ring { fill:none; stroke:rgba(138,180,248,.28); stroke-dasharray:2 5; }
+    .qe-core { fill:url(#quizCoreGlow); }
+    .qe-orbit { transform-origin:84px 84px; animation:quiz-orbit 6s linear infinite; }
+    .qe-orbit.outer { animation-duration:10.67s; }
+    .qe-orbit circle { fill:#f4f7fb; filter:drop-shadow(0 0 4px rgba(138,180,248,.95)); }
+    .qe-orbit.outer circle { fill:var(--gold); filter:drop-shadow(0 0 5px rgba(233,200,138,.95)); }
+    @keyframes quiz-orbit { to { transform:rotate(360deg); } }
+    html.calm .qe-orbit, html.lite .qe-orbit { animation:none; }
+    .quiz-chips { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 20px; padding:0; list-style:none; }
+    .quiz-chips li { padding:4px 11px; border:1px solid var(--line-strong); border-radius:999px; background:rgba(255,255,255,.02); color:var(--ink-2); font:500 12px/1.4 var(--f-ui); }
+    .quiz-btn { display:inline-flex; align-items:center; gap:10px; min-height:44px; padding:0 8px 0 20px; border:1px solid rgba(170,200,255,.6); border-radius:999px; background:linear-gradient(135deg,#3561b0,#1d3566 75%); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(70,120,235,.28); color:#f4f7ff; font:600 14px/1 var(--f-ui); cursor:pointer; transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s,border-color .2s; }
+    .quiz-btn .next-arrow { background:rgba(255,255,255,.16); }
+    .quiz-btn.ghost { padding:0 20px; border-color:var(--line-strong); background:rgba(255,255,255,.03); box-shadow:none; color:var(--ink); }
+    .quiz-btn.ghost:hover { border-color:rgba(138,180,248,.7); }
+    html:not(.calm):not(.lite) .quiz-btn:hover { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 10px 26px rgba(70,120,235,.38); }
+    html:not(.calm):not(.lite) .quiz-btn.ghost:hover { box-shadow:none; }
+    .quiz-btn:focus-visible, .quiz-opt:focus-visible, .quiz-more:focus-visible, .quiz-review a:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+    .quiz-q:focus, .quiz-summary h3:focus { outline:none; }
+    /* A question */
+    .quiz-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .quiz-count { color:var(--muted); font:500 12px/1 var(--f-mono); letter-spacing:.04em; }
+    .quiz-topic { padding:4px 11px; border:1px solid rgba(138,180,248,.4); border-radius:999px; background:rgba(138,180,248,.08); color:var(--accent); font:600 11px/1.3 var(--f-ui); letter-spacing:.08em; text-transform:uppercase; }
+    .quiz-progress { display:grid; grid-template-columns:repeat(var(--n,10),minmax(0,1fr)); gap:5px; margin:14px 0 22px; padding:0; list-style:none; }
+    .quiz-progress li { height:5px; border-radius:3px; background:rgba(148,170,200,.16); transition:background .3s,box-shadow .3s; }
+    .quiz-progress li.now { background:rgba(138,180,248,.6); box-shadow:0 0 8px rgba(138,180,248,.55); }
+    .quiz-progress li.ok { background:#6fd3a0; }
+    .quiz-progress li.miss { background:#f08a8a; }
+    .quiz-q { margin:0 0 18px; color:var(--ink); font:600 21px/1.4 var(--f-serif); }
+    .quiz-options { display:grid; gap:10px; }
+    .quiz-options.figures { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .quiz-opt { display:flex; align-items:center; gap:14px; width:100%; min-height:54px; padding:12px 16px; border:1px solid var(--line-strong); border-radius:var(--r); background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.01)); color:var(--ink); font:500 14.5px/1.45 var(--f-ui); text-align:left; cursor:pointer; transition:border-color .2s,background .2s,transform .25s cubic-bezier(.16,1,.3,1),opacity .3s; }
+    .quiz-opt:hover:not([aria-disabled=true]) { border-color:rgba(138,180,248,.7); background:rgba(138,180,248,.08); }
+    html:not(.calm):not(.lite) .quiz-opt:not(.figure):hover:not([aria-disabled=true]) { transform:translateX(3px); }
+    html:not(.calm):not(.lite) .quiz-opt.figure:hover:not([aria-disabled=true]) { transform:translateY(-2px); }
+    .quiz-opt[aria-disabled=true] { cursor:default; }
+    .quiz-letter { display:inline-grid; place-items:center; flex:none; width:28px; height:28px; border:1px solid var(--line-strong); border-radius:8px; color:var(--ink-2); font:600 12px/1 var(--f-mono); transition:background .2s,border-color .2s,color .2s; }
+    .quiz-opt-text { min-width:0; }
+    .quiz-tick { margin-left:auto; flex:none; font-size:15px; font-weight:700; }
+    .quiz-opt.figure { display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center; gap:10px 12px; }
+    .quiz-opt.figure svg { grid-column:1 / -1; width:100%; height:auto; max-height:96px; }
+    .qc-axis { fill:none; stroke:rgba(148,170,200,.45); stroke-width:1.2; }
+    .qc-line { fill:none; stroke:var(--accent); stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; }
+    .quiz-opt.is-correct { border-color:rgba(111,211,160,.85); background:linear-gradient(180deg,rgba(111,211,160,.16),rgba(111,211,160,.05)); opacity:1; }
+    .quiz-opt.is-correct .quiz-letter { border-color:#6fd3a0; background:#6fd3a0; color:#06140d; }
+    .quiz-opt.is-correct .quiz-tick, .quiz-opt.is-correct .qc-line { color:#8fe3b8; stroke:#6fd3a0; }
+    .quiz-opt.is-wrong { border-color:rgba(240,138,138,.85); background:linear-gradient(180deg,rgba(240,138,138,.14),rgba(240,138,138,.04)); }
+    .quiz-opt.is-wrong .quiz-letter { border-color:#f08a8a; background:#f08a8a; color:#1a0707; }
+    .quiz-opt.is-wrong .quiz-tick, .quiz-opt.is-wrong .qc-line { color:#f5a3a3; stroke:#f08a8a; }
+    .quiz-opt.is-dim { opacity:.42; }
+    .quiz-feedback { margin-top:16px; padding:14px 18px; border:1px solid var(--line-strong); border-left:3px solid var(--accent); border-radius:var(--r); background:rgba(138,180,248,.06); }
+    .quiz-feedback.ok { border-left-color:#6fd3a0; background:rgba(111,211,160,.07); }
+    .quiz-feedback.miss { border-left-color:#f08a8a; background:rgba(240,138,138,.06); }
+    .quiz-verdict { margin:0 0 4px; color:var(--ink); font:600 15px/1.4 var(--f-ui); }
+    .quiz-feedback.ok .quiz-verdict { color:#8fe3b8; }
+    .quiz-feedback.miss .quiz-verdict { color:#f5a3a3; }
+    .quiz-why { margin:0; color:var(--ink-2); font-size:14px; line-height:1.6; }
+    .quiz-more { display:inline-block; margin-top:8px; color:var(--accent); font:500 13px/1.4 var(--f-ui); text-decoration:none; }
+    .quiz-more:hover { text-decoration:underline; }
+    .quiz-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; margin-top:20px; }
+    .quiz-keys { color:var(--muted); font:500 11.5px/1.4 var(--f-mono); }
+    @media (hover:none) { .quiz-keys { visibility:hidden; } }
+    /* Motion: a new question's words rise in one after another; a right answer pops, a wrong one shakes. */
+    @keyframes quiz-in { from { opacity:0; transform:translateY(10px); } }
+    @keyframes quiz-pop { 40% { transform:scale(1.025); } }
+    @keyframes quiz-shake { 20%,60% { transform:translateX(-5px); } 40%,80% { transform:translateX(5px); } }
+    html:not(.calm):not(.lite) .quiz-view.enter :is(.quiz-q,.quiz-opt), html:not(.calm):not(.lite) .quiz-view.enter:is(.quiz-intro,.quiz-results) > * { animation:quiz-in .45s cubic-bezier(.16,1,.3,1) both; animation-delay:calc(var(--i,0) * 55ms); }
+    html:not(.calm):not(.lite) .quiz-opt.is-correct { animation:quiz-pop .45s ease; }
+    html:not(.calm):not(.lite) .quiz-opt.is-wrong { animation:quiz-shake .4s ease; }
+    html:not(.calm):not(.lite) .quiz-feedback { animation:quiz-in .35s cubic-bezier(.16,1,.3,1); }
+    /* Results */
+    .quiz-results { display:grid; grid-template-columns:auto minmax(0,1fr); gap:20px 38px; align-items:center; }
+    .quiz-score { position:relative; width:168px; height:168px; }
+    .quiz-ring { display:block; width:100%; height:100%; transform:rotate(-90deg); }
+    .qr-track { fill:none; stroke:rgba(148,170,200,.14); stroke-width:10; }
+    .qr-fill { fill:none; stroke:url(#quizRingGrad); stroke-width:10; stroke-linecap:round; stroke-dasharray:364.4; stroke-dashoffset:364.4; filter:drop-shadow(0 0 6px rgba(138,180,248,.45)); transition:stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1); }
+    html.calm .qr-fill, html.lite .qr-fill { transition:none; }
+    .quiz-score-num { position:absolute; inset:0; display:grid; place-content:center; text-align:center; }
+    .quiz-score-num b { color:var(--ink); font:600 46px/1 var(--f-serif); font-variant-numeric:tabular-nums; }
+    .quiz-score-num > span { margin-top:4px; color:var(--muted); font:500 12px/1 var(--f-ui); }
+    .quiz-summary h3 { margin:8px 0 6px; color:var(--ink); font:600 26px/1.2 var(--f-serif); }
+    .quiz-summary p:not(.quiz-eyebrow) { margin:0; color:var(--ink-2); font-size:14.5px; line-height:1.6; }
+    .quiz-result-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    .quiz-review { grid-column:1 / -1; display:grid; gap:4px; margin:6px 0 0; padding:18px 0 0; border-top:1px solid var(--line); list-style:none; }
+    .quiz-review li { display:grid; grid-template-columns:22px 112px minmax(0,1fr) auto; align-items:center; gap:12px; padding:8px 10px; border-radius:8px; color:var(--ink-2); font-size:13.5px; line-height:1.4; }
+    .quiz-review li:nth-child(odd) { background:rgba(255,255,255,.02); }
+    .qr-mark { display:inline-grid; place-items:center; width:22px; height:22px; border-radius:50%; font-size:12px; font-weight:700; }
+    .quiz-review .ok .qr-mark { background:rgba(111,211,160,.18); color:#8fe3b8; }
+    .quiz-review .miss .qr-mark { background:rgba(240,138,138,.16); color:#f5a3a3; }
+    .qr-topic { color:var(--accent); font:600 10.5px/1.3 var(--f-ui); letter-spacing:.08em; text-transform:uppercase; }
+    .quiz-review a { color:var(--accent); font:500 12.5px/1.3 var(--f-ui); text-decoration:none; white-space:nowrap; }
+    .quiz-review a:hover { text-decoration:underline; }
+    /* A perfect score: sparks fly out from the ring once it has filled. Visual only. */
+    .quiz-sparks i { position:absolute; left:calc(50% - 3px); top:calc(50% - 3px); width:6px; height:6px; border-radius:50%; background:var(--gold); box-shadow:0 0 8px var(--gold); opacity:0; }
+    @keyframes quiz-spark { from { opacity:1; transform:rotate(var(--a)) translateX(60px) scale(1); } to { opacity:0; transform:rotate(var(--a)) translateX(112px) scale(.3); } }
+    html:not(.calm):not(.lite) .quiz-results.perfect .quiz-sparks i { animation:quiz-spark 1.1s 1s cubic-bezier(.16,1,.3,1) both; }
+    @media (max-width:640px) {
+      .quiz { padding:22px 16px 20px; }
+      .quiz-intro, .quiz-results { grid-template-columns:1fr; gap:16px; }
+      .quiz-emblem, .quiz-score { width:120px; height:120px; }
+      .quiz-score-num b { font-size:36px; }
+      .quiz-intro h3, .quiz-summary h3 { font-size:22px; }
+      .quiz-q { font-size:18px; }
+      .quiz-opt { padding:11px 12px; gap:12px; font-size:14px; }
+      .quiz-review li { grid-template-columns:22px minmax(0,1fr) auto; }
+      .qr-topic, .quiz-keys { display:none; }
+      .quiz-opt.figure { padding:10px; gap:6px 8px; font-size:13px; }
+      .quiz-opt.figure .quiz-letter { width:24px; height:24px; }
+    }
   </style>
   <script>
     /* Reduce motion (Settings). Until the visitor chooses, it follows the computer's own setting (prefers-reduced-motion),
@@ -1297,7 +1419,7 @@
 <body>
   <nav class="topbar" aria-label="Page sections">
     <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Simulating the Invisible</span></a>
-    <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
+    <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#quiz">Quiz</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
     <div class="settings">
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <div class="settings-panel" id="settingsPanel" role="dialog" aria-label="Settings" tabindex="-1" hidden>
@@ -1708,10 +1830,52 @@
         <li><b>A small sample</b><span id="scoreCount">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner.</li>
       </ul>
     </section>
+    <nav class="page-next" aria-label="Next page"><a class="next-link" href="#quiz">Next: test your knowledge <span class="next-arrow" aria-hidden="true">→</span></a></nav>
+    </div>
+    <div class="page" data-page="quiz">
+    <div class="section-head" id="quiz"><span class="kicker">06</span><h2>Test your knowledge</h2><p>Ten questions on the story so far, with the reason behind every answer.</p></div>
+    <section class="quiz" id="quizBox" aria-label="Quiz">
+      <div class="quiz-view quiz-intro" id="quizIntro">
+        <svg class="quiz-emblem" viewBox="0 0 168 168" aria-hidden="true"><defs><radialGradient id="quizCoreGlow"><stop offset="0" stop-color="#fff6df"/><stop offset=".35" stop-color="#e9c88a" stop-opacity=".75"/><stop offset="1" stop-color="#e9c88a" stop-opacity="0"/></radialGradient></defs><circle cx="84" cy="84" r="80" class="qe-halo"/><circle cx="84" cy="84" r="36" class="qe-ring"/><circle cx="84" cy="84" r="64" class="qe-ring"/><circle cx="84" cy="84" r="24" class="qe-core"/><g class="qe-orbit inner"><circle cx="120" cy="84" r="4"/></g><g class="qe-orbit outer"><circle cx="148" cy="84" r="5"/></g></svg>
+        <div>
+          <p class="quiz-eyebrow">Test your knowledge</p>
+          <h3>How well do you know the missing mass problem?</h3>
+          <p>Ten questions that follow the site’s story, from what a rotation curve is to the evidence for each idea. After each answer you’ll see why, with a link to where the site explains it.</p>
+          <ul class="quiz-chips"><li>10 questions</li><li>About 3 minutes</li><li>Nothing is saved</li></ul>
+          <button type="button" class="quiz-btn" id="quizStart">Start the quiz <span class="next-arrow" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+      <div class="quiz-view" id="quizQuestion" hidden>
+        <div class="quiz-top"><span class="quiz-count" id="quizCount">Question 1 of 10</span><span class="quiz-topic" id="quizTopic">Definition</span></div>
+        <ol class="quiz-progress" id="quizProgress" aria-hidden="true"></ol>
+        <h3 class="quiz-q" id="quizPrompt" tabindex="-1">Question</h3>
+        <div class="quiz-options" id="quizOptions" role="group" aria-labelledby="quizPrompt"></div>
+        <div class="quiz-feedback" id="quizFeedback" aria-live="polite" hidden>
+          <p class="quiz-verdict" id="quizVerdict">Correct</p>
+          <p class="quiz-why" id="quizWhy">Why</p>
+          <a class="quiz-more" id="quizMore" href="#puzzle">See it on the site</a>
+        </div>
+        <div class="quiz-actions"><span class="quiz-keys">Keys 1–4 to answer · Enter for the next question</span><button type="button" class="quiz-btn" id="quizNext" hidden><span id="quizNextLabel">Next question</span> <span class="next-arrow" aria-hidden="true">→</span></button></div>
+      </div>
+      <div class="quiz-view quiz-results" id="quizResults" hidden>
+        <div class="quiz-score">
+          <svg class="quiz-ring" viewBox="0 0 140 140" aria-hidden="true"><defs><linearGradient id="quizRingGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8ab4f8"/><stop offset="1" stop-color="#e9c88a"/></linearGradient></defs><circle cx="70" cy="70" r="58" class="qr-track"/><circle cx="70" cy="70" r="58" class="qr-fill" id="quizRingFill"/></svg>
+          <div class="quiz-score-num"><b id="quizScore">0</b><span>out of <span id="quizTotal">10</span></span></div>
+          <div class="quiz-sparks" aria-hidden="true"><i style="--a:0deg"></i><i style="--a:45deg"></i><i style="--a:90deg"></i><i style="--a:135deg"></i><i style="--a:180deg"></i><i style="--a:225deg"></i><i style="--a:270deg"></i><i style="--a:315deg"></i></div>
+        </div>
+        <div class="quiz-summary">
+          <p class="quiz-eyebrow">Your score</p>
+          <h3 id="quizBand" tabindex="-1">Score</h3>
+          <p id="quizBandText">Summary</p>
+          <div class="quiz-result-actions"><button type="button" class="quiz-btn ghost" id="quizRetry">Try again</button></div>
+        </div>
+        <ol class="quiz-review" id="quizReview" aria-label="Your answers"></ol>
+      </div>
+    </section>
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#method">Next: method and sources <span class="next-arrow" aria-hidden="true">→</span></a></nav>
     </div>
     <div class="page" data-page="method">
-    <div class="section-head" id="method"><span class="kicker">06</span><h2>Method &amp; sources</h2><p>From telescope measurements to a score, and where every number comes from.</p></div>
+    <div class="section-head" id="method"><span class="kicker">07</span><h2>Method &amp; sources</h2><p>From telescope measurements to a score, and where every number comes from.</p></div>
     <section class="method" aria-label="How the simulator works">
       <ol class="method-flow" aria-label="The method in five steps">
         <li><a href="#mMeasure"><span class="mf-n">1</span><b>Measure</b><span>Real orbit speeds</span></a></li>
@@ -5002,6 +5166,7 @@ window.GALAXIES = {
     /* ---------- The puzzle figure ----------
        The default galaxy's real SPARC speeds against the speed its visible matter predicts, drawn once as an SVG.
        The colours match the rotation-curve plot; the shaded gap is a visual aid only. */
+    let puzzleGap=null; // the homepage figure's edge speeds and pull ratio, read by the quiz
     function drawPuzzleFigure(){
       const galaxy=GALAXIES[DATA.default_galaxy_id],rows=sparcRowsOf(galaxy),vBar=sparcBaryons(rows,DATA.upsilon_disk,DATA.upsilon_bulge);
       const n=rows.length,outer=rows[n-1],W=400,H=250,LEFT=44,RIGHT=12,TOP=14,BOTTOM=38;
@@ -5027,6 +5192,7 @@ window.GALAXIES = {
       svg+=`<text class="pf-label pf-l-pred" x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
       document.getElementById('puzzleChart').innerHTML=svg;
       const ratio=(outer.observed_kms/vBar[n-1])**2;
+      puzzleGap={name:galaxy.name,obs:outer.observed_kms,bar:vBar[n-1],ratio};
       setCountable('puzzleObs',Math.round(outer.observed_kms),0,' km/s');
       setCountable('puzzleBar',Math.round(vBar[n-1]),0,' km/s');
       setCountable('puzzleRatio',ratio<3?Number(ratio.toFixed(1)):Math.round(ratio),ratio<3?1:0,'');
@@ -5288,6 +5454,160 @@ window.GALAXIES = {
           const next=picks[(i+step+picks.length)%picks.length];
           next.focus();choose(next);
         });
+      });
+    })();
+
+    /* ---------- Test your knowledge (quiz page) ----------
+       Ten multiple-choice questions in the order of the site's story: one for each idea a visitor should leave with
+       (what a rotation curve is, what was expected, what was seen, why that is a problem, the two answers, how the
+       Scorecard judges them, and the wider evidence). Wrong answers are common misconceptions. In each question the
+       FIRST option is the right one; the options are shuffled on every attempt. Each answer explains why and links to
+       where the site says so. The missing-pull question reads its numbers from the homepage figure (puzzleGap), so
+       the quiz and the homepage always agree. Nothing is stored. */
+    (()=>{
+      const box=document.getElementById('quizBox');
+      if(!box)return;
+      const $=id=>document.getElementById(id);
+      const curve=d=>`<svg viewBox="0 0 120 64" aria-hidden="true"><path class="qc-axis" d="M8 58H116M8 58V4"/><path class="qc-line" d="${d}"/></svg>`;
+      function pullQuestion(){
+        const gap=puzzleGap||{name:'NGC 3198',obs:149,bar:65,ratio:(149/65)**2};
+        const obs=Math.round(gap.obs),bar=Math.round(gap.bar),pull=gap.ratio<3?Number(gap.ratio.toFixed(1)):Math.round(gap.ratio);
+        const speed=(gap.obs/gap.bar).toFixed(1),far=Math.round(gap.ratio**2);
+        return {topic:'The problem',short:'How much extra pull the outer gas needs',link:'#puzzleChart',linkText:'Homepage: the gap in the figure',
+          prompt:`At the edge of ${gap.name}, gas orbits at ${obs} km/s, but its visible matter could only hold it in orbit at about ${bar} km/s. About how much more pull does keeping it there take?`,
+          options:[{text:`About ${pull} times as much`},{text:`About ${speed} times as much`},{text:`About ${far} times as much`},{text:'No more: orbit speed doesn’t depend on the pull'}],
+          why:`For a circular orbit the pull needed is V²/r, so it grows with the speed squared: (${obs} ÷ ${bar})² ≈ ${pull}. About ${speed} times the speed takes about ${pull} times the pull. That shortfall is the missing mass problem.`};
+      }
+      const questions=()=>[
+        {topic:'Definition',short:'What a rotation curve shows',link:'#puzzle',linkText:'Homepage: a rotation curve is a speed chart',
+          prompt:'What does a galaxy’s rotation curve show?',
+          options:[{text:'How fast its stars and gas orbit at each distance from the centre'},{text:'How its brightness changes with distance from the centre'},{text:'The path that one star takes around the centre'},{text:'How the galaxy’s spin has changed over billions of years'}],
+          why:'It is a speed chart: orbit speed going up, distance from the centre going across. Each point is a different ring of stars or gas, all measured today.'},
+        {topic:'Definition',short:'What a faster orbit tells you',link:'#puzzle',linkText:'Homepage: orbit speed works like a scale',
+          prompt:'Two stars orbit at the same distance from the centres of two different galaxies. Star A orbits faster. What does that tell you?',
+          options:[{text:'More mass lies inside star A’s orbit'},{text:'Star A itself is heavier than star B'},{text:'Star A’s galaxy is further away from us'},{text:'Star A is younger than star B'}],
+          why:'Orbit speed works like a weighing scale: at a given distance, a faster orbit needs a stronger pull, so more mass inside the orbit. The star’s own mass doesn’t matter, just as a hammer and a feather fall together without air.'},
+        {topic:'Prediction',short:'Why Neptune orbits slower than Mercury',link:'#puzzle',linkText:'Homepage: outer stars should slow down',
+          prompt:'Mercury orbits the Sun at 47 km/s, but Neptune at only 5 km/s. Why is Neptune so much slower?',
+          options:[{text:'The Sun’s pull is much weaker that far out, so a slower speed is enough to stay in orbit'},{text:'Neptune is bigger, so it is harder to move'},{text:'Gas between the planets slows Neptune down by friction'},{text:'Neptune formed later, so it hasn’t sped up yet'}],
+          why:'Almost all the Solar System’s mass is in the Sun, and its pull weakens with distance (Williams 2024 gives the speeds). Astronomers expected galaxies to behave the same way, because most of their visible matter sits near the centre.'},
+        {topic:'Observation',short:'The shape Rubin and colleagues found',link:'#puzzleChart',linkText:'Homepage: what telescopes found',figures:true,
+          prompt:'By 1980, Vera Rubin and colleagues had measured many spiral galaxies and found one rotation curve shape again and again. Which one?',
+          options:[{text:'Rises, then stays level',svg:curve('M10 56C18 20 28 14 44 13S100 12 114 12')},{text:'Rises, then falls away',svg:curve('M10 56C15 18 22 12 32 14S70 37 114 45')},{text:'Keeps rising',svg:curve('M10 56L114 8')},{text:'Falls from the centre outwards',svg:curve('M10 10C40 24 80 40 114 50')}],
+          why:'The speeds rise, then stay high far beyond most of the stars (Rubin, Ford & Thonnard 1980). Rising then falling is what the visible matter alone predicts: the dashed line on the homepage.'},
+        pullQuestion(),
+        {topic:'Dark matter',short:'How dark matter explains the fast orbits',link:'#ideaHalo',linkText:'The two ideas: what is a dark matter halo?',
+          prompt:'How does the dark matter idea explain the fast outer orbits?',
+          options:[{text:'A huge halo of unseen mass adds extra pull. Newton’s gravity is unchanged'},{text:'Gravity itself becomes stronger where it is very weak'},{text:'A giant black hole at the centre pulls the outer stars round faster'},{text:'Dark dust hides the stars, so the measured speeds are wrong'}],
+          why:'Dark matter gives out no light, so we only detect it through its gravity. The halo reaches far beyond the stars, so its share of the pull grows outwards as the visible matter’s fades. A central black hole can’t do this: like the Sun, one central mass gives a falling curve.'},
+        {topic:'MOND',short:'What MOND changes',link:'#ideaMond',linkText:'The two ideas: what is MOND?',
+          prompt:'What does MOND change to explain the same fast orbits?',
+          options:[{text:'Nothing is added: gravity gets a boost that grows the weaker it is'},{text:'It adds a halo of unseen mass, just a smaller one'},{text:'It makes gravity weaker near the centre of a galaxy'},{text:'It says the outer stars are not really orbiting'}],
+          why:'MOND (Milgrom 1983) keeps only the visible matter but changes the law: the boost is tiny where gravity is strong and large where it is far weaker than a₀ ≈ 1.2 × 10⁻¹⁰ m/s², one constant shared by every galaxy.'},
+        {topic:'Scoring',short:'What a χ²<sub>r</sub> of about 1 means',link:'#scorecard',linkText:'Scorecard: how each idea scores',
+          prompt:'On the Scorecard, a model scores χ²<sub>r</sub> ≈ 1 for a galaxy. What does that mean?',
+          options:[{text:'It misses the measured speeds by about one error bar on average: as close as the data allow'},{text:'It misses every speed by exactly 1 km/s'},{text:'It is the worst possible fit'},{text:'It fits perfectly, with no miss at all'}],
+          why:'χ²<sub>r</sub> is roughly the squared miss per measured speed, counted in error bars. Below 2 is a close fit, above 10 a poor one. A perfect zero is not expected: real measurements scatter by about their error bars.'},
+        {topic:'Fair test',short:'Why a closer fit doesn’t settle it',link:'#scoreNotes',linkText:'Scorecard: before drawing conclusions',
+          prompt:'With standard values, the dark matter halo fits NGC 3198 more closely than MOND. Why doesn’t that settle which idea is right?',
+          options:[{text:'The halo tunes two values to each galaxy, while MOND’s one constant is the same for all of them'},{text:'MOND was tested against less accurate data'},{text:'A closer fit always means a worse model'},{text:'NGC 3198 is an imaginary galaxy from the sandbox'}],
+          why:'The more values a model can adjust, the easier any curve is to fit, which is why the Scorecard counts every tuned value. And 4 of SPARC’s 175 galaxies are enough to show the method, not to pick a winner.'},
+        {topic:'Evidence',short:'What the Bullet Cluster supports',link:'#evBullet',linkText:'The two ideas: the Bullet Cluster',
+          prompt:'When the two galaxy clusters of the Bullet Cluster collided, most of their mass ended up away from most of their visible matter. Which idea does that support most?',
+          options:[{text:'Dark matter: unseen mass can sit apart from the gas and stars'},{text:'MOND: it shows gravity is stronger where it is weak'},{text:'Neither: it shows rotation speeds were measured wrongly'},{text:'Both equally: it is another flat rotation curve'}],
+          why:'If there were no extra mass, the pull would follow the visible matter. Here it doesn’t (Clowe et al. 2006). The debate isn’t over, though: no dark matter particle has been found yet (Bertone & Hooper 2018).'}
+      ];
+      const BANDS=[ // [lowest score, title, message]
+        [10,'Perfect orbit','Ten out of ten. You could explain the missing mass problem to anyone.'],
+        [7,'Stable orbit','You have the core of the story. The links below go straight to anything you missed.'],
+        [4,'Wobbly orbit','A good start. The links below go straight to the parts worth another look.'],
+        [0,'Drifting off','Worth another lap: read the homepage and The two ideas, then try again.']
+      ];
+      const RING=2*Math.PI*58;
+      let quiz=[],index=0,answers=[];
+      const shuffle=list=>{const out=list.slice();for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}return out;};
+      function show(view){
+        ['quizIntro','quizQuestion','quizResults'].forEach(id=>{const el=$(id);el.hidden=id!==view;el.classList.remove('enter');});
+        void box.offsetWidth; // restart the entrance animation
+        $(view).classList.add('enter');
+        if(box.getBoundingClientRect().top<0)box.scrollIntoView({block:'start'});
+      }
+      function start(){
+        quiz=questions().map(q=>({...q,options:shuffle(q.options.map((option,i)=>({...option,right:i===0})))}));
+        index=0;answers=[];
+        $('quizProgress').style.setProperty('--n',quiz.length);
+        $('quizProgress').innerHTML=quiz.map(()=>'<li></li>').join('');
+        show('quizQuestion');renderQuestion();
+      }
+      function renderQuestion(){
+        const q=quiz[index];
+        $('quizCount').textContent=`Question ${index+1} of ${quiz.length}`;
+        $('quizTopic').textContent=q.topic;
+        $('quizPrompt').innerHTML=q.prompt;
+        $('quizPrompt').style.setProperty('--i',0);
+        const list=$('quizOptions');
+        list.classList.toggle('figures',!!q.figures);
+        list.innerHTML=q.options.map((option,i)=>`<button type="button" class="quiz-opt${option.svg?' figure':''}" data-i="${i}" style="--i:${i+1}">${option.svg||''}<span class="quiz-letter">${'ABCD'[i]}</span><span class="quiz-opt-text">${option.text}</span><span class="quiz-tick" aria-hidden="true"></span></button>`).join('');
+        [...$('quizProgress').children].forEach((li,i)=>li.className=i<index?(answers[i]?'ok':'miss'):i===index?'now':'');
+        $('quizFeedback').hidden=true;$('quizNext').hidden=true;
+        if(index>0)$('quizPrompt').focus({preventScroll:true});
+      }
+      function choose(i){
+        if(answers[index]!==undefined)return;
+        const q=quiz[index],right=q.options[i].right;
+        answers[index]=right;
+        $('quizQuestion').classList.remove('enter');
+        [...$('quizOptions').children].forEach((button,j)=>{
+          const option=q.options[j];
+          button.setAttribute('aria-disabled','true');
+          button.classList.toggle('is-correct',option.right);
+          button.classList.toggle('is-wrong',j===i&&!right);
+          button.classList.toggle('is-dim',j!==i&&!option.right);
+          if(j===i)button.setAttribute('aria-pressed','true');
+          button.querySelector('.quiz-tick').textContent=option.right?'✓':j===i?'✗':'';
+        });
+        const answer=q.options.find(option=>option.right);
+        $('quizFeedback').className=`quiz-feedback ${right?'ok':'miss'}`;
+        $('quizVerdict').innerHTML=right?'Correct':`Not quite. The answer is “${answer.text}”.`;
+        $('quizWhy').innerHTML=q.why;
+        $('quizMore').href=q.link;$('quizMore').innerHTML=`${q.linkText} <span aria-hidden="true">→</span>`;
+        $('quizFeedback').hidden=false;
+        $('quizProgress').children[index].className=right?'ok':'miss';
+        $('quizNextLabel').textContent=index===quiz.length-1?'See my score':'Next question';
+        $('quizNext').hidden=false;$('quizNext').focus({preventScroll:true});
+      }
+      function next(){
+        if(answers[index]===undefined)return;
+        if(index<quiz.length-1){index++;show('quizQuestion');renderQuestion();}
+        else results();
+      }
+      function results(){
+        const score=answers.filter(Boolean).length,[,title,text]=BANDS.find(([least])=>score>=least);
+        show('quizResults');
+        $('quizResults').classList.toggle('perfect',score===quiz.length);
+        $('quizTotal').textContent=quiz.length;
+        $('quizBand').textContent=title;$('quizBandText').textContent=text;
+        $('quizReview').innerHTML=quiz.map((q,i)=>`<li class="${answers[i]?'ok':'miss'}"><span class="qr-mark" aria-label="${answers[i]?'Right':'Wrong'}">${answers[i]?'✓':'✗'}</span><span class="qr-topic">${q.topic}</span><span>${q.short}</span>${answers[i]?'<span></span>':`<a href="${q.link}">Revisit →</a>`}</li>`).join('');
+        const fill=$('quizRingFill');
+        fill.style.strokeDashoffset=RING;
+        void fill.getBoundingClientRect();
+        requestAnimationFrame(()=>{fill.style.strokeDashoffset=RING*(1-score/quiz.length);});
+        if(calmMotion())$('quizScore').textContent=score;
+        else{
+          const t0=performance.now(),tick=now=>{const p=Math.min(1,Math.max(0,(now-t0)/1100));$('quizScore').textContent=Math.round(score*(1-(1-p)**3));if(p<1)requestAnimationFrame(tick);};
+          requestAnimationFrame(tick);
+        }
+        $('quizBand').focus({preventScroll:true});
+      }
+      $('quizStart').addEventListener('click',start);
+      $('quizRetry').addEventListener('click',start);
+      $('quizNext').addEventListener('click',next);
+      $('quizOptions').addEventListener('click',e=>{const button=e.target.closest('.quiz-opt');if(button)choose(Number(button.dataset.i));});
+      document.addEventListener('keydown',e=>{ // 1–4 or A–D answers, Enter moves on (only on this page, mid-question)
+        if(activePage!=='quiz'||$('quizQuestion').hidden||e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select'))return;
+        const pick='1234'.indexOf(e.key)>=0?'1234'.indexOf(e.key):'abcd'.indexOf(e.key.toLowerCase());
+        if(e.key.length===1&&pick>=0&&pick<quiz[index].options.length){e.preventDefault();choose(pick);}
+        else if(e.key==='Enter'&&!e.target.closest('button,a')&&answers[index]!==undefined){e.preventDefault();next();}
       });
     })();
 

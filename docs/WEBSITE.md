@@ -5,10 +5,10 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
 The site is called **Simulating the Invisible** (the EPQ's title; top bar, browser tab and page
-description). It is one file (`index.html`) split into five pages, in this order (Will's choice, 24 Nov: the ideas are explained before they are
+description). It is one file (`index.html`) split into six pages, in this order (Will's choice, 24 Nov: the ideas are explained before they are
 tested): the homepage (page id `puzzle`, menu "Home"; its section heading is "Background: from prediction
 to problem"), The two ideas (heading "The two ideas"; page id `background`, menu label "Ideas" on narrow
-screens), Simulator (Model setup and Simulation), Scorecard, and Method & sources. The page order is the
+screens), Simulator (Model setup and Simulation), Scorecard, Test your knowledge (page id `quiz`, menu "Quiz"; added 26 Nov 2026) and Method & sources. The page order is the
 order of the `.page` blocks in the HTML (`showPage` reads it for the slide direction). The top menu shows one page at a time (`showPage`); each page ends with
 a "Next" button (The two ideas' is the guided tour panel; Method's is "Back to the homepage"), the browser's Back button works, and a link such as
 `#scorecard` or `#curvePanel` opens the right page. A hidden page keeps its
@@ -682,3 +682,27 @@ where the line it changes was: the cyan visible-matter line for the anatomy
 sliders, the orange total for the halo sliders. The speed axis keeps room for it.
 It fades in over 0.3 s and out over 0.9 s.
 Changing galaxy, galaxy source or gravity model clears it at once. It is a visual aid only.
+
+## Test your knowledge (quiz page)
+
+Between the Scorecard and Method (the Scorecard's Next button leads to it; its own leads to Method). One card
+(`#quizBox`) with three views: an intro (an emblem of two stars orbiting at the same speed, a flat rotation
+curve in miniature, inside a faint halo; visual only), one question at a time, and the results.
+
+- **Ten questions, one per idea a visitor should leave with**, in the site's story order: what a rotation curve
+  shows; that a faster orbit means more mass inside; why Neptune is slower than Mercury (the prediction); the
+  curve shape Rubin and colleagues found (four mini graphs as the answers); how much extra pull the outer gas
+  needs; how dark matter explains it; what MOND changes; what χ²ᵣ ≈ 1 means; why a closer fit with more tuned
+  values doesn't settle it; and what the Bullet Cluster supports. Wrong answers are common misconceptions
+  (for example, the speed ratio instead of its square, or a central black hole).
+- The missing-pull question reads the default galaxy's edge speeds and pull ratio from the homepage figure
+  (`puzzleGap`, set in `drawPuzzleFigure`), so the quiz and the homepage always give the same numbers.
+- After each answer: green for right, red for wrong (with the right one shown), a short reason with its source,
+  and a link to the section that explains it. Options are shuffled on every attempt (in the code the first
+  option is the right one). Keys 1–4 or A–D answer and Enter moves on (on this page only).
+- Results: a ring that fills to the score, a title from four bands (Perfect orbit 10, Stable orbit 7–9, Wobbly
+  orbit 4–6, Drifting off 0–3), every question marked right or wrong with a "Revisit" link for the misses, and
+  Try again. A perfect score sends a few sparks out of the ring (visual only). Nothing is stored.
+- Reduced motion or lite visuals turn off the orbiting, entrance, pop/shake and count-up animations. The quiz
+  needs neither Plotly nor Three.js, so it stays available when they fail to load.
+

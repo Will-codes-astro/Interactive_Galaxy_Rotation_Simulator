@@ -24,12 +24,12 @@
   "text": "Page sections"
  },
  {
-  "id": "124909fc98",
+  "id": "c1fb496f52",
   "kind": "html",
   "page": "top bar",
   "section": "Top bar and menu",
   "label": "Text",
-  "text": "<span class=\"nav-ink\" aria-hidden=\"true\"></span><a href=\"#puzzle\" aria-current=\"page\">Home</a><a href=\"#background\"><span class=\"nav-long\">The two ideas</span><span class=\"nav-short\">Ideas</span></a><a href=\"#simulator\">Simulator</a><a href=\"#scorecard\">Scorecard</a><a href=\"#method\">Method<span class=\"nav-long\"> &amp; sources</span></a>"
+  "text": "<span class=\"nav-ink\" aria-hidden=\"true\"></span><a href=\"#puzzle\" aria-current=\"page\">Home</a><a href=\"#background\"><span class=\"nav-long\">The two ideas</span><span class=\"nav-short\">Ideas</span></a><a href=\"#simulator\">Simulator</a><a href=\"#scorecard\">Scorecard</a><a href=\"#quiz\">Quiz</a><a href=\"#method\">Method<span class=\"nav-long\"> &amp; sources</span></a>"
  },
  {
   "id": "113ae53b40",
@@ -3427,10 +3427,212 @@
   "text": "Next page"
  },
  {
-  "id": "0ef8cba6be",
+  "id": "a96ce8625b",
   "kind": "html",
   "page": "scorecard",
   "section": "Scorecard",
+  "label": "Text",
+  "text": "<a class=\"next-link\" href=\"#quiz\">Next: test your knowledge <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
+ },
+ {
+  "id": "f4b697ec38",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Test your knowledge",
+  "label": "Heading",
+  "text": "Test your knowledge"
+ },
+ {
+  "id": "c0f4a2653e",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Test your knowledge",
+  "label": "Paragraph",
+  "text": "Ten questions on the story so far, with the reason behind every answer."
+ },
+ {
+  "id": "6df4bc3015",
+  "kind": "attr",
+  "page": "quiz",
+  "section": "Test your knowledge",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "where": "Quiz box",
+  "text": "Quiz"
+ },
+ {
+  "id": "baf33cb15c",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Test your knowledge",
+  "label": "Paragraph",
+  "text": "Test your knowledge"
+ },
+ {
+  "id": "95cf0be9cb",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "Heading",
+  "text": "How well do you know the missing mass problem?"
+ },
+ {
+  "id": "c95a89097f",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "Paragraph",
+  "text": "Ten questions that follow the site’s story, from what a rotation curve is to the evidence for each idea. After each answer you’ll see why, with a link to where the site explains it."
+ },
+ {
+  "id": "c1d589d104",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "List item",
+  "text": "10 questions"
+ },
+ {
+  "id": "7dff21de22",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "List item",
+  "text": "About 3 minutes"
+ },
+ {
+  "id": "b1d03de3e4",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "List item",
+  "text": "Nothing is saved"
+ },
+ {
+  "id": "3e82f3a1b4",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "Button",
+  "text": "Start the quiz <span class=\"next-arrow\" aria-hidden=\"true\">→</span>"
+ },
+ {
+  "id": "a46c69ec44",
+  "kind": "html",
+  "page": "quiz",
+  "section": "How well do you know the missing mass problem?",
+  "label": "Text",
+  "text": "<span class=\"quiz-count\" id=\"quizCount\">Question 1 of 10</span><span class=\"quiz-topic\" id=\"quizTopic\">Definition</span>"
+ },
+ {
+  "id": "0ffca6aead",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Heading",
+  "text": "Question"
+ },
+ {
+  "id": "a592ac993d",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Paragraph",
+  "text": "Correct"
+ },
+ {
+  "id": "90fce53a63",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Paragraph",
+  "text": "Why"
+ },
+ {
+  "id": "8612e3739e",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Paragraph",
+  "text": "<a class=\"quiz-more\" id=\"quizMore\" href=\"#puzzle\">See it on the site</a>"
+ },
+ {
+  "id": "d985770d9e",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Text",
+  "text": "<span class=\"quiz-keys\">Keys 1–4 to answer · Enter for the next question</span>"
+ },
+ {
+  "id": "d9a90f1534",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Button",
+  "text": "<span id=\"quizNextLabel\">Next question</span> <span class=\"next-arrow\" aria-hidden=\"true\">→</span>"
+ },
+ {
+  "id": "737ad51987",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Text",
+  "text": "<b id=\"quizScore\">0</b><span>out of <span id=\"quizTotal\">10</span></span>"
+ },
+ {
+  "id": "70a10cda13",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Question",
+  "label": "Paragraph",
+  "text": "Your score"
+ },
+ {
+  "id": "c1a6995d21",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Score",
+  "label": "Heading",
+  "text": "Score"
+ },
+ {
+  "id": "38422885a5",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Score",
+  "label": "Paragraph",
+  "text": "Summary"
+ },
+ {
+  "id": "ce057bec69",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Score",
+  "label": "Button",
+  "text": "Try again"
+ },
+ {
+  "id": "6575f0e609",
+  "kind": "attr",
+  "page": "quiz",
+  "section": "Score",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "where": "Quiz review",
+  "text": "Your answers"
+ },
+ {
+  "id": "9fd303ba47",
+  "kind": "attr",
+  "page": "quiz",
+  "section": "Score",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "text": "Next page"
+ },
+ {
+  "id": "0ef8cba6be",
+  "kind": "html",
+  "page": "quiz",
+  "section": "Score",
   "label": "Text",
   "text": "<a class=\"next-link\" href=\"#method\">Next: method and sources <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
  },
@@ -4436,7 +4638,7 @@
   "text": "Export raw data (CSV)"
  },
  {
-  "id": "9fd303ba47",
+  "id": "d51a0df803",
   "kind": "attr",
   "page": "method",
   "section": "Sources",
@@ -5612,6 +5814,686 @@
   "section": "Sync motion settings",
   "label": "Message",
   "text": "Your choice, remembered on this device."
+ },
+ {
+  "id": "8792013fbb",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "How much extra pull the outer gas needs"
+ },
+ {
+  "id": "a5a81a15b8",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Homepage: the gap in the figure"
+ },
+ {
+  "id": "a8fbd859f9",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "At the edge of ${gap.name}, gas orbits at ${obs} km/s, but its visible matter could only hold it in orbit at about ${bar} km/s. About how much more pull does keeping it there take?"
+ },
+ {
+  "id": "f8c24e3a99",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "About ${pull} times as much"
+ },
+ {
+  "id": "952864e19d",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "About ${speed} times as much"
+ },
+ {
+  "id": "19604c2c3c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "About ${far} times as much"
+ },
+ {
+  "id": "4be9b552ba",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "No more: orbit speed doesn’t depend on the pull"
+ },
+ {
+  "id": "0877edd11f",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "For a circular orbit the pull needed is V²/r, so it grows with the speed squared: (${obs} ÷ ${bar})² ≈ ${pull}. About ${speed} times the speed takes about ${pull} times the pull. That shortfall is the missing mass problem."
+ },
+ {
+  "id": "d10fde6634",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What a rotation curve shows"
+ },
+ {
+  "id": "56be557ffc",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Homepage: a rotation curve is a speed chart"
+ },
+ {
+  "id": "2e95579c5f",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What does a galaxy’s rotation curve show?"
+ },
+ {
+  "id": "ed36d87835",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "How fast its stars and gas orbit at each distance from the centre"
+ },
+ {
+  "id": "cb97e6e058",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "How its brightness changes with distance from the centre"
+ },
+ {
+  "id": "ef5df718b8",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "The path that one star takes around the centre"
+ },
+ {
+  "id": "3b98cee10c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "How the galaxy’s spin has changed over billions of years"
+ },
+ {
+  "id": "fb236843c8",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "It is a speed chart: orbit speed going up, distance from the centre going across. Each point is a different ring of stars or gas, all measured today."
+ },
+ {
+  "id": "001e9bf91c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What a faster orbit tells you"
+ },
+ {
+  "id": "10888648db",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Homepage: orbit speed works like a scale"
+ },
+ {
+  "id": "82e48abc1a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Two stars orbit at the same distance from the centres of two different galaxies. Star A orbits faster. What does that tell you?"
+ },
+ {
+  "id": "d05f2b0add",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "More mass lies inside star A’s orbit"
+ },
+ {
+  "id": "8d4543b58e",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Star A itself is heavier than star B"
+ },
+ {
+  "id": "9021d902ae",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Star A’s galaxy is further away from us"
+ },
+ {
+  "id": "4667a3ac71",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Star A is younger than star B"
+ },
+ {
+  "id": "f56aed47cd",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Orbit speed works like a weighing scale: at a given distance, a faster orbit needs a stronger pull, so more mass inside the orbit. The star’s own mass doesn’t matter, just as a hammer and a feather fall together without air."
+ },
+ {
+  "id": "e23d0ff5fa",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Why Neptune orbits slower than Mercury"
+ },
+ {
+  "id": "e373c1359c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Homepage: outer stars should slow down"
+ },
+ {
+  "id": "d481c25ba9",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Mercury orbits the Sun at 47 km/s, but Neptune at only 5 km/s. Why is Neptune so much slower?"
+ },
+ {
+  "id": "9ab279a6c0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "The Sun’s pull is much weaker that far out, so a slower speed is enough to stay in orbit"
+ },
+ {
+  "id": "a8768eed6e",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Neptune is bigger, so it is harder to move"
+ },
+ {
+  "id": "e17a8c3a90",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Gas between the planets slows Neptune down by friction"
+ },
+ {
+  "id": "678ce63cb8",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Neptune formed later, so it hasn’t sped up yet"
+ },
+ {
+  "id": "cba3183749",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Almost all the Solar System’s mass is in the Sun, and its pull weakens with distance (Williams 2024 gives the speeds). Astronomers expected galaxies to behave the same way, because most of their visible matter sits near the centre."
+ },
+ {
+  "id": "b8040aa832",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The shape Rubin and colleagues found"
+ },
+ {
+  "id": "76fca42813",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Homepage: what telescopes found"
+ },
+ {
+  "id": "d30c263ed6",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "By 1980, Vera Rubin and colleagues had measured many spiral galaxies and found one rotation curve shape again and again. Which one?"
+ },
+ {
+  "id": "d34e835979",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Rises, then stays level"
+ },
+ {
+  "id": "80adba95c3",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Rises, then falls away"
+ },
+ {
+  "id": "04930f0c4d",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Falls from the centre outwards"
+ },
+ {
+  "id": "eb28584bf6",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The speeds rise, then stay high far beyond most of the stars (Rubin, Ford & Thonnard 1980). Rising then falling is what the visible matter alone predicts: the dashed line on the homepage."
+ },
+ {
+  "id": "ce541777a1",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "How dark matter explains the fast orbits"
+ },
+ {
+  "id": "f239e5727e",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The two ideas: what is a dark matter halo?"
+ },
+ {
+  "id": "41a89f08e5",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "How does the dark matter idea explain the fast outer orbits?"
+ },
+ {
+  "id": "2f528863e3",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "A huge halo of unseen mass adds extra pull. Newton’s gravity is unchanged"
+ },
+ {
+  "id": "dc1b745632",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Gravity itself becomes stronger where it is very weak"
+ },
+ {
+  "id": "2f4911dcb2",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "A giant black hole at the centre pulls the outer stars round faster"
+ },
+ {
+  "id": "8b10d00896",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Dark dust hides the stars, so the measured speeds are wrong"
+ },
+ {
+  "id": "1bcdc44bb7",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Dark matter gives out no light, so we only detect it through its gravity. The halo reaches far beyond the stars, so its share of the pull grows outwards as the visible matter’s fades. A central black hole can’t do this: like the Sun, one central mass gives a falling curve."
+ },
+ {
+  "id": "518828f507",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What MOND changes"
+ },
+ {
+  "id": "16f8ac5cfa",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The two ideas: what is MOND?"
+ },
+ {
+  "id": "4c6adcf9c0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What does MOND change to explain the same fast orbits?"
+ },
+ {
+  "id": "56cfc3cc92",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Nothing is added: gravity gets a boost that grows the weaker it is"
+ },
+ {
+  "id": "3c824eae10",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It adds a halo of unseen mass, just a smaller one"
+ },
+ {
+  "id": "e26935e329",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It makes gravity weaker near the centre of a galaxy"
+ },
+ {
+  "id": "67b45bfe42",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It says the outer stars are not really orbiting"
+ },
+ {
+  "id": "6e00a0f941",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "MOND (Milgrom 1983) keeps only the visible matter but changes the law: the boost is tiny where gravity is strong and large where it is far weaker than a₀ ≈ 1.2 × 10⁻¹⁰ m/s², one constant shared by every galaxy."
+ },
+ {
+  "id": "37af12667a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What a χ²<sub>r</sub> of about 1 means"
+ },
+ {
+  "id": "75cec792a0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Scorecard: how each idea scores"
+ },
+ {
+  "id": "be7805aef0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "On the Scorecard, a model scores χ²<sub>r</sub> ≈ 1 for a galaxy. What does that mean?"
+ },
+ {
+  "id": "a8079adabf",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It misses the measured speeds by about one error bar on average: as close as the data allow"
+ },
+ {
+  "id": "a33a6d2f9a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It misses every speed by exactly 1 km/s"
+ },
+ {
+  "id": "2a6980069a",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It is the worst possible fit"
+ },
+ {
+  "id": "e7b98d88a0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "It fits perfectly, with no miss at all"
+ },
+ {
+  "id": "796c345047",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "χ²<sub>r</sub> is roughly the squared miss per measured speed, counted in error bars. Below 2 is a close fit, above 10 a poor one. A perfect zero is not expected: real measurements scatter by about their error bars."
+ },
+ {
+  "id": "f7ae6e747d",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Why a closer fit doesn’t settle it"
+ },
+ {
+  "id": "f22f1645f9",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "Scorecard: before drawing conclusions"
+ },
+ {
+  "id": "c36aab9cef",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "With standard values, the dark matter halo fits NGC 3198 more closely than MOND. Why doesn’t that settle which idea is right?"
+ },
+ {
+  "id": "c581d9b428",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "The halo tunes two values to each galaxy, while MOND’s one constant is the same for all of them"
+ },
+ {
+  "id": "1e65aa0127",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "MOND was tested against less accurate data"
+ },
+ {
+  "id": "71c00bba04",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "A closer fit always means a worse model"
+ },
+ {
+  "id": "c0b2ddf9e5",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "NGC 3198 is an imaginary galaxy from the sandbox"
+ },
+ {
+  "id": "73b90165e0",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The more values a model can adjust, the easier any curve is to fit, which is why the Scorecard counts every tuned value. And 4 of SPARC’s 175 galaxies are enough to show the method, not to pick a winner."
+ },
+ {
+  "id": "431952e755",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "What the Bullet Cluster supports"
+ },
+ {
+  "id": "711440dccd",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "The two ideas: the Bullet Cluster"
+ },
+ {
+  "id": "f7cd9420df",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "When the two galaxy clusters of the Bullet Cluster collided, most of their mass ended up away from most of their visible matter. Which idea does that support most?"
+ },
+ {
+  "id": "fbb8576b1f",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Dark matter: unseen mass can sit apart from the gas and stars"
+ },
+ {
+  "id": "d06a670438",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "MOND: it shows gravity is stronger where it is weak"
+ },
+ {
+  "id": "2d440c7ed6",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Neither: it shows rotation speeds were measured wrongly"
+ },
+ {
+  "id": "22819e8507",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Card explanation",
+  "text": "Both equally: it is another flat rotation curve"
+ },
+ {
+  "id": "45c454975c",
+  "kind": "js",
+  "page": "messages",
+  "section": "Pull question",
+  "label": "Message",
+  "text": "If there were no extra mass, the pull would follow the visible matter. Here it doesn’t (Clowe et al. 2006). The debate isn’t over, though: no dark matter particle has been found yet (Bertone & Hooper 2018)."
+ },
+ {
+  "id": "7220f3f26b",
+  "kind": "js",
+  "page": "messages",
+  "section": "Bands",
+  "label": "Message",
+  "text": "Ten out of ten. You could explain the missing mass problem to anyone."
+ },
+ {
+  "id": "a9246c03db",
+  "kind": "js",
+  "page": "messages",
+  "section": "Bands",
+  "label": "Message",
+  "text": "You have the core of the story. The links below go straight to anything you missed."
+ },
+ {
+  "id": "d7f56cc7d3",
+  "kind": "js",
+  "page": "messages",
+  "section": "Bands",
+  "label": "Message",
+  "text": "A good start. The links below go straight to the parts worth another look."
+ },
+ {
+  "id": "bc23e492cc",
+  "kind": "js",
+  "page": "messages",
+  "section": "Bands",
+  "label": "Message",
+  "text": "Worth another lap: read the homepage and The two ideas, then try again."
+ },
+ {
+  "id": "984960b641",
+  "kind": "js",
+  "page": "messages",
+  "section": "Choose",
+  "label": "Message",
+  "text": "Not quite. The answer is “${answer.text}”."
+ },
+ {
+  "id": "deb4ac4921",
+  "kind": "js",
+  "page": "messages",
+  "section": "Choose",
+  "label": "Message",
+  "text": "See my score"
  },
  {
   "id": "6ada41a55d",
