@@ -913,12 +913,13 @@
     .score-notes-title + .score-notes { margin-top:8px; padding-top:0; border-top:0; }
     /* Wider evidence: a full-width box under the two theory boxes. */
     .learn article.evidence { grid-column:1/-1; }
+    .learn.wider-evidence { margin-top:28px; } /* the wider evidence, after the Scorecard's notes */
 
     /* History timeline (The two ideas): a row of years on wide screens with the chosen year's story under it, and a
        vertical list on phones with each story under its own year. Colours follow the site: blue for the clues to the
        problem, purple dark matter, orange MOND, grey data and open questions. */
     .learn article.history { grid-column:1/-1; padding-bottom:18px; }
-    #history, #ideaHalo, #ideaMond, .evidence-card[id], #evOpen, #mMeasure { scroll-margin-top:72px; }
+    #history, #ideaHalo, #ideaMond, .evidence-card[id], #evOpen, #mMeasure, #evidence { scroll-margin-top:72px; }
     .timeline { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); margin:2px 0 0; padding:0; list-style:none; }
     .timeline > li { display:contents; --tl:#8ab4f8; }
     .timeline > li.tl-dm, .tl-key .tl-dm { --tl:#b39ae8; } .timeline > li.tl-mond, .tl-key .tl-mond { --tl:#ffae5c; } .timeline > li.tl-data, .tl-key .tl-data { --tl:#aab8cc; }
@@ -982,7 +983,7 @@
     .page:not(.active) { height:0; overflow:hidden; visibility:hidden; }
     .load-failed { margin:16px 0; padding:14px 16px; border:1px solid rgba(255,138,128,.6); border-radius:10px; background:rgba(255,138,128,.08); color:var(--ink); line-height:1.5; }
     body.sim-unavailable .page:not(.active) { height:auto; overflow:visible; visibility:visible; }
-    body.sim-unavailable :is(.page[data-page="simulator"], .page[data-page="scorecard"], .page-next, .topnav a[href="#simulator"], .topnav a[href="#scorecard"]) { display:none; }
+    body.sim-unavailable :is(.page[data-page="simulator"], .page[data-page="scorecard"] > :not(.wider-evidence), .page-next, .topnav a[href="#simulator"], .topnav a[href="#scorecard"]) { display:none; }
     .topnav a[aria-current="page"] { color:var(--ink); background:rgba(138,180,248,.16); }
     .page header { max-width:none; margin:0; padding:36px 0 4px; display:block; }
     /* Opening hero: the title beside a face-on galaxy turning at the default galaxy's real speeds (startHeroGalaxy). */
@@ -1474,20 +1475,20 @@
     </section>
     </div>
     <div class="page" data-page="background">
-    <div class="section-head" id="background"><span class="kicker">02</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says.</p></div>
+    <div class="section-head" id="background"><span class="kicker">02</span><h2>The two ideas</h2><p>Dark matter or MOND: how each explains the fast orbits.</p></div>
     <section class="learn" id="theoryGuide" aria-label="Theory guide">
       <article class="history" id="history"><h3>How we got here</h3>
         <p class="tldr">Ninety years of clues, in the order they arrived. Select a year to see what it added.</p>
         <ol class="timeline" aria-label="Timeline of the missing mass problem">
-          <li class="tl-clue" style="--i:0"><button type="button" class="tl-pick" aria-expanded="true" aria-controls="tl0"><span class="tl-year">1933</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The first hint</span></button><div class="tl-detail open" id="tl0"><p>Galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><a class="tl-more" href="#evClusters">Galaxy clusters →</a></div></li>
+          <li class="tl-clue" style="--i:0"><button type="button" class="tl-pick" aria-expanded="true" aria-controls="tl0"><span class="tl-year">1933</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The first hint</span></button><div class="tl-detail open" id="tl0"><p>Galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><a class="tl-more" href="#evClusters">Scorecard: galaxy clusters →</a></div></li>
           <li class="tl-clue" style="--i:1"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl1"><span class="tl-year">1980</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">Flat rotation curves</span></button><div class="tl-detail" id="tl1"><p>Galaxy after galaxy, stars and gas far from the centre orbit as fast as those further in, not slower as Newton’s gravity predicts from the visible matter (Rubin, Ford &amp; Thonnard 1980).</p><a class="tl-more" href="#puzzle">The missing mass problem →</a></div></li>
           <li class="tl-mond" style="--i:2"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl2"><span class="tl-year">1983</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">MOND</span></button><div class="tl-detail" id="tl2"><p>Milgrom proposes that there is no extra mass: gravity itself becomes stronger than Newton’s law once it is very weak (Milgrom 1983).</p><a class="tl-more" href="#ideaMond">What is MOND? →</a></div></li>
           <li class="tl-dm" style="--i:3"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl3"><span class="tl-year">1996</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The NFW halo</span></button><div class="tl-detail" id="tl3"><p>Computer simulations of cold dark matter give halos of every size the same density profile, the NFW shape this site tests (Navarro, Frenk &amp; White 1996).</p><a class="tl-more" href="#ideaHalo">What is a dark matter halo? →</a></div></li>
-          <li class="tl-dm" style="--i:4"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl4"><span class="tl-year">2006</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The Bullet Cluster</span></button><div class="tl-detail" id="tl4"><p>After two galaxy clusters collided, most of their mass ended up away from most of their visible matter (Clowe et al. 2006).</p><a class="tl-more" href="#evBullet">The Bullet Cluster →</a></div></li>
+          <li class="tl-dm" style="--i:4"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl4"><span class="tl-year">2006</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The Bullet Cluster</span></button><div class="tl-detail" id="tl4"><p>After two galaxy clusters collided, most of their mass ended up away from most of their visible matter (Clowe et al. 2006).</p><a class="tl-more" href="#evBullet">Scorecard: the Bullet Cluster →</a></div></li>
           <li class="tl-data" style="--i:5"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl5"><span class="tl-year">2016</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">SPARC</span></button><div class="tl-detail" id="tl5"><p>A public catalogue of 175 disk galaxies, each with measured orbit speeds and a model of its stars and gas: the data this site uses (Lelli, McGaugh &amp; Schombert 2016).</p><a class="tl-more" href="#mMeasure">Method: start from real measurements →</a></div></li>
-          <li class="tl-mond" style="--i:6"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl6"><span class="tl-year">2016</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">One curve</span></button><div class="tl-detail" id="tl6"><p>Across 153 SPARC galaxies, the pull worked out from the measured speeds follows one curve set by the visible matter alone, as MOND predicts (McGaugh, Lelli &amp; Schombert 2016).</p><a class="tl-more" href="#evRar">Visible matter predicts the pull →</a></div></li>
-          <li class="tl-dm" style="--i:7"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl7"><span class="tl-year">2020</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The oldest light</span></button><div class="tl-detail" id="tl7"><p>Planck’s map of the cosmic microwave background fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p><a class="tl-more" href="#evCmb">The oldest light →</a></div></li>
-          <li class="tl-data" style="--i:8"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl8"><span class="tl-year">Today</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">Still open</span></button><div class="tl-detail" id="tl8"><p>No dark matter particle has been confirmed (Bertone &amp; Hooper 2018), and MOND still needs unseen matter in galaxy clusters (Famaey &amp; McGaugh 2012).</p><a class="tl-more" href="#evOpen">Still open →</a></div></li>
+          <li class="tl-mond" style="--i:6"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl6"><span class="tl-year">2016</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">One curve</span></button><div class="tl-detail" id="tl6"><p>Across 153 SPARC galaxies, the pull worked out from the measured speeds follows one curve set by the visible matter alone, as MOND predicts (McGaugh, Lelli &amp; Schombert 2016).</p><a class="tl-more" href="#evRar">Scorecard: visible matter predicts the pull →</a></div></li>
+          <li class="tl-dm" style="--i:7"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl7"><span class="tl-year">2020</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">The oldest light</span></button><div class="tl-detail" id="tl7"><p>Planck’s map of the cosmic microwave background fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p><a class="tl-more" href="#evCmb">Scorecard: the oldest light →</a></div></li>
+          <li class="tl-data" style="--i:8"><button type="button" class="tl-pick" aria-expanded="false" aria-controls="tl8"><span class="tl-year">Today</span><span class="tl-dot" aria-hidden="true"></span><span class="tl-title">Still open</span></button><div class="tl-detail" id="tl8"><p>No dark matter particle has been confirmed (Bertone &amp; Hooper 2018), and MOND still needs unseen matter in galaxy clusters (Famaey &amp; McGaugh 2012).</p><a class="tl-more" href="#evOpen">Scorecard: still open →</a></div></li>
         </ol>
         <p class="tl-key"><span class="tl-clue">The problem</span><span class="tl-dm">Dark matter</span><span class="tl-mond">MOND</span><span class="tl-data">Data and open questions</span></p>
       </article>
@@ -1498,7 +1499,7 @@
           <tbody>
             <tr><th scope="row">What it changes</th><td>Adds unseen mass. Newton’s gravity is unchanged.</td><td>No extra mass. Gravity is boosted where it is very weak.</td></tr>
             <tr><th scope="row">Values tuned to each galaxy (standard values)</th><td><b>2</b>: halo mass and scale radius</td><td><b>0</b>: one constant, a<sub>0</sub>, shared by every galaxy</td></tr>
-            <tr><th scope="row">Best evidence for it</th><td>Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)</td><td>Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)</td></tr>
+            <tr><th scope="row">Best evidence for it</th><td>Galaxy clusters, the Bullet Cluster and the cosmic microwave background (see <a href="#evidence">the wider evidence</a> on the Scorecard page)</td><td>Visible matter alone predicts the pull in galaxies (McGaugh, Lelli &amp; Schombert 2016)</td></tr>
             <tr><th scope="row">Biggest open problem</th><td>No dark matter particle has been confirmed (Bertone &amp; Hooper 2018)</td><td>Galaxy clusters and the cosmic microwave background still need unseen matter (Famaey &amp; McGaugh 2012)</td></tr>
           </tbody>
         </table>
@@ -1592,23 +1593,6 @@
         <div class="eq"><math display="block"><mo>⇒</mo><mspace width="0.5em"/><msup><mi>v</mi><mn>4</mn></msup><mo>=</mo><mi>G</mi><mi>M</mi><msub><mi>a</mi><mn>0</mn></msub></math></div>
         <p>r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method).</p>
         </details>
-        </div>
-      </article>
-      <article class="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
-        <div class="learn-content">
-        <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
-        <div class="evidence-grid">
-          <div class="evidence-card" id="evClusters"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
-          <div class="evidence-card" id="evBullet"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
-          <div class="evidence-card" id="evCmb"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
-          <div class="evidence-card" id="evRar"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
-        </div>
-        <details class="fold" id="evOpen"><summary>Still open: each idea’s unsolved problem</summary><div class="fold-body">
-        <div class="evidence-grid two">
-          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
-          <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
-        </div>
-        </div></details>
         </div>
       </article>
     </section>
@@ -1797,7 +1781,7 @@
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#scorecard">Next: how both ideas score on every galaxy <span class="next-arrow" aria-hidden="true">→</span></a></nav>
     </div>
     <div class="page" data-page="scorecard">
-    <div class="section-head" id="scorecard"><span class="kicker">05</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site.</p></div>
+    <div class="section-head" id="scorecard"><span class="kicker">05</span><h2>Scorecard</h2><p>How closely each idea matches every galaxy on this site, and what the wider evidence says.</p></div>
     <section class="scorecard" aria-label="Fit scores for every preset galaxy">
       <p class="score-intro">One score per galaxy and idea: χ<sup>2</sup><sub>r</sub> (reduced chi-squared), how far the model misses the measured speeds, in error bars. Lower is better; about 1 is as close as the data allow.</p>
       <ul class="score-legend" aria-label="What the colours mean"><li><span class="score good">below 2</span>close fit</li><li><span class="score ok">2 to 10</span>rough fit</li><li><span class="score poor">above 10</span>poor fit</li></ul>
@@ -1833,6 +1817,25 @@
         <li><b>What the error bars cover</b>Only each speed’s own uncertainty. A wrong distance or tilt shifts the whole curve at once, so the best fits vary those separately.</li>
         <li><b>A small sample</b><span id="scoreCount">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner.</li>
       </ul>
+    </section>
+    <section class="learn wider-evidence" aria-label="The wider evidence">
+      <article class="evidence" id="evidence"><h3>Beyond rotation curves: the wider evidence</h3>
+        <div class="learn-content">
+        <p class="tldr">Rotation curves are one clue among several. A winning explanation has to account for all of them.</p>
+        <div class="evidence-grid">
+          <div class="evidence-card" id="evClusters"><span class="evidence-tag dm">Points to dark matter</span><h4>Galaxy clusters</h4><p><b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933).</p><p><b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012).</p></div>
+          <div class="evidence-card" id="evBullet"><span class="evidence-tag dm">Points to dark matter</span><h4>The Bullet Cluster</h4><p><b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006).</p><p><b>Why it matters:</b> the mass and the visible matter ended up in different places.</p></div>
+          <div class="evidence-card" id="evCmb"><span class="evidence-tag dm">Points to dark matter</span><h4>The oldest light</h4><p><b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches.</p><p><b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020).</p></div>
+          <div class="evidence-card" id="evRar"><span class="evidence-tag mond">Points to MOND</span><h4>Visible matter predicts the pull</h4><p><b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016).</p><p><b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining.</p></div>
+        </div>
+        <details class="fold" id="evOpen"><summary>Still open: each idea’s unsolved problem</summary><div class="fold-body">
+        <div class="evidence-grid two">
+          <div class="evidence-card"><h4>No confirmed dark matter particle</h4><p>Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026).</p></div>
+          <div class="evidence-card"><h4>MOND beyond galaxies</h4><p>MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012).</p></div>
+        </div>
+        </div></details>
+        </div>
+      </article>
     </section>
     <nav class="page-next" aria-label="Next page"><a class="next-link" href="#quiz">Next: test your knowledge <span class="next-arrow" aria-hidden="true">→</span></a></nav>
     </div>
@@ -5519,7 +5522,7 @@ window.GALAXIES = {
           prompt:'With standard values, the dark matter halo fits NGC 3198 more closely than MOND. Why doesn’t that settle which idea is right?',
           options:[{answer:'The halo tunes two values to each galaxy, while MOND’s one constant is the same for all of them'},{answer:'MOND was tested against less accurate data'},{answer:'A closer fit always means a worse model'},{answer:'NGC 3198 is an imaginary galaxy from the sandbox'}],
           why:'The more values a model can adjust, the easier any curve is to fit, which is why the Scorecard counts every tuned value. And 4 of SPARC’s 175 galaxies are enough to show the method, not to pick a winner.'},
-        {topic:'Evidence',short:'What the Bullet Cluster supports',link:'#evBullet',linkText:'The two ideas: the Bullet Cluster',
+        {topic:'Evidence',short:'What the Bullet Cluster supports',link:'#evBullet',linkText:'Scorecard: the Bullet Cluster',
           prompt:'When the two galaxy clusters of the Bullet Cluster collided, most of their mass ended up away from most of their visible matter. Which idea does that support most?',
           options:[{answer:'Dark matter: unseen mass can sit apart from the gas and stars'},{answer:'MOND: it shows gravity is stronger where it is weak'},{answer:'Neither: it shows rotation speeds were measured wrongly'},{answer:'Both equally: it is another flat rotation curve'}],
           why:'If there were no extra mass, the pull would follow the visible matter. Here it doesn’t (Clowe et al. 2006). The debate isn’t over, though: no dark matter particle has been found yet (Bertone & Hooper 2018).'}
@@ -6008,7 +6011,7 @@ window.GALAXIES = {
          text:'Each row is a galaxy, scored under each idea: close (green), rough (yellow) or poor (red). An arrow leads from the standard values to the best realistic fit; a † marks a fit that needed a value at the edge of its realistic range.',
          action:'Read along the rows in the blue box, then press Next.'},
         {id:'finish',closing:true,noRing:true,target:'scoreNotes',gesture:'scan',tag:'Read these',title:'What this does and doesn’t show',
-         text:'A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (The two ideas page sums it up). These notes say what limits this comparison.',
+         text:'A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (summed up below these notes). These notes say what limits this comparison.',
          action:'Read these notes, then press Finish.'}
       ]},
       sandbox:{label:'Sandbox tutorial',steps:[

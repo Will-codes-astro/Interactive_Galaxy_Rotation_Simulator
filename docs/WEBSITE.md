@@ -15,8 +15,8 @@ a "Next" button (The two ideas' is the guided tour panel; Method's is "Back to t
 width (height 0, not `display:none`), so the 3D view and the rotation curve stay
 correctly sized. If Plotly or Three.js fails to load (for example a network that blocks CDNs) or
 WebGL is off, a red note at the top says which, and the page shows the homepage,
-The two ideas and Method as one long scroll; the Simulator and Scorecard, which need
-the libraries, are hidden. On phones (640 px or narrower) the menu uses short labels
+The two ideas and Method as one long scroll; the Simulator and the Scorecard's scores, which need
+the libraries, are hidden (the wider evidence after the scores stays). On phones (640 px or narrower) the menu uses short labels
 ("Home", "Ideas", "Method") in one row (below 420 px the logo is hidden to make room); on
 narrower screens it wraps onto a second row, so every entry stays visible. The stat tiles (test stars, timeline, mass-to-light, tilt) and the Best realistic
 fits switch sit just under the Simulation heading, directly above the sliders
@@ -632,14 +632,21 @@ with every radius of the SPARC presets as fixed dots (SPARC's standard mass-to-l
 and an a₀ line sideways; a "Measured value" button jumps to 1.20. The one-line readout gives the rms gap between curve and
 dots as a speed and says which way to slide, or that it is the best match for these four galaxies (≈1.11, found
 by scanning the slider's range; within ±0.04 dex counts as best). Two cards follow: the measured value (1.20, 153 galaxies) and the unexplained a₀ ≈ cH₀/2π
-coincidence. A lone last card spans the full width. Below them is a full-width box, "Beyond rotation curves: the wider
-evidence": galaxy clusters, the Bullet Cluster, the cosmic microwave background
+coincidence. A lone last card spans the full width.
+
+"Beyond rotation curves: the wider evidence" (`#evidence`) is on the Scorecard page, after the
+"Before drawing conclusions" notes (moved there from The two ideas on 26 Nov 2026, Will's decision, so
+the page before the simulator shows about 420 words on arrival; it also follows on from the notes'
+point that a close fit doesn't settle which idea is right). The timeline's evidence links say
+"Scorecard: …", and the comparison table's "Best evidence" cell links to it. It is a full-width box: galaxy clusters, the Bullet Cluster, the cosmic microwave background
 and the radial acceleration relation, each with a tag for the idea it points
 to and two short lines, "Seen:" (the observation, with its source) and "Why it
 matters:". Two "Still open" cards follow, folded under "Still open: each idea's unsolved problem"
 (`#evOpen`; the comparison table's last row already names both problems): no confirmed dark matter
 particle (including the single LZ candidate event of September 2026, a 2.6σ
-preprint, arXiv:2609.02823) and MOND beyond galaxies. The MOND box gives the
+preprint, arXiv:2609.02823) and MOND beyond galaxies.
+
+Back on The two ideas page, the MOND box gives the
 speed boost at five strengths of Newton's pull (10 a₀ to a₀ ÷ 100) as a small
 table, and folds a three-step A-level derivation (g = v²/r, MOND's strong and weak limits,
 v⁴ = GMa₀) under "Show the maths"; the full interpolating formula (the RAR

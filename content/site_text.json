@@ -435,12 +435,12 @@
   "text": "The two ideas"
  },
  {
-  "id": "394e0de7af",
+  "id": "af69a06c9b",
   "kind": "html",
   "page": "background",
   "section": "The two ideas",
   "label": "Paragraph",
-  "text": "Dark matter or MOND: how each explains the fast orbits, and what the wider evidence says."
+  "text": "Dark matter or MOND: how each explains the fast orbits."
  },
  {
   "id": "c29baa3a8e",
@@ -492,12 +492,12 @@
   "text": "Galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933)."
  },
  {
-  "id": "4855cf028f",
+  "id": "484b621d53",
   "kind": "html",
   "page": "background",
   "section": "How we got here",
   "label": "Paragraph",
-  "text": "<a class=\"tl-more\" href=\"#evClusters\">Galaxy clusters →</a>"
+  "text": "<a class=\"tl-more\" href=\"#evClusters\">Scorecard: galaxy clusters →</a>"
  },
  {
   "id": "9694939be5",
@@ -588,12 +588,12 @@
   "text": "After two galaxy clusters collided, most of their mass ended up away from most of their visible matter (Clowe et al. 2006)."
  },
  {
-  "id": "9be68aefa8",
+  "id": "6a41f9885d",
   "kind": "html",
   "page": "background",
   "section": "How we got here",
   "label": "Paragraph",
-  "text": "<a class=\"tl-more\" href=\"#evBullet\">The Bullet Cluster →</a>"
+  "text": "<a class=\"tl-more\" href=\"#evBullet\">Scorecard: the Bullet Cluster →</a>"
  },
  {
   "id": "da2991079b",
@@ -636,12 +636,12 @@
   "text": "Across 153 SPARC galaxies, the pull worked out from the measured speeds follows one curve set by the visible matter alone, as MOND predicts (McGaugh, Lelli &amp; Schombert 2016)."
  },
  {
-  "id": "fcd6f0d8fc",
+  "id": "741b0d9f30",
   "kind": "html",
   "page": "background",
   "section": "How we got here",
   "label": "Paragraph",
-  "text": "<a class=\"tl-more\" href=\"#evRar\">Visible matter predicts the pull →</a>"
+  "text": "<a class=\"tl-more\" href=\"#evRar\">Scorecard: visible matter predicts the pull →</a>"
  },
  {
   "id": "19704ce51f",
@@ -660,12 +660,12 @@
   "text": "Planck’s map of the cosmic microwave background fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020)."
  },
  {
-  "id": "767d2479a8",
+  "id": "c9d6596931",
   "kind": "html",
   "page": "background",
   "section": "How we got here",
   "label": "Paragraph",
-  "text": "<a class=\"tl-more\" href=\"#evCmb\">The oldest light →</a>"
+  "text": "<a class=\"tl-more\" href=\"#evCmb\">Scorecard: the oldest light →</a>"
  },
  {
   "id": "3615215551",
@@ -684,12 +684,12 @@
   "text": "No dark matter particle has been confirmed (Bertone &amp; Hooper 2018), and MOND still needs unseen matter in galaxy clusters (Famaey &amp; McGaugh 2012)."
  },
  {
-  "id": "4034e8f9ea",
+  "id": "06cf74bc10",
   "kind": "html",
   "page": "background",
   "section": "How we got here",
   "label": "Paragraph",
-  "text": "<a class=\"tl-more\" href=\"#evOpen\">Still open →</a>"
+  "text": "<a class=\"tl-more\" href=\"#evOpen\">Scorecard: still open →</a>"
  },
  {
   "id": "8207412169",
@@ -796,12 +796,12 @@
   "text": "Best evidence for it"
  },
  {
-  "id": "4869b41f7b",
+  "id": "88cd43d8c4",
   "kind": "html",
   "page": "background",
   "section": "Side by side",
   "label": "Table cell",
-  "text": "Galaxy clusters, the Bullet Cluster and the cosmic microwave background (below)"
+  "text": "Galaxy clusters, the Bullet Cluster and the cosmic microwave background (see <a href=\"#evidence\">the wider evidence</a> on the Scorecard page)"
  },
  {
   "id": "2a7da5c546",
@@ -1246,194 +1246,10 @@
   "text": "r cancels, so the speed stops falling: a flat rotation curve set by the visible mass alone (Milgrom 1983). Between the two limits the simulator blends smoothly, using a formula fitted to SPARC galaxies (McGaugh, Lelli &amp; Schombert 2016; see Method)."
  },
  {
-  "id": "ef1c9eb45a",
-  "kind": "html",
-  "page": "background",
-  "section": "Beyond rotation curves: the wider evidence",
-  "label": "Heading",
-  "text": "Beyond rotation curves: the wider evidence"
- },
- {
-  "id": "c71d035dc4",
-  "kind": "html",
-  "page": "background",
-  "section": "Beyond rotation curves: the wider evidence",
-  "label": "Paragraph",
-  "text": "Rotation curves are one clue among several. A winning explanation has to account for all of them."
- },
- {
-  "id": "e8e064adbf",
-  "kind": "html",
-  "page": "background",
-  "section": "Beyond rotation curves: the wider evidence",
-  "label": "Text",
-  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
- },
- {
-  "id": "a660c8ac9d",
-  "kind": "html",
-  "page": "background",
-  "section": "Galaxy clusters",
-  "label": "Heading",
-  "text": "Galaxy clusters"
- },
- {
-  "id": "d43217a198",
-  "kind": "html",
-  "page": "background",
-  "section": "Galaxy clusters",
-  "label": "Paragraph",
-  "text": "<b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933)."
- },
- {
-  "id": "3d921d6cba",
-  "kind": "html",
-  "page": "background",
-  "section": "Galaxy clusters",
-  "label": "Paragraph",
-  "text": "<b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012)."
- },
- {
-  "id": "f20ab510e6",
-  "kind": "html",
-  "page": "background",
-  "section": "Galaxy clusters",
-  "label": "Text",
-  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
- },
- {
-  "id": "06b1006227",
-  "kind": "html",
-  "page": "background",
-  "section": "The Bullet Cluster",
-  "label": "Heading",
-  "text": "The Bullet Cluster"
- },
- {
-  "id": "93a27105b3",
-  "kind": "html",
-  "page": "background",
-  "section": "The Bullet Cluster",
-  "label": "Paragraph",
-  "text": "<b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006)."
- },
- {
-  "id": "b1b16226c7",
-  "kind": "html",
-  "page": "background",
-  "section": "The Bullet Cluster",
-  "label": "Paragraph",
-  "text": "<b>Why it matters:</b> the mass and the visible matter ended up in different places."
- },
- {
-  "id": "afcd64ac9b",
-  "kind": "html",
-  "page": "background",
-  "section": "The Bullet Cluster",
-  "label": "Text",
-  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
- },
- {
-  "id": "00504822c8",
-  "kind": "html",
-  "page": "background",
-  "section": "The oldest light",
-  "label": "Heading",
-  "text": "The oldest light"
- },
- {
-  "id": "580b5664c1",
-  "kind": "html",
-  "page": "background",
-  "section": "The oldest light",
-  "label": "Paragraph",
-  "text": "<b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches."
- },
- {
-  "id": "339d59bd38",
-  "kind": "html",
-  "page": "background",
-  "section": "The oldest light",
-  "label": "Paragraph",
-  "text": "<b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020)."
- },
- {
-  "id": "8aa8938a6b",
-  "kind": "html",
-  "page": "background",
-  "section": "The oldest light",
-  "label": "Text",
-  "text": "<span class=\"evidence-tag mond\">Points to MOND</span>"
- },
- {
-  "id": "95ab6d7b01",
-  "kind": "html",
-  "page": "background",
-  "section": "Visible matter predicts the pull",
-  "label": "Heading",
-  "text": "Visible matter predicts the pull"
- },
- {
-  "id": "44278d3ee7",
-  "kind": "html",
-  "page": "background",
-  "section": "Visible matter predicts the pull",
-  "label": "Paragraph",
-  "text": "<b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016)."
- },
- {
-  "id": "6cc8f4bd32",
-  "kind": "html",
-  "page": "background",
-  "section": "Visible matter predicts the pull",
-  "label": "Paragraph",
-  "text": "<b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining."
- },
- {
-  "id": "310e68f336",
-  "kind": "html",
-  "page": "background",
-  "section": "Visible matter predicts the pull",
-  "label": "Click-to-open heading",
-  "text": "Still open: each idea’s unsolved problem"
- },
- {
-  "id": "89d99827c5",
-  "kind": "html",
-  "page": "background",
-  "section": "No confirmed dark matter particle",
-  "label": "Heading",
-  "text": "No confirmed dark matter particle"
- },
- {
-  "id": "8a62620fe1",
-  "kind": "html",
-  "page": "background",
-  "section": "No confirmed dark matter particle",
-  "label": "Paragraph",
-  "text": "Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026)."
- },
- {
-  "id": "dd926633af",
-  "kind": "html",
-  "page": "background",
-  "section": "MOND beyond galaxies",
-  "label": "Heading",
-  "text": "MOND beyond galaxies"
- },
- {
-  "id": "98fb367126",
-  "kind": "html",
-  "page": "background",
-  "section": "MOND beyond galaxies",
-  "label": "Paragraph",
-  "text": "MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012)."
- },
- {
   "id": "2646285a6f",
   "kind": "attr",
   "page": "background",
-  "section": "MOND beyond galaxies",
+  "section": "Find a0 yourself",
   "label": "Screen-reader label (read aloud, not shown)",
   "text": "Next page"
  },
@@ -1441,7 +1257,7 @@
   "id": "ccc6a50b6f",
   "kind": "html",
   "page": "background",
-  "section": "MOND beyond galaxies",
+  "section": "Find a0 yourself",
   "label": "Text",
   "text": "<span class=\"tour-cta-eyebrow\">Now test them</span>"
  },
@@ -1449,7 +1265,7 @@
   "id": "896f82e352",
   "kind": "html",
   "page": "background",
-  "section": "MOND beyond galaxies",
+  "section": "Find a0 yourself",
   "label": "Paragraph",
   "text": "Put both ideas to work on real galaxies: follow the guided tour, or explore the simulator on your own."
  },
@@ -1457,7 +1273,7 @@
   "id": "8c23075f42",
   "kind": "html",
   "page": "background",
-  "section": "MOND beyond galaxies",
+  "section": "Find a0 yourself",
   "label": "Text",
   "text": "<span class=\"tour-go-text\"><b>Take the full guided tour</b><small>The simulator, the sandbox, then the scores</small></span><span class=\"tour-go-arrow\" aria-hidden=\"true\">→</span>"
  },
@@ -1465,7 +1281,7 @@
   "id": "924e6913b2",
   "kind": "html",
   "page": "background",
-  "section": "MOND beyond galaxies",
+  "section": "Find a0 yourself",
   "label": "Text",
   "text": "<a class=\"next-link\" href=\"#simulator\" id=\"exploreAlone\">Explore on my own <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
  },
@@ -3106,12 +2922,12 @@
   "text": "Scorecard"
  },
  {
-  "id": "70256518f1",
+  "id": "94a61cfa50",
   "kind": "html",
   "page": "scorecard",
   "section": "Scorecard",
   "label": "Paragraph",
-  "text": "How closely each idea matches every galaxy on this site."
+  "text": "How closely each idea matches every galaxy on this site, and what the wider evidence says."
  },
  {
   "id": "8aa2d410d3",
@@ -3435,10 +3251,202 @@
   "text": "<b>A small sample</b><span id=\"scoreCount\">A few</span> of SPARC’s 175 galaxies (Lelli, McGaugh &amp; Schombert 2016): enough to show the method, not to pick a winner."
  },
  {
-  "id": "1e6edb3e3d",
+  "id": "3b38cf81aa",
   "kind": "attr",
   "page": "scorecard",
   "section": "Scorecard",
+  "label": "Screen-reader label (read aloud, not shown)",
+  "text": "The wider evidence"
+ },
+ {
+  "id": "ef1c9eb45a",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Beyond rotation curves: the wider evidence",
+  "label": "Heading",
+  "text": "Beyond rotation curves: the wider evidence"
+ },
+ {
+  "id": "c71d035dc4",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Beyond rotation curves: the wider evidence",
+  "label": "Paragraph",
+  "text": "Rotation curves are one clue among several. A winning explanation has to account for all of them."
+ },
+ {
+  "id": "e8e064adbf",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Beyond rotation curves: the wider evidence",
+  "label": "Text",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "a660c8ac9d",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Galaxy clusters",
+  "label": "Heading",
+  "text": "Galaxy clusters"
+ },
+ {
+  "id": "d43217a198",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Galaxy clusters",
+  "label": "Paragraph",
+  "text": "<b>Seen:</b> galaxies in the Coma cluster move too fast for the cluster’s visible mass to hold them together (Zwicky 1933)."
+ },
+ {
+  "id": "3d921d6cba",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Galaxy clusters",
+  "label": "Paragraph",
+  "text": "<b>Why it matters:</b> the first hint of missing mass. MOND shrinks the gap but still needs some unseen matter (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "f20ab510e6",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Galaxy clusters",
+  "label": "Text",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "06b1006227",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The Bullet Cluster",
+  "label": "Heading",
+  "text": "The Bullet Cluster"
+ },
+ {
+  "id": "93a27105b3",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The Bullet Cluster",
+  "label": "Paragraph",
+  "text": "<b>Seen:</b> two clusters collided. Their hot gas, most of the visible matter, slowed down in the middle, but the bending of background light shows most of the mass carried on with the galaxies (Clowe et al. 2006)."
+ },
+ {
+  "id": "b1b16226c7",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The Bullet Cluster",
+  "label": "Paragraph",
+  "text": "<b>Why it matters:</b> the mass and the visible matter ended up in different places."
+ },
+ {
+  "id": "afcd64ac9b",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The Bullet Cluster",
+  "label": "Text",
+  "text": "<span class=\"evidence-tag dm\">Points to dark matter</span>"
+ },
+ {
+  "id": "00504822c8",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The oldest light",
+  "label": "Heading",
+  "text": "The oldest light"
+ },
+ {
+  "id": "580b5664c1",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The oldest light",
+  "label": "Paragraph",
+  "text": "<b>Seen:</b> the cosmic microwave background, light left over from the early Universe, has a pattern of slightly hotter and cooler patches."
+ },
+ {
+  "id": "339d59bd38",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The oldest light",
+  "label": "Paragraph",
+  "text": "<b>Why it matters:</b> the pattern fits a universe with about five times as much dark matter as ordinary matter (Planck Collaboration 2020)."
+ },
+ {
+  "id": "8aa8938a6b",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "The oldest light",
+  "label": "Text",
+  "text": "<span class=\"evidence-tag mond\">Points to MOND</span>"
+ },
+ {
+  "id": "95ab6d7b01",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Visible matter predicts the pull",
+  "label": "Heading",
+  "text": "Visible matter predicts the pull"
+ },
+ {
+  "id": "44278d3ee7",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Visible matter predicts the pull",
+  "label": "Paragraph",
+  "text": "<b>Seen:</b> across 153 galaxies, the pull worked out from the measured speeds closely follows one curve set only by the visible matter (McGaugh, Lelli &amp; Schombert 2016)."
+ },
+ {
+  "id": "6cc8f4bd32",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Visible matter predicts the pull",
+  "label": "Paragraph",
+  "text": "<b>Why it matters:</b> MOND predicts exactly this. Dark matter can match it only if every halo is closely tied to its galaxy’s visible matter, which still needs explaining."
+ },
+ {
+  "id": "310e68f336",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Visible matter predicts the pull",
+  "label": "Click-to-open heading",
+  "text": "Still open: each idea’s unsolved problem"
+ },
+ {
+  "id": "89d99827c5",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "No confirmed dark matter particle",
+  "label": "Heading",
+  "text": "No confirmed dark matter particle"
+ },
+ {
+  "id": "8a62620fe1",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "No confirmed dark matter particle",
+  "label": "Paragraph",
+  "text": "Decades of searches have found none (Bertone &amp; Hooper 2018). In September 2026 the LZ experiment reported one unexplained event, but at 2.6σ it is far below the 5σ needed to claim a discovery, and it is not yet peer reviewed (LZ Collaboration 2026)."
+ },
+ {
+  "id": "dd926633af",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "MOND beyond galaxies",
+  "label": "Heading",
+  "text": "MOND beyond galaxies"
+ },
+ {
+  "id": "98fb367126",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "MOND beyond galaxies",
+  "label": "Paragraph",
+  "text": "MOND has not matched galaxy clusters or the cosmic microwave background without adding unseen matter of its own (Famaey &amp; McGaugh 2012)."
+ },
+ {
+  "id": "1e6edb3e3d",
+  "kind": "attr",
+  "page": "scorecard",
+  "section": "MOND beyond galaxies",
   "label": "Screen-reader label (read aloud, not shown)",
   "text": "Next page"
  },
@@ -3446,7 +3454,7 @@
   "id": "a96ce8625b",
   "kind": "html",
   "page": "scorecard",
-  "section": "Scorecard",
+  "section": "MOND beyond galaxies",
   "label": "Text",
   "text": "<a class=\"next-link\" href=\"#quiz\">Next: test your knowledge <span class=\"next-arrow\" aria-hidden=\"true\">→</span></a>"
  },
@@ -6408,12 +6416,12 @@
   "text": "What the Bullet Cluster supports"
  },
  {
-  "id": "e28037d9dd",
+  "id": "c0615a466d",
   "kind": "js",
   "page": "messages",
   "section": "Quiz questions",
   "label": "Link back to the site",
-  "text": "The two ideas: the Bullet Cluster"
+  "text": "Scorecard: the Bullet Cluster"
  },
  {
   "id": "14dbf3ad4a",
@@ -7656,12 +7664,12 @@
   "text": "What this does and doesn’t show"
  },
  {
-  "id": "a2793ed86a",
+  "id": "44964852fd",
   "kind": "js",
   "page": "tour",
   "section": "Simulator tutorial: What this does and doesn’t show",
   "label": "Card explanation",
-  "text": "A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (The two ideas page sums it up). These notes say what limits this comparison."
+  "text": "A close fit is consistent with an idea but does not prove it: both models are simplified, and the rest of the evidence matters too (summed up below these notes). These notes say what limits this comparison."
  },
  {
   "id": "55a2b032ed",
