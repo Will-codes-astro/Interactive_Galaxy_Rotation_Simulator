@@ -64,7 +64,11 @@ TAG_LABELS = {"h1": "Heading", "h2": "Heading", "h3": "Heading", "h4": "Heading"
 TOUR_KEY_LABELS = {"title": "Card title", "text": "Card explanation", "action": "What to do",
                    "doneText": "Shown when the step is done", "tag": "Hint by the highlighted control",
                    "question": "Prediction question", "options": "Answer choice", "watch": "Watch hint",
-                   "also": "Hint by another highlighted control", "label": "Tour name"}
+                   "also": "Hint by another highlighted control", "label": "Tour name",
+                   # quiz page (QUIZ_QUESTIONS in the page script)
+                   "prompt": "Quiz question", "answer": "Quiz answer (the first is the right one)",
+                   "why": "Why (shown after answering)", "short": "Line in the results list",
+                   "linkText": "Link back to the site"}
 PAGE_TITLES = {"head": "Browser tab and search results", "top bar": "Top bar and menu"}
 TOUR_CARD_RE = re.compile(r"\{id:'([\w-]+)'(?:(?!\{id:).)*?\btitle:'((?:[^'\\\n]|\\.)*)'", re.S)
 TOUR_NAME_RE = re.compile(r"(\w+):\{label:'((?:[^'\\\n]|\\.)*)'")

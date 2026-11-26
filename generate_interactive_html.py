@@ -5772,7 +5772,7 @@ __GALAXIES_JS__
        Ten multiple-choice questions in the order of the site's story: one for each idea a visitor should leave with
        (what a rotation curve is, what was expected, what was seen, why that is a problem, the two answers, how the
        Scorecard judges them, and the wider evidence). Wrong answers are common misconceptions. In each question the
-       FIRST option is the right one; the options are shuffled on every attempt. Each answer explains why and links to
+       FIRST answer is the right one; the options are shuffled on every attempt. Each answer explains why and links to
        where the site says so. The missing-pull question reads its numbers from the homepage figure (puzzleGap), so
        the quiz and the homepage always agree. Nothing is stored. */
     (()=>{
@@ -5780,55 +5780,55 @@ __GALAXIES_JS__
       if(!box)return;
       const $=id=>document.getElementById(id);
       const curve=d=>`<svg viewBox="0 0 120 64" aria-hidden="true"><path class="qc-axis" d="M8 58H116M8 58V4"/><path class="qc-line" d="${d}"/></svg>`;
-      function pullQuestion(){
+      function quizPullQuestion(){
         const gap=puzzleGap||{name:'NGC 3198',obs:149,bar:65,ratio:(149/65)**2};
         const obs=Math.round(gap.obs),bar=Math.round(gap.bar),pull=gap.ratio<3?Number(gap.ratio.toFixed(1)):Math.round(gap.ratio);
         const speed=(gap.obs/gap.bar).toFixed(1),far=Math.round(gap.ratio**2);
         return {topic:'The problem',short:'How much extra pull the outer gas needs',link:'#puzzleChart',linkText:'Homepage: the gap in the figure',
           prompt:`At the edge of ${gap.name}, gas orbits at ${obs} km/s, but its visible matter could only hold it in orbit at about ${bar} km/s. About how much more pull does keeping it there take?`,
-          options:[{text:`About ${pull} times as much`},{text:`About ${speed} times as much`},{text:`About ${far} times as much`},{text:'No more: orbit speed doesn’t depend on the pull'}],
+          options:[{answer:`About ${pull} times as much`},{answer:`About ${speed} times as much`},{answer:`About ${far} times as much`},{answer:'No more: orbit speed doesn’t depend on the pull'}],
           why:`For a circular orbit the pull needed is V²/r, so it grows with the speed squared: (${obs} ÷ ${bar})² ≈ ${pull}. About ${speed} times the speed takes about ${pull} times the pull. That shortfall is the missing mass problem.`};
       }
-      const questions=()=>[
+      const QUIZ_QUESTIONS=()=>[
         {topic:'Definition',short:'What a rotation curve shows',link:'#puzzle',linkText:'Homepage: a rotation curve is a speed chart',
           prompt:'What does a galaxy’s rotation curve show?',
-          options:[{text:'How fast its stars and gas orbit at each distance from the centre'},{text:'How its brightness changes with distance from the centre'},{text:'The path that one star takes around the centre'},{text:'How the galaxy’s spin has changed over billions of years'}],
+          options:[{answer:'How fast its stars and gas orbit at each distance from the centre'},{answer:'How its brightness changes with distance from the centre'},{answer:'The path that one star takes around the centre'},{answer:'How the galaxy’s spin has changed over billions of years'}],
           why:'It is a speed chart: orbit speed going up, distance from the centre going across. Each point is a different ring of stars or gas, all measured today.'},
         {topic:'Definition',short:'What a faster orbit tells you',link:'#puzzle',linkText:'Homepage: orbit speed works like a scale',
           prompt:'Two stars orbit at the same distance from the centres of two different galaxies. Star A orbits faster. What does that tell you?',
-          options:[{text:'More mass lies inside star A’s orbit'},{text:'Star A itself is heavier than star B'},{text:'Star A’s galaxy is further away from us'},{text:'Star A is younger than star B'}],
+          options:[{answer:'More mass lies inside star A’s orbit'},{answer:'Star A itself is heavier than star B'},{answer:'Star A’s galaxy is further away from us'},{answer:'Star A is younger than star B'}],
           why:'Orbit speed works like a weighing scale: at a given distance, a faster orbit needs a stronger pull, so more mass inside the orbit. The star’s own mass doesn’t matter, just as a hammer and a feather fall together without air.'},
         {topic:'Prediction',short:'Why Neptune orbits slower than Mercury',link:'#puzzle',linkText:'Homepage: outer stars should slow down',
           prompt:'Mercury orbits the Sun at 47 km/s, but Neptune at only 5 km/s. Why is Neptune so much slower?',
-          options:[{text:'The Sun’s pull is much weaker that far out, so a slower speed is enough to stay in orbit'},{text:'Neptune is bigger, so it is harder to move'},{text:'Gas between the planets slows Neptune down by friction'},{text:'Neptune formed later, so it hasn’t sped up yet'}],
+          options:[{answer:'The Sun’s pull is much weaker that far out, so a slower speed is enough to stay in orbit'},{answer:'Neptune is bigger, so it is harder to move'},{answer:'Gas between the planets slows Neptune down by friction'},{answer:'Neptune formed later, so it hasn’t sped up yet'}],
           why:'Almost all the Solar System’s mass is in the Sun, and its pull weakens with distance (Williams 2024 gives the speeds). Astronomers expected galaxies to behave the same way, because most of their visible matter sits near the centre.'},
         {topic:'Observation',short:'The shape Rubin and colleagues found',link:'#puzzleChart',linkText:'Homepage: what telescopes found',figures:true,
           prompt:'By 1980, Vera Rubin and colleagues had measured many spiral galaxies and found one rotation curve shape again and again. Which one?',
-          options:[{text:'Rises, then stays level',svg:curve('M10 56C18 20 28 14 44 13S100 12 114 12')},{text:'Rises, then falls away',svg:curve('M10 56C15 18 22 12 32 14S70 37 114 45')},{text:'Keeps rising',svg:curve('M10 56L114 8')},{text:'Falls from the centre outwards',svg:curve('M10 10C40 24 80 40 114 50')}],
+          options:[{answer:'Rises, then stays level',svg:curve('M10 56C18 20 28 14 44 13S100 12 114 12')},{answer:'Rises, then falls away',svg:curve('M10 56C15 18 22 12 32 14S70 37 114 45')},{answer:'Keeps rising',svg:curve('M10 56L114 8')},{answer:'Falls from the centre outwards',svg:curve('M10 10C40 24 80 40 114 50')}],
           why:'The speeds rise, then stay high far beyond most of the stars (Rubin, Ford & Thonnard 1980). Rising then falling is what the visible matter alone predicts: the dashed line on the homepage.'},
-        pullQuestion(),
+        quizPullQuestion(),
         {topic:'Dark matter',short:'How dark matter explains the fast orbits',link:'#ideaHalo',linkText:'The two ideas: what is a dark matter halo?',
           prompt:'How does the dark matter idea explain the fast outer orbits?',
-          options:[{text:'A huge halo of unseen mass adds extra pull. Newton’s gravity is unchanged'},{text:'Gravity itself becomes stronger where it is very weak'},{text:'A giant black hole at the centre pulls the outer stars round faster'},{text:'Dark dust hides the stars, so the measured speeds are wrong'}],
+          options:[{answer:'A huge halo of unseen mass adds extra pull. Newton’s gravity is unchanged'},{answer:'Gravity itself becomes stronger where it is very weak'},{answer:'A giant black hole at the centre pulls the outer stars round faster'},{answer:'Dark dust hides the stars, so the measured speeds are wrong'}],
           why:'Dark matter gives out no light, so we only detect it through its gravity. The halo reaches far beyond the stars, so its share of the pull grows outwards as the visible matter’s fades. A central black hole can’t do this: like the Sun, one central mass gives a falling curve.'},
         {topic:'MOND',short:'What MOND changes',link:'#ideaMond',linkText:'The two ideas: what is MOND?',
           prompt:'What does MOND change to explain the same fast orbits?',
-          options:[{text:'Nothing is added: gravity gets a boost that grows the weaker it is'},{text:'It adds a halo of unseen mass, just a smaller one'},{text:'It makes gravity weaker near the centre of a galaxy'},{text:'It says the outer stars are not really orbiting'}],
+          options:[{answer:'Nothing is added: gravity gets a boost that grows the weaker it is'},{answer:'It adds a halo of unseen mass, just a smaller one'},{answer:'It makes gravity weaker near the centre of a galaxy'},{answer:'It says the outer stars are not really orbiting'}],
           why:'MOND (Milgrom 1983) keeps only the visible matter but changes the law: the boost is tiny where gravity is strong and large where it is far weaker than a₀ ≈ 1.2 × 10⁻¹⁰ m/s², one constant shared by every galaxy.'},
         {topic:'Scoring',short:'What a χ²<sub>r</sub> of about 1 means',link:'#scorecard',linkText:'Scorecard: how each idea scores',
           prompt:'On the Scorecard, a model scores χ²<sub>r</sub> ≈ 1 for a galaxy. What does that mean?',
-          options:[{text:'It misses the measured speeds by about one error bar on average: as close as the data allow'},{text:'It misses every speed by exactly 1 km/s'},{text:'It is the worst possible fit'},{text:'It fits perfectly, with no miss at all'}],
+          options:[{answer:'It misses the measured speeds by about one error bar on average: as close as the data allow'},{answer:'It misses every speed by exactly 1 km/s'},{answer:'It is the worst possible fit'},{answer:'It fits perfectly, with no miss at all'}],
           why:'χ²<sub>r</sub> is roughly the squared miss per measured speed, counted in error bars. Below 2 is a close fit, above 10 a poor one. A perfect zero is not expected: real measurements scatter by about their error bars.'},
         {topic:'Fair test',short:'Why a closer fit doesn’t settle it',link:'#scoreNotes',linkText:'Scorecard: before drawing conclusions',
           prompt:'With standard values, the dark matter halo fits NGC 3198 more closely than MOND. Why doesn’t that settle which idea is right?',
-          options:[{text:'The halo tunes two values to each galaxy, while MOND’s one constant is the same for all of them'},{text:'MOND was tested against less accurate data'},{text:'A closer fit always means a worse model'},{text:'NGC 3198 is an imaginary galaxy from the sandbox'}],
+          options:[{answer:'The halo tunes two values to each galaxy, while MOND’s one constant is the same for all of them'},{answer:'MOND was tested against less accurate data'},{answer:'A closer fit always means a worse model'},{answer:'NGC 3198 is an imaginary galaxy from the sandbox'}],
           why:'The more values a model can adjust, the easier any curve is to fit, which is why the Scorecard counts every tuned value. And 4 of SPARC’s 175 galaxies are enough to show the method, not to pick a winner.'},
         {topic:'Evidence',short:'What the Bullet Cluster supports',link:'#evBullet',linkText:'The two ideas: the Bullet Cluster',
           prompt:'When the two galaxy clusters of the Bullet Cluster collided, most of their mass ended up away from most of their visible matter. Which idea does that support most?',
-          options:[{text:'Dark matter: unseen mass can sit apart from the gas and stars'},{text:'MOND: it shows gravity is stronger where it is weak'},{text:'Neither: it shows rotation speeds were measured wrongly'},{text:'Both equally: it is another flat rotation curve'}],
+          options:[{answer:'Dark matter: unseen mass can sit apart from the gas and stars'},{answer:'MOND: it shows gravity is stronger where it is weak'},{answer:'Neither: it shows rotation speeds were measured wrongly'},{answer:'Both equally: it is another flat rotation curve'}],
           why:'If there were no extra mass, the pull would follow the visible matter. Here it doesn’t (Clowe et al. 2006). The debate isn’t over, though: no dark matter particle has been found yet (Bertone & Hooper 2018).'}
       ];
-      const BANDS=[ // [lowest score, title, message]
+      const QUIZ_BANDS=[ // [lowest score, title, message]
         [10,'Perfect orbit','Ten out of ten. You could explain the missing mass problem to anyone.'],
         [7,'Stable orbit','You have the core of the story. The links below go straight to anything you missed.'],
         [4,'Wobbly orbit','A good start. The links below go straight to the parts worth another look.'],
@@ -5844,7 +5844,7 @@ __GALAXIES_JS__
         if(box.getBoundingClientRect().top<0)box.scrollIntoView({block:'start'});
       }
       function start(){
-        quiz=questions().map(q=>({...q,options:shuffle(q.options.map((option,i)=>({...option,right:i===0})))}));
+        quiz=QUIZ_QUESTIONS().map(q=>({...q,options:shuffle(q.options.map((option,i)=>({...option,right:i===0})))}));
         index=0;answers=[];
         $('quizProgress').style.setProperty('--n',quiz.length);
         $('quizProgress').innerHTML=quiz.map(()=>'<li></li>').join('');
@@ -5858,7 +5858,7 @@ __GALAXIES_JS__
         $('quizPrompt').style.setProperty('--i',0);
         const list=$('quizOptions');
         list.classList.toggle('figures',!!q.figures);
-        list.innerHTML=q.options.map((option,i)=>`<button type="button" class="quiz-opt${option.svg?' figure':''}" data-i="${i}" style="--i:${i+1}">${option.svg||''}<span class="quiz-letter">${'ABCD'[i]}</span><span class="quiz-opt-text">${option.text}</span><span class="quiz-tick" aria-hidden="true"></span></button>`).join('');
+        list.innerHTML=q.options.map((option,i)=>`<button type="button" class="quiz-opt${option.svg?' figure':''}" data-i="${i}" style="--i:${i+1}">${option.svg||''}<span class="quiz-letter">${'ABCD'[i]}</span><span class="quiz-opt-text">${option.answer}</span><span class="quiz-tick" aria-hidden="true"></span></button>`).join('');
         [...$('quizProgress').children].forEach((li,i)=>li.className=i<index?(answers[i]?'ok':'miss'):i===index?'now':'');
         $('quizFeedback').hidden=true;$('quizNext').hidden=true;
         if(index>0)$('quizPrompt').focus({preventScroll:true});
@@ -5879,7 +5879,7 @@ __GALAXIES_JS__
         });
         const answer=q.options.find(option=>option.right);
         $('quizFeedback').className=`quiz-feedback ${right?'ok':'miss'}`;
-        $('quizVerdict').innerHTML=right?'Correct':`Not quite. The answer is “${answer.text}”.`;
+        $('quizVerdict').innerHTML=right?'Correct':`Not quite. The answer is “${answer.answer}”.`;
         $('quizWhy').innerHTML=q.why;
         $('quizMore').href=q.link;$('quizMore').innerHTML=`${q.linkText} <span aria-hidden="true">→</span>`;
         $('quizFeedback').hidden=false;
@@ -5893,7 +5893,7 @@ __GALAXIES_JS__
         else results();
       }
       function results(){
-        const score=answers.filter(Boolean).length,[,title,text]=BANDS.find(([least])=>score>=least);
+        const score=answers.filter(Boolean).length,[,title,text]=QUIZ_BANDS.find(([least])=>score>=least);
         show('quizResults');
         $('quizResults').classList.toggle('perfect',score===quiz.length);
         $('quizTotal').textContent=quiz.length;
