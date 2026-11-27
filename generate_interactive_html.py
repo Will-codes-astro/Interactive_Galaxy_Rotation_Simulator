@@ -375,7 +375,7 @@ def with_uncertainties(sparc_id: str, fits: dict[str, dict[str, Any]]) -> dict[s
             raise RuntimeError(f"{FIT_UNCERTAINTY_PATH.name} does not match the {sparc_id} {kind} fit: "
                                "run python analysis/fit_uncertainties.py, then this script again")
         fit.update(uncertainty=record["uncertainty"], uncertainty_cut=record["uncertainty_cut"],
-                   uncertainty_chi2_rise=record["chi2_rise"])
+                   uncertainty_halo_limit=record["uncertainty_halo_limit"], uncertainty_chi2_rise=record["chi2_rise"])
     return fits
 
 
@@ -5509,7 +5509,12 @@ __GALAXIES_JS__
       const d=larger>0?Math.min(4,Math.max(digits,1-Math.floor(Math.log10(larger)))):digits,side=x=>x>0?x.toFixed(d):'0';
       const cut=fit.uncertainty_cut&&fit.uncertainty_cut[key];
       const stops=cut?` The range stops at the ${cut==='both'?'realistic limits':`${cut==='low'?'lower':'upper'} realistic limit`}.`:'';
-      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}`;
+      // Halo ends set by a limit on mass and concentration together (fit.uncertainty_halo_limit), not by this value's own limits.
+      const haloLimit={concentration_band:'its realistic concentration limit for that mass',scale_radius:'the end of the scale radius slider'};
+      const halo=Object.entries((fit.uncertainty_halo_limit||{})[key]||{}).map(([end,limit])=>` At the ${end==='low'?'lower':'upper'} end the refitted halo sits on ${haloLimit[limit]}, so without that limit the range could reach further.`).join('');
+      // The rise is chi2_r for a poor fit: scaling the error bars up assumes the model's shape is right, which a poor fit puts in doubt.
+      const poor=fit.uncertainty_chi2_rise>=ROUGH_FIT_RED_CHI?' This model misses the points by far more than their error bars, so treat this range with caution: widening the error bars to match assumes the model has the right shape.':'';
+      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}${halo}${poor}`;
       return `${(value/scale).toFixed(d)}<span class="fit-range" title="${title}">+${side(up)}/−${side(down)}</span>`;
     }
     function fitSettingsHtml(galaxy,fit){

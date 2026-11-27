@@ -5712,12 +5712,44 @@
   "text": "Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)"
  },
  {
-  "id": "9b7cae3a4e",
+  "id": "5abdf2e78a",
   "kind": "js",
   "page": "messages",
   "section": "With range",
   "label": "Message",
-  "text": "Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}"
+  "text": "its realistic concentration limit for that mass"
+ },
+ {
+  "id": "bd93da74a0",
+  "kind": "js",
+  "page": "messages",
+  "section": "With range",
+  "label": "Message",
+  "text": "the end of the scale radius slider"
+ },
+ {
+  "id": "b77b8ccccc",
+  "kind": "js",
+  "page": "messages",
+  "section": "With range",
+  "label": "Message",
+  "text": " At the ${end==='low'?'lower':'upper'} end the refitted halo sits on ${haloLimit[limit]}, so without that limit the range could reach further."
+ },
+ {
+  "id": "9c62ecd188",
+  "kind": "js",
+  "page": "messages",
+  "section": "With range",
+  "label": "Message",
+  "text": " This model misses the points by far more than their error bars, so treat this range with caution: widening the error bars to match assumes the model has the right shape."
+ },
+ {
+  "id": "65504e19bc",
+  "kind": "js",
+  "page": "messages",
+  "section": "With range",
+  "label": "Message",
+  "text": "Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}${halo}${poor}"
  },
  {
   "id": "761a023275",

@@ -84,7 +84,7 @@ that the numbers match.
 
 | File | Contents |
 |---|---|
-| `galaxies.js` | `window.GALAXIES`: for each preset, `radius_kpc`, `v_obs_kms`, `v_obs_err_kms`, `v_gas_kms` (signed), `v_disk_kms`, `v_bulge_kms` (copied from SPARC; Vobs, e_Vobs, Vdisk and Vbulge are taken as absolute values) plus `catalogue` (Table 1's distance and inclination with their errors) and `best_fit.nfw` / `best_fit.mond` (**model**: the best realistic fits, with their Υ, distance, inclination, halo or a₀, `tuned_settings`, `at_limit` (which fitted values stopped at a realistic limit, `low` or `high`), `uncertainty`, `uncertainty_cut` and `uncertainty_chi2_rise` (1σ ranges, from `results/fit_uncertainties.json`) and `chi2`; see PHYSICS.md) |
+| `galaxies.js` | `window.GALAXIES`: for each preset, `radius_kpc`, `v_obs_kms`, `v_obs_err_kms`, `v_gas_kms` (signed), `v_disk_kms`, `v_bulge_kms` (copied from SPARC; Vobs, e_Vobs, Vdisk and Vbulge are taken as absolute values) plus `catalogue` (Table 1's distance and inclination with their errors) and `best_fit.nfw` / `best_fit.mond` (**model**: the best realistic fits, with their Υ, distance, inclination, halo or a₀, `tuned_settings`, `at_limit` (which fitted values stopped at a realistic limit, `low` or `high`), `uncertainty`, `uncertainty_cut`, `uncertainty_halo_limit` and `uncertainty_chi2_rise` (1σ ranges, from `results/fit_uncertainties.json`) and `chi2`; see PHYSICS.md) |
 | `index.html` | The whole site, with the `galaxies.js` code and settings inlined. This is the only file deployed, together with the QR images |
 
 **Site CSV export** (the download button; file `<galaxy>_rotation_curve_model.csv`).
@@ -107,7 +107,7 @@ so they are **not** the raw measurements.
 
 | File | Made by | Contents |
 |---|---|---|
-| `results/fit_uncertainties.json` | `analysis/fit_uncertainties.py` | **Model**: for each preset and fit (`nfw_standard`, `nfw`, `mond`): `fit_chi2` (the generator's fit it was measured on), `chi2_min` (the global minimum), `chi2_rise`, `uncertainty` (each tuned value's 1σ range [low, high], in the fit record's units) and `uncertainty_cut` (ends that stopped at a realistic limit). The generator copies these into `best_fit` and stops if `fit_chi2` no longer matches. See PHYSICS.md |
+| `results/fit_uncertainties.json` | `analysis/fit_uncertainties.py` | **Model**: for each preset and fit (`nfw_standard`, `nfw`, `mond`): `fit_chi2` (the generator's fit it was measured on), `chi2_min` (the global minimum), `chi2_rise`, `uncertainty` (each tuned value's 1σ range [low, high], in the fit record's units) `uncertainty_cut` (ends that stopped at a realistic limit) and `uncertainty_halo_limit` (halo ends where the refitted halo sits on its concentration limit or the scale radius slider's end: `concentration_band` or `scale_radius`, by end). The generator copies these into `best_fit` and stops if `fit_chi2` no longer matches. See PHYSICS.md |
 | `results/rotation_curve_summary.csv` / `.txt` | `analysis/baryonic_baseline.py` | NGC 3198 baryonic-only fit: distance, N, Υ, χ²_ν (dof = N), peak and outer speeds, outer deficit V_obs − V_bar (km/s) |
 | `plots/ngc3198_baryonic_baseline.png` / `.pdf` | `analysis/baryonic_baseline.py` | V_obs ± σ, components, V_bar and residuals |
 | `results/star_trajectories_baryonic.csv` | `analysis/simulate_baryonic_orbits.py` | **Model**: 200 stars × 301 frames (1 Myr steps), baryons only. Columns: `frame`, `time_myr`, `star_id`, `initial_r_kpc`, `v_obs_kms` (starting speed = observed speed at that radius), `current_v_kms`, `x_kpc`, `y_kpc`, `z_kpc` (always 0) |

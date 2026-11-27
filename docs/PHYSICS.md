@@ -140,6 +140,17 @@ every error bar by √χ²_ν, the usual correction when a model does not fit to
 the errors, which otherwise gives misleadingly narrow ranges. A range that reaches
 a realistic limit stops there (`uncertainty_cut`), so it is the range within the
 limits, not the full statistical one. The halo is profiled in log M₂₀₀ and log c.
+Its limits (c within 2× the scatter of the Dutton & Macciò value for its mass, and
+r_s within the slider's range) tie M₂₀₀ and c together, so they are not ends of
+either value's own range: a halo end where the fully refitted halo sits within 1 %
+of one of them is recorded in `uncertainty_halo_limit` (added 27 Nov 2026, after a
+check found NGC 2403's and UGC 128's NFW ends on the c limit and NGC 7331's standard
+halo held at r_s = 60 kpc, unlabelled). The number is unchanged; the tooltip says
+the range could reach further without that limit.
+- **Poor fits:** scaling the errors by √χ²_ν assumes the model's shape is right and
+  only the error bars are too small. For a poor fit (χ²_ν ≥ 10, the red badge) that is
+  doubtful (e.g. UGC 128 in MOND, χ²_ν ≈ 59), so the tooltip warns that the range
+  should be treated with caution.
 
 - **Computed offline** by `analysis/fit_uncertainties.py` with SciPy's differential
   evolution (a global optimiser) for every refit, into `results/fit_uncertainties.json`.

@@ -2,7 +2,9 @@
 
 Will's choice (27 Nov 2026): hold one fitted value at a trial value and refit all the others; its 1-sigma range is
 where chi-squared has risen by 1 above the minimum, with the error bars scaled up by sqrt(chi2_r) when the fit is poor
-(chi2_r > 1), so the rise is max(1, chi2_r). A range that reaches a realistic limit stops there.
+(chi2_r > 1), so the rise is max(1, chi2_r). A range that reaches a realistic limit stops there. A halo range end
+where the refitted halo sits on its concentration-for-mass limit or the scale radius slider's end is recorded too
+(uncertainty_halo_limit): without that limit the range could reach further.
 
 Each refit uses SciPy's global optimiser (differential evolution). Distance, tilt and M/L trade off along long curved
 valleys in chi-squared, and the generator's local search, moving one value at a time, can stop short in them: on
@@ -40,13 +42,18 @@ DE_MAX_GENERATIONS = 1000
 DE_SEED = 3198
 # Fits outside the realistic limits cost this instead of infinity (the optimiser's polish step needs finite values).
 OUT_OF_LIMITS_COST = 1e12
+# A refitted halo within this fraction of a limit's span from the limit counts as sitting on it. Ends that sat on a
+# limit were within 0.001 dex of the concentration band on 27 Nov 2026; the nearest that did not was 0.013 dex away.
+HALO_LIMIT_FRACTION = 0.01
 
 
 def fit_problem(kind, rotation, info):
-	"""The fit as an optimisation problem: value names, limits, chi-squared, and each value in the record's units.
+	"""The fit as an optimisation problem: value names, limits, chi-squared, each value in the record's units, and
+	which of the halo's own limits a set of values sits on (None, or always None for MOND).
 
 	The NFW halo is described by log10 M200 and log10 c, the values the Scorecard shows, and c must stay within
-	the generator's realistic limit of the Dutton & Maccio (2014) concentration for its mass.
+	the generator's realistic limit of the Dutton & Maccio (2014) concentration for its mass. That limit and the
+	scale radius slider's range depend on M200 and c together, so they are not edges of either value's own range.
 	"""
 	settings = site._standard_settings(info) if kind == 'nfw_standard' else site._realistic_settings(rotation, info)
 	plain = [lambda x: x] * len(SETTING_NAMES)
@@ -56,7 +63,7 @@ def fit_problem(kind, rotation, info):
 		def cost(p):
 			return site._chi_squared(rotation, info, p[1:], lambda v, r: site._mond_velocity(v, r, p[0] * 1e-10))
 
-		return ('a0_ms2', *SETTING_NAMES), bounds, cost, [lambda x: x * 1e-10, *plain]
+		return ('a0_ms2', *SETTING_NAMES), bounds, cost, [lambda x: x * 1e-10, *plain], lambda p: None
 
 	log_c_limit = site.FIT_LIMIT_SIGMA * site.HALO_CONCENTRATION_SCATTER_DEX
 	log_c = lambda m200: math.log10(site._halo_concentration(m200))
@@ -71,8 +78,18 @@ def fit_problem(kind, rotation, info):
 		halo = lambda v, r: math.hypot(v, site._nfw_velocity(r, m200, scale_radius))
 		return site._chi_squared(rotation, info, p[2:], halo)
 
+	def halo_limit(p):
+		offset = abs(p[1] - log_c(10 ** p[0]))
+		if offset >= log_c_limit - HALO_LIMIT_FRACTION * 2 * log_c_limit:
+			return 'concentration_band'
+		lo, hi = site.HALO_SCALE_RANGE_KPC
+		scale_radius = site._r200_kpc(10 ** p[0]) / 10 ** p[1]
+		if min(scale_radius - lo, hi - scale_radius) <= HALO_LIMIT_FRACTION * (hi - lo):
+			return 'scale_radius'
+		return None
+
 	unlog = lambda x: 10 ** x
-	return ('m200_msun', 'concentration', *SETTING_NAMES), bounds, cost, [unlog, unlog, *plain]
+	return ('m200_msun', 'concentration', *SETTING_NAMES), bounds, cost, [unlog, unlog, *plain], halo_limit
 
 
 def inside(x, lo, hi):
@@ -115,7 +132,7 @@ def profile_ranges(job):
 		fit = site.fit_mond(rotation, info)
 	else:
 		fit = site.fit_nfw(rotation, info, site._standard_settings(info) if kind == 'nfw_standard' else None)
-	names, bounds, cost, to_record = fit_problem(kind, rotation, info)
+	names, bounds, cost, to_record, halo_limit = fit_problem(kind, rotation, info)
 	chi_min, best = minimise(cost, bounds)
 	free = sum(hi > lo for lo, hi in bounds)
 	rise = max(1.0, chi_min / (len(rotation['radius_kpc']) - free))
@@ -125,7 +142,7 @@ def profile_ranges(job):
 		chi, values = minimise(cost, bounds, (d, x), anchor, target)
 		return chi <= target, values
 
-	ranges, cut = {}, {}
+	ranges, cut, halo_limited = {}, {}, {}
 	for d, name in enumerate(names):
 		lo, hi = bounds[d]
 		if hi <= lo:
@@ -147,6 +164,12 @@ def profile_ranges(job):
 				else:
 					outside = middle
 			ends.append((inside + outside) / 2.0)
+			# An end can also be set by a halo limit that is not an edge of this value's range: refit fully (the
+			# bisection stops each refit once it is good enough) and see whether the best halo there sits on one.
+			if name in ('m200_msun', 'concentration'):
+				limit = halo_limit(minimise(cost, bounds, (d, inside), anchor)[1])
+				if limit:
+					halo_limited.setdefault(name, {})[side] = limit
 		ranges[name] = [float(f'{to_record[d](x):.4g}') for x in ends]
 	return galaxy_id, kind, {
 		'fit_chi2': fit['chi2'],
@@ -154,6 +177,7 @@ def profile_ranges(job):
 		'chi2_rise': round(rise, 3),
 		'uncertainty': ranges,
 		'uncertainty_cut': cut,
+		'uncertainty_halo_limit': halo_limited,
 	}
 
 

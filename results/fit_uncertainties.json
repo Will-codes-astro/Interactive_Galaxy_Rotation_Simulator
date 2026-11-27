@@ -16,7 +16,8 @@
       9.967
      ]
     },
-    "uncertainty_cut": {}
+    "uncertainty_cut": {},
+    "uncertainty_halo_limit": {}
    },
    "nfw": {
     "fit_chi2": 55.69,
@@ -47,7 +48,8 @@
     "uncertainty_cut": {
      "distance_mpc": "both",
      "inclination_deg": "both"
-    }
+    },
+    "uncertainty_halo_limit": {}
    },
    "mond": {
     "fit_chi2": 78.623,
@@ -76,7 +78,8 @@
      "upsilon_disk": "high",
      "distance_mpc": "low",
      "inclination_deg": "low"
-    }
+    },
+    "uncertainty_halo_limit": {}
    }
   },
   "NGC2403": {
@@ -94,7 +97,8 @@
       12.66
      ]
     },
-    "uncertainty_cut": {}
+    "uncertainty_cut": {},
+    "uncertainty_halo_limit": {}
    },
    "nfw": {
     "fit_chi2": 635.361,
@@ -126,6 +130,14 @@
      "upsilon_disk": "low",
      "distance_mpc": "both",
      "inclination_deg": "both"
+    },
+    "uncertainty_halo_limit": {
+     "m200_msun": {
+      "low": "concentration_band"
+     },
+     "concentration": {
+      "high": "concentration_band"
+     }
     }
    },
    "mond": {
@@ -154,7 +166,8 @@
      "a0_ms2": "high",
      "distance_mpc": "high",
      "inclination_deg": "high"
-    }
+    },
+    "uncertainty_halo_limit": {}
    }
   },
   "NGC7331": {
@@ -172,7 +185,15 @@
       5.02
      ]
     },
-    "uncertainty_cut": {}
+    "uncertainty_cut": {},
+    "uncertainty_halo_limit": {
+     "m200_msun": {
+      "high": "scale_radius"
+     },
+     "concentration": {
+      "low": "scale_radius"
+     }
+    }
    },
    "nfw": {
     "fit_chi2": 21.683,
@@ -208,7 +229,8 @@
      "upsilon_bulge": "low",
      "distance_mpc": "low",
      "inclination_deg": "both"
-    }
+    },
+    "uncertainty_halo_limit": {}
    },
    "mond": {
     "fit_chi2": 40.703,
@@ -241,7 +263,8 @@
      "upsilon_disk": "low",
      "upsilon_bulge": "low",
      "inclination_deg": "both"
-    }
+    },
+    "uncertainty_halo_limit": {}
    }
   },
   "UGC00128": {
@@ -259,7 +282,8 @@
       8.911
      ]
     },
-    "uncertainty_cut": {}
+    "uncertainty_cut": {},
+    "uncertainty_halo_limit": {}
    },
    "nfw": {
     "fit_chi2": 60.202,
@@ -291,6 +315,11 @@
      "upsilon_disk": "both",
      "distance_mpc": "both",
      "inclination_deg": "both"
+    },
+    "uncertainty_halo_limit": {
+     "concentration": {
+      "high": "concentration_band"
+     }
     }
    },
    "mond": {
@@ -319,7 +348,8 @@
      "a0_ms2": "both",
      "upsilon_disk": "high",
      "distance_mpc": "both"
-    }
+    },
+    "uncertainty_halo_limit": {}
    }
   }
  }
