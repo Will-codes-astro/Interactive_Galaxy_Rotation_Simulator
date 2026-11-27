@@ -236,10 +236,12 @@ site, not a published standard, and the page says so.
   Springel (2005).
 - **Integrator:** velocity-Verlet (symplectic), 2 substeps per 1 Myr frame,
   over 1000 Myr (`integrateTrajectories`). A star counts as ejected beyond
-  1.5 × R_max (`EJECTION_RADIUS_FACTOR`). While a slider moves, the orbits are
-  recalculated in a background worker (`requestOrbits`), which runs the page's
-  own `integrateStars` and `accelFactor`, so its numbers are identical to the
-  main-thread path that start-up, galaxy switches and the physics checks use.
+  1.5 × R_max (`EJECTION_RADIUS_FACTOR`). When a slider moves or a preset
+  galaxy is picked, the orbits are recalculated in a background worker
+  (`requestOrbits`; a new galaxy's stars appear together with their orbits), which
+  runs the page's own `integrateStars` and `accelFactor`, so its numbers are
+  identical to the main-thread path that start-up, the physics checks and
+  browsers without workers use.
 - **Orbit blend (visual choice, not physics):** each new set of orbits eases in
   over 0.25 s from where the stars and orbit lines were drawn
   (`ORBIT_BLEND_MS`, `swapOrbits`), matched star by star through each star's

@@ -4715,8 +4715,10 @@ __GALAXIES_JS__
     // so it runs in a background worker and the page never freezes. While a slider moves, each finished set is shown
     // (eased in by swapOrbits) and, if the settings changed meanwhile, the next one starts at once: several updates a
     // second during a drag. The worker runs the page's own integrateStars and accelFactor, so the numbers are the same
-    // as the main-thread path (integrateTrajectories), which start-up, galaxy switches and the physics checks use.
+    // as the main-thread path (integrateTrajectories), which start-up and the physics checks use. Picking a preset
+    // galaxy goes through the worker too: its new stars are shown together with their orbits (pendingPresetStars).
     let pendingCustomStars=null; // a custom galaxy's new anatomy, waiting for its stars (rebuildCustomGalaxy)
+    let pendingPresetStars=null; // a newly picked preset's stars {anatomy,count}, waiting for their orbits (loadPreset)
     const ORBIT_SEND_FALLBACK_MS=100;
     let orbitWorker=null,orbitInFlight=null,orbitSendQueued=false,orbitRequests=0,orbitGeneration=0,spareOrbitBuffer=null,workerOrbitBuffer=null;
     function getOrbitWorker(){
@@ -4766,12 +4768,18 @@ __GALAXIES_JS__
       let job,population=null;
       if(pendingCustomStars&&customActive){
         // A custom galaxy's new stars are built now but only shown with their orbits (onOrbitResult).
-        const{anatomy,baseline}=pendingCustomStars,shown=populationState();pendingCustomStars=null;
+        const{anatomy,baseline}=pendingCustomStars,shown=populationState();pendingCustomStars=null;pendingPresetStars=null;
         setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),sandboxTemplateMass()));
         job=orbitJobFor(massT,rs);population={state:populationState(),baseline};
         restorePopulation(shown);
+      }else if(pendingPresetStars&&!customActive){
+        // A new preset's stars, the same way: built now, shown with their orbits (no easing between two galaxies).
+        const{anatomy,count}=pendingPresetStars,shown=populationState();pendingPresetStars=null;
+        setPopulation(anatomy,count);
+        job=orbitJobFor(massT,rs);population={state:populationState(),preset:true};
+        restorePopulation(shown);
       }else{
-        pendingCustomStars=null;
+        pendingCustomStars=null;pendingPresetStars=null;
         job=orbitJobFor(massT,rs);
       }
       const buffer=spareOrbitBuffer;spareOrbitBuffer=null;
@@ -4783,20 +4791,25 @@ __GALAXIES_JS__
       const sent=orbitInFlight,{buffer,escapeByStar,escapeTimes}=e.data;orbitInFlight=null;
       if(sent.generation===orbitGeneration){
         const count=sent.population?sent.population.state.starCount:starCount;
-        swapOrbits(trajectoryViewsOf(buffer,count),true,sent.population&&(()=>{
+        const preset=!!sent.population&&sent.population.preset;
+        swapOrbits(trajectoryViewsOf(buffer,count),!preset,sent.population&&(()=>{
           restorePopulation(sent.population.state);
-          syncStarMeshes();updateStarTelemetry();updateCustomSummary(sent.population.baseline);
+          syncStarMeshes();updateStarTelemetry();if(!preset)updateCustomSummary(sent.population.baseline);
         }));
         applyEscapes(sent,escapeByStar,escapeTimes);updateEscapeCounter(simTime);
         spareOrbitBuffer=workerOrbitBuffer;workerOrbitBuffer=buffer; // the set no longer shown is lent out next time
       }else spareOrbitBuffer=buffer; // a galaxy switch since: these orbits are for the old one
       if(sent.request!==orbitRequests)queueOrbitJob();
     }
-    // All at once on the main thread (galaxy switches, and without a worker); a calculation still in the worker is dropped.
+    // All at once on the main thread (custom galaxy rebuilds that are not live, and anything without a worker); a calculation still in the worker is dropped.
     function refreshOrbits(){
       clearTimeout(orbitModelTimer);
       orbitGeneration++;
       if(pendingCustomStars){if(customActive)rebuildCustomStars();else pendingCustomStars=null;}
+      if(pendingPresetStars){
+        if(!customActive){setPopulation(pendingPresetStars.anatomy,pendingPresetStars.count);syncStarMeshes();updateStarTelemetry();}
+        pendingPresetStars=null;
+      }
       swapOrbits(integrateTrajectories(Number(massSlider.value),Number(scaleSlider.value)),false);
       if(workerOrbitBuffer){spareOrbitBuffer=spareOrbitBuffer||workerOrbitBuffer;workerOrbitBuffer=null;}
       updateEscapeCounter(simTime);
@@ -5343,11 +5356,14 @@ __GALAXIES_JS__
       componentCurves=COMPONENT_STYLE.map(()=>radii.map(()=>0));
       referenceSpeedSquared=presetReferenceSpeedSquared;
       const anatomy=presetAnatomy(galaxy);
-      setPopulation(anatomy,starCountFor(visibleMassOf(anatomy),PRESET_TEMPLATE_MASS));
-      syncStarMeshes();updateStarTelemetry();controls.reset();
-      // Restart the orbit clock and integrate the new population in the new galaxy's potential.
+      // Restart the orbit clock and integrate the new population in the new galaxy's potential. With the background
+      // worker, the new stars appear with their orbits once it finishes (updateHalo below asks for them), so the page
+      // never freezes on a galaxy switch; without one, everything is worked out here at once.
+      pendingPresetStars={anatomy,count:starCountFor(visibleMassOf(anatomy),PRESET_TEMPLATE_MASS)};
+      controls.reset();
       simTime=0;syncTimelineUI(0);
-      refreshOrbits();
+      if(getOrbitWorker())orbitGeneration++; // drop a calculation still running for the old galaxy
+      else refreshOrbits();
       const{halo,total}=modelCurves(DEFAULTS.massT,DEFAULTS.scaleRadius);
       Plotly.react('curvePlot',buildCurveData(halo,total),curveLayoutNow(),curveConfig);
       updateHalo();clearTimeout(orbitModelTimer);
