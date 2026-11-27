@@ -21,6 +21,8 @@ GALAXIES_JS_PATH = BASE_DIR / "galaxies.js"
 # Real photos of the preset galaxies for the profile card: SDSS colour cutouts (CC BY 4.0) from the
 # Legacy Surveys viewer, saved as <sparc_id>.jpg. Inlined, since the deployed site is index.html alone.
 GALAXY_IMAGE_DIR = BASE_DIR / "assets" / "galaxy_images"
+# 1-sigma ranges of the best fits' values, from analysis/fit_uncertainties.py (it takes minutes, so it is run separately).
+FIT_UNCERTAINTY_PATH = BASE_DIR / "results" / "fit_uncertainties.json"
 
 G_KPC_KMS2_PER_MSUN = 4.30091e-6
 H0_KMS_PER_KPC = 0.07
@@ -353,13 +355,28 @@ def build_galaxy_record(preset: GalaxyPreset, galaxy_info: dict[str, GalaxyInfo]
             "hi_mass_1e9_msun": info.hi_mass_1e9_msun,
             "v_flat_kms": info.v_flat_kms,
         },
-        "best_fit": {
+        "best_fit": with_uncertainties(preset.sparc_id, {
             "nfw_standard": fit_nfw(galaxy["rotation"], info, _standard_settings(info)),
             "nfw": fit_nfw(galaxy["rotation"], info),
             "mond": fit_mond(galaxy["rotation"], info),
-        },
+        }),
         "rotation": galaxy["rotation"],
     }
+
+
+def with_uncertainties(sparc_id: str, fits: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Add each fit's 1-sigma ranges from FIT_UNCERTAINTY_PATH (made by analysis/fit_uncertainties.py, Will's choice of
+    method, 27 Nov 2026). They are only valid for the fits they were measured on, so a file that no longer matches a
+    fit's chi-squared stops the build."""
+    stored = json.loads(FIT_UNCERTAINTY_PATH.read_text(encoding="utf-8"))["galaxies"].get(sparc_id, {})
+    for kind, fit in fits.items():
+        record = stored.get(kind)
+        if record is None or record["fit_chi2"] != fit["chi2"]:
+            raise RuntimeError(f"{FIT_UNCERTAINTY_PATH.name} does not match the {sparc_id} {kind} fit: "
+                               "run python analysis/fit_uncertainties.py, then this script again")
+        fit.update(uncertainty=record["uncertainty"], uncertainty_cut=record["uncertainty_cut"],
+                   uncertainty_chi2_rise=record["chi2_rise"])
+    return fits
 
 
 GALAXIES_JS_HEADER = """/*
@@ -1305,6 +1322,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     }
     .score { display:inline-block; min-width:58px; padding:2px 9px; border:1px solid rgba(120,150,180,.3); border-radius:999px; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums; text-align:center; }
     .score.good { border-color:rgba(120,214,140,.55); color:#93e3a0; } .score.ok { border-color:rgba(236,204,96,.55); color:#f2d675; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
+    .fit-range { margin-left:2px; font-size:10.5px; color:var(--muted); cursor:help; white-space:nowrap; }
     .at-limit { padding:0 4px; border:1px solid rgba(255,174,92,.5); border-radius:4px; color:#ffc48a; font-size:10.5px; text-decoration:none; cursor:help; white-space:nowrap; }
     .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
     .glance-table td, .glance-table th { vertical-align:middle; }
@@ -4145,7 +4163,9 @@ __GALAXIES_JS__
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3),frameScale=Math.sqrt(fitFrame.f)/fitFrame.s; // a best fit's distance and tilt (1 otherwise)
             // The sandbox galaxy has no measurements, so its file leaves out the observed and residual columns.
-            let csv=customActive?"Radius_kpc,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model\n":"Radius_kpc,V_obs,V_obs_err,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
+            // In MOND mode the extra column is MOND's boost sqrt(V_MOND^2 - V_bar^2), not a halo, so it is named for that.
+            const extra=mondMode?'V_mond_boost':'V_nfw_halo';
+            let csv=customActive?`Radius_kpc,V_gas,V_stars,V_bar,${extra},V_total_model\n`:`Radius_kpc,V_obs,V_obs_err,V_gas,V_stars,V_bar,${extra},V_total_model,Residual_V_obs_minus_V_bar\n`;
             for(let r=Math.max(1,Math.ceil(radii[0]-1e-9));r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r)*frameScale,vd=interpolateAt(disk,r)*frameScale;
                 const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)*frameScale**2+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondModelVelocity(vb,r)**2-vb*vb,0)):halo(r);
@@ -5479,14 +5499,27 @@ __GALAXIES_JS__
       const side=fit.at_limit&&fit.at_limit[key];
       return side?` <abbr class="at-limit" title="At its ${side==='low'?'lower':'upper'} realistic limit: a closer fit would need a value outside the realistic range">at limit</abbr>`:'';
     }
+    // A fitted value with its 1σ range as +up/−down (fit.uncertainty, from analysis/fit_uncertainties.py; see PHYSICS.md).
+    // value/scale is shown with at least `digits` decimals, and more if the larger side needs them for 2 significant figures;
+    // a side that is 0 (the value is at a realistic limit) is shown as 0.
+    function withRange(fit,key,value,scale,digits){
+      const range=fit.uncertainty&&fit.uncertainty[key];
+      if(!range)return (value/scale).toFixed(digits);
+      const up=Math.max(0,range[1]-value)/scale,down=Math.max(0,value-range[0])/scale,larger=Math.max(up,down);
+      const d=larger>0?Math.min(4,Math.max(digits,1-Math.floor(Math.log10(larger)))):digits,side=x=>x>0?x.toFixed(d):'0';
+      const cut=fit.uncertainty_cut&&fit.uncertainty_cut[key];
+      const stops=cut?` The range stops at the ${cut==='both'?'realistic limits':`${cut==='low'?'lower':'upper'} realistic limit`}.`:'';
+      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}`;
+      return `${(value/scale).toFixed(d)}<span class="fit-range" title="${title}">+${side(up)}/−${side(down)}</span>`;
+    }
     function fitSettingsHtml(galaxy,fit){
-      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}${limitMark(fit,'upsilon_bulge')}`:'';
-      return `M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
+      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${withRange(fit,'upsilon_bulge',fit.upsilon_bulge,1,2)}${limitMark(fit,'upsilon_bulge')}`:'';
+      return `M/L ${withRange(fit,'upsilon_disk',fit.upsilon_disk,1,2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${withRange(fit,'distance_mpc',fit.distance_mpc,1,1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${withRange(fit,'inclination_deg',fit.inclination_deg,1,0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
     }
     const SCORE_COLUMNS={visible:'Visible matter only',nfwStd:'Dark matter halo (NFW), standard values',mond:'MOND, standard values',nfw:'NFW, best realistic fit',mondBest:'MOND, best realistic fit'};
     function scoreRowHtml(galaxy){
       const score=scoreGalaxy(galaxy),{nfw_standard:std,nfw,mond}=galaxy.best_fit;
-      const haloText=fit=>`M<sub>200</sub> ${(fit.m200_msun/1e12).toFixed(2)}×10¹² M☉${limitMark(fit,'m200_msun')} · concentration ${fit.concentration.toFixed(1)}${limitMark(fit,'concentration')}${limitMark(fit,'scale_radius_kpc')}`;
+      const haloText=fit=>`M<sub>200</sub> ${withRange(fit,'m200_msun',fit.m200_msun,1e12,2)} ×10¹² M☉${limitMark(fit,'m200_msun')} · concentration ${withRange(fit,'concentration',fit.concentration,1,1)}${limitMark(fit,'concentration')}${limitMark(fit,'scale_radius_kpc')}`;
       const stdTuned=`<small>${score.k.nfwStd} tuned: ${haloText(std)}</small>`;
       const cell=(model,note='')=>{ // data-label names the column on phones, where the table stacks
         const red=reducedChi(score.chi[model],score.pointCount,score.k[model]),verdict=fitVerdict(red);
@@ -5494,7 +5527,7 @@ __GALAXIES_JS__
         return `<td data-label="${SCORE_COLUMNS[model]}"><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
       };
       const nfwTuned=`<small>${score.k.nfw} tuned: ${haloText(nfw)} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
-      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
+      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${withRange(mond,'a0_ms2',mond.a0_ms2,1e-10,2)} ×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
       return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>`;
     }
     // At a glance: one verdict per model (standard values → best realistic fit), from the same scores as the full table.

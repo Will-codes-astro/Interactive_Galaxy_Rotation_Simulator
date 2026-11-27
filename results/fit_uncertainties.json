@@ -1,0 +1,326 @@
+{
+ "method": "profile chi-squared, rise max(1, chi2_r) above the minimum; differential evolution refits; ranges stop at the realistic limits (see analysis/fit_uncertainties.py)",
+ "galaxies": {
+  "NGC3198": {
+   "nfw_standard": {
+    "fit_chi2": 57.407,
+    "chi2_min": 57.086,
+    "chi2_rise": 1.392,
+    "uncertainty": {
+     "m200_msun": [
+      443200000000.0,
+      470700000000.0
+     ],
+     "concentration": [
+      9.522,
+      9.967
+     ]
+    },
+    "uncertainty_cut": {}
+   },
+   "nfw": {
+    "fit_chi2": 55.69,
+    "chi2_min": 55.253,
+    "chi2_rise": 1.454,
+    "uncertainty": {
+     "m200_msun": [
+      354400000000.0,
+      543500000000.0
+     ],
+     "concentration": [
+      8.189,
+      14.29
+     ],
+     "upsilon_disk": [
+      0.3278,
+      0.645
+     ],
+     "distance_mpc": [
+      11.0,
+      16.6
+     ],
+     "inclination_deg": [
+      67.0,
+      79.0
+     ]
+    },
+    "uncertainty_cut": {
+     "distance_mpc": "both",
+     "inclination_deg": "both"
+    }
+   },
+   "mond": {
+    "fit_chi2": 78.623,
+    "chi2_min": 78.623,
+    "chi2_rise": 2.016,
+    "uncertainty": {
+     "a0_ms2": [
+      1.16e-10,
+      1.24e-10
+     ],
+     "upsilon_disk": [
+      0.7483,
+      0.7924
+     ],
+     "distance_mpc": [
+      11.0,
+      11.32
+     ],
+     "inclination_deg": [
+      67.0,
+      69.07
+     ]
+    },
+    "uncertainty_cut": {
+     "a0_ms2": "both",
+     "upsilon_disk": "high",
+     "distance_mpc": "low",
+     "inclination_deg": "low"
+    }
+   }
+  },
+  "NGC2403": {
+   "nfw_standard": {
+    "fit_chi2": 714.343,
+    "chi2_min": 710.891,
+    "chi2_rise": 10.013,
+    "uncertainty": {
+     "m200_msun": [
+      268100000000.0,
+      299100000000.0
+     ],
+     "concentration": [
+      11.85,
+      12.66
+     ]
+    },
+    "uncertainty_cut": {}
+   },
+   "nfw": {
+    "fit_chi2": 635.361,
+    "chi2_min": 635.955,
+    "chi2_rise": 9.352,
+    "uncertainty": {
+     "m200_msun": [
+      187800000000.0,
+      294300000000.0
+     ],
+     "concentration": [
+      14.67,
+      16.37
+     ],
+     "upsilon_disk": [
+      0.3155,
+      0.5246
+     ],
+     "distance_mpc": [
+      2.84,
+      3.48
+     ],
+     "inclination_deg": [
+      57.0,
+      69.0
+     ]
+    },
+    "uncertainty_cut": {
+     "upsilon_disk": "low",
+     "distance_mpc": "both",
+     "inclination_deg": "both"
+    }
+   },
+   "mond": {
+    "fit_chi2": 931.045,
+    "chi2_min": 931.043,
+    "chi2_rise": 13.493,
+    "uncertainty": {
+     "a0_ms2": [
+      1.162e-10,
+      1.24e-10
+     ],
+     "upsilon_disk": [
+      0.4975,
+      0.5497
+     ],
+     "distance_mpc": [
+      3.055,
+      3.48
+     ],
+     "inclination_deg": [
+      61.0,
+      69.0
+     ]
+    },
+    "uncertainty_cut": {
+     "a0_ms2": "high",
+     "distance_mpc": "high",
+     "inclination_deg": "high"
+    }
+   }
+  },
+  "NGC7331": {
+   "nfw_standard": {
+    "fit_chi2": 312.221,
+    "chi2_min": 311.992,
+    "chi2_rise": 9.176,
+    "uncertainty": {
+     "m200_msun": [
+      2547000000000.0,
+      2905000000000.0
+     ],
+     "concentration": [
+      4.741,
+      5.02
+     ]
+    },
+    "uncertainty_cut": {}
+   },
+   "nfw": {
+    "fit_chi2": 21.683,
+    "chi2_min": 21.562,
+    "chi2_rise": 1.0,
+    "uncertainty": {
+     "m200_msun": [
+      2068000000000.0,
+      3110000000000.0
+     ],
+     "concentration": [
+      7.238,
+      9.403
+     ],
+     "upsilon_disk": [
+      0.4449,
+      0.513
+     ],
+     "upsilon_bulge": [
+      0.4417,
+      0.6014
+     ],
+     "distance_mpc": [
+      11.7,
+      12.94
+     ],
+     "inclination_deg": [
+      71.0,
+      79.0
+     ]
+    },
+    "uncertainty_cut": {
+     "upsilon_bulge": "low",
+     "distance_mpc": "low",
+     "inclination_deg": "both"
+    }
+   },
+   "mond": {
+    "fit_chi2": 40.703,
+    "chi2_min": 40.691,
+    "chi2_rise": 1.313,
+    "uncertainty": {
+     "a0_ms2": [
+      1.16e-10,
+      1.24e-10
+     ],
+     "upsilon_disk": [
+      0.3155,
+      0.3519
+     ],
+     "upsilon_bulge": [
+      0.4417,
+      0.7272
+     ],
+     "distance_mpc": [
+      14.54,
+      17.1
+     ],
+     "inclination_deg": [
+      71.0,
+      79.0
+     ]
+    },
+    "uncertainty_cut": {
+     "a0_ms2": "both",
+     "upsilon_disk": "low",
+     "upsilon_bulge": "low",
+     "inclination_deg": "both"
+    }
+   }
+  },
+  "UGC00128": {
+   "nfw_standard": {
+    "fit_chi2": 64.529,
+    "chi2_min": 61.929,
+    "chi2_rise": 3.096,
+    "uncertainty": {
+     "m200_msun": [
+      345200000000.0,
+      372200000000.0
+     ],
+     "concentration": [
+      8.265,
+      8.911
+     ]
+    },
+    "uncertainty_cut": {}
+   },
+   "nfw": {
+    "fit_chi2": 60.202,
+    "chi2_min": 59.915,
+    "chi2_rise": 3.524,
+    "uncertainty": {
+     "m200_msun": [
+      198400000000.0,
+      1057000000000.0
+     ],
+     "concentration": [
+      7.207,
+      14.66
+     ],
+     "upsilon_disk": [
+      0.3155,
+      0.7924
+     ],
+     "distance_mpc": [
+      45.1,
+      83.9
+     ],
+     "inclination_deg": [
+      37.0,
+      77.0
+     ]
+    },
+    "uncertainty_cut": {
+     "upsilon_disk": "both",
+     "distance_mpc": "both",
+     "inclination_deg": "both"
+    }
+   },
+   "mond": {
+    "fit_chi2": 1053.427,
+    "chi2_min": 1053.427,
+    "chi2_rise": 58.524,
+    "uncertainty": {
+     "a0_ms2": [
+      1.16e-10,
+      1.24e-10
+     ],
+     "upsilon_disk": [
+      0.7672,
+      0.7924
+     ],
+     "distance_mpc": [
+      45.1,
+      83.9
+     ],
+     "inclination_deg": [
+      41.87,
+      71.31
+     ]
+    },
+    "uncertainty_cut": {
+     "a0_ms2": "both",
+     "upsilon_disk": "high",
+     "distance_mpc": "both"
+    }
+   }
+  }
+ }
+}

@@ -5712,12 +5712,20 @@
   "text": "Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)"
  },
  {
-  "id": "a543961553",
+  "id": "9b7cae3a4e",
+  "kind": "js",
+  "page": "messages",
+  "section": "With range",
+  "label": "Message",
+  "text": "Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}"
+ },
+ {
+  "id": "761a023275",
   "kind": "js",
   "page": "messages",
   "section": "Fit settings html",
   "label": "Message",
-  "text": "M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)"
+  "text": "M/L ${withRange(fit,'upsilon_disk',fit.upsilon_disk,1,2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${withRange(fit,'distance_mpc',fit.distance_mpc,1,1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${withRange(fit,'inclination_deg',fit.inclination_deg,1,0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)"
  },
  {
   "id": "9455a36dbd",

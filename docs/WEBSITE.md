@@ -603,7 +603,7 @@ values" (closed by default) opens the full table, scoring every preset galaxy in
 "Standard values": visible matter only, the NFW halo fit (halo only) and MOND
 at the default a₀. "Best realistic fits": the NFW and MOND best fits. The halo
 and best-fit cells list how many values were tuned and what they
-are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). A value that stopped at a realistic limit carries a small "at limit" tag whose tooltip says which limit. Under each score it gives the root-mean-square gap in plain words
+are (halo mass and concentration, or a₀; M/L; distance and tilt beside SPARC's). A value that stopped at a realistic limit carries a small "at limit" tag whose tooltip says which limit. Each fitted value is followed by its 1σ range as +up/−down in small grey text (`withRange`, 27 Nov 2026), whose tooltip gives the range, the χ² rise it uses and whether it stops at a realistic limit (PHYSICS.md, Uncertainty of the fitted values). Under each score it gives the root-mean-square gap in plain words
 ("about 1.2 error bars off", √(χ²/N)); χ² itself is in the score's tooltip.
 On phones (640 px or narrower) the table becomes one stacked card per galaxy,
 with each score labelled by its column, so nothing is off-screen.

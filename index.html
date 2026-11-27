@@ -897,6 +897,7 @@
     }
     .score { display:inline-block; min-width:58px; padding:2px 9px; border:1px solid rgba(120,150,180,.3); border-radius:999px; font:500 13px var(--f-mono); font-variant-numeric:tabular-nums; text-align:center; }
     .score.good { border-color:rgba(120,214,140,.55); color:#93e3a0; } .score.ok { border-color:rgba(236,204,96,.55); color:#f2d675; } .score.poor { border-color:rgba(255,138,128,.6); color:#ff9d94; }
+    .fit-range { margin-left:2px; font-size:10.5px; color:var(--muted); cursor:help; white-space:nowrap; }
     .at-limit { padding:0 4px; border:1px solid rgba(255,174,92,.5); border-radius:4px; color:#ffc48a; font-size:10.5px; text-decoration:none; cursor:help; white-space:nowrap; }
     .score-show { margin-top:6px; padding:3px 9px; font-size:11.5px; }
     .glance-table td, .glance-table th { vertical-align:middle; }
@@ -2177,9 +2178,9 @@ window.GALAXIES = {
     summary: "The classic test case: a calm spiral measured far beyond its stars",
     catalogue: {"distance_mpc": 13.8, "distance_err_mpc": 1.4, "inclination_deg": 73.0, "inclination_err_deg": 3.0, "hubble_type": 5, "luminosity_36_1e9_lsun": 38.279, "hi_mass_1e9_msun": 10.869, "v_flat_kms": 150.1},
     best_fit: {
-      nfw_standard: {"m200_msun": 460000000000.0, "scale_radius_kpc": 16.5, "concentration": 9.651, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 13.8, "inclination_deg": 73.0, "tuned_settings": 0, "at_limit": {}, "chi2": 57.407},
-      nfw: {"m200_msun": 370000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.877, "upsilon_disk": 0.5222, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 78.11, "tuned_settings": 3, "at_limit": {"distance_mpc": "low"}, "chi2": 55.69},
-      mond: {"a0_ms2": 1.1870000000000001e-10, "upsilon_disk": 0.7766, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 67.0, "tuned_settings": 3, "at_limit": {"distance_mpc": "low", "inclination_deg": "low"}, "chi2": 78.623},
+      nfw_standard: {"m200_msun": 460000000000.0, "scale_radius_kpc": 16.5, "concentration": 9.651, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 13.8, "inclination_deg": 73.0, "tuned_settings": 0, "at_limit": {}, "chi2": 57.407, "uncertainty": {"m200_msun": [443200000000.0, 470700000000.0], "concentration": [9.522, 9.967]}, "uncertainty_cut": {}, "uncertainty_chi2_rise": 1.392},
+      nfw: {"m200_msun": 370000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.877, "upsilon_disk": 0.5222, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 78.11, "tuned_settings": 3, "at_limit": {"distance_mpc": "low"}, "chi2": 55.69, "uncertainty": {"m200_msun": [354400000000.0, 543500000000.0], "concentration": [8.189, 14.29], "upsilon_disk": [0.3278, 0.645], "distance_mpc": [11.0, 16.6], "inclination_deg": [67.0, 79.0]}, "uncertainty_cut": {"distance_mpc": "both", "inclination_deg": "both"}, "uncertainty_chi2_rise": 1.454},
+      mond: {"a0_ms2": 1.1870000000000001e-10, "upsilon_disk": 0.7766, "upsilon_bulge": 0.7, "distance_mpc": 11.0, "inclination_deg": 67.0, "tuned_settings": 3, "at_limit": {"distance_mpc": "low", "inclination_deg": "low"}, "chi2": 78.623, "uncertainty": {"a0_ms2": [1.16e-10, 1.24e-10], "upsilon_disk": [0.7483, 0.7924], "distance_mpc": [11.0, 11.32], "inclination_deg": [67.0, 69.07]}, "uncertainty_cut": {"a0_ms2": "both", "upsilon_disk": "high", "distance_mpc": "low", "inclination_deg": "low"}, "uncertainty_chi2_rise": 2.016},
     },
     rotation: {
       radius_kpc: [0.32, 0.64, 0.96, 1.28, 1.61, 1.93, 2.24, 2.57, 2.89, 3.21, 3.54, 3.85, 4.17, 4.5, 4.82, 5.15, 5.46, 5.78, 6.1, 6.43, 6.74, 7.06, 8.04, 9.04, 10.04, 11.04, 12.05, 14.05, 16.07, 18.13, 20.05, 22.12, 24.03, 26.1, 28.16, 30.08, 32.14, 34.06, 36.12, 38.19, 40.1, 42.17, 44.08],
@@ -2196,9 +2197,9 @@ window.GALAXIES = {
     summary: "A nearby, gas-rich spiral, measured in fine detail",
     catalogue: {"distance_mpc": 3.16, "distance_err_mpc": 0.16, "inclination_deg": 63.0, "inclination_err_deg": 3.0, "hubble_type": 6, "luminosity_36_1e9_lsun": 10.041, "hi_mass_1e9_msun": 3.199, "v_flat_kms": 131.2},
     best_fit: {
-      nfw_standard: {"m200_msun": 280000000000.0, "scale_radius_kpc": 11.0, "concentration": 12.268, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 3.16, "inclination_deg": 63.0, "tuned_settings": 0, "at_limit": {}, "chi2": 714.343},
-      nfw: {"m200_msun": 280000000000.0, "scale_radius_kpc": 8.5, "concentration": 15.877, "upsilon_disk": 0.4262, "upsilon_bulge": 0.7, "distance_mpc": 3.093, "inclination_deg": 57.0, "tuned_settings": 3, "at_limit": {"concentration": "high", "inclination_deg": "low"}, "chi2": 635.361},
-      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.5233, "upsilon_bulge": 0.7, "distance_mpc": 3.155, "inclination_deg": 68.24, "tuned_settings": 3, "at_limit": {"a0_ms2": "high"}, "chi2": 931.045},
+      nfw_standard: {"m200_msun": 280000000000.0, "scale_radius_kpc": 11.0, "concentration": 12.268, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 3.16, "inclination_deg": 63.0, "tuned_settings": 0, "at_limit": {}, "chi2": 714.343, "uncertainty": {"m200_msun": [268100000000.0, 299100000000.0], "concentration": [11.85, 12.66]}, "uncertainty_cut": {}, "uncertainty_chi2_rise": 10.013},
+      nfw: {"m200_msun": 280000000000.0, "scale_radius_kpc": 8.5, "concentration": 15.877, "upsilon_disk": 0.4262, "upsilon_bulge": 0.7, "distance_mpc": 3.093, "inclination_deg": 57.0, "tuned_settings": 3, "at_limit": {"concentration": "high", "inclination_deg": "low"}, "chi2": 635.361, "uncertainty": {"m200_msun": [187800000000.0, 294300000000.0], "concentration": [14.67, 16.37], "upsilon_disk": [0.3155, 0.5246], "distance_mpc": [2.84, 3.48], "inclination_deg": [57.0, 69.0]}, "uncertainty_cut": {"upsilon_disk": "low", "distance_mpc": "both", "inclination_deg": "both"}, "uncertainty_chi2_rise": 9.352},
+      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.5233, "upsilon_bulge": 0.7, "distance_mpc": 3.155, "inclination_deg": 68.24, "tuned_settings": 3, "at_limit": {"a0_ms2": "high"}, "chi2": 931.045, "uncertainty": {"a0_ms2": [1.162e-10, 1.24e-10], "upsilon_disk": [0.4975, 0.5497], "distance_mpc": [3.055, 3.48], "inclination_deg": [61.0, 69.0]}, "uncertainty_cut": {"a0_ms2": "high", "distance_mpc": "high", "inclination_deg": "high"}, "uncertainty_chi2_rise": 13.493},
     },
     rotation: {
       radius_kpc: [0.16, 0.26, 0.36, 0.46, 0.56, 0.66, 0.76, 0.86, 0.96, 1.06, 1.16, 1.27, 1.36, 1.47, 1.57, 1.67, 1.77, 1.87, 1.97, 2.08, 2.18, 2.28, 2.37, 2.47, 2.57, 2.68, 2.78, 2.88, 2.98, 3.08, 3.19, 3.29, 3.39, 3.49, 3.59, 3.69, 3.79, 3.9, 3.99, 4.47, 4.97, 5.47, 5.96, 6.46, 6.96, 7.45, 7.95, 8.45, 8.94, 9.44, 9.94, 10.43, 10.93, 11.43, 11.92, 12.42, 12.92, 13.42, 13.91, 14.41, 14.91, 15.4, 15.9, 16.4, 16.89, 17.39, 17.89, 18.38, 18.88, 19.38, 19.87, 20.37, 20.87],
@@ -2215,9 +2216,9 @@ window.GALAXIES = {
     summary: "A big, bright spiral with a large central bulge",
     catalogue: {"distance_mpc": 14.7, "distance_err_mpc": 1.5, "inclination_deg": 75.0, "inclination_err_deg": 2.0, "hubble_type": 3, "luminosity_36_1e9_lsun": 250.631, "hi_mass_1e9_msun": 11.067, "v_flat_kms": 239.0},
     best_fit: {
-      nfw_standard: {"m200_msun": 2740000000000.0, "scale_radius_kpc": 60.0, "concentration": 4.811, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 14.7, "inclination_deg": 75.0, "tuned_settings": 0, "at_limit": {"scale_radius_kpc": "high"}, "chi2": 312.221},
-      nfw: {"m200_msun": 2440000000000.0, "scale_radius_kpc": 32.5, "concentration": 8.545, "upsilon_disk": 0.4905, "upsilon_bulge": 0.4417, "distance_mpc": 11.7, "inclination_deg": 71.0, "tuned_settings": 4, "at_limit": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "low"}, "chi2": 21.683},
-      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.3177, "upsilon_bulge": 0.5308, "distance_mpc": 16.166, "inclination_deg": 72.44, "tuned_settings": 4, "at_limit": {"a0_ms2": "high"}, "chi2": 40.703},
+      nfw_standard: {"m200_msun": 2740000000000.0, "scale_radius_kpc": 60.0, "concentration": 4.811, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 14.7, "inclination_deg": 75.0, "tuned_settings": 0, "at_limit": {"scale_radius_kpc": "high"}, "chi2": 312.221, "uncertainty": {"m200_msun": [2547000000000.0, 2905000000000.0], "concentration": [4.741, 5.02]}, "uncertainty_cut": {}, "uncertainty_chi2_rise": 9.176},
+      nfw: {"m200_msun": 2440000000000.0, "scale_radius_kpc": 32.5, "concentration": 8.545, "upsilon_disk": 0.4905, "upsilon_bulge": 0.4417, "distance_mpc": 11.7, "inclination_deg": 71.0, "tuned_settings": 4, "at_limit": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "low"}, "chi2": 21.683, "uncertainty": {"m200_msun": [2068000000000.0, 3110000000000.0], "concentration": [7.238, 9.403], "upsilon_disk": [0.4449, 0.513], "upsilon_bulge": [0.4417, 0.6014], "distance_mpc": [11.7, 12.94], "inclination_deg": [71.0, 79.0]}, "uncertainty_cut": {"upsilon_bulge": "low", "distance_mpc": "low", "inclination_deg": "both"}, "uncertainty_chi2_rise": 1.0},
+      mond: {"a0_ms2": 1.24e-10, "upsilon_disk": 0.3177, "upsilon_bulge": 0.5308, "distance_mpc": 16.166, "inclination_deg": 72.44, "tuned_settings": 4, "at_limit": {"a0_ms2": "high"}, "chi2": 40.703, "uncertainty": {"a0_ms2": [1.16e-10, 1.24e-10], "upsilon_disk": [0.3155, 0.3519], "upsilon_bulge": [0.4417, 0.7272], "distance_mpc": [14.54, 17.1], "inclination_deg": [71.0, 79.0]}, "uncertainty_cut": {"a0_ms2": "both", "upsilon_disk": "low", "upsilon_bulge": "low", "inclination_deg": "both"}, "uncertainty_chi2_rise": 1.313},
     },
     rotation: {
       radius_kpc: [2.67, 3.21, 3.74, 4.27, 4.81, 5.35, 5.88, 6.41, 7.48, 8.55, 9.62, 10.66, 11.74, 12.83, 13.91, 15.0, 16.08, 17.07, 18.15, 19.24, 20.32, 21.41, 22.49, 23.48, 24.57, 25.65, 26.74, 27.82, 28.91, 29.89, 30.98, 32.06, 33.15, 34.23, 35.32, 36.31],
@@ -2234,9 +2235,9 @@ window.GALAXIES = {
     summary: "A faint, spread-out low-surface-brightness galaxy (de Blok & McGaugh 1996)",
     catalogue: {"distance_mpc": 64.5, "distance_err_mpc": 9.7, "inclination_deg": 57.0, "inclination_err_deg": 10.0, "hubble_type": 8, "luminosity_36_1e9_lsun": 12.02, "hi_mass_1e9_msun": 7.431, "v_flat_kms": 129.3},
     best_fit: {
-      nfw_standard: {"m200_msun": 360000000000.0, "scale_radius_kpc": 17.0, "concentration": 8.632, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 64.5, "inclination_deg": 57.0, "tuned_settings": 0, "at_limit": {}, "chi2": 64.529},
-      nfw: {"m200_msun": 320000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.269, "upsilon_disk": 0.3155, "upsilon_bulge": 0.7, "distance_mpc": 45.1, "inclination_deg": 56.47, "tuned_settings": 3, "at_limit": {"upsilon_disk": "low", "distance_mpc": "low"}, "chi2": 60.202},
-      mond: {"a0_ms2": 1.16e-10, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 45.252, "inclination_deg": 69.03, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high"}, "chi2": 1053.427},
+      nfw_standard: {"m200_msun": 360000000000.0, "scale_radius_kpc": 17.0, "concentration": 8.632, "upsilon_disk": 0.5, "upsilon_bulge": 0.7, "distance_mpc": 64.5, "inclination_deg": 57.0, "tuned_settings": 0, "at_limit": {}, "chi2": 64.529, "uncertainty": {"m200_msun": [345200000000.0, 372200000000.0], "concentration": [8.265, 8.911]}, "uncertainty_cut": {}, "uncertainty_chi2_rise": 3.096},
+      nfw: {"m200_msun": 320000000000.0, "scale_radius_kpc": 11.5, "concentration": 12.269, "upsilon_disk": 0.3155, "upsilon_bulge": 0.7, "distance_mpc": 45.1, "inclination_deg": 56.47, "tuned_settings": 3, "at_limit": {"upsilon_disk": "low", "distance_mpc": "low"}, "chi2": 60.202, "uncertainty": {"m200_msun": [198400000000.0, 1057000000000.0], "concentration": [7.207, 14.66], "upsilon_disk": [0.3155, 0.7924], "distance_mpc": [45.1, 83.9], "inclination_deg": [37.0, 77.0]}, "uncertainty_cut": {"upsilon_disk": "both", "distance_mpc": "both", "inclination_deg": "both"}, "uncertainty_chi2_rise": 3.524},
+      mond: {"a0_ms2": 1.16e-10, "upsilon_disk": 0.7924, "upsilon_bulge": 0.7, "distance_mpc": 45.252, "inclination_deg": 69.03, "tuned_settings": 3, "at_limit": {"a0_ms2": "low", "upsilon_disk": "high"}, "chi2": 1053.427, "uncertainty": {"a0_ms2": [1.16e-10, 1.24e-10], "upsilon_disk": [0.7672, 0.7924], "distance_mpc": [45.1, 83.9], "inclination_deg": [41.87, 71.31]}, "uncertainty_cut": {"a0_ms2": "both", "upsilon_disk": "high", "distance_mpc": "both"}, "uncertainty_chi2_rise": 58.524},
     },
     rotation: {
       radius_kpc: [1.25, 3.75, 6.25, 8.76, 11.25, 13.74, 16.22, 18.71, 21.3, 23.79, 26.28, 28.77, 31.25, 33.74, 36.23, 38.82, 41.31, 43.8, 46.28, 48.77, 51.26, 53.75],
@@ -3830,7 +3831,9 @@ window.GALAXIES = {
             const rs=Number(scaleSlider.value),halo=extraVelocityModel(activeHaloMassT*1e12,rs,r=>interpolateAt(vBary,r));
             const f=v=>v.toFixed(3),frameScale=Math.sqrt(fitFrame.f)/fitFrame.s; // a best fit's distance and tilt (1 otherwise)
             // The sandbox galaxy has no measurements, so its file leaves out the observed and residual columns.
-            let csv=customActive?"Radius_kpc,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model\n":"Radius_kpc,V_obs,V_obs_err,V_gas,V_stars,V_bar,V_nfw_halo,V_total_model,Residual_V_obs_minus_V_bar\n";
+            // In MOND mode the extra column is MOND's boost sqrt(V_MOND^2 - V_bar^2), not a halo, so it is named for that.
+            const extra=mondMode?'V_mond_boost':'V_nfw_halo';
+            let csv=customActive?`Radius_kpc,V_gas,V_stars,V_bar,${extra},V_total_model\n`:`Radius_kpc,V_obs,V_obs_err,V_gas,V_stars,V_bar,${extra},V_total_model,Residual_V_obs_minus_V_bar\n`;
             for(let r=Math.max(1,Math.ceil(radii[0]-1e-9));r<=radii[radii.length-1]+1e-9;r++){
                 const vo=interpolateAt(vObs,r),eo=interpolateAt(err,r),vg=interpolateAt(gas,r)*frameScale,vd=interpolateAt(disk,r)*frameScale;
                 const vb=Math.sqrt(Math.max(0,interpolateAt(gasSq,r)*frameScale**2+vd*vd)),vh=mondMode?Math.sqrt(Math.max(mondModelVelocity(vb,r)**2-vb*vb,0)):halo(r);
@@ -5164,14 +5167,27 @@ window.GALAXIES = {
       const side=fit.at_limit&&fit.at_limit[key];
       return side?` <abbr class="at-limit" title="At its ${side==='low'?'lower':'upper'} realistic limit: a closer fit would need a value outside the realistic range">at limit</abbr>`:'';
     }
+    // A fitted value with its 1σ range as +up/−down (fit.uncertainty, from analysis/fit_uncertainties.py; see PHYSICS.md).
+    // value/scale is shown with at least `digits` decimals, and more if the larger side needs them for 2 significant figures;
+    // a side that is 0 (the value is at a realistic limit) is shown as 0.
+    function withRange(fit,key,value,scale,digits){
+      const range=fit.uncertainty&&fit.uncertainty[key];
+      if(!range)return (value/scale).toFixed(digits);
+      const up=Math.max(0,range[1]-value)/scale,down=Math.max(0,value-range[0])/scale,larger=Math.max(up,down);
+      const d=larger>0?Math.min(4,Math.max(digits,1-Math.floor(Math.log10(larger)))):digits,side=x=>x>0?x.toFixed(d):'0';
+      const cut=fit.uncertainty_cut&&fit.uncertainty_cut[key];
+      const stops=cut?` The range stops at the ${cut==='both'?'realistic limits':`${cut==='low'?'lower':'upper'} realistic limit`}.`:'';
+      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}`;
+      return `${(value/scale).toFixed(d)}<span class="fit-range" title="${title}">+${side(up)}/−${side(down)}</span>`;
+    }
     function fitSettingsHtml(galaxy,fit){
-      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${fit.upsilon_bulge.toFixed(2)}${limitMark(fit,'upsilon_bulge')}`:'';
-      return `M/L ${fit.upsilon_disk.toFixed(2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${fit.distance_mpc.toFixed(1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${fit.inclination_deg.toFixed(0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
+      const c=galaxy.catalogue,bulge=fit.tuned_settings>3?` · bulge M/L ${withRange(fit,'upsilon_bulge',fit.upsilon_bulge,1,2)}${limitMark(fit,'upsilon_bulge')}`:'';
+      return `M/L ${withRange(fit,'upsilon_disk',fit.upsilon_disk,1,2)}${limitMark(fit,'upsilon_disk')}${bulge} · ${withRange(fit,'distance_mpc',fit.distance_mpc,1,1)} Mpc${limitMark(fit,'distance_mpc')} (SPARC ${c.distance_mpc}) · tilt ${withRange(fit,'inclination_deg',fit.inclination_deg,1,0)}°${limitMark(fit,'inclination_deg')} (SPARC ${c.inclination_deg.toFixed(0)}°)`;
     }
     const SCORE_COLUMNS={visible:'Visible matter only',nfwStd:'Dark matter halo (NFW), standard values',mond:'MOND, standard values',nfw:'NFW, best realistic fit',mondBest:'MOND, best realistic fit'};
     function scoreRowHtml(galaxy){
       const score=scoreGalaxy(galaxy),{nfw_standard:std,nfw,mond}=galaxy.best_fit;
-      const haloText=fit=>`M<sub>200</sub> ${(fit.m200_msun/1e12).toFixed(2)}×10¹² M☉${limitMark(fit,'m200_msun')} · concentration ${fit.concentration.toFixed(1)}${limitMark(fit,'concentration')}${limitMark(fit,'scale_radius_kpc')}`;
+      const haloText=fit=>`M<sub>200</sub> ${withRange(fit,'m200_msun',fit.m200_msun,1e12,2)} ×10¹² M☉${limitMark(fit,'m200_msun')} · concentration ${withRange(fit,'concentration',fit.concentration,1,1)}${limitMark(fit,'concentration')}${limitMark(fit,'scale_radius_kpc')}`;
       const stdTuned=`<small>${score.k.nfwStd} tuned: ${haloText(std)}</small>`;
       const cell=(model,note='')=>{ // data-label names the column on phones, where the table stacks
         const red=reducedChi(score.chi[model],score.pointCount,score.k[model]),verdict=fitVerdict(red);
@@ -5179,7 +5195,7 @@ window.GALAXIES = {
         return `<td data-label="${SCORE_COLUMNS[model]}"><span class="score ${verdict.cls}" title="χ² = ${score.chi[model].toFixed(0)} over ${score.pointCount} measured speeds, ${score.k[model]} values tuned">${red<100?red.toFixed(2):red.toFixed(0)}</span><small>${verdict.word} · about ${miss<10?miss.toFixed(1):miss.toFixed(0)} error bars off</small>${note}</td>`;
       };
       const nfwTuned=`<small>${score.k.nfw} tuned: ${haloText(nfw)} · ${fitSettingsHtml(galaxy,nfw)}</small>`;
-      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${(mond.a0_ms2/1e-10).toFixed(2)}×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
+      const mondTuned=`<small>${score.k.mondBest} tuned: a₀ ${withRange(mond,'a0_ms2',mond.a0_ms2,1e-10,2)} ×10⁻¹⁰${limitMark(mond,'a0_ms2')} (standard ${(MOND_A0_DEFAULT/1e-10).toFixed(2)}) · ${fitSettingsHtml(galaxy,mond)}</small>`;
       return `<tr><th scope="row">${galaxy.name}<small>${score.pointCount} measured speeds</small><button type="button" class="score-show" data-galaxy="${galaxy.id}">Show in simulator</button></th>${cell('visible')}${cell('nfwStd',stdTuned)}${cell('mond')}${cell('nfw',nfwTuned)}${cell('mondBest',mondTuned)}</tr>`;
     }
     // At a glance: one verdict per model (standard values → best realistic fit), from the same scores as the full table.

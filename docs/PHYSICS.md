@@ -129,6 +129,39 @@ site uses hard limits.
 - Implemented in: `fit_nfw`, `fit_mond`, `_realistic_settings`, `_chi_squared`
   (generator); `activeFit`, `applyBaryonState`, `scoreGalaxy` (page JS).
 
+### Uncertainty of the fitted values
+
+Will's choice (27 Nov 2026): each value a best fit tunes (M₂₀₀, c, a₀, Υ, D, i) gets
+a 1σ range from the **profile χ²**. The value is held at a trial value and every
+other tuned value is refitted; the range is where the refitted χ² has risen by
+Δχ² = max(1, χ²_ν) above the minimum (χ²_ν = χ²_min/(N − k), k as below). Δχ² = 1 is
+the textbook 1σ range for one value; multiplying by χ²_ν is the same as scaling
+every error bar by √χ²_ν, the usual correction when a model does not fit to within
+the errors, which otherwise gives misleadingly narrow ranges. A range that reaches
+a realistic limit stops there (`uncertainty_cut`), so it is the range within the
+limits, not the full statistical one. The halo is profiled in log M₂₀₀ and log c.
+
+- **Computed offline** by `analysis/fit_uncertainties.py` with SciPy's differential
+  evolution (a global optimiser) for every refit, into `results/fit_uncertainties.json`.
+  Each end is bisected to 1 % of its distance from the best value. A local search was tried first in the generator
+  (its pattern search, then Powell's method): checked against differential
+  evolution on 27 Nov 2026, both missed fits along the curved valleys where D, i and
+  Υ trade off, so some ranges came out too narrow. The global search takes minutes,
+  so the generator only reads the file (`with_uncertainties`) and stops if a fit's
+  χ² no longer matches the one the ranges were measured on.
+- The minimum is the global one, so for the NFW fits it can be a little below the
+  page's χ², whose halo is snapped to the slider steps; the snapped value can then
+  sit slightly off-centre in its range.
+- **Shown** in the Scorecard's full table as value +up/−down (`withRange`, page
+  JS), with the range, the Δχ² and any limit in the tooltip.
+- Assumes Gaussian, independent errors, like χ² itself; D and i are partly
+  degenerate, so their ranges are wide and correlated (a range is for one value
+  with the others free, not a joint region).
+- **Checked** on 27 Nov 2026 by a separate script (not committed): at 3 % of each
+  range inside and outside every end not at a limit, a fresh global search (or an
+  exhaustive scan when one value is left free) found a fit within Δχ² inside and
+  none outside, for all 54 ends.
+
 **Halo stability band**: in the sandbox, a warning shows when c is outside 3–25
 (`STABLE_CONCENTRATION`). This range is a rule of thumb, not a published cut.
 
@@ -276,8 +309,8 @@ RAR function on 17 Nov 2026; the current values are in `galaxies.js` (`best_fit.
    fixed Υ (see Best realistic fits). It still stays inside the scale-radius
    slider's range.
 2. The halo mass is truncated at r₂₀₀ (see NFW above).
-3. In MOND mode, the site's CSV export puts the MOND boost in the `V_nfw_halo`
-   column.
+3. Resolved 27 Nov 2026: in MOND mode the site's CSV export names the MOND
+   boost column `V_mond_boost` (it was labelled `V_nfw_halo`).
 4. `anatomyFromRotation` estimates the gas mass from V_gas(last)²·r/G, which
    ignores the sign. This is visual only and does not affect the rotation curve.
 5. Resolved 17 Nov 2026: the softening kernel is cited on the page as the

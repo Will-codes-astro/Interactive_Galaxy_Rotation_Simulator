@@ -33,8 +33,9 @@ analysis/                      offline Python
   baryonic_baseline.py           baryonic-only curve + χ²  -> results/, plots/
   simulate_baryonic_orbits.py    baryonic-only 2D orbits    -> results/star_trajectories_baryonic.csv
   plot_orbits_2d.py, plot_orbits_3d.py   plots of that CSV  -> plots/
+  fit_uncertainties.py           1σ ranges of the best fits (minutes) -> results/fit_uncertainties.json
 blender/                       Blender scene script and saved .blend (needs Blender's Python)
-generate_interactive_html.py   builds the website: index.html + galaxies.js
+generate_interactive_html.py   builds the website: index.html + galaxies.js (rerun fit_uncertainties.py first if a fit changed)
 index.html, galaxies.js        generated website (do not edit by hand)
 site_text.py, content/         the site's wording for Will's text editor artifact (site_text.json is generated)
 epq_qr_code.png/.svg, generate_qr.py   QR code to the live site
