@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import csv
 import itertools
 import json
@@ -17,6 +18,9 @@ from site_text import SNAPSHOT_PATH, write_snapshot
 BASE_DIR = Path(__file__).resolve().parent
 OUTPUT_PATH = BASE_DIR / "index.html"
 GALAXIES_JS_PATH = BASE_DIR / "galaxies.js"
+# Real photos of the preset galaxies for the profile card: SDSS colour cutouts (CC BY 4.0) from the
+# Legacy Surveys viewer, saved as <sparc_id>.jpg. Inlined, since the deployed site is index.html alone.
+GALAXY_IMAGE_DIR = BASE_DIR / "assets" / "galaxy_images"
 
 G_KPC_KMS2_PER_MSUN = 4.30091e-6
 H0_KMS_PER_KPC = 0.07
@@ -409,6 +413,15 @@ HTML_TEMPLATE = r"""<!doctype html>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Simulating the Invisible: an interactive galaxy rotation simulator testing dark matter and MOND against real SPARC rotation curves of __GALAXY_NAMES__">
   <title>Simulating the Invisible · Galaxy rotation, dark matter and MOND</title>
+  <!-- Link previews (WhatsApp, Teams, etc.): social_card.png is a 1200 x 630 screenshot of the homepage, published beside index.html. -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Simulating the Invisible">
+  <meta property="og:description" content="An interactive galaxy rotation simulator testing dark matter and MOND against real SPARC rotation curves.">
+  <meta property="og:url" content="https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/">
+  <meta property="og:image" content="https://will-codes-astro.github.io/Interactive_Galaxy_Rotation_Simulator/social_card.png">
+  <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23b39ae8'/%3E%3Cstop offset='1' stop-color='%23f2c879'/%3E%3C/linearGradient%3E%3Crect width='32' height='32' rx='7' fill='%230c1322'/%3E%3Cpath d='M4 27C6.5 14 9 10.5 12 10.5S20 15 29 19.5' fill='none' stroke='%235fd0e0' stroke-width='2' stroke-dasharray='2.5 2.2' stroke-linecap='round'/%3E%3Cpath d='M4 27C6.5 14 9 10 12 9.5S20 9 29 9' fill='none' stroke='url(%23g)' stroke-width='3.2' stroke-linecap='round'/%3E%3Ccircle cx='17' cy='9.2' r='1.9' fill='%23f4f7fb'/%3E%3Ccircle cx='24' cy='9' r='1.9' fill='%23f4f7fb'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
@@ -496,7 +509,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .switch .opt.active { color:var(--ink); font-weight:600; }
     .control.disabled { opacity:.35; pointer-events:none; }
     .control.disabled input, .control.disabled button { cursor:not-allowed; }
-    .mond-note { color:#ffc48a; font-size:12px; }
+    .mond-note { color:var(--c-mond-ink); font-size:12px; }
     .preset-picker { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
     .preset-picker[hidden], .sandbox[hidden], .stability-chip[hidden] { display:none; }
     /* Galaxy source: two big choice cards (real data or build your own), the first decision on the Simulator. Visual only. */
@@ -516,9 +529,9 @@ HTML_TEMPLATE = r"""<!doctype html>
     .source-toggle input:focus-visible + .source-card { outline:2px solid var(--cyan); outline-offset:2px; }
     @media (max-width:640px) { .source-toggle { grid-template-columns:1fr; gap:8px; } .source-card { padding:11px 13px; gap:11px; } .source-icon { width:34px; height:34px; } .source-text b { font-size:15.5px; } }
     .sandbox { margin-bottom:14px; padding:13px 16px 14px; border:1px solid var(--line); background:var(--panel); border-radius:5px; }
-    .galaxy-type { margin:0 0 12px; padding:10px 14px 11px; border:1px solid rgba(242,200,121,0.3); border-left:3px solid var(--gold); border-radius:6px; background:linear-gradient(160deg,rgba(242,200,121,0.08),rgba(242,200,121,0.01)); }
+    .galaxy-type { margin:0 0 12px; padding:10px 14px 11px; border:1px solid var(--line-strong); border-left:3px solid var(--accent); border-radius:6px; background:linear-gradient(160deg,rgba(138,180,248,.08),rgba(138,180,248,.01)); }
     .galaxy-type-kicker { margin:0; color:var(--muted); font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
-    .galaxy-type h3 { margin:2px 0 4px; color:var(--gold); font-size:16px; }
+    .galaxy-type h3 { margin:2px 0 4px; color:var(--ink); font-size:16px; }
     .galaxy-type p { margin:0 0 5px; font-size:12.5px; line-height:1.45; }
     .galaxy-type .galaxy-type-example { color:var(--muted); font-size:12px; }
     .galaxy-type-tags { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; padding:0; list-style:none; }
@@ -571,7 +584,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .learn { margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:14px; }
     .learn article { background:var(--panel); border:1px solid var(--line); border-radius:5px; padding:0 16px 6px; min-width:0; }
     .learn h3 { margin:0; padding:12px 0; font-size:14px; font-weight:600; }
-    .learn article.nfw h3 { color:#b39ae8; } .learn article.mond h3 { color:#ffae5c; }
+    .learn article.nfw h3 { color:var(--c-dm); } .learn article.mond h3 { color:var(--c-mond); }
     .learn p { color:#9fb0c2; font-size:13px; margin:0 0 10px; }
     .learn p.tldr { color:#dbe7f4; }
     @media (max-width:900px) { .learn { grid-template-columns:1fr; } }
@@ -939,14 +952,26 @@ HTML_TEMPLATE = r"""<!doctype html>
     @media(max-width:960px) { .panel-grid { grid-template-columns:1fr; } .plot { height:62vh; } .controls { grid-template-columns:1fr 1fr; } .control:last-child { grid-column:1/-1; } }
     @media(max-width:560px) { header { align-items:flex-start; flex-direction:column; padding:17px; } .header-stats { justify-content:flex-start; flex-wrap:wrap; } main { padding:10px; } .controls { grid-template-columns:1fr; } .control:last-child { grid-column:auto; } .plot { min-height:360px; height:56vh; } }
     /* ===== Design system: tokens and component layer (visual only; no physics). ===== */
-    :root { --bg:#060a12; --panel:#0c1322; --panel-2:#101929; --line:rgba(148,170,200,.14); --line-strong:rgba(148,170,200,.28); --ink:#e7edf6; --ink-2:#b8c4d6; --muted:#8392a8; --accent:#8ab4f8; --cyan:var(--accent); --gold:#e9c88a;
+    :root { --bg:#060a12; --panel:#0c1322; --panel-2:#101929; --line:rgba(148,170,200,.14); --line-strong:rgba(148,170,200,.28); --ink:#e7edf6; --ink-2:#b8c4d6; --muted:#8392a8; --accent:#8ab4f8; --cyan:var(--accent); --gold:#e9c88a; --c-data:#f4f7fb; --c-visible:#5fd0e0; --c-dm:#b39ae8; --c-dm-ink:#c9b8f0; --c-mond:#f2c879; --c-mond-ink:#f7dba6; --c-model:#ffae5c;
       --r:10px; --r-lg:14px; --f-ui:Inter,"Segoe UI",system-ui,sans-serif; --f-serif:"Source Serif 4",Georgia,serif; --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace; --shadow:inset 0 1px 0 rgba(255,255,255,.03),0 12px 32px rgba(0,0,0,.28); }
     html:not(.calm) { scroll-behavior:smooth; }
     body { font:14px/1.55 var(--f-ui); -webkit-font-smoothing:antialiased; background:radial-gradient(1100px 520px at 80% -8%,rgba(70,100,170,.16),transparent 62%),radial-gradient(800px 460px at -8% 6%,rgba(120,90,180,.08),transparent 60%),var(--bg); background-repeat:no-repeat; min-height:100vh; }
     .section-head[id], #curvePanel, #theoryGuide, #scoreNotes, #references { scroll-margin-top:72px; }
     .topbar { position:sticky; top:0; z-index:60; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px; padding:0 28px; border-bottom:1px solid var(--line); background:rgba(6,10,18,.74); -webkit-backdrop-filter:blur(14px) saturate(140%); backdrop-filter:blur(14px) saturate(140%); }
     .brand { display:inline-flex; align-items:center; gap:10px; color:var(--ink); font-weight:600; font-size:14px; letter-spacing:.01em; text-decoration:none; white-space:nowrap; }
-    .brand svg { width:24px; height:24px; color:var(--accent); flex:none; }
+    .brand svg { width:26px; height:26px; color:var(--accent); flex:none; overflow:visible; }
+    /* The site's mark: a rotation curve that rises and stays flat through measured points (white), while the
+       expected curve (cyan, dashed) falls away; violet to gold for the two ideas that try to explain the gap. */
+    html:not(.calm):not(.lite) .brand .mk-obs { stroke-dasharray:1; animation:mark-draw 1.1s cubic-bezier(.45,0,.2,1) .2s both; }
+    html:not(.calm):not(.lite) .brand .mk-exp { animation:mark-fade .8s ease-out 1.1s both; }
+    html:not(.calm):not(.lite) .brand .mk-pt { transform-box:fill-box; transform-origin:center; animation:mark-pop .45s cubic-bezier(.2,.9,.3,1.4) calc(.75s + var(--d,0) * .14s) both; }
+    @keyframes mark-draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+    @keyframes mark-fade { from { opacity:0; } }
+    @keyframes mark-pop { from { transform:scale(0); opacity:0; } }
+    /* The same curve, small, under every page title; it draws itself when the page opens. */
+    .section-head h2::after { content:''; display:block; width:64px; height:12px; margin-top:7px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 12'%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23b39ae8'/%3E%3Cstop offset='1' stop-color='%23f2c879'/%3E%3C/linearGradient%3E%3Cpath d='M1.5 11C4 4 6.5 3 10 3S22 6 62 10' fill='none' stroke='%235fd0e0' stroke-width='1.2' stroke-dasharray='2 2' opacity='.7'/%3E%3Cpath d='M1.5 11C4 4 6.5 2 10 2L62 2' fill='none' stroke='url(%23g)' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat left center / contain; }
+    html:not(.calm):not(.lite) .page.active .section-head h2::after { animation:mark-wipe .9s cubic-bezier(.45,0,.2,1) .25s both; }
+    @keyframes mark-wipe { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
     .topnav { display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; }
     .topnav a { padding:6px 11px; border-radius:7px; color:var(--muted); font-size:13px; font-weight:500; text-decoration:none; white-space:nowrap; transition:color .15s,background .15s; }
     .topnav .nav-short { display:none; }
@@ -1086,7 +1111,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .galaxy-menu { position:relative; }
     .galaxy-menu-btn { display:flex; align-items:center; gap:10px; min-width:200px; padding:6px 36px 6px 7px; background-color:var(--panel-2); background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%); background-position:calc(100% - 19px) 52%,calc(100% - 14px) 52%; background-size:5px 5px,5px 5px; background-repeat:no-repeat; font:600 14px var(--f-ui); text-align:left; }
     .galaxy-menu-btn[aria-expanded="true"] { border-color:var(--accent); }
-    .gm-code { display:inline-grid; place-items:center; flex:none; min-width:36px; height:24px; padding:0 6px; border:1px solid rgba(233,200,138,.42); border-radius:6px; background:rgba(233,200,138,.08); color:var(--gold); font:600 11.5px var(--f-mono); }
+    .gm-code { display:inline-grid; place-items:center; flex:none; min-width:36px; height:24px; padding:0 6px; border:1px solid rgba(138,180,248,.42); border-radius:6px; background:rgba(138,180,248,.08); color:var(--accent); font:600 11.5px var(--f-mono); }
     .galaxy-menu-list { position:absolute; top:calc(100% + 6px); left:0; z-index:60; width:min(400px,calc(100vw - 32px)); margin:0; padding:6px; list-style:none; border:1px solid var(--line-strong); border-radius:var(--r); background:var(--panel-2); box-shadow:0 18px 44px rgba(0,0,0,.55); }
     .galaxy-menu-list[hidden] { display:none; }
     .galaxy-menu-list:focus { outline:none; }
@@ -1096,8 +1121,14 @@ HTML_TEMPLATE = r"""<!doctype html>
     .gm-text { display:flex; flex-direction:column; gap:2px; min-width:0; }
     .gm-text b { color:var(--ink); font:600 13.5px var(--f-ui); }
     .gm-text small { color:var(--muted); font-size:12px; line-height:1.4; }
-    .galaxy-profile { flex:1 1 100%; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 18px; padding:14px 18px 13px; border:1px solid rgba(233,200,138,.26); border-left:3px solid var(--gold); border-radius:var(--r); background:linear-gradient(160deg,rgba(233,200,138,.075),rgba(233,200,138,.01)); }
-    .gp-badge { display:grid; place-items:center; width:66px; height:66px; margin-top:2px; border:1px solid rgba(233,200,138,.38); border-radius:50%; background:radial-gradient(circle,rgba(233,200,138,.3) 0,rgba(233,200,138,.06) 55%,transparent 72%); color:var(--gold); font:600 20px var(--f-serif); }
+    .galaxy-profile { flex:1 1 100%; display:grid; grid-template-columns:auto minmax(0,1fr); gap:4px 18px; padding:14px 18px 13px; border:1px solid var(--line-strong); border-left:3px solid var(--accent); border-radius:var(--r); background:linear-gradient(160deg,rgba(138,180,248,.07),rgba(138,180,248,.01)); }
+    /* Neutral blue, not gold: gold is MOND's colour across the site. The photo is a real SDSS image of the galaxy (credited under it). */
+    .gp-photo { position:relative; width:118px; margin:2px 0 0; }
+    .gp-photo img { display:block; width:118px; height:118px; border:1px solid var(--line-strong); border-radius:12px; object-fit:cover; background:#000; box-shadow:0 8px 22px rgba(0,0,0,.4); }
+    .gp-photo img[hidden] + .gp-badge { position:static; width:66px; height:66px; border-radius:50%; font-size:20px; }
+    .gp-badge { position:absolute; left:6px; top:6px; display:grid; place-items:center; min-width:30px; height:24px; padding:0 7px; border:1px solid rgba(138,180,248,.45); border-radius:999px; background:rgba(6,10,18,.82); color:var(--accent); font:600 13px var(--f-serif); }
+    .gp-photo figcaption { margin-top:5px; color:var(--muted); font-size:10.5px; line-height:1.3; }
+    .gp-photo figcaption a { color:var(--ink-2); }
     .galaxy-profile h3 { margin:2px 0 3px; color:var(--ink); font:600 18px/1.25 var(--f-serif); }
     .gp-summary { margin:0 0 11px; color:var(--ink-2); font-size:13px; line-height:1.45; }
     .gp-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px 16px; margin:0 0 12px; }
@@ -1114,7 +1145,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .gp-note { margin:8px 0 0; color:var(--muted); font-size:10.5px; line-height:1.4; }
     html.calm .gp-bar span { transition:none; }
     @media (min-width:1000px) { .gp-body { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.45fr); gap:0 30px; align-items:start; } .gp-summary { margin-bottom:0; } }
-    @media (max-width:560px) { .galaxy-profile { grid-template-columns:1fr; } .gp-badge { width:48px; height:48px; font-size:16px; } .gp-stats { grid-template-columns:1fr 1fr; } }
+    @media (max-width:560px) { .galaxy-profile { grid-template-columns:1fr; } .gp-photo, .gp-photo img { width:88px; height:auto; } .gp-photo img { height:88px; } .gp-stats { grid-template-columns:1fr 1fr; } }
     .switch .opt { font-size:13px; }
     .track-input { border-color:var(--line-strong); background:rgba(0,0,0,.25); font-family:var(--f-mono); }
     .sandbox-group h3 { font:500 10.5px var(--f-mono); letter-spacing:.14em; color:var(--accent); }
@@ -1175,7 +1206,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .ms-maths h4:not(:first-child) { margin-top:16px; }
     .ms-option { border-top:2px solid; }
     .ms-option.nfw { border-top-color:#b39ae8; } .ms-option.nfw h4 { color:#b39ae8; }
-    .ms-option.mond { border-top-color:#ffae5c; } .ms-option.mond h4 { color:#ffae5c; }
+    .ms-option.mond { border-top-color:var(--c-mond); } .ms-option.mond h4 { color:var(--c-mond); }
     .method .eq { margin:6px 0 10px; padding:6px 10px; } .method .eq math { font-size:1.1em; }
     .ms-steps .eq { margin-bottom:4px; }
     .limits-table th { color:var(--ink-2); padding-right:16px; }
@@ -1276,7 +1307,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     /* Scorecard chart: χ²ᵣ on a log scale, one row per galaxy, one lane per model (renderScoreChart). On arrival the
        halo and MOND dots slide in from where visible matter alone sits (visual only). */
     .score-chart { margin:6px 0 22px; }
-    .sc-visible { --c:#5fd0e0; } .sc-nfw { --c:#b39ae8; } .sc-mond { --c:#f2c879; }
+    .sc-visible { --c:var(--c-visible); } .sc-nfw { --c:var(--c-dm); } .sc-mond { --c:var(--c-mond); }
     .sc-key { display:flex; flex-wrap:wrap; gap:6px 16px; margin:8px 0 12px; padding:0; list-style:none; color:var(--ink-2); font-size:12px; }
     .sc-key li { display:inline-flex; align-items:center; gap:7px; } .sc-key .sc-key-gap { margin-left:10px; }
     .sc-dot { display:inline-block; width:11px; height:11px; border:2px solid var(--c,#cfd8e6); border-radius:50%; background:var(--c,#cfd8e6); box-sizing:border-box; }
@@ -1326,7 +1357,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     #history, #ideaHalo, #ideaMond, .evidence-card[id], #evOpen, #mMeasure, #evidence { scroll-margin-top:72px; }
     .timeline { display:grid; grid-template-columns:repeat(9,minmax(0,1fr)); margin:2px 0 0; padding:0; list-style:none; }
     .timeline > li { display:contents; --tl:#8ab4f8; }
-    .timeline > li.tl-dm, .tl-key .tl-dm { --tl:#b39ae8; } .timeline > li.tl-mond, .tl-key .tl-mond { --tl:#ffae5c; } .timeline > li.tl-data, .tl-key .tl-data { --tl:#aab8cc; }
+    .timeline > li.tl-dm, .tl-key .tl-dm { --tl:var(--c-dm); } .timeline > li.tl-mond, .tl-key .tl-mond { --tl:var(--c-mond); } .timeline > li.tl-data, .tl-key .tl-data { --tl:#aab8cc; }
     .tl-pick { grid-row:1; display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; padding:6px 0 8px; border:0; border-radius:var(--r); background:none; color:var(--ink-2); font:inherit; text-align:center; cursor:pointer; }
     .tl-pick:focus-visible { outline:2px solid var(--accent); outline-offset:-2px; }
     .tl-year { font:500 12px var(--f-mono); color:var(--muted); transition:color .25s; }
@@ -1372,7 +1403,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .learn .evidence-card p { margin:0 0 8px; font-size:13px; line-height:1.6; }
     .learn .evidence-card p.evidence-source { margin:0; color:var(--muted); font-size:11.5px; }
     .evidence-tag { display:inline-block; padding:2px 8px; border-radius:999px; font:500 10.5px var(--f-mono); letter-spacing:.06em; }
-    .evidence-tag.dm { border:1px solid rgba(179,154,232,.5); color:#c9b8f0; } .evidence-tag.mond { border:1px solid rgba(255,174,92,.5); color:#ffc48a; }
+    .evidence-tag.dm { border:1px solid rgba(179,154,232,.5); color:var(--c-dm-ink); } .evidence-tag.mond { border:1px solid rgba(242,200,121,.5); color:var(--c-mond-ink); }
     @media (max-width:1100px) { .evidence-grid { grid-template-columns:1fr 1fr; } } @media (max-width:560px) { .evidence-grid { grid-template-columns:1fr; } }
     /* Reference list. */
     .refs { margin:56px 0 18px; padding-top:28px; border-top:1px solid var(--line-strong); }
@@ -1451,7 +1482,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .answer b { display:block; margin-bottom:2px; font:600 14px var(--f-ui); }
     .answer span { color:var(--ink-2); font-size:13px; line-height:1.5; }
     .answer.dm { border-left-color:#b39ae8; } .answer.dm b { color:#c9b8f0; }
-    .answer.mond { border-left-color:#ffae5c; } .answer.mond b { color:#ffc48a; }
+    .answer.mond { border-left-color:var(--c-mond); } .answer.mond b { color:var(--c-mond-ink); }
     @media (max-width:560px) { .answers { grid-template-columns:1fr; } }
     .score-legend { display:flex; flex-wrap:wrap; gap:8px 22px; margin:0 0 14px; padding:0; list-style:none; color:var(--ink-2); font-size:12.5px; }
     .score-legend .score { min-width:0; margin-right:8px; font-size:11.5px; }
@@ -1478,7 +1509,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .compare-table th, .compare-table td { padding:10px 14px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
     .compare-table tbody tr:last-child :is(th,td) { border-bottom:0; }
     .compare-table thead th { padding-top:0; font:600 15px var(--f-serif); }
-    .compare-table thead th.nfw { color:#c9b8f0; box-shadow:inset 0 -2px #b39ae8; } .compare-table thead th.mond { color:#ffc48a; box-shadow:inset 0 -2px #ffae5c; }
+    .compare-table thead th.nfw { color:var(--c-dm-ink); box-shadow:inset 0 -2px var(--c-dm); } .compare-table thead th.mond { color:var(--c-mond-ink); box-shadow:inset 0 -2px var(--c-mond); }
     .compare-table tbody th { width:22%; padding-left:0; color:var(--muted); font:500 12.5px var(--f-ui); }
     .compare-table td { width:39%; color:var(--ink-2); }
     .compare-table td b { color:var(--ink); font:600 15px var(--f-mono); }
@@ -1486,22 +1517,22 @@ HTML_TEMPLATE = r"""<!doctype html>
     .learn .boost { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 20px; align-items:start; }
     .learn .boost .mini-table { margin-top:2px; }
     @media (max-width:640px) { .learn .boost { grid-template-columns:1fr; } .compare-table { min-width:520px; } }
-    .learn .a0-head { margin:16px 0 4px; font:600 15px var(--f-serif); color:#ffc48a; }
+    .learn .a0-head { margin:16px 0 4px; font:600 15px var(--f-serif); color:var(--c-mond-ink); }
     .a0-graph { margin:8px 0 14px; padding:12px 14px 10px; border:1px solid var(--line); border-radius:var(--r); background:rgba(0,0,0,.22); color:var(--muted); }
     .a0-graph svg { display:block; width:100%; max-width:520px; height:auto; margin:auto; font:11px var(--f-ui); touch-action:pan-y; cursor:crosshair; }
     .a0-graph svg text { fill:currentColor; }
     .a0-graph svg .a0-newton { fill:#8ab4f8; } .a0-graph svg .a0-mark-text { fill:#ffe2c2; font-weight:600; }
     .a0-controls { display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; max-width:520px; margin:6px auto 0; }
-    .a0-controls input[type=range] { flex:1; min-width:0; accent-color:#ffae5c; }
+    .a0-controls input[type=range] { flex:1; min-width:0; accent-color:var(--c-mond); }
     .a0-value { min-width:11.5em; color:var(--ink); font-size:12.5px; font-variant-numeric:tabular-nums; white-space:nowrap; }
-    .a0-snap { padding:4px 10px; border:1px solid rgba(255,174,92,.5); border-radius:var(--r); background:rgba(255,174,92,.08); color:#ffc48a; font:12px var(--f-ui); white-space:nowrap; cursor:pointer; }
-    .a0-snap:hover { background:rgba(255,174,92,.18); }
+    .a0-snap { padding:4px 10px; border:1px solid rgba(242,200,121,.5); border-radius:var(--r); background:rgba(242,200,121,.08); color:var(--c-mond-ink); font:12px var(--f-ui); white-space:nowrap; cursor:pointer; }
+    .a0-snap:hover { background:rgba(242,200,121,.18); }
     .learn .a0-readout { max-width:520px; margin:8px auto 0; color:var(--ink); font-size:13.5px; line-height:1.5; }
-    .learn .a0-readout b { color:#ffc48a; }
+    .learn .a0-readout b { color:var(--c-mond-ink); }
     .a0-graph figcaption { max-width:520px; margin:8px auto 0; font-size:11.5px; line-height:1.5; }
     .a0-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; }
     .a0-facts > p:last-child:nth-child(odd) { grid-column:1/-1; }
-    .learn .a0-facts p { margin:0; padding:10px 12px; border-left:3px solid rgba(255,174,92,.5); border-radius:0 var(--r) var(--r) 0; background:rgba(255,174,92,.06); font-size:13.5px; }
+    .learn .a0-facts p { margin:0; padding:10px 12px; border-left:3px solid rgba(242,200,121,.5); border-radius:0 var(--r) var(--r) 0; background:rgba(242,200,121,.06); font-size:13.5px; }
     /* ---------- Pull-outs: one shared opening motion ----------
        Everything that opens from a control (the ? boxes and tips, the halo cards' notes, the View panel, Settings, the
        galaxy menu and the fold-out sections) grows out of the control that opened it: it fades in while easing from a
@@ -1648,6 +1679,17 @@ HTML_TEMPLATE = r"""<!doctype html>
     html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-l-obs { animation:fade-in .5s ease .5s both; }
     html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-gap { animation:fade-in .8s ease .65s both; }
     html:not(.calm):not(.lite) .puzzle-fig.s-obs .pf-l-gap { animation:fade-in .5s ease .9s both; }
+    /* Hypotheses step (stage s-ideas): the neutral gap and its label give way to the violet-to-gold gap and the two answers. */
+    .puzzle-fig:not(.s-ideas) :is(.pf-gap-ideas,.pf-l-ideas), .puzzle-fig.s-ideas :is(.pf-gap,.pf-l-gap) { opacity:0; }
+    html:not(.calm):not(.lite) .puzzle-fig.s-obs :is(.pf-gap,.pf-l-gap,.pf-gap-ideas,.pf-l-ideas) { transition:opacity .9s ease; }
+    /* While the figure sits beside the steps, the step being read is lit and the others dim, so it is clear which step
+       the figure is showing; the rail between the numbers fills as the reader moves down. */
+    html:not(.calm):not(.lite) .puzzle.tracking .puzzle-steps > li { transition:opacity .5s ease; }
+    @media (min-width:901px) { html:not(.calm):not(.lite) .puzzle.tracking .puzzle-steps > li:not(.is-current) { opacity:.5; } }
+    .puzzle.tracking .puzzle-steps > li::before { transition:background .4s, color .4s, border-color .4s, box-shadow .4s; }
+    .puzzle.tracking .puzzle-steps > li.is-read::before { border-color:var(--accent); }
+    .puzzle.tracking .puzzle-steps > li.is-current::before { border-color:var(--accent); background:var(--accent); color:#06131f; box-shadow:0 0 0 4px rgba(138,180,248,.16); }
+    .puzzle.tracking .puzzle-steps > li.is-read::after { background:linear-gradient(var(--accent),rgba(138,180,248,.35)); }
     @keyframes pt-in { from { opacity:0; transform:translateY(-10px) scale(.2); } }
     @keyframes draw-x { from { clip-path:inset(0 100% 0 0); } to { clip-path:inset(0 0 0 0); } }
     @keyframes fade-in { from { opacity:0; } }
@@ -1822,7 +1864,7 @@ HTML_TEMPLATE = r"""<!doctype html>
 </head>
 <body>
   <nav class="topbar" aria-label="Page sections">
-    <a class="brand" href="#puzzle"><svg viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="16" rx="13" ry="5.5" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".55"/><ellipse cx="16" cy="16" rx="8" ry="3.2" transform="rotate(-24 16 16)" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".85"/><circle cx="16" cy="16" r="2.4" fill="currentColor"/></svg><span>Simulating the Invisible</span></a>
+    <a class="brand" href="#puzzle"><svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="markGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b39ae8"/><stop offset="1" stop-color="#f2c879"/></linearGradient></defs><path class="mk-exp" d="M4 27C6.5 14 9 10.5 12 10.5S20 15 29 19.5" fill="none" stroke="#5fd0e0" stroke-width="1.6" stroke-dasharray="2.2 2" stroke-linecap="round" opacity=".75"/><path class="mk-obs" d="M4 27C6.5 14 9 10 12 9.5S20 9 29 9" pathLength="1" fill="none" stroke="url(#markGrad)" stroke-width="2.4" stroke-linecap="round"/><circle class="mk-pt" cx="16.5" cy="9.15" r="1.5" fill="#f4f7fb"/><circle class="mk-pt" cx="22" cy="9.05" r="1.5" fill="#f4f7fb" style="--d:1"/><circle class="mk-pt" cx="27.5" cy="9" r="1.5" fill="#f4f7fb" style="--d:2"/></svg><span>Simulating the Invisible</span></a>
     <div class="topnav"><span class="nav-ink" aria-hidden="true"></span><a href="#puzzle" aria-current="page">Home</a><a href="#background"><span class="nav-long">The two ideas</span><span class="nav-short">Ideas</span></a><a href="#simulator">Simulator</a><a href="#scorecard">Scorecard</a><a href="#quiz">Quiz</a><a href="#method">Method<span class="nav-long"> &amp; sources</span></a></div>
     <div class="settings">
       <button class="settings-btn" id="settingsBtn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settingsPanel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -2022,7 +2064,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           <ul class="galaxy-menu-list" id="galaxyMenuList" role="listbox" aria-labelledby="galaxyLabel" tabindex="-1" hidden></ul>
         </div>
         <div class="galaxy-profile" id="galaxyProfile" aria-live="polite">
-          <div class="gp-badge" aria-hidden="true"><span id="gpCode"></span></div>
+          <figure class="gp-photo"><img id="gpPhoto" alt="" width="118" height="118"><div class="gp-badge" aria-hidden="true"><span id="gpCode"></span></div><figcaption id="gpPhotoCredit">Image: <a href="https://www.sdss.org/" target="_blank" rel="noopener">SDSS</a> (CC BY 4.0)</figcaption></figure>
           <div class="gp-body">
             <div>
             <p class="galaxy-type-kicker" id="gpFamily"></p>
@@ -2469,6 +2511,7 @@ HTML_TEMPLATE = r"""<!doctype html>
           <li>Navarro, J.F., Frenk, C.S. and White, S.D.M. (1996) ‘The structure of cold dark matter halos’, <i>The Astrophysical Journal</i>, 462, p. 563. <a href="https://doi.org/10.1086/177173" target="_blank" rel="noopener">doi:10.1086/177173</a></li>
           <li>Planck Collaboration (2020) ‘Planck 2018 results. VI. Cosmological parameters’, <i>Astronomy &amp; Astrophysics</i>, 641, A6. <a href="https://doi.org/10.1051/0004-6361/201833910" target="_blank" rel="noopener">doi:10.1051/0004-6361/201833910</a></li>
           <li>Rubin, V.C., Ford, W.K. and Thonnard, N. (1980) ‘Rotational properties of 21 Sc galaxies with a large range of luminosities and radii, from NGC 4605 (R = 4 kpc) to UGC 2885 (R = 122 kpc)’, <i>The Astrophysical Journal</i>, 238, p. 471. <a href="https://doi.org/10.1086/158003" target="_blank" rel="noopener">doi:10.1086/158003</a></li>
+          <li>Sloan Digital Sky Survey (2026) <i>Image use policy</i>. Galaxy photos on the Simulator's galaxy card are SDSS colour images (CC BY 4.0), cut out with the Legacy Surveys viewer. Available at: <a href="https://www.sdss.org/collaboration/image-use-policy/" target="_blank" rel="noopener">sdss.org/collaboration/image-use-policy</a> (Accessed: 26 November 2026).</li>
           <li>Springel, V. (2005) ‘The cosmological simulation code GADGET-2’, <i>Monthly Notices of the Royal Astronomical Society</i>, 364(4), pp. 1105–1134. <a href="https://doi.org/10.1111/j.1365-2966.2005.09655.x" target="_blank" rel="noopener">doi:10.1111/j.1365-2966.2005.09655.x</a></li>
           <li>Williams, D.R. (2024) <i>Planetary fact sheet</i>. NASA Goddard Space Flight Center. <a href="https://nssdc.gsfc.nasa.gov/planetary/factsheet/" target="_blank" rel="noopener">nssdc.gsfc.nasa.gov/planetary/factsheet</a></li>
           <li>Zwicky, F. (1933) ‘Die Rotverschiebung von extragalaktischen Nebeln’, <i>Helvetica Physica Acta</i>, 6, pp. 110–127. English translation (2009): ‘The redshift of extragalactic nebulae’, <i>General Relativity and Gravitation</i>, 41(1), pp. 207–224. <a href="https://doi.org/10.1007/s10714-008-0707-4" target="_blank" rel="noopener">doi:10.1007/s10714-008-0707-4</a></li>
@@ -5240,6 +5283,9 @@ __GALAXIES_JS__
       set('gpSpeed',`${c.v_flat_kms.toFixed(0)} km/s`);set('gpSpeedKmh',`${(Math.round(c.v_flat_kms*3.6)*1000).toLocaleString('en-GB')} km/h`);
       set('gpExtent',`${radii[radii.length-1].toFixed(0)} kpc`);set('gpPoints',`${radii.length} measured speeds`);
       set('gpStars',billions(stars));set('gpGas',billions(gas));
+      const photo=document.getElementById('gpPhoto'),src=DATA.galaxy_images[galaxy.id];
+      photo.hidden=!src;document.getElementById('gpPhotoCredit').hidden=!src;
+      if(src){photo.src=src;photo.alt=`${galaxy.name}, photographed by the Sloan Digital Sky Survey`;}
       document.getElementById('gpStarsBar').style.flexBasis=`${(100*stars/(stars+gas)).toFixed(1)}%`;
       document.getElementById('gpBar').setAttribute('aria-label',`Stars ${Math.round(100*stars/(stars+gas))}% and gas ${Math.round(100*gas/(stars+gas))}% of the visible mass`);
     }
@@ -5492,7 +5538,7 @@ __GALAXIES_JS__
       const x=r=>LEFT+(W-LEFT-RIGHT)*r/rMax,y=v=>H-BOTTOM-(H-TOP-BOTTOM)*v/vMax,f=value=>value.toFixed(1);
       const tickStep=(max,target)=>{const raw=max/target,pow=10**Math.floor(Math.log10(raw));return [1,2,5,10].map(m=>m*pow).find(step=>step>=raw);};
       const ticks=(max,target)=>{const step=tickStep(max,target),out=[];for(let t=0;t<=max;t+=step)out.push(t);return out;};
-      const axis='#96a5ba',white='#f4f7fb',cyan='#5fd0e0',gold='#e9c88a';
+      const axis='#96a5ba',white='#f4f7fb',cyan='#5fd0e0',violet='#c9b8f0',gold='#f2c879';
       let svg=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Rotation curve of ${galaxy.name}: measured speeds stay near ${Math.round(outer.observed_kms)} km/s out to ${Math.round(outer.radius_kpc)} kpc, while the speed expected from visible matter falls to ${Math.round(vBar[n-1])} km/s">`;
       ticks(vMax,4).forEach(v=>{svg+=`<path d="M${LEFT} ${f(y(v))}H${W-RIGHT}" stroke="${axis}" stroke-opacity="${v?0.14:0.5}"/><text x="${LEFT-6}" y="${f(y(v)+4)}" text-anchor="end" fill="${axis}">${v}</text>`;});
       ticks(rMax,5).forEach(r=>{svg+=`<path d="M${f(x(r))} ${H-BOTTOM}v4" stroke="${axis}" stroke-opacity=".5"/><text x="${f(x(r))}" y="${H-BOTTOM+17}" text-anchor="middle" fill="${axis}">${r}</text>`;});
@@ -5501,11 +5547,16 @@ __GALAXIES_JS__
       let from=0;
       rows.forEach((p,i)=>{if(p.observed_kms<=vBar[i])from=Math.min(i+1,n-1);});
       const top=rows.slice(from).map(p=>`${f(x(p.radius_kpc))},${f(y(p.observed_kms))}`),bottom=rows.slice(from).map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[from+i]))}`).reverse();
-      svg+=`<polygon class="pf-gap" points="${top.concat(bottom).join(' ')}" fill="${gold}" fill-opacity=".13"/>`;
+      // The gap is neutral until the Hypotheses step, when it takes the title's violet-to-gold "missing mass" colours.
+      const gap=top.concat(bottom).join(' ');
+      svg+=`<defs><linearGradient id="pfGapGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b39ae8"/><stop offset="1" stop-color="${gold}"/></linearGradient></defs>`;
+      svg+=`<polygon class="pf-gap" points="${gap}" fill="${white}" fill-opacity=".08"/><polygon class="pf-gap-ideas" points="${gap}" fill="url(#pfGapGrad)" fill-opacity=".2"/>`;
       svg+=`<polyline class="pf-pred" points="${rows.map((p,i)=>`${f(x(p.radius_kpc))},${f(y(vBar[i]))}`).join(' ')}" fill="none" stroke="${cyan}" stroke-width="2" stroke-dasharray="5 4"/>`;
       rows.forEach((p,i)=>{svg+=`<g class="pf-pt" style="--i:${i}"><path d="M${f(x(p.radius_kpc))} ${f(y(p.observed_kms-p.error_kms))}V${f(y(p.observed_kms+p.error_kms))}" stroke="${white}" stroke-opacity=".55"/><circle cx="${f(x(p.radius_kpc))}" cy="${f(y(p.observed_kms))}" r="2.4" fill="${white}"/></g>`;});
       const mid=rows[Math.max(from,Math.round(0.7*(n-1)))],midBar=vBar[rows.indexOf(mid)];
-      svg+=`<text class="pf-label pf-l-gap" x="${f(x(mid.radius_kpc))}" y="${f(y((mid.observed_kms+midBar)/2)+4)}" text-anchor="middle" fill="${gold}" font-weight="600">the gap</text>`;
+      const gapX=f(x(mid.radius_kpc)),gapY=y((mid.observed_kms+midBar)/2);
+      svg+=`<text class="pf-label pf-l-gap" x="${gapX}" y="${f(gapY+4)}" text-anchor="middle" fill="${white}" font-weight="600">the gap</text>`;
+      svg+=`<g class="pf-label pf-l-ideas" text-anchor="middle" font-weight="600"><text x="${gapX}" y="${f(gapY-4)}" fill="${violet}">unseen mass?</text><text x="${gapX}" y="${f(gapY+13)}" fill="${gold}">stronger gravity?</text></g>`;
       svg+=`<text class="pf-label pf-l-obs" x="${W-RIGHT}" y="${f(y(outer.observed_kms+outer.error_kms)-9)}" text-anchor="end" fill="${white}">measured</text>`;
       svg+=`<text class="pf-label pf-l-pred" x="${W-RIGHT}" y="${f(y(vBar[n-1])+17)}" text-anchor="end" fill="${cyan}">expected from visible matter</text></svg>`;
       document.getElementById('puzzleChart').innerHTML=svg;
@@ -5959,7 +6010,7 @@ __GALAXIES_JS__
        draws once the Prediction step is being read and the measured points and gap once the Observation step is;
        under the steps (900 px or narrower) both play in turn when it scrolls in. Stages never come closer together
        than PUZZLE_STAGE_GAP_MS, so a fast scroll still shows the prediction before the measurements. */
-    const PUZZLE_STAGES=['s-pred','s-obs'],PUZZLE_STAGE_GAP_MS=800,PUZZLE_READ_LINE=.65;
+    const PUZZLE_STAGES=['s-pred','s-obs','s-ideas'],PUZZLE_STAGE_GAP_MS=800,PUZZLE_READ_LINE=.65;
     const PUZZLE_FIG_BESIDE=matchMedia('(min-width:901px)');
     let puzzleStageWanted=0,puzzleStageShown=0,puzzleStageTimer=0;
     function stagePuzzleFigure(stage){
@@ -5977,6 +6028,8 @@ __GALAXIES_JS__
       const check=()=>{
         if(!PUZZLE_FIG_BESIDE.matches||!home.classList.contains('active'))return;
         const read=steps.filter(li=>li.getBoundingClientRect().top<innerHeight*PUZZLE_READ_LINE).length;
+        steps.forEach((li,i)=>{li.classList.toggle('is-current',i===Math.max(read,1)-1);li.classList.toggle('is-read',i<read-1);});
+        home.querySelector('.puzzle').classList.add('tracking');
         stagePuzzleFigure(Math.max(0,Math.min(PUZZLE_STAGES.length,read-1)));
       };
       const watcher=new IntersectionObserver(check,{rootMargin:`0px 0px -${Math.round((1-PUZZLE_READ_LINE)*100)}% 0px`});
@@ -7641,6 +7694,16 @@ def tuned_count_text(galaxies: list[dict[str, Any]], model: str, fit_key: str) -
     return f"{usual} ({extra})" if extra else str(usual)
 
 
+def galaxy_images() -> dict[str, str]:
+    """Each preset's photo as a data URI, keyed by SPARC id; a preset with no photo is left out."""
+    images = {}
+    for preset in GALAXY_PRESETS:
+        path = GALAXY_IMAGE_DIR / f"{preset.sparc_id}.jpg"
+        if path.is_file():
+            images[preset.sparc_id] = "data:image/jpeg;base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+    return images
+
+
 def main() -> None:
     if not SPARC_PATH.is_file():
         raise FileNotFoundError(f"Missing SPARC table: {SPARC_PATH}")
@@ -7654,6 +7717,7 @@ def main() -> None:
         "upsilon_bulge": UPSILON_BULGE,
         "default_galaxy_id": DEFAULT_PRESET.sparc_id,
         "stable_concentration": list(STABLE_CONCENTRATION),
+        "galaxy_images": galaxy_images(),
         "model_tuned_values": MODEL_TUNED_VALUES,
         "particle_model": {
             "base_count": BASE_STAR_COUNT,

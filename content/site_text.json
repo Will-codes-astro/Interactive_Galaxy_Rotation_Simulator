@@ -16,6 +16,14 @@
   "text": "Simulating the Invisible · Galaxy rotation, dark matter and MOND"
  },
  {
+  "id": "baa31f7cd8",
+  "kind": "attr",
+  "page": "head",
+  "section": "Browser tab and search results",
+  "label": "Search-engine description",
+  "text": "Why do galaxies spin too fast? Test dark matter and MOND against real galaxy rotation curves."
+ },
+ {
   "id": "5044302619",
   "kind": "attr",
   "page": "top bar",
@@ -1343,6 +1351,14 @@
   "label": "Tooltip (shows on hover)",
   "where": "Galaxy menu",
   "text": "Choose which SPARC galaxy to model"
+ },
+ {
+  "id": "ac1c04c359",
+  "kind": "html",
+  "page": "simulator",
+  "section": "Model setup",
+  "label": "Figure caption",
+  "text": "Image: <a href=\"https://www.sdss.org/\" target=\"_blank\" rel=\"noopener\">SDSS</a> (CC BY 4.0)"
  },
  {
   "id": "cb8efc2853",
@@ -4613,6 +4629,14 @@
   "text": "Rubin, V.C., Ford, W.K. and Thonnard, N. (1980) ‘Rotational properties of 21 Sc galaxies with a large range of luminosities and radii, from NGC 4605 (R = 4 kpc) to UGC 2885 (R = 122 kpc)’, <i>The Astrophysical Journal</i>, 238, p. 471. <a href=\"https://doi.org/10.1086/158003\" target=\"_blank\" rel=\"noopener\">doi:10.1086/158003</a>"
  },
  {
+  "id": "042c5c9bc5",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "label": "List item",
+  "text": "Sloan Digital Sky Survey (2026) <i>Image use policy</i>. Galaxy photos on the Simulator's galaxy card are SDSS colour images (CC BY 4.0), cut out with the Legacy Surveys viewer. Available at: <a href=\"https://www.sdss.org/collaboration/image-use-policy/\" target=\"_blank\" rel=\"noopener\">sdss.org/collaboration/image-use-policy</a> (Accessed: 26 November 2026)."
+ },
+ {
   "id": "0b8a0548de",
   "kind": "html",
   "page": "method",
@@ -5592,6 +5616,14 @@
   "text": "${Math.round(c.distance_mpc*LIGHT_YEARS_PER_MPC/1e6)} million light-years"
  },
  {
+  "id": "606d2b55b2",
+  "kind": "js",
+  "page": "messages",
+  "section": "Render galaxy profile",
+  "label": "Message",
+  "text": "${galaxy.name}, photographed by the Sloan Digital Sky Survey"
+ },
+ {
   "id": "53e78ffbef",
   "kind": "js",
   "page": "messages",
@@ -5782,6 +5814,14 @@
   "section": "Draw puzzle figure",
   "label": "Message",
   "text": "<text x=\"${(LEFT+W-RIGHT)/2}\" y=\"${H-4}\" text-anchor=\"middle\" fill=\"${axis}\">Distance from the centre (kpc)</text><text x=\"12\" y=\"${(TOP+H-BOTTOM)/2}\" text-anchor=\"middle\" fill=\"${axis}\" transform=\"rotate(-90 12 ${(TOP+H-BOTTOM)/2})\">Orbital speed (km/s)</text>"
+ },
+ {
+  "id": "e92c768065",
+  "kind": "js",
+  "page": "messages",
+  "section": "Draw puzzle figure",
+  "label": "Message",
+  "text": "<g class=\"pf-label pf-l-ideas\" text-anchor=\"middle\" font-weight=\"600\"><text x=\"${gapX}\" y=\"${f(gapY-4)}\" fill=\"${violet}\">unseen mass?</text><text x=\"${gapX}\" y=\"${f(gapY+13)}\" fill=\"${gold}\">stronger gravity?</text></g>"
  },
  {
   "id": "f471138234",

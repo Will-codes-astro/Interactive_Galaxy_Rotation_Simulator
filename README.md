@@ -96,7 +96,11 @@ the site, add a `GalaxyPreset` to `GALAXY_PRESETS` in the generator and run it a
 ## Deployment
 
 Pushing to `main` runs `.github/workflows/deploy-pages.yml`, which publishes
-only `index.html`, `epq_qr_code.png` and `epq_qr_code.svg` from the repository
-root. Those files must stay in the root. The page loads Plotly and Three.js
+only `index.html`, `epq_qr_code.png`, `epq_qr_code.svg` and `social_card.png`
+from the repository root. Those files must stay in the root. `social_card.png` is
+the picture shown when the link is shared: a 1200 × 630 screenshot of the homepage.
+After a visible change to the homepage, retake it with the site served locally
+(`python -m http.server 8765`) and headless Chrome:
+`chrome --headless=new --hide-scrollbars --force-prefers-reduced-motion --window-size=1200,630 --virtual-time-budget=8000 --screenshot=social_card.png http://localhost:8765/index.html`. The page loads Plotly and Three.js
 from CDNs; if one is blocked or WebGL is off, it shows a note saying so and
 keeps the text pages readable (see `docs/WEBSITE.md`).

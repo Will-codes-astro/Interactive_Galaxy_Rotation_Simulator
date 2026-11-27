@@ -5,7 +5,21 @@ What the live site does, control by control. Code: `generate_interactive_html.py
 in [PHYSICS.md](PHYSICS.md). Keep this file in step with anything visible on the site.
 
 The site is called **Simulating the Invisible** (the EPQ's title; top bar, browser tab and page
-description). It is one file (`index.html`) split into six pages, in this order (Will's choice, 24 Nov: the ideas are explained before they are
+description). Its mark (top bar, browser tab icon, and small under every page title) is a rotation
+curve that rises and stays flat through three measured points (white) while the expected curve
+(cyan, dashed) falls away, drawn violet to gold for the two ideas (a design choice, added 26 Nov
+2026). In the top bar it draws itself on load; under a page title it wipes in when the page opens
+(neither with reduced motion or lite visuals). Shared links show `social_card.png`, a screenshot
+of the homepage (Open Graph tags; see README for retaking it).
+
+**Colour language** (26 Nov 2026, Will's choice): one colour per physical idea everywhere,
+set as CSS tokens in the design-system `:root`: measured data white (`--c-data`), visible matter
+cyan (`--c-visible`), dark matter violet (`--c-dm`, `--c-dm-ink` for text), MOND gold (`--c-mond`,
+`--c-mond-ink`), and orange (`--c-model`) only for the model's total line (the tutorial's "orange
+line") and "at the limit" warnings. MOND was orange in places (the two ideas page, timeline,
+comparison table, a₀ box); it is gold everywhere now. Things that are neither idea (the galaxy
+profile card, the galaxy menu badge, the sandbox's "What you have built" card) are the UI blue,
+not gold. Stars stay warm, as in the 3D view. It is one file (`index.html`) split into six pages, in this order (Will's choice, 24 Nov: the ideas are explained before they are
 tested): the homepage (page id `puzzle`, menu "Home"; its section heading is "Background: from prediction
 to problem"), The two ideas (heading "The two ideas"; page id `background`, menu label "Ideas" on narrow
 screens), Simulator (Model setup and Simulation), Scorecard, Test your knowledge (page id `quiz`, menu "Quiz"; added 26 Nov 2026) and Method & sources. The page order is the
@@ -123,7 +137,13 @@ Beside them a figure (`drawPuzzleFigure`) plots the default galaxy's real SPARC
 speeds against the speed its visible matter predicts, with the gap between them
 shaded. The speeds and the "about 5 times the pull" ratio, (V_obs / V_bar)² at
 the outermost point, are read from the data, not typed in. The shading is a
-visual aid only. The homepage ends with just "Next: the two ideas →" (Will's choice, 24 Nov: the
+visual aid only. While the figure sits beside the steps (901 px and wider), it builds in the
+story's order as each step reaches the reading line: the prediction line (Prediction), then the
+measured points and a neutral white gap labelled "the gap" (Observation), then the gap takes the
+title's violet-to-gold "missing mass" colours and is labelled "unseen mass?" (violet) and
+"stronger gravity?" (gold) (Hypotheses; stage `s-ideas`, added 26 Nov 2026). The step being read
+is lit (its number filled blue) and the others dim; the rail between passed numbers turns blue.
+With reduced motion, lite visuals or the narrow layout the figure shows its final state. The homepage ends with just "Next: the two ideas →" (Will's choice, 24 Nov: the
 tour comes after the theory).
 
 The two ideas ends with a "Now test them" panel (`.tour-cta`). "Take the full guided tour"
@@ -147,7 +167,10 @@ set the star population described under "Test stars" below.
 The Galaxy menu is a custom listbox (`galaxyMenuBtn`, `galaxyMenuList`; arrow
 keys, Home/End, Enter/Space, Escape), so each option shows its Hubble type badge
 and the preset's one-line `summary`. Under it, the galaxy profile card
-(`renderGalaxyProfile`) shows SPARC Table 1's values in plain words: the Hubble
+(`renderGalaxyProfile`) shows a real photo of the galaxy (an SDSS colour image, CC BY 4.0, cut out
+with the Legacy Surveys viewer from `assets/galaxy_images/<sparc id>.jpg` and inlined by the
+generator; credited under it and in Method & sources; a preset with no photo shows the Hubble type
+disc instead) with its Hubble type on a tag, and SPARC Table 1's values in plain words: the Hubble
 type with its family and arms (`HUBBLE_TYPES`), whether there is a central bulge (from SPARC's mass model: any non-zero V_bulge, so NGC 3198 shows none although Sc galaxies often have a small one), distance (also in light-years),
 flat rotation speed (also in km/h), how far out it was measured and how many
 speeds, and a stars-vs-gas bar (stars ≈ 0.5 × L[3.6], gas = 1.33 × M_HI, the

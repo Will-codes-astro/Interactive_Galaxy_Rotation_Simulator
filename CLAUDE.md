@@ -163,7 +163,7 @@ never `index.html` or `galaxies.js`; regenerate with
 `python generate_interactive_html.py` (in `.venv`) and commit the generated
 files with the generator. Pushing to `main` deploys the live site: always
 ask Will first. `.github/workflows/deploy-pages.yml` publishes only root
-`index.html`, `epq_qr_code.png` and `epq_qr_code.svg`; change that contract
+`index.html`, `epq_qr_code.png`, `epq_qr_code.svg` and `social_card.png`; change that contract
 only together with the workflow. Will writes the site's wording in his
 "Simulating the Invisible Text" editor artifact: when he says "sync my site
 text", or a commit changes `content/site_text.json`, run the `site-text`
