@@ -620,7 +620,7 @@ Predict-first cards (25 Nov 2026, so visitors work as investigators: predict, te
 it to restart its clock). The tour's ring goes round the question and its answers together (`#tutorialChoices`).
 The card's controls stay locked until a prediction is chosen; then the done
 message (`tutorialCalled`) begins "You called it:" after the right answer, or, after a wrong one, gives
-the same explanation in orange under "Not quite." and waits for Next instead of moving on by itself
+the same explanation in orange under "Not quite." and waits for Next instead of moving on by itself (after a wrong pick, every ring on that card that finishes fades orange, never green: `body.tutorial-missed`)
 (`completeTutorialAction` applies this to every predict card, whichever check finishes it). Four cards
 use it: "Take the dark matter away" (what the orange line will do with no halo), "MOND's one dial" (what
 a ten-times-smaller a₀ does to it; drag a₀ to within `TOUR_A0_LOW_DEX` of the slider's left end, then

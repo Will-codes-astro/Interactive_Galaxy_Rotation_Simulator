@@ -909,6 +909,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-also.is-handover { animation:tutorial-handover .7s ease forwards; }
     @keyframes tutorial-handover { to { opacity:0; } }
     .tutorial-also.is-leaving .tutorial-tag { background:#a5e3c2; }
+    /* After a wrong prediction nothing on that card turns green: finished parts fade in orange (body.tutorial-missed). */
+    body.tutorial-missed .tutorial-also.is-leaving { animation-name:tutorial-ring-missed; }
+    body.tutorial-missed .tutorial-also.is-leaving .tutorial-tag { background:#ffb36b; }
+    @keyframes tutorial-ring-missed { 0%,54% { opacity:1; border-color:#ffb36b; box-shadow:0 0 12px 3px rgba(255,179,107,.45); } 100% { opacity:0; border-color:#ffb36b; box-shadow:0 0 6px 1px rgba(255,179,107,0); } }
     @keyframes tutorial-ring-done { 0% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 14px 4px rgba(165,227,194,.7); } 54% { opacity:1; border-color:#a5e3c2; box-shadow:0 0 18px 6px rgba(165,227,194,.6); } 100% { opacity:0; border-color:#a5e3c2; box-shadow:0 0 6px 1px rgba(165,227,194,0); } }
     .tutorial-pointer { position:absolute; left:0; top:0; width:25px; height:30px; filter:drop-shadow(0 2px 3px #000); animation:tutorial-gesture 2.8s ease-in-out infinite; will-change:transform; transition:opacity .5s ease; }
     .tutorial-spotlight.is-interacting .tutorial-pointer { opacity:.15; }
@@ -5260,11 +5264,15 @@ __GALAXIES_JS__
       galaxyMenuList.hidden=true;galaxyMenuBtn.setAttribute('aria-expanded','false');
       if(returnFocus)galaxyMenuBtn.focus();
     }
+    // Loading a galaxy re-runs every star's orbit (a fraction of a second), so the menu closes and is drawn first,
+    // then the new galaxy loads: the click answers at once instead of the open list freezing on screen.
     function pickGalaxy(id){
       closeGalaxyMenu(true);
       if(id===activeGalaxy.id)return;
-      selectGalaxy(id);
-      completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo. Its profile is under the menu.');
+      requestAnimationFrame(()=>setTimeout(()=>{
+        selectGalaxy(id);
+        completeTutorialAction('galaxies','New galaxy loaded: its own data, visible matter and starting halo. Its profile is under the menu.');
+      }));
     }
     galaxyMenuBtn.addEventListener('click',()=>{if(galaxyMenuList.hidden)openGalaxyMenu();else closeGalaxyMenu(true);});
     galaxyMenuBtn.addEventListener('keydown',e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();openGalaxyMenu();}});
@@ -7021,9 +7029,22 @@ __GALAXIES_JS__
     const TUTORIAL_POPUPS='#mlExplainer,#tiltExplainer,#starsExplainer,#haloRadiusHelp,#haloScaleHelp,#haloConcentrationHelp,#galaxyMenuList,#viewPanel,#fsSliders';
     const TUTORIAL_RING_GLOW_PX=40; // room kept round a ring for its glow
     const tutorialPopupShown=el=>{if(!el.getClientRects().length)return false;const cs=getComputedStyle(el);return cs.visibility!=='hidden'&&parseFloat(cs.opacity)>0.05;};
+    // The open pop-ups and their boxes, measured once a frame and shared by every ring and the dim layer (searching
+    // the page and reading styles for each ring every frame took most of the tour's time, and made the page lag).
+    const tutorialPopupEls=[];
+    let tutorialPopupFrame=null,tutorialPopupList=[];
+    function tutorialShownPopups(){
+      const frame=document.timeline.currentTime;
+      if(frame!==tutorialPopupFrame){
+        tutorialPopupFrame=frame;
+        if(!tutorialPopupEls.length||tutorialPopupEls.some(el=>!el.isConnected))tutorialPopupEls.splice(0,Infinity,...document.querySelectorAll(TUTORIAL_POPUPS));
+        tutorialPopupList=tutorialPopupEls.filter(tutorialPopupShown).map(pop=>[pop,pop.getBoundingClientRect()]);
+      }
+      return tutorialPopupList;
+    }
     function tutorialPopupRects(el,box){
-      return[...document.querySelectorAll(TUTORIAL_POPUPS)].filter(pop=>!pop.contains(el)&&!el.contains(pop)&&tutorialPopupShown(pop))
-        .map(pop=>pop.getBoundingClientRect()).filter(p=>!(p.left>=box.left-1&&p.right<=box.right+1&&p.top>=box.top-1&&p.bottom<=box.bottom+1));
+      return tutorialShownPopups().filter(([pop])=>!pop.contains(el)&&!el.contains(pop))
+        .map(([,p])=>p).filter(p=>!(p.left>=box.left-1&&p.right<=box.right+1&&p.top>=box.top-1&&p.bottom<=box.bottom+1));
     }
     function clipTutorialRing(ring,el,box){
       const g=TUTORIAL_RING_GLOW_PX,L=box.left-g,T=box.top-g,R=box.right+g,B=box.bottom+g,cover=tutorialCoverBottom(el);
@@ -7170,8 +7191,8 @@ __GALAXIES_JS__
         cutHole(el,{left:r.left-pad,top:r.top-pad,width:r.width+2*pad,height:r.height+2*pad},TUTORIAL_RING_MIN_RADIUS_PX);
       });
       // Open pop-ups stay bright too (the always-open View and slider panels follow the dim like the rest of the page).
-      document.querySelectorAll('#mlExplainer,#tiltExplainer,#starsExplainer,#haloRadiusHelp,#haloScaleHelp,#haloConcentrationHelp,#galaxyMenuList').forEach(pop=>{
-        if(tutorialPopupShown(pop))cutHole(pop,pop.getBoundingClientRect(),parseFloat(getComputedStyle(pop).borderTopLeftRadius)||0);
+      tutorialShownPopups().forEach(([pop,r])=>{
+        if(pop.id!=='viewPanel'&&pop.id!=='fsSliders')cutHole(pop,r,parseFloat(getComputedStyle(pop).borderTopLeftRadius)||0);
       });
       // Whole pixels, so a control shifting a fraction of a pixel does not rebuild the mask (and re-draw the dim) every frame.
       const html=holes.map(([r,k])=>`<rect x="${Math.round(r.left)}" y="${Math.round(r.top)}" width="${Math.round(r.width)}" height="${Math.round(r.height)}" rx="${Math.round(Math.min(k,r.width/2,r.height/2))}"/>`).join('');
@@ -7225,6 +7246,8 @@ __GALAXIES_JS__
       else if(!tutorialReadout.hidden){tutorialReadout.hidden=true;tutorialReadoutKey='';}
       applyTutorialLocks();
       trimTutorialPanels();
+      const missedStep=tutorialCard.hidden?null:tutorialStep();
+      document.body.classList.toggle('tutorial-missed',!!missedStep&&!!missedStep.predict&&tutorialFlags.prediction!=null&&tutorialFlags.prediction!==missedStep.predict.answer);
       // updateTutorialSpotlight re-fits the other rings itself, so they are fitted once a frame, not twice.
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
       else{
