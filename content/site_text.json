@@ -3211,6 +3211,46 @@
   "text": "Calculating the scores…"
  },
  {
+  "id": "16c03eaac4",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Click-to-open heading",
+  "text": "What the small ± numbers mean"
+ },
+ {
+  "id": "bfbd04a5f5",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Paragraph",
+  "text": "Each fitted value is followed by its likely range (1σ): how far it could move and still fit about as well. Point at a range to see its two ends."
+ },
+ {
+  "id": "ef1483b215",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Paragraph",
+  "text": "<b>How it is found:</b> hold the value a little away from its best fit, let every other value refit, and see how much worse χ² gets. The range ends where χ² has risen by 1, the standard rule for one value (Avni 1976)."
+ },
+ {
+  "id": "c3bae75950",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Paragraph",
+  "text": "<b>Poor fits:</b> if a model misses by more than the error bars, the rise used is χ²<sub>r</sub> instead, as if every error bar were bigger. That assumes the model has the right shape, so ranges on red (poor) fits are only a rough guide."
+ },
+ {
+  "id": "b6ebd1b70e",
+  "kind": "html",
+  "page": "scorecard",
+  "section": "Scorecard",
+  "label": "Paragraph",
+  "text": "<b>Limits:</b> a range never goes past a realistic limit, so it can be one-sided. Ending at a limit means the data alone would allow more."
+ },
+ {
   "id": "47dc73c38a",
   "kind": "html",
   "page": "scorecard",
@@ -4469,6 +4509,14 @@
   "text": "Every source cited on this site, in Harvard style. Links open in a new tab."
  },
  {
+  "id": "28f273f2ef",
+  "kind": "html",
+  "page": "method",
+  "section": "Sources",
+  "label": "List item",
+  "text": "Avni, Y. (1976) ‘Energy spectra of X-ray clusters of galaxies’, <i>The Astrophysical Journal</i>, 210, pp. 642–646. <a href=\"https://doi.org/10.1086/154870\" target=\"_blank\" rel=\"noopener\">doi:10.1086/154870</a>"
+ },
+ {
   "id": "cdce4b7e4f",
   "kind": "html",
   "page": "method",
@@ -5712,12 +5760,12 @@
   "text": "Put both halo sliders back to the typical halo for this mass of stars (Moster et al. 2013; Dutton & Macciò 2014)"
  },
  {
-  "id": "5abdf2e78a",
+  "id": "3a971996dd",
   "kind": "js",
   "page": "messages",
   "section": "With range",
   "label": "Message",
-  "text": "its realistic concentration limit for that mass"
+  "text": "its concentration limit for that mass"
  },
  {
   "id": "bd93da74a0",
@@ -5728,28 +5776,28 @@
   "text": "the end of the scale radius slider"
  },
  {
-  "id": "b77b8ccccc",
+  "id": "c9864da79e",
   "kind": "js",
   "page": "messages",
   "section": "With range",
   "label": "Message",
-  "text": " At the ${end==='low'?'lower':'upper'} end the refitted halo sits on ${haloLimit[limit]}, so without that limit the range could reach further."
+  "text": " ${end==='low'?'Lower':'Upper'} end: the halo is held at ${haloLimit[limit]}."
  },
  {
-  "id": "9c62ecd188",
+  "id": "5ee3f97d0b",
   "kind": "js",
   "page": "messages",
   "section": "With range",
   "label": "Message",
-  "text": " This model misses the points by far more than their error bars, so treat this range with caution: widening the error bars to match assumes the model has the right shape."
+  "text": " Poor fit, so only a rough guide."
  },
  {
-  "id": "65504e19bc",
+  "id": "5bec1cd4a5",
   "kind": "js",
   "page": "messages",
   "section": "With range",
   "label": "Message",
-  "text": "Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}${halo}${poor}"
+  "text": "Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}.${stops}${halo}${poor}"
  },
  {
   "id": "761a023275",

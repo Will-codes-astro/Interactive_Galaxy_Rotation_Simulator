@@ -135,7 +135,7 @@ Will's choice (27 Nov 2026): each value a best fit tunes (M₂₀₀, c, a₀, �
 a 1σ range from the **profile χ²**. The value is held at a trial value and every
 other tuned value is refitted; the range is where the refitted χ² has risen by
 Δχ² = max(1, χ²_ν) above the minimum (χ²_ν = χ²_min/(N − k), k as below). Δχ² = 1 is
-the textbook 1σ range for one value; multiplying by χ²_ν is the same as scaling
+the textbook 1σ range for one value (Avni 1976, ApJ 210, 642); multiplying by χ²_ν is the same as scaling
 every error bar by √χ²_ν, the usual correction when a model does not fit to within
 the errors, which otherwise gives misleadingly narrow ranges. A range that reaches
 a realistic limit stops there (`uncertainty_cut`), so it is the range within the
@@ -164,7 +164,8 @@ the range could reach further without that limit.
   page's χ², whose halo is snapped to the slider steps; the snapped value can then
   sit slightly off-centre in its range.
 - **Shown** in the Scorecard's full table as value +up/−down (`withRange`, page
-  JS), with the range, the Δχ² and any limit in the tooltip.
+  JS). The tooltip gives only the range, any limit and the poor-fit note; the method is
+  explained once in the "What the small ± numbers mean" fold under the full table.
 - Assumes Gaussian, independent errors, like χ² itself; D and i are partly
   degenerate, so their ranges are wide and correlated (a range is for one value
   with the others free, not a joint region).

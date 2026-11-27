@@ -1369,6 +1369,7 @@ HTML_TEMPLATE = r"""<!doctype html>
     .score-details { margin-top:16px; }
     .score-details > summary { cursor:pointer; color:var(--accent); font-size:13px; font-weight:500; padding:6px 0; }
     .score-details[open] > summary { margin-bottom:10px; }
+    #rangeFold { margin:12px 0 0; } #rangeFold .fold-body p { margin:0 0 8px; max-width:96ch; color:var(--ink-2); font-size:12.5px; line-height:1.55; }
     .score-notes { margin:14px 0 0; padding:14px 0 0 18px; border-top:1px solid var(--line); color:var(--ink-2); font-size:13px; line-height:1.6; }
     .score-notes li { margin-bottom:6px; max-width:96ch; }
     .score-notes b { color:var(--ink); font-weight:600; }
@@ -2281,6 +2282,12 @@ HTML_TEMPLATE = r"""<!doctype html>
           <tbody id="scoreBody"><tr><td colspan="6">Calculating the scores…</td></tr></tbody>
         </table>
       </div>
+      <details class="fold" id="rangeFold"><summary>What the small ± numbers mean</summary><div class="fold-body">
+        <p>Each fitted value is followed by its likely range (1σ): how far it could move and still fit about as well. Point at a range to see its two ends.</p>
+        <p><b>How it is found:</b> hold the value a little away from its best fit, let every other value refit, and see how much worse χ² gets. The range ends where χ² has risen by 1, the standard rule for one value (Avni 1976).</p>
+        <p><b>Poor fits:</b> if a model misses by more than the error bars, the rise used is χ²<sub>r</sub> instead, as if every error bar were bigger. That assumes the model has the right shape, so ranges on red (poor) fits are only a rough guide.</p>
+        <p><b>Limits:</b> a range never goes past a realistic limit, so it can be one-sided. Ending at a limit means the data alone would allow more.</p>
+      </div></details>
       </details>
       <p class="score-notes-title" id="scoreNotes">Before drawing conclusions</p>
       <ul class="score-notes">
@@ -2519,6 +2526,7 @@ HTML_TEMPLATE = r"""<!doctype html>
       <h3 id="refsTitle">Sources</h3>
       <p class="refs-intro">Every source cited on this site, in Harvard style. Links open in a new tab.</p>
       <ul>
+          <li>Avni, Y. (1976) ‘Energy spectra of X-ray clusters of galaxies’, <i>The Astrophysical Journal</i>, 210, pp. 642–646. <a href="https://doi.org/10.1086/154870" target="_blank" rel="noopener">doi:10.1086/154870</a></li>
           <li>Bertone, G. and Hooper, D. (2018) ‘History of dark matter’, <i>Reviews of Modern Physics</i>, 90(4), 045002. <a href="https://doi.org/10.1103/RevModPhys.90.045002" target="_blank" rel="noopener">doi:10.1103/RevModPhys.90.045002</a></li>
           <li>Clowe, D., Bradač, M., Gonzalez, A.H., Markevitch, M., Randall, S.W., Jones, C. and Zaritsky, D. (2006) ‘A direct empirical proof of the existence of dark matter’, <i>The Astrophysical Journal</i>, 648(2), pp. L109–L113. <a href="https://doi.org/10.1086/508162" target="_blank" rel="noopener">doi:10.1086/508162</a></li>
           <li>de Blok, W.J.G. (2010) ‘The core-cusp problem’, <i>Advances in Astronomy</i>, 2010, 789293. <a href="https://doi.org/10.1155/2010/789293" target="_blank" rel="noopener">doi:10.1155/2010/789293</a></li>
@@ -5508,13 +5516,14 @@ __GALAXIES_JS__
       const up=Math.max(0,range[1]-value)/scale,down=Math.max(0,value-range[0])/scale,larger=Math.max(up,down);
       const d=larger>0?Math.min(4,Math.max(digits,1-Math.floor(Math.log10(larger)))):digits,side=x=>x>0?x.toFixed(d):'0';
       const cut=fit.uncertainty_cut&&fit.uncertainty_cut[key];
-      const stops=cut?` The range stops at the ${cut==='both'?'realistic limits':`${cut==='low'?'lower':'upper'} realistic limit`}.`:'';
+      // The method is explained once, in the "What the small ± numbers mean" fold; the tooltip only says what is special about this value.
+      const stops=cut?` Stops at the ${cut==='both'?'realistic limits':`${cut==='low'?'lower':'upper'} realistic limit`}.`:'';
       // Halo ends set by a limit on mass and concentration together (fit.uncertainty_halo_limit), not by this value's own limits.
-      const haloLimit={concentration_band:'its realistic concentration limit for that mass',scale_radius:'the end of the scale radius slider'};
-      const halo=Object.entries((fit.uncertainty_halo_limit||{})[key]||{}).map(([end,limit])=>` At the ${end==='low'?'lower':'upper'} end the refitted halo sits on ${haloLimit[limit]}, so without that limit the range could reach further.`).join('');
-      // The rise is chi2_r for a poor fit: scaling the error bars up assumes the model's shape is right, which a poor fit puts in doubt.
-      const poor=fit.uncertainty_chi2_rise>=ROUGH_FIT_RED_CHI?' This model misses the points by far more than their error bars, so treat this range with caution: widening the error bars to match assumes the model has the right shape.':'';
-      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}. Holding this value there and refitting the others raises χ² by ${fit.uncertainty_chi2_rise} (1, times χ²ᵣ when the fit is poor).${stops}${halo}${poor}`;
+      const haloLimit={concentration_band:'its concentration limit for that mass',scale_radius:'the end of the scale radius slider'};
+      const halo=Object.entries((fit.uncertainty_halo_limit||{})[key]||{}).map(([end,limit])=>` ${end==='low'?'Lower':'Upper'} end: the halo is held at ${haloLimit[limit]}.`).join('');
+      // For a poor fit the chi-squared rise is chi2_r, which assumes the model's shape is right.
+      const poor=fit.uncertainty_chi2_rise>=ROUGH_FIT_RED_CHI?' Poor fit, so only a rough guide.':'';
+      const title=`Likely range (1σ): ${(range[0]/scale).toFixed(d)} to ${(range[1]/scale).toFixed(d)}.${stops}${halo}${poor}`;
       return `${(value/scale).toFixed(d)}<span class="fit-range" title="${title}">+${side(up)}/−${side(down)}</span>`;
     }
     function fitSettingsHtml(galaxy,fit){
