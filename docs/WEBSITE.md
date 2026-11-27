@@ -617,7 +617,8 @@ what limits the comparison; they do not say which idea wins.
 
 Predict-first cards (25 Nov 2026, so visitors work as investigators: predict, test, explain). A step's
 `predict` gives a question, its options, the right answer's index and an optional `onPick` (the race uses
-it to restart its clock). The card's controls stay locked until a prediction is chosen; then the done
+it to restart its clock). The tour's ring goes round the question and its answers together (`#tutorialChoices`).
+The card's controls stay locked until a prediction is chosen; then the done
 message (`tutorialCalled`) begins "You called it:" after the right answer, or, after a wrong one, gives
 the same explanation in orange under "Not quite." and waits for Next instead of moving on by itself
 (`completeTutorialAction` applies this to every predict card, whichever check finishes it). Four cards
@@ -646,9 +647,10 @@ about 925 words showing on arrival before, 665 after, nothing removed), each car
 "Show more" fold (`.fold`, content in one `.fold-body` so it animates as a whole) before its maths:
 the halo's holds the NFW paragraph and "A known weakness"; MOND's holds the boost paragraph, with the
 a₀ explanation beside the boost table. "Where does a₀ come from?" is a fold-out that works as the a₀ explainer. It opens with one line (a₀ is
-measured, and marks the middle of MOND's change, not its start), then two short cards: why the boost is already ×1.6 at a₀ (a₀ is where the ×1 and ×√(a₀/g_N) rules cross;
-the formula rounds that corner, ×1.3 to ×1.6 depending on the formula) and what a₀ controls (v⁴ = GMa₀). "Find a₀
-yourself" follows: a log-log graph (`#a0Plot`, drawn by `setupA0Explainer`) of the gravity boost the measured
+measured, and marks the middle of MOND's change, not its start), then two short cards: why gravity is already ×1.6 at a₀ (the ×1 and ×√(a₀/g_N) rules agree at a₀ and
+the formula blends them, ×1.3 to ×1.6 depending on the formula; the card ties ×1.6 to the table's +26% speed, √1.6 ≈ 1.26)
+and what a₀ controls (v⁴ = GMa₀, so measured v and M give a₀). "Find a₀
+yourself" follows, introduced by what the dots and both axes mean: a log-log graph (`#a0Plot`, drawn by `setupA0Explainer`) of the gravity boost the measured
 speed needs, V_obs²/V_bar² (×0.6 to ×20), against the visible pull g_N = V_bar²/R in m/s² (10⁻¹²·³ to 10⁻⁸·⁷),
 with every radius of the SPARC presets as fixed dots (SPARC's standard mass-to-light ratios). A slider sets a₀
 (0.1 to 10 × 10⁻¹⁰ m/s², opening at 0.25) and slides the page's own `mondVelocity` curve, the two dashed rules

@@ -895,6 +895,8 @@ HTML_TEMPLATE = r"""<!doctype html>
     .tutorial-try li { margin:2px 0; }
     .tutorial-try .tutorial-more-parts { display:block; margin-top:3px; color:var(--muted); font-size:11px; font-weight:400; }
     .tutorial-try .tutorial-first { display:block; margin-bottom:4px; color:#ffcf7a; }
+    /* The predict question and its answers, ringed together: a little room so the ring and its number clear the text. */
+    #tutorialChoices { margin:2px -6px 0; padding:8px 6px 6px; border-radius:10px; }
     /* The three answers share one row; they only wrap on a very narrow card. */
     .tutorial-choices { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
     .tutorial-choices button { flex:1 1 auto; min-height:34px; padding:6px 8px; border-radius:999px; font-size:12px; white-space:nowrap; }
@@ -1262,6 +1264,10 @@ HTML_TEMPLATE = r"""<!doctype html>
     .chi-wrap { display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; gap:4px 8px; }
     .chi-fit { color:var(--muted); font-size:11.5px; cursor:help; }
     #chiBadge b { margin-right:4px; font:600 11.5px var(--f-ui); letter-spacing:.01em; }
+    /* Room for the longest verdict ('Rough fit') and a χ²ᵣ up to 99.99, so the badge (and the tour's ring on it)
+       keeps one width while a slider changes the fit, instead of twitching with every new number. */
+    #chiVerdict { display:inline-block; min-width:4.5em; }
+    #chiNumbers { display:inline-block; min-width:5.35em; text-align:right; }
     /* Wide screens: a long fit label wraps inside its own space and both figure headings keep one fixed height,
        so the graph never jumps down when the label grows (e.g. "Visible matter only · 0 tuned · about 28 error bars off"). */
     @media (min-width:1200px) {
@@ -2010,13 +2016,13 @@ HTML_TEMPLATE = r"""<!doctype html>
         </div>
         </div></details>
         <details class="maths"><summary>Where does a<sub>0</sub> come from?</summary>
-        <p>a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change, not where the boost starts.</p>
+        <p>a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change from normal gravity to boosted gravity, not where the boost starts.</p>
         <div class="a0-facts">
-          <p><b>Why ×1.6 at a<sub>0</sub>, not ×1?</b> a<sub>0</sub> is where MOND’s two rules cross: ×1 for strong gravity, ×√(a<sub>0</sub> ÷ g<sub>N</sub>) for weak. Gravity rounds that corner smoothly, so the curve passes above both. The ×1.6 comes from how it is rounded, not from a<sub>0</sub>; other formulas give ×1.3 to ×1.6 (Famaey &amp; McGaugh 2012).</p>
-          <p><b>What a<sub>0</sub> controls.</b> How fast the outer stars orbit: v⁴ = G M a<sub>0</sub> (Milgrom 1983). So measured speeds pin a<sub>0</sub> down.</p>
+          <p><b>Why is gravity already boosted at a<sub>0</sub>?</b> MOND has two rules: for strong gravity, leave it alone (×1); for weak gravity, multiply it by √(a<sub>0</sub> ÷ g<sub>N</sub>). The two rules give the same answer at a<sub>0</sub>. MOND’s formula blends them smoothly instead of switching sharply, so at a<sub>0</sub> gravity is 1.6 times Newton’s. That is the +26% speed in the table above (√1.6 ≈ 1.26). Other blending formulas give 1.3 to 1.6 times (Famaey &amp; McGaugh 2012).</p>
+          <p><b>What a<sub>0</sub> controls.</b> Far out, MOND says a galaxy’s speed depends only on its visible mass M and a<sub>0</sub>: v⁴ = G M a<sub>0</sub> (Milgrom 1983). Measure v and M, and you can work out a<sub>0</sub>.</p>
         </div>
         <h4 class="a0-head">Find a<sub>0</sub> yourself</h4>
-        <p>Each dot is a real measurement, so it stays put. Slide a<sub>0</sub> to move MOND’s curve. Where does it fit?</p>
+        <p>Each dot is one point in a real galaxy. Across: how strong its visible matter’s pull is. Up: how many times stronger gravity must be there to match the measured speed. The dots are measurements, so they stay put. Slide a<sub>0</sub> to move MOND’s curve until it runs through them.</p>
         <figure class="a0-graph">
           <svg id="a0Plot" viewBox="0 0 400 250" role="img" aria-label="Log-log graph of the gravity boost real galaxies need against the visible matter’s pull, with MOND’s curve for the chosen a0. The curve runs through the dots only when a0 is close to 1.2 × 10⁻¹⁰ m/s²."></svg>
           <div class="a0-controls"><span class="a0-value" id="a0Value"></span><input type="range" id="a0Slider" min="-11" max="-9" step="0.005" value="-10.6" aria-label="MOND’s a0, from 0.1 to 10 × 10⁻¹⁰ m/s²"><button type="button" class="a0-snap" id="a0Snap">Measured value</button></div>
@@ -6717,7 +6723,8 @@ __GALAXIES_JS__
     // A predict-first question: the step's controls stay locked (and the race paused) until it is answered.
     function tutorialPredictionPrompt(predict){
       const box=document.createElement('div'),q=document.createElement('strong'),row=document.createElement('div');
-      q.textContent=predict.question;row.className='tutorial-choices';row.id='tutorialChoices';
+      // The ring goes round the question and its answers together (box), so it is clear what is being asked.
+      q.textContent=predict.question;row.className='tutorial-choices';box.id='tutorialChoices';
       predict.options.forEach((label,i)=>{const b=document.createElement('button');b.type='button';b.textContent=label;
         b.addEventListener('click',()=>{
           if(predict.onPick)predict.onPick();
@@ -6937,8 +6944,19 @@ __GALAXIES_JS__
     // the tour card's own slider is ringed round its whole panel.
     const tutorialSliderLabel=el=>el.matches('input[type=range]')&&el.id?document.querySelector(`label[for="${el.id}"]`):null;
     const tutorialRingBox=el=>el&&el.closest?el.closest('.tutorial-slider')||el:el;
+    // The collapsed View panel is clipped down to its "View" pill in the corner (see fitViewPill), so its toggle,
+    // whose button still spans the panel's width, is ringed as that pill.
+    function tutorialViewPill(el){
+      const panel=el.id==='viewToggle'&&el.closest('.view-panel.collapsed');
+      if(!panel)return null;
+      const p=panel.getBoundingClientRect(),cs=getComputedStyle(panel);
+      const w=parseFloat(cs.getPropertyValue('--pill-w'))||84,h=parseFloat(cs.getPropertyValue('--pill-h'))||32;
+      return{left:p.right-w,top:p.top,right:p.right,bottom:p.top+h,width:w,height:h};
+    }
     function tutorialBaseRect(target){
       if(tutorialRingBox(target)!==target)return tutorialRingBox(target).getBoundingClientRect();
+      const pill=tutorialViewPill(target);
+      if(pill)return pill;
       let r=target.getBoundingClientRect();
       if(target.tagName==='OUTPUT'&&target.textContent.trim()){const range=document.createRange();range.selectNodeContents(target);r=range.getBoundingClientRect();}
       const label=tutorialSliderLabel(target);
@@ -6985,10 +7003,15 @@ __GALAXIES_JS__
       const pad=4,radius=parseFloat(getComputedStyle(tutorialRingBox(el)).borderTopLeftRadius)||0;
       const fixed=tutorialIsFullscreen()||!!el.closest(TUTORIAL_SCREEN_FIXED),dx=fixed?0:scrollX,dy=fixed?0:scrollY;
       ring.classList.toggle('is-fixed',fixed);
-      ring.style.left=(r.left-pad+dx)+'px';ring.style.top=(r.top-pad+dy)+'px';
-      ring.style.width=(r.width+2*pad)+'px';ring.style.height=(r.height+2*pad)+'px';
+      // Edges snap to whole screen pixels: a ring sitting between pixels re-draws its border and glow slightly
+      // differently whenever the control shifts a fraction, which shows as shimmer while a slider is dragged.
+      const snap=v=>Math.round(v*devicePixelRatio)/devicePixelRatio,L=snap(r.left-pad+dx),T=snap(r.top-pad+dy);
+      const width=snap(r.right+pad+dx)-L,height=snap(r.bottom+pad+dy)-T;
+      if(ring.style.left!==L+'px')ring.style.left=L+'px';if(ring.style.top!==T+'px')ring.style.top=T+'px';
+      if(ring.style.width!==width+'px')ring.style.width=width+'px';if(ring.style.height!==height+'px')ring.style.height=height+'px';
       // Corners follow the control itself, not a box it has opened (a round ? button with its square info box).
-      ring.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,Math.min(radius,el.getBoundingClientRect().height/2)+pad)+'px';
+      const pill=tutorialViewPill(el);
+      ring.style.borderRadius=Math.max(TUTORIAL_RING_MIN_RADIUS_PX,(pill?pill.height/2:Math.min(radius,el.getBoundingClientRect().height/2))+pad)+'px';
       clipTutorialRing(ring,el,{left:r.left-pad,top:r.top-pad,right:r.right+pad,bottom:r.bottom+pad});
       return true;
     }
@@ -7150,7 +7173,8 @@ __GALAXIES_JS__
       document.querySelectorAll('#mlExplainer,#tiltExplainer,#starsExplainer,#haloRadiusHelp,#haloScaleHelp,#haloConcentrationHelp,#galaxyMenuList').forEach(pop=>{
         if(tutorialPopupShown(pop))cutHole(pop,pop.getBoundingClientRect(),parseFloat(getComputedStyle(pop).borderTopLeftRadius)||0);
       });
-      const html=holes.map(([r,k])=>`<rect x="${r.left}" y="${r.top}" width="${r.width}" height="${r.height}" rx="${Math.min(k,r.width/2,r.height/2)}"/>`).join('');
+      // Whole pixels, so a control shifting a fraction of a pixel does not rebuild the mask (and re-draw the dim) every frame.
+      const html=holes.map(([r,k])=>`<rect x="${Math.round(r.left)}" y="${Math.round(r.top)}" width="${Math.round(r.width)}" height="${Math.round(r.height)}" rx="${Math.round(Math.min(k,r.width/2,r.height/2))}"/>`).join('');
       if(html!==tutorialDimLast){tutorialDimLast=html;tutorialDimHoles.innerHTML=html;}
     }
     // Phones in fullscreen: the View panel and the halo slider panel would cover most of the 3D view, so while the tour
@@ -7201,11 +7225,14 @@ __GALAXIES_JS__
       else if(!tutorialReadout.hidden){tutorialReadout.hidden=true;tutorialReadoutKey='';}
       applyTutorialLocks();
       trimTutorialPanels();
-      positionTutorialAlso();
+      // updateTutorialSpotlight re-fits the other rings itself, so they are fitted once a frame, not twice.
       if(!tutorialCard.hidden&&tutorialAimTarget&&rectKey(tutorialSpotRect(tutorialAimTarget))!==tutorialSpotLast)updateTutorialSpotlight();
-      else if(!tutorialSpotlight.hidden&&tutorialAimTarget){
-        const st=tutorialSpotlight.style,fixed=tutorialSpotlight.classList.contains('is-fixed'),left=parseFloat(st.left)-(fixed?0:scrollX),top=parseFloat(st.top)-(fixed?0:scrollY);
-        clipTutorialRing(tutorialSpotlight,tutorialAimTarget,{left,top,right:left+parseFloat(st.width),bottom:top+parseFloat(st.height)});
+      else{
+        positionTutorialAlso();
+        if(!tutorialSpotlight.hidden&&tutorialAimTarget){
+          const st=tutorialSpotlight.style,fixed=tutorialSpotlight.classList.contains('is-fixed'),left=parseFloat(st.left)-(fixed?0:scrollX),top=parseFloat(st.top)-(fixed?0:scrollY);
+          clipTutorialRing(tutorialSpotlight,tutorialAimTarget,{left,top,right:left+parseFloat(st.width),bottom:top+parseFloat(st.height)});
+        }
       }
       updateTutorialDim();
       requestAnimationFrame(trackTutorialSpot);

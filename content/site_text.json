@@ -16,12 +16,12 @@
   "text": "Simulating the Invisible · Galaxy rotation, dark matter and MOND"
  },
  {
-  "id": "baa31f7cd8",
+  "id": "e991eccde2",
   "kind": "attr",
   "page": "head",
   "section": "Browser tab and search results",
   "label": "Search-engine description",
-  "text": "Why do galaxies spin too fast? Test dark matter and MOND against real galaxy rotation curves."
+  "text": "An interactive galaxy rotation simulator testing dark matter and MOND against real SPARC rotation curves."
  },
  {
   "id": "5044302619",
@@ -1108,28 +1108,28 @@
   "text": "Where does a<sub>0</sub> come from?"
  },
  {
-  "id": "432aab8353",
+  "id": "e00a1d94a9",
   "kind": "html",
   "page": "background",
   "section": "What is MOND?",
   "label": "Paragraph",
-  "text": "a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change, not where the boost starts."
+  "text": "a<sub>0</sub> is <b>measured from real galaxies</b>, not predicted. It marks the middle of MOND’s change from normal gravity to boosted gravity, not where the boost starts."
  },
  {
-  "id": "6421c67f1a",
+  "id": "ae39782e71",
   "kind": "html",
   "page": "background",
   "section": "What is MOND?",
   "label": "Paragraph",
-  "text": "<b>Why ×1.6 at a<sub>0</sub>, not ×1?</b> a<sub>0</sub> is where MOND’s two rules cross: ×1 for strong gravity, ×√(a<sub>0</sub> ÷ g<sub>N</sub>) for weak. Gravity rounds that corner smoothly, so the curve passes above both. The ×1.6 comes from how it is rounded, not from a<sub>0</sub>; other formulas give ×1.3 to ×1.6 (Famaey &amp; McGaugh 2012)."
+  "text": "<b>Why is gravity already boosted at a<sub>0</sub>?</b> MOND has two rules: for strong gravity, leave it alone (×1); for weak gravity, multiply it by √(a<sub>0</sub> ÷ g<sub>N</sub>). The two rules give the same answer at a<sub>0</sub>. MOND’s formula blends them smoothly instead of switching sharply, so at a<sub>0</sub> gravity is 1.6 times Newton’s. That is the +26% speed in the table above (√1.6 ≈ 1.26). Other blending formulas give 1.3 to 1.6 times (Famaey &amp; McGaugh 2012)."
  },
  {
-  "id": "44222642a0",
+  "id": "8f46913d1f",
   "kind": "html",
   "page": "background",
   "section": "What is MOND?",
   "label": "Paragraph",
-  "text": "<b>What a<sub>0</sub> controls.</b> How fast the outer stars orbit: v⁴ = G M a<sub>0</sub> (Milgrom 1983). So measured speeds pin a<sub>0</sub> down."
+  "text": "<b>What a<sub>0</sub> controls.</b> Far out, MOND says a galaxy’s speed depends only on its visible mass M and a<sub>0</sub>: v⁴ = G M a<sub>0</sub> (Milgrom 1983). Measure v and M, and you can work out a<sub>0</sub>."
  },
  {
   "id": "d4914b46ee",
@@ -1140,12 +1140,12 @@
   "text": "Find a<sub>0</sub> yourself"
  },
  {
-  "id": "721fd95c51",
+  "id": "2753ca27af",
   "kind": "html",
   "page": "background",
   "section": "Find a0 yourself",
   "label": "Paragraph",
-  "text": "Each dot is a real measurement, so it stays put. Slide a<sub>0</sub> to move MOND’s curve. Where does it fit?"
+  "text": "Each dot is one point in a real galaxy. Across: how strong its visible matter’s pull is. Up: how many times stronger gravity must be there to match the measured speed. The dots are measurements, so they stay put. Slide a<sub>0</sub> to move MOND’s curve until it runs through them."
  },
  {
   "id": "d8db57eb74",
